@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test:smoke": "playwright test"
+    "test:smoke": "playwright test",
+    "contact-sheet": "node scripts/contact-sheet.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^11.0.0-alpha.5",

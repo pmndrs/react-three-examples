@@ -46,7 +46,9 @@ function Soldier() {
   }, [scene])
 
   useEffect(() => {
-    for (const action of Object.values(actions)) action?.play()
+    // Soldier.glb also ships a TPose clip — playing it (even at weight 1 default)
+    // blends the rest pose into everything. Play only the three blendable clips.
+    for (const name of ['Idle', 'Walk', 'Run']) actions[name]?.play()
   }, [actions])
 
   useEffect(() => {

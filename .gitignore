@@ -5,3 +5,4 @@ reference/
 *.local
 test-results/
 playwright-report/
+screenshots/
