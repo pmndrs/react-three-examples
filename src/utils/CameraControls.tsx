@@ -13,9 +13,13 @@ CameraControlsImpl.install({ THREE })
 export interface CameraControlsProps {
   /** Point the camera orbits around. */
   target?: [number, number, number]
+  /** Dolly-in limit (camera-controls `minDistance`). */
+  minDistance?: number
+  /** Dolly-out limit (camera-controls `maxDistance`). */
+  maxDistance?: number
 }
 
-export function CameraControls({ target }: CameraControlsProps) {
+export function CameraControls({ target, minDistance, maxDistance }: CameraControlsProps) {
   const camera = useThree((s) => s.camera)
   const domElement = useThree((s) => s.renderer.domElement)
 
@@ -36,6 +40,11 @@ export function CameraControls({ target }: CameraControlsProps) {
   useEffect(() => {
     if (tx !== undefined) controls.setTarget(tx, ty!, tz!, false)
   }, [controls, tx, ty, tz])
+
+  useEffect(() => {
+    controls.minDistance = minDistance ?? 0
+    controls.maxDistance = maxDistance ?? Infinity
+  }, [controls, minDistance, maxDistance])
 
   useFrame((_, delta) => {
     controls.update(delta)

@@ -83,6 +83,15 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   - fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so passing a
     uniform to TSL math expecting `Node<'float'>` fails strict tsc — cast
     `uFoo as unknown as Node<'float'>` with a comment (upstream fiber typing gap).
+  - TWO dynamism patterns — pick by where the uniform lives: (a) values YOU introduce
+    into the graph → fiber `useUniforms` + the cast above; (b) knobs a three.js pass
+    already exposes as `uniform()`-backed fields (`bloom().strength/.radius` etc.) →
+    return the pass from the mainCB to register it on `passes`, then mutate
+    `pass.foo.value` in an effect. (b) needs no cast and no extra uniform — prefer it
+    when the field exists.
+  - `useRenderPipeline(mainCB, setupCB)`: setupCB is where MRT config goes
+    (`scenePass.setMRT(...)`) — full details in
+    `reference/react-three-fiber/docs/webgpu/render-pipeline.mdx`.
 
 ### Ecosystem + React
 
@@ -180,6 +189,11 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   `.mdx` docs, and the M0/M1 gotcha log. Set the folder-pattern threshold at ~200
   lines (example #1 landed at ~110). Established: titleblock is shell furniture;
   readiness signal rides in DemoHelpers.
+- 2026-07-27 — v0.3 amendments from gate port #3 (`postprocessing-bloom-emissive`,
+  Sonnet, zero human edits, cheaper than #2 — doc steering works): documented the two
+  pipeline-dynamism patterns (fiber useUniforms vs pass-owned uniform fields via
+  return-to-register) and the setupCB/MRT pointer. CameraControls gained
+  `minDistance`/`maxDistance` (gap flagged by the port; forwarded through DemoHelpers).
 - 2026-07-27 — v0.2 amendments from gate port #2 (`skinning-instancing`, Sonnet,
   zero human edits): useRenderPipeline null-guard + uniform-not-closure rules;
   `UniformNode` → `Node<'float'>` cast for the fiber typing gap; smoke-tier

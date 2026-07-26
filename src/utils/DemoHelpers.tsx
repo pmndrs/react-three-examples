@@ -13,9 +13,19 @@ export interface DemoHelpersProps {
   controls?: boolean
   /** Orbit/look-at target. */
   target?: [number, number, number]
+  /** Dolly-in limit, forwarded to CameraControls. */
+  minDistance?: number
+  /** Dolly-out limit, forwarded to CameraControls. */
+  maxDistance?: number
 }
 
-export function DemoHelpers({ grid = true, controls = true, target }: DemoHelpersProps) {
+export function DemoHelpers({
+  grid = true,
+  controls = true,
+  target,
+  minDistance,
+  maxDistance,
+}: DemoHelpersProps) {
   return (
     <>
       {grid && (
@@ -34,7 +44,9 @@ export function DemoHelpers({ grid = true, controls = true, target }: DemoHelper
           fadeStrength={1.5}
         />
       )}
-      {controls && <CameraControls target={target} />}
+      {controls && (
+        <CameraControls target={target} minDistance={minDistance} maxDistance={maxDistance} />
+      )}
       <ReadinessSignal />
     </>
   )

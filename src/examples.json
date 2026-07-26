@@ -17,5 +17,12 @@
     "tags": ["animation", "skinning", "instancing", "gltf", "tsl", "post-processing", "leva"],
     "original": "https://threejs.org/examples/#webgpu_skinning_instancing",
     "credits": "Michelle model from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-bloom-emissive",
+    "title": "Postprocessing / Bloom Emissive",
+    "tags": ["postprocessing", "bloom", "mrt", "tsl", "gltf", "environment", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_bloom_emissive",
+    "credits": "DamagedHelmet model and moonless_golf_1k HDR from the three.js examples (glTF-Sample-Models / Poly Haven)"
   }
 ]
