@@ -1,0 +1,50 @@
+# CI tiers per SPEC §10. This is tier 1 (smoke: renders + non-black canvas).
+# Key facts (research/webgpu-ci-github.md): WebGPU works on free runners via
+# SwiftShader Vulkan, BUT headless Chrome never presents the WebGPU canvas on
+# Linux — tests must run HEADED under Xvfb (playwright.config.ts handles the
+# headless:false + SwiftShader flags when platform is linux).
+# Sharding: add a matrix over --shard=N/M when the corpus outgrows one runner.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm build
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Install SwiftShader Vulkan + Xvfb
+        run: sudo apt-get update && sudo apt-get install -y mesa-vulkan-drivers xvfb
+      - run: npx playwright install chromium --with-deps
+      - name: Smoke suite (headed Chromium under Xvfb)
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" pnpm test:smoke
+        env:
+          CI: 'true'
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-failures
+          path: test-results/
+          retention-days: 7

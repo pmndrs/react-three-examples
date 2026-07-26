@@ -3,3 +3,5 @@ dist/
 reference/
 .DS_Store
 *.local
+test-results/
+playwright-report/
