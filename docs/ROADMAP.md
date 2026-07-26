@@ -7,14 +7,22 @@
 - [x] Pick name: **r3f-examples** (may fold into pmndrs/examples someday)
 - [ ] Create `pmndrs/r3f-examples` repo (Dennis); MIT license; branch protection
 - [x] SPEC v1.0 finalized (2026-07-26)
-- [ ] Acquire resources locally: three.js shallow/sparse (`examples/` + `src/`, pinned),
-      r3f `v10` branch incl. `.mdx` docs, drei `v11`, pmndrs/examples `packages/e2e`
+- [x] Acquire resources locally: three.js sparse (26M, src + example sources, no assets),
+      r3f `v10` branch incl. `.mdx` docs (docs/webgpu, docs/migration), drei (v11 work
+      lives on `master` — no separate branch). TODO: pmndrs/examples `packages/e2e`
       (read the Canvas-monkeypatch Vite plugin)
-- [ ] Scaffold: Vite + react-router + TS strict + Tailwind/shadcn; glob-routed examples
-- [ ] `examples.json` manifest schema; `AGENTS.md` skeleton; `CLAUDE.md` (`@AGENTS.md`)
+- [x] Scaffold: Vite 8 + react-router 7 + TS strict + Tailwind 4; glob-routed examples;
+      fiber pinned to `10.0.0-alpha.2` (NOT canary — canary is broken against three
+      ≥0.183: imports removed `WebGLCubeRenderTarget` from three.webgpu; upstream fix
+      needed), three 0.185.1 + @types/three
+- [x] `examples.json` manifest (minimal — schema hardens in M1)
+- [ ] `AGENTS.md` skeleton; `CLAUDE.md` (`@AGENTS.md`)
 - [ ] ESLint base + custom conventions-plugin scaffold (rules accrete from M1 on)
 
 **Done when:** repo builds, one placeholder route renders on WebGPU locally.
+**GATE MET 2026-07-26**: verified in a real browser — canvas context is `webgpu` (real
+adapter, not WebGL2 fallback), console clean. AGENTS.md + eslint scaffolds folded into M1
+since they're seeded by example #1 anyway.
 
 ## M1 — Golden path (built together, Dennis + Fable)
 - [ ] First example built pair-style → establishes the baseline: `<DemoHelpers>`
