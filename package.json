@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-three/fiber": "^10.0.0-alpha.2",
+    "@react-three/drei": "^11.0.0-alpha.5",
+    "@react-three/fiber": "file:reference/react-three-fiber-10.0.0-alpha.3.tgz",
+    "camera-controls": "^3.1.2",
+    "leva": "^0.10.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^7.18.1",
@@ -18,6 +21,7 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.1.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.185.1",

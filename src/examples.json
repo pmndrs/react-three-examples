@@ -1,5 +1,10 @@
 [
   {
+    "slug": "animation-skinning-blending",
+    "title": "Animation / Skinning / Blending",
+    "tags": ["animation", "skinning", "gltf", "shadows", "leva"]
+  },
+  {
     "slug": "hello-webgpu",
     "title": "Hello WebGPU",
     "tags": ["placeholder", "webgpu"]
