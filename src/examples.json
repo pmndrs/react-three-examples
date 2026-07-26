@@ -2,7 +2,9 @@
   {
     "slug": "animation-skinning-blending",
     "title": "Animation / Skinning / Blending",
-    "tags": ["animation", "skinning", "gltf", "shadows", "leva"]
+    "tags": ["animation", "skinning", "gltf", "shadows", "leva"],
+    "original": "https://threejs.org/examples/#webgl_animation_skinning_blending",
+    "credits": "Soldier model from the three.js examples"
   },
   {
     "slug": "hello-webgpu",

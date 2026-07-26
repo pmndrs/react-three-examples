@@ -1,13 +1,5 @@
 import { NavLink, Outlet } from 'react-router'
-import examples from '../examples.json'
-
-interface Example {
-  slug: string
-  title: string
-  tags: string[]
-}
-
-const exampleList = examples as Example[]
+import { exampleMeta as exampleList } from './manifest'
 
 export function Layout() {
   return (
