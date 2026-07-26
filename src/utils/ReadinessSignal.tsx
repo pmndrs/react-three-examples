@@ -2,6 +2,11 @@
 // Playwright waits on `window.__exampleReady` instead of sleeping: true once all
 // loader activity has settled AND 30 consecutive frames have completed since.
 // Rides inside <DemoHelpers>, so every example emits it with zero wiring.
+//
+// NOTE: reads drei's useProgress store NON-reactively (getState() inside useFrame).
+// Subscribing would re-render this component when a loader starts — and loaders can
+// start synchronously during another component's render, which React flags as
+// "cannot update a component while rendering a different component".
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber/webgpu'
 import { useProgress } from '@react-three/drei/core'
@@ -16,7 +21,6 @@ const SETTLE_FRAMES = 30
 
 export function ReadinessSignal() {
   const settled = useRef(0)
-  const { active } = useProgress()
 
   useEffect(() => {
     window.__exampleReady = false
@@ -26,8 +30,9 @@ export function ReadinessSignal() {
   }, [])
 
   useFrame(() => {
-    if (active) {
+    if (useProgress.getState().active) {
       settled.current = 0
+      window.__exampleReady = false
       return
     }
     if (settled.current < SETTLE_FRAMES) {
