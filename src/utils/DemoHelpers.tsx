@@ -4,6 +4,7 @@
 // original look demands it.
 import { Grid } from '@react-three/drei/webgpu'
 import { CameraControls } from './CameraControls'
+import { ReadinessSignal } from './ReadinessSignal'
 
 export interface DemoHelpersProps {
   /** Infinite ground grid. Default on. */
@@ -34,6 +35,7 @@ export function DemoHelpers({ grid = true, controls = true, target }: DemoHelper
         />
       )}
       {controls && <CameraControls target={target} />}
+      <ReadinessSignal />
     </>
   )
 }
