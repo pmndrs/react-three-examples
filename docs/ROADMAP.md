@@ -38,9 +38,14 @@ since they're seeded by example #1 anyway.
       (2026-07-27 — green locally; first real GH Actions run still pending)
 - [x] Contact-sheet generator (`pnpm contact-sheet` → screenshots/index.html)
       (2026-07-27)
-- [ ] Examples #2–3 ported BY AGENTS (Sonnet/Opus) against the conventions doc — this
-      validates that the doc actually steers agents before we scale it (#2 in flight
-      2026-07-27)
+- [x] Examples #2–3 ported BY AGENTS (Sonnet/Opus) against the conventions doc — this
+      validates that the doc actually steers agents before we scale it
+      (#2 `skinning-instancing` + #3 `postprocessing-bloom-emissive`, both single-Sonnet
+      zero-human-edit ports, 2026-07-27; #3 ran ~35% cheaper against the amended doc —
+      the co-evolution loop measurably works)
+
+**Gate status 2026-07-27**: machine checks + Fable visual review green on both agent
+ports. Remaining for gate: **Dennis sign-off without touching the code.**
 
 **Done when:** an agent-ported example passes lint/build/smoke/screenshot and Dennis
 signs off on it without needing to touch the code.
