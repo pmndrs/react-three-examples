@@ -10,5 +10,12 @@
     "slug": "hello-webgpu",
     "title": "Hello WebGPU",
     "tags": ["placeholder", "webgpu"]
+  },
+  {
+    "slug": "skinning-instancing",
+    "title": "Skinning / Instancing",
+    "tags": ["animation", "skinning", "instancing", "gltf", "tsl", "post-processing", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_skinning_instancing",
+    "credits": "Michelle model from the three.js examples"
   }
 ]

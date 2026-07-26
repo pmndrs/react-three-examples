@@ -74,7 +74,15 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   etc. just work in JSX.
 - Post-processing: v10's `useRenderPipeline` (wraps THREE.PostProcessing). NOT
   `@react-three/postprocessing` (stalled, WebGL-only). Pipeline callbacks don't re-run
-  on HMR — full-reload after editing them.
+  on HMR — full-reload after editing them. Known sharp edges (verified porting
+  `skinning-instancing`):
+  - The callback's `renderPipeline` param is typed nullable — guard with
+    `if (!renderPipeline) return` (the mdx examples omit this; strict mode won't).
+  - Pipeline callbacks don't re-run on React re-render either: any dynamic value
+    (leva control etc.) must flow through a uniform, never a closed-over prop.
+  - fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so passing a
+    uniform to TSL math expecting `Node<'float'>` fails strict tsc — cast
+    `uFoo as unknown as Node<'float'>` with a comment (upstream fiber typing gap).
 
 ### Ecosystem + React
 
@@ -88,6 +96,9 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   intentional, showcased escape hatch (R3F is an AND with three.js, not an OR) — keep
   them visible in the component that owns them, not hidden in helpers.
 - No module-scope mutable state. Controls at the edge; props where they clarify.
+- `useAnimations`: play clips BY NAME, never `Object.values(actions)` — GLTFs ship
+  rest/utility clips (e.g. Soldier.glb's `TPose`) that pollute the blend at default
+  weight 1.
 
 ## Layer 2 — corpus conventions (this repo's format)
 
@@ -143,7 +154,11 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 
 1. `npx tsc --noEmit` && `pnpm lint` && `pnpm build`
 2. Dev server: route renders, console clean, canvas context is `webgpu`
-3. `pnpm test:smoke` (Playwright: readiness signal fires, canvas non-black)
+3. `pnpm test:smoke` (Playwright: readiness signal fires, canvas non-black). Expected
+   transient: the FIRST-ever run of an example with multi-MB hotlinked assets and/or a
+   fresh shader-graph build can blow the readiness timeout once (cold CDN fetch +
+   compile), then pass in ~1s thereafter — one slow first run is not a broken example;
+   two is.
 4. Screenshot for review — collapse the leva panel first (it overlays center-frame
    subjects at small viewports)
 
@@ -165,3 +180,9 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   `.mdx` docs, and the M0/M1 gotcha log. Set the folder-pattern threshold at ~200
   lines (example #1 landed at ~110). Established: titleblock is shell furniture;
   readiness signal rides in DemoHelpers.
+- 2026-07-27 — v0.2 amendments from gate port #2 (`skinning-instancing`, Sonnet,
+  zero human edits): useRenderPipeline null-guard + uniform-not-closure rules;
+  `UniformNode` → `Node<'float'>` cast for the fiber typing gap; smoke-tier
+  cold-start allowance. Play-only-named-clips lesson from the Soldier TPose bug
+  folded into example #1 review: never `Object.values(actions).play()` blindly —
+  GLTFs ship rest/utility clips.

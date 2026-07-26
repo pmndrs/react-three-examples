@@ -25,16 +25,22 @@ adapter, not WebGL2 fallback), console clean. AGENTS.md + eslint scaffolds folde
 since they're seeded by example #1 anyway.
 
 ## M1 — Golden path (built together, Dennis + Fable)
-- [ ] First example built pair-style → establishes the baseline: `<DemoHelpers>`
+- [x] First example built pair-style → establishes the baseline: `<DemoHelpers>`
       (infinite grid, CameraControls, Inspector/perf slot, toggleable), ACES tonemap,
-      header-comment schema, metadata shape
-- [ ] Conventions doc v1 seeded from that example (two-layer structure + changelog)
-- [ ] Render-readiness signal in the shell (three.js `_renderFinished` pattern)
-- [ ] Playwright harness: smoke test + screenshot capture, headed-Chromium-under-Xvfb
-      GitHub Actions workflow, sharding-ready
-- [ ] Contact-sheet generator for batch visual review
+      header-comment schema, metadata shape (2026-07-26; Dennis look-review pending;
+      TPose-blend bug found+fixed by contact sheet 07-27)
+- [x] Conventions doc v1 seeded from that example (AGENTS.md, two layers + changelog;
+      CLAUDE.md slimmed to @AGENTS.md) (2026-07-27)
+- [x] Render-readiness signal (`window.__exampleReady` via ReadinessSignal in
+      DemoHelpers: loaders settled + 30 clean frames) (2026-07-27)
+- [x] Playwright harness: smoke tier live (readiness + webgpu-context + non-black
+      pixel check), ci.yml headed-under-Xvfb + SwiftShader, sharding-ready
+      (2026-07-27 — green locally; first real GH Actions run still pending)
+- [x] Contact-sheet generator (`pnpm contact-sheet` → screenshots/index.html)
+      (2026-07-27)
 - [ ] Examples #2–3 ported BY AGENTS (Sonnet/Opus) against the conventions doc — this
-      validates that the doc actually steers agents before we scale it
+      validates that the doc actually steers agents before we scale it (#2 in flight
+      2026-07-27)
 
 **Done when:** an agent-ported example passes lint/build/smoke/screenshot and Dennis
 signs off on it without needing to touch the code.
