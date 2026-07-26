@@ -23,11 +23,14 @@ export function DemoHelpers({ grid = true, controls = true, target }: DemoHelper
           infiniteGrid
           cellSize={0.5}
           sectionSize={2.5}
-          cellThickness={0.6}
-          sectionThickness={1.2}
+          // Sub-pixel thin lines shimmer worst under WGSL's coarse fwidth derivatives
+          // (drei Grid TSL port; upstream) — keep thickness ≥1 and fade before moiré range.
+          cellThickness={1}
+          sectionThickness={1.4}
           cellColor="#7a7a7a"
           sectionColor="#5f5f5f"
-          fadeDistance={40}
+          fadeDistance={28}
+          fadeStrength={1.5}
         />
       )}
       {controls && <CameraControls target={target} />}
