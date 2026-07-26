@@ -24,10 +24,12 @@ for (const { slug } of examples) {
 
     await page.goto(`/examples/${slug}`)
 
-    // Readiness = loaders settled + 30 clean frames (window.__exampleReady, set by
-    // <ReadinessSignal> inside DemoHelpers). Poll instead of sleeping.
+    // Readiness = loaders settled + clean frames (window.__exampleReady, set by
+    // <ReadinessSignal> inside DemoHelpers). Poll instead of sleeping. CI gets a
+    // bigger budget: SwiftShader renders heavy examples at ~1 fps, so settle frames
+    // cost real wall-clock there (verified: 30 instances + blur blew 60s twice).
     await page.waitForFunction(() => window.__exampleReady === true, undefined, {
-      timeout: 60_000,
+      timeout: process.env.CI ? 180_000 : 60_000,
     })
 
     // Real webgpu context, not a WebGL2 fallback: getContext returns the existing

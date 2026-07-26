@@ -17,7 +17,9 @@ declare global {
   }
 }
 
-const SETTLE_FRAMES = 30
+// Kept low: on CI's SwiftShader (software raster) heavy examples run at ~1 fps,
+// so every settle frame costs real wall-clock against the smoke timeout.
+const SETTLE_FRAMES = 12
 
 export function ReadinessSignal() {
   const settled = useRef(0)

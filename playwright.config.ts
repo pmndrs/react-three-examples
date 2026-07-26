@@ -21,7 +21,7 @@ const WEBGPU_ARGS = [
 
 export default defineConfig({
   testDir: 'tests',
-  timeout: 90_000,
+  timeout: process.env.CI ? 300_000 : 90_000,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
   use: {
