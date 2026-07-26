@@ -70,6 +70,28 @@ signs off on it without needing to touch the code.
 
 **Done when:** public URL live, announcement out.
 
+## Agent economics (how model budget gets spent — keep it boring)
+
+Principle: **the cheapest verifier wins.** Machines (tsc/lint/build/Playwright
+screenshots) verify; models port and review. Escalate model capability only when the
+tier below demonstrably fails, and record the escalation.
+
+- **M1 (now)**: pair-style inline work (Fable in the IDE), no orchestration. Subagents
+  only for one-off research/scouting. The gate ports (#2–3) are ONE Sonnet agent each,
+  steered by the conventions doc alone — if a port fails, fix the doc, not the port;
+  that's the product being tested.
+- **M2 (batch of 77)**: Workflow waves of ~10 ports, one Sonnet agent per port +
+  machine checks. No per-port model review — Fable reviews the contact sheet and
+  divergence flags only. Between waves, fold repeated review notes into AGENTS.md/lint
+  rules so each wave is cheaper than the last. No wave 2 until wave 1's lessons land.
+- **M3 (TSL/compute)**: same pipeline; only examples flagged thin-training-data
+  (TSL, compute, MRT) get an added Opus/Fable review pass. Porter stays Sonnet-first;
+  escalate a specific example only after 2 failed attempts.
+- **Standing rules**: never buy a second model pass where a lint rule or screenshot
+  diff catches the same class of error; each batch PR notes agents run/retries/
+  escalations so cost drift is visible; adversarial multi-agent review is reserved for
+  the launch pass (M4), not routine ports.
+
 ## Post-launch (standing)
 - Monthly: re-diff three.js `files.json` → port new webgpu examples; three version bump PR
 - Drei gap-closure watch: when drei ships a stubbed component, migrate examples, retire util
