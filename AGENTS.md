@@ -173,6 +173,11 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 
 ### Environment gotchas (do not rediscover)
 
+Every patch/override/pin this repo carries is ledgered in
+[docs/UPSTREAM.md](docs/UPSTREAM.md) (Part A: what + unwind condition; Part B:
+agent-ready upstream fix briefs for fiber/drei). **House rule: any new patch, pin, or
+override lands with an UPSTREAM.md entry in the same commit.** Highlights:
+
 - fiber `.` vs `./webgpu` are two separate builds of the same runtime — the regex alias
   in [vite.config.ts](vite.config.ts) forces one; keep it until fiber fixes packaging.
 - drei alpha.5 is patched via `pnpm patch` for three ≥0.183's `WebGLCubeRenderTarget` →
