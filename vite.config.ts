@@ -17,4 +17,10 @@ export default defineConfig({
   resolve: {
     alias: [{ find: /^@react-three\/fiber(\/webgpu)?$/, replacement: fiberWebgpu }],
   },
+  // Vite's dep scanner crawls every *.html in the project by default — including the
+  // gitignored three.js clone in reference/, whose example pages import packages we
+  // don't have. Scope the scan to our real entry.
+  optimizeDeps: {
+    entries: ['index.html'],
+  },
 })
