@@ -1,6 +1,11 @@
 node_modules/
 dist/
-reference/
+# reference/* (not reference/) so the tarball exception below can apply —
+# git cannot re-include files inside a directory-level ignore.
+reference/*
+# TEMP (docs/UPSTREAM.md #1): CI needs the locally-built fiber tarball until a
+# published v10 alpha exists on npm; drop the exception when swapping to it.
+!reference/react-three-fiber-10.0.0-alpha.3.tgz
 .DS_Store
 *.local
 test-results/
