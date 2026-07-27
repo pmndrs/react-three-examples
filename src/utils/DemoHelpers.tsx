@@ -20,6 +20,9 @@ export interface DemoHelpersProps {
   /** Polar (vertical orbit) limits in radians, forwarded to CameraControls. */
   minPolarAngle?: number
   maxPolarAngle?: number
+  /** Orthographic zoom limits (OrbitControls' minZoom/maxZoom), forwarded. */
+  minZoom?: number
+  maxZoom?: number
   /** Allow panning; false = orbit/dolly only. Forwarded to CameraControls. */
   pan?: boolean
   /** Continuous auto-orbit. Forwarded to CameraControls. */
@@ -45,6 +48,8 @@ export function DemoHelpers({
   maxDistance,
   minPolarAngle,
   maxPolarAngle,
+  minZoom,
+  maxZoom,
   pan,
   autoRotate,
   autoRotateSpeed,
@@ -75,6 +80,8 @@ export function DemoHelpers({
           maxDistance={maxDistance}
           minPolarAngle={minPolarAngle}
           maxPolarAngle={maxPolarAngle}
+          minZoom={minZoom}
+          maxZoom={maxZoom}
           pan={pan}
           autoRotate={autoRotate}
           autoRotateSpeed={autoRotateSpeed}

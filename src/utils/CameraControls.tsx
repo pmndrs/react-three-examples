@@ -21,6 +21,12 @@ export interface CameraControlsProps {
    * ground plane like OrbitControls' maxPolarAngle. */
   minPolarAngle?: number
   maxPolarAngle?: number
+  /** Orthographic zoom limits (camera-controls maps wheel dolly to `camera.zoom`
+   * for ortho cameras) — OrbitControls' minZoom/maxZoom. Added after two ortho
+   * ports (materials-displacementmap, postprocessing-pixel) needed the
+   * controlsRef hatch for exactly this. */
+  minZoom?: number
+  maxZoom?: number
   /** Allow panning/trucking. Default true; false = orbit/dolly only (common in
    * skybox/panorama-style originals that lock the viewpoint). */
   pan?: boolean
@@ -41,6 +47,8 @@ export function CameraControls({
   maxDistance,
   minPolarAngle,
   maxPolarAngle,
+  minZoom,
+  maxZoom,
   pan = true,
   autoRotate = false,
   autoRotateSpeed = 2,
@@ -74,7 +82,9 @@ export function CameraControls({
     controls.maxDistance = maxDistance ?? Infinity
     controls.minPolarAngle = minPolarAngle ?? 0
     controls.maxPolarAngle = maxPolarAngle ?? Math.PI
-  }, [controls, minDistance, maxDistance, minPolarAngle, maxPolarAngle])
+    controls.minZoom = minZoom ?? 0.01
+    controls.maxZoom = maxZoom ?? Infinity
+  }, [controls, minDistance, maxDistance, minPolarAngle, maxPolarAngle, minZoom, maxZoom])
 
   // camera-controls has no enablePan boolean — panning is the TRUCK action on the
   // right button / multi-touch gestures, so locking = remapping those actions.

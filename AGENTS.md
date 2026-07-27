@@ -177,6 +177,12 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   - `useRenderPipeline(mainCB, setupCB)`: setupCB is where MRT config goes
     (`scenePass.setMRT(...)`) — full details in
     `reference/react-three-fiber/docs/webgpu/render-pipeline.mdx`.
+  - fiber's Canvas defaults to MSAA 4x and every `pass()` target inherits
+    `renderer.samples` — TRAA (and any pass that copies depth textures) requires
+    single-sampled targets: `passes.scenePass.options.samples = 0` and
+    `pass(scene, camera, { samples: 0 })`, or WebGPU rejects the copy with a
+    sample-count validation error at runtime (caught by the smoke console
+    assertion; pattern: `postprocessing-ao`, matching upstream's own TRAA path).
 
 ### Ecosystem + React
 
@@ -311,6 +317,14 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.11 amendments from wave-7 pair 2 (postprocessing-pixel +
+  postprocessing-ao): TRAA/depth-copy passes need `samples: 0` targets (fiber's
+  MSAA-4x default propagates into pass() — real WebGPU validation error, found and
+  fixed by the AO port); CameraControls/DemoHelpers gained `minZoom`/`maxZoom`
+  (second ortho port to need the cap via controlsRef — pixel port retrofitted onto
+  the prop). Also of note: `camera={{ manual: true }}` hands the frustum to the
+  example (fiber's updateCamera early-returns) — used by pixel's per-frame
+  frustum-snap.
 - 2026-07-27 — v0.10 amendments from wave-7 pair 1 (postprocessing +
   postprocessing-dof, both zero-review-fix — postprocessing cluster opens): the
   pipeline dynamism patterns grew from two to THREE — (c) const-wrapping pass

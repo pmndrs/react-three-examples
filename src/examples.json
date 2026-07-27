@@ -347,5 +347,19 @@
     "tags": ["postprocessing", "depth-of-field", "tsl", "instancing", "cubemap", "leva"],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_dof",
     "credits": "SwedishRoyalCastle cube map from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-pixel",
+    "title": "Postprocessing / Pixelation",
+    "tags": ["postprocessing", "pixelation", "tsl", "orthographic", "shadows", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_pixel",
+    "credits": "Pixelation pass with single-pixel outlines by Kody King; checker texture from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-ao",
+    "title": "Postprocessing / Ambient Occlusion",
+    "tags": ["postprocessing", "ao", "gtao", "traa", "mrt", "tsl", "gltf", "environment", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_ao",
+    "credits": "Tennyson bust from Three D Scans, via the three.js examples"
   }
 ]
