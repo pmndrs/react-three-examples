@@ -542,5 +542,20 @@
     "tags": ["compute", "tsl", "particles", "collision", "render-target", "layers", "postprocessing", "leva"],
     "original": "https://threejs.org/examples/#webgpu_compute_particles_snow",
     "credits": "TeapotGeometry and GaussianBlurNode addons from the three.js examples"
+  },
+  {
+    "slug": "materials-transmission",
+    "title": "Materials / Transmission",
+    "tags": ["materials", "transmission", "physical", "environment", "hdr", "canvas-texture", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_transmission",
+    "credits": "San Giuseppe Bridge HDR from the three.js examples (Poly Haven)",
+    "static": true
+  },
+  {
+    "slug": "materials-alphahash",
+    "title": "Materials / Alpha Hash",
+    "tags": ["materials", "instancing", "postprocessing", "pmrem", "environment", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_alphahash",
+    "static": true
   }
 ]

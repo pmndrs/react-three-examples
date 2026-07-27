@@ -190,11 +190,15 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
     (`scenePass.setMRT(...)`) — full details in
     `reference/react-three-fiber/docs/webgpu/render-pipeline.mdx`.
   - fiber's Canvas defaults to MSAA 4x and every `pass()` target inherits
-    `renderer.samples` — TRAA (and any pass that copies depth textures) requires
-    single-sampled targets: `passes.scenePass.options.samples = 0` and
-    `pass(scene, camera, { samples: 0 })`, or WebGPU rejects the copy with a
-    sample-count validation error at runtime (caught by the smoke console
-    assertion; pattern: `postprocessing-ao`, matching upstream's own TRAA path).
+    `renderer.samples` — TRAA, `ssaaPass`, and any pass that copies depth
+    textures require single-sampled targets: `passes.scenePass.options.samples
+    = 0`, `pass(scene, camera, { samples: 0 })`, or `ssaa.options.samples = 0`,
+    or WebGPU rejects the copy with a sample-count validation error at runtime
+    (caught by the smoke console assertion; patterns: `postprocessing-ao`,
+    `materials-alphahash`). Don't reason from `updateBefore` overrides — the
+    inheritance happens elsewhere; if the pass copies depth, set samples 0.
+    (`PassNode.options` is undeclared in @types/three — B11-family structural
+    cast on raw addon passes; fiber's own `scenePass` type carries it.)
 
 ### Ecosystem + React
 
@@ -372,6 +376,15 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.21 from wave-10 pair 2 (materials-transmission +
+  materials-alphahash, both zero-review-fix, both static-by-design, both ran
+  the animates tier as step 0 on first use): samples:0 bullet extended with
+  ssaaPass + the don't-reason-from-updateBefore warning + PassNode.options
+  typing note (alphahash initially mis-reasoned and self-corrected).
+  Third-occurrence confirmation: ALL MeshPhysicalMaterial scalar/color fields
+  are reference-node-backed in the node pipeline (sheen, clearcoat,
+  transmission each verified subsets) — leva → plain JSX material props with
+  zero plumbing is the default for physical-material studies.
 - 2026-07-27 — v0.20: **the animates tier ships** (tests/animates.spec.ts,
   `pnpm test:animates`) — the pixel-diff assertion queued since v0.12, made
   urgent by rain's finding that consoles stay clean while frozen. Two-frame
