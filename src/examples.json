@@ -251,5 +251,19 @@
     "title": "Camera Array",
     "tags": ["camera", "arraycamera", "shadows", "node-material", "leva"],
     "original": "https://threejs.org/examples/#webgpu_camera_array"
+  },
+  {
+    "slug": "loader-gltf-iridescence",
+    "title": "Loader / glTF Iridescence",
+    "tags": ["gltf", "loader", "iridescence", "environment", "hdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_loader_gltf_iridescence",
+    "credits": "Iridescence Lamp (KHR_materials_iridescence sample) from glTF-Sample-Models; Venice Sunset HDR from HDRI Haven, via the three.js examples"
+  },
+  {
+    "slug": "loader-gltf-sheen",
+    "title": "Loader / glTF Sheen",
+    "tags": ["gltf", "loader", "sheen", "environment", "hdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_loader_gltf_sheen",
+    "credits": "Sheen Chair (KHR_materials_sheen sample) from glTF-Sample-Models"
   }
 ]
