@@ -630,5 +630,20 @@
     "tags": ["layers", "instancing", "tsl", "node-material", "sprites", "leva"],
     "original": "https://threejs.org/examples/#webgpu_layers",
     "credits": "blossom.png sprite from the three.js examples"
+  },
+  {
+    "slug": "pmrem-equirectangular",
+    "title": "PMREM / Equirectangular",
+    "tags": ["pmrem", "environment", "envmap", "tsl", "node-material", "ultrahdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_pmrem_equirectangular",
+    "credits": "Royal Esplanade UltraHDR environment from the three.js examples (Poly Haven)",
+    "static": true
+  },
+  {
+    "slug": "reflection-blurred",
+    "title": "Reflection / Blurred",
+    "tags": ["tsl", "reflection", "reflector", "hash-blur", "depth", "node-material", "gltf", "animation", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_reflection_blurred",
+    "credits": "Michelle model and uv_grid texture from the three.js examples; hash blur after shadertoy 4lXXWn; circle effect after shadertoy 3tdSRn"
   }
 ]

@@ -1,4 +1,25 @@
-# Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
+# Session Handoff — 2026-07-27/28 (overnight, continued: repo live + M2 waves 1–2)
+
+## Wave 11 (into the early hours of 07-28)
+
+8 ports, 4 pairs. **89 examples total, 89/89 smoke + contact sheet + animates
+green on Metal. FIFTH consecutive zero-review-fix wave** (one retrofit landed
+alongside: skinning-instancing now plays SambaDance by name).
+
+| Example | Notes | Cost |
+|---|---|---|
+| postprocessing-godrays | raymarch vs cube shadow map; samples:0 extended to arbitrary-UV depth sampling | 118k |
+| postprocessing-motion-blur | first setupCB MRT on main pass; third cold-start signature isolated (falsified own hypothesis) | 124k |
+| mesh-batch | 20k BatchedMesh + radix custom sort; remount-over-dispose | 114k |
+| skinning-points | compute kernel AS positionNode; **found B21** (fiber module augmentation shadows @types Fn); .mix landmine | 161k |
+| occlusion | WebGPU occlusion queries; state flip captured live; occlusionTest DT gap flagged | 91k |
+| layers | blossom storms on camera layers; first consumer of the fresh .mix rule | 114k |
+| pmrem-equirectangular | pmremTexture live level uniform; **B13 sharpened** (UltraHDRLoader works via useLoader) | 101k |
+| reflection-blurred | depth-masked hashBlur reflector; @types-newer-than-runtime drift found; reflection retrofit candidate | 131k |
+
+Cumulative: **95 agent ports across 11 waves + 2 gate ports, zero manifest
+clobbers across 48+ concurrent pair-registrations.** AGENTS.md v0.21→v0.24;
+UPSTREAM briefs at B21.
 
 ## Wave 10 (same night) — and the animates tier
 

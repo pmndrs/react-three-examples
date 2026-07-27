@@ -178,6 +178,9 @@ commit** (AGENTS.md points agents at this file).
   that family will hit this too.
 - **Suggested fix**: extension-sniff `.hdr.jpg`/`.jpg` (UltraHDR) in Environment's
   loader selection, or accept a `loader` prop override.
+- **Sharpened (wave 11)**: `useLoader(UltraHDRLoader, url)` works cleanly on
+  `/webgpu` (`pmrem-equirectangular` uses the original UltraHDR asset directly) —
+  the gap is strictly Environment's loader selection, not the loader or renderer.
 
 ### B14 · @types/three: TSL `Loop()` typed surface lags the runtime
 

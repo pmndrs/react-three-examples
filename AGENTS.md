@@ -383,9 +383,23 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
   `node_modules/three/examples/jsm/`. CHECK node_modules before importing; if missing,
   inline the addon's code into the example with attribution (pattern:
   `backdrop-water/voronoiNoise.ts`) — never import from the gitignored clone.
+- The mirror-image trap: installed @types/three can be NEWER than the npm runtime
+  for jsm addons — `hashBlur`'s typed options (`{ size, mask, ... }`) track a newer
+  three than 0.185.1's runtime signature (`{ repeats, ... }`). When an addon's typed
+  surface rejects the ORIGINAL's exact arguments, check the npm runtime source, not
+  just @types; cast with a comment (`as Parameters<typeof fn>[n]`) if the runtime is
+  right (pattern: `reflection-blurred`).
 
 ## Changelog
 
+- 2026-07-28 — v0.24 from wave-11 pair 4 (pmrem-equirectangular +
+  reflection-blurred, both zero-review-fix — wave 11 closes at 89 examples,
+  the whole wave zero-fix): B13 sharpened (UltraHDRLoader works via useLoader
+  on /webgpu — the gap is strictly drei Environment's loader selection);
+  new mirror-image trap bullet (@types newer than npm runtime for jsm addons —
+  hashBlur options drift); retrofit candidate logged: reflection's
+  resolutionScale-needs-recreation rationale is outdated for r185 (it's
+  live-mutable, verified in source by the blurred cousin).
 - 2026-07-27 — v0.23 from wave-11 pair 2 (mesh-batch + skinning-points, both
   zero-review-fix): UPSTREAM B21 (fiber's three/tsl module augmentation SHADOWS
   @types' Fn overloads — new mechanism, statement-form `Fn(fn,'void')` fails
