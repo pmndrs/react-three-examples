@@ -6,8 +6,9 @@ every upstream bug we've verified. Two audiences:
 - **Part A** — Dennis / maintainers of THIS repo: what we're carrying, why, and the
   exact condition under which each item unwinds. Nothing gets added to the repo's
   patch surface without an entry here.
-- **Part B** — agents working IN the react-three-fiber / drei repos: self-contained
-  fix briefs with evidence and suggested fixes. Each is independently actionable.
+- **Part B** — agents working in the react-three-fiber / drei / three.js /
+  @types/three repos: self-contained fix briefs with evidence and suggested fixes.
+  Each is independently actionable.
 
 Last verified: 2026-07-27 against fiber `v10` branch HEAD (`dc6bbd7`, up to date with
 origin), drei `11.0.0-alpha.5`, three `0.185.1`.
@@ -133,6 +134,17 @@ commit** (AGENTS.md points agents at this file).
   eight casts). Same cast family as fiber's B1, but this one is three's typings.
 - **Suggested fix**: let `Fn`'s type accept a tuple of node-typed params (generic
   parameter per arg, or a `Fn<[Node<'float'>, Node<'vec3'>]>` signature).
+
+### B11 · @types/three: `Scene.fogNode` missing
+
+- **What**: `Scene.fogNode` is a real webgpu runtime property (read by
+  `renderers/common/nodes/NodeManager.js` and `NodeMaterial`) — the TSL replacement
+  for legacy `Fog`/`FogExp2` — but `@types/three` doesn't declare it.
+- **Evidence**: hit porting `webgpu_sprites` (scene-level `fog(color, rangeFogFactor)`).
+- **Local workaround**: `(scene as unknown as { fogNode: Node | null }).fogNode = …`
+  with a comment (src/examples/sprites.tsx).
+- **Suggested fix**: add `fogNode: Node | null` to the `Scene` declaration in
+  @types/three (or three's own types if that's where Scene now lives).
 
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 

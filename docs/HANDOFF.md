@@ -1,93 +1,73 @@
-# Session Handoff — 2026-07-27 (overnight autonomous session)
+# Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 dry-run wave)
 
-Read AGENTS.md first (conventions + stack pins + gotchas — now the source of truth),
-then this for where-we-are. SPEC/ROADMAP unchanged in substance; ROADMAP M1 checklist
-is current.
+Read AGENTS.md first (v0.4 — conventions + stack pins + gotchas), then
+[UPSTREAM.md](UPSTREAM.md) (the patch/override ledger + upstream fix briefs Dennis
+asked for), then this.
 
-## Where we are: M1 is functionally COMPLETE, pending Dennis sign-off
+## Where we are
 
-All M1 infrastructure landed this session, and both gate ports ran clean:
+**M1 complete** (Dennis signed off on grid/leva/titleblock look; both gate ports
+reviewed). **M2 is well underway**: repo live at
+github.com/pmndrs/react-three-examples, CI green, and the 5-port dry-run wave is
+merged. **9 examples total**, all green locally (tsc/lint/build/smoke 9/9).
 
-- **AGENTS.md v0.3** — two-layer conventions doc + changelog; CLAUDE.md is now a thin
-  `@AGENTS.md` import. Amended twice from real gate-port feedback (the co-evolution
-  loop is running and measurably works: port #3 cost ~35% less than #2 against the
-  amended doc).
-- **Conventions lint** — flat ESLint config: tseslint + react-hooks +
-  `@react-three/eslint-plugin` (npm alpha) + local `corpus` plugin
-  (eslint-rules/require-header-block.js, negative-tested); fiber/drei entry-point
-  import bans via no-restricted-imports. NOTE: `typescript` pinned ^6 — tseslint has
-  no TS7 support yet (typescript-eslint#10940).
-- **Readiness signal** — `window.__exampleReady` (ReadinessSignal inside DemoHelpers:
-  loaders settled + 30 clean frames).
-- **Playwright smoke tier** — per-manifest test: readiness + real-webgpu-context +
-  non-black-pixel + console-error capture. 4/4 green locally (~6s). macOS headless
-  new-headless Chromium does WebGPU on Metal fine; `.github/workflows/ci.yml` does
-  headed-under-Xvfb + SwiftShader for Linux per research. **CI has never actually run
-  — no git remote exists yet** (repo creation is Dennis's M0 item).
-- **Contact sheet** — `pnpm contact-sheet` → screenshots/index.html (leva hidden,
-  +800ms past readiness so animations clear the rest pose).
-- **Gate ports #2 and #3** — `skinning-instancing` and `postprocessing-bloom-emissive`,
-  each a single Sonnet agent steered ONLY by AGENTS.md, zero human code edits, all
-  machine checks + Fable visual review green (instanced dancers with depth blur;
-  selective MRT bloom on the helmet's emissive circuitry only).
+### The M2 dry-run wave (all single-Sonnet agents, AGENTS.md-steered)
 
-Also this session: dev server restored (Vite dep-scan scoping + pnpm adoption +
-durable `pnpm patch` for drei), Titleblock shell overlay, grid anti-shimmer tuning,
-and a real bug in example #1 caught BY the contact sheet on its first run (Soldier
-TPose clip was blending into the walk at weight 1 — arms-out zombie gait; now plays
-Idle/Walk/Run by name; AGENTS.md rule added).
+| # | Example | Notes | Agent cost |
+|---|---------|-------|-----------|
+| gate#2 | skinning-instancing | instancing + TSL range + blur pipeline | 146k tok |
+| gate#3 | postprocessing-bloom-emissive | MRT selective bloom | 93k |
+| 1 | sky | SkyMesh + CubeCamera; slug-rule violation (fixed + doc reworded) | 111k |
+| 2 | rtt | pipeline subsumes manual RTT; cleanest port | 78k |
+| 3 | shadow-contact | first folder-pattern; `before:'render'` capture pass | 181k |
+| 4 | tsl-halftone | deepest TSL; found the WGSL-identifier trap | 201k |
+| 5 | sprites | SpriteNodeMaterial + userData node + scene.fogNode | 128k |
 
-## Awaiting Dennis (M1 gate closes on this)
+Review cost stayed cheap: every port needed at most a slug rename / one-prop
+consistency fix. Cost tracks example difficulty, not doc decay — simple ports got
+cheaper as AGENTS.md absorbed each round's lessons (now at v0.4, see its changelog).
 
-1. **Sign off on the two agent ports without touching their code** — that's the gate
-   condition. Review `pnpm contact-sheet` output or the live routes.
-2. Look-review carried items: Titleblock (bottom-left; logo slot is a placeholder),
-   grid tuning verdict, DemoHelpers/CameraControls API, leva placement strategy,
-   example #1 divergences.
-3. **Create the GitHub repo + push** — unblocks first real CI run (watch the smoke
-   job: the Xvfb/SwiftShader path is research-verified but never executed here).
-4. Fresh drei/fiber alphas when ready — drei bump will error on the stale pnpm patch
-   (delete `patches/` entry then), fiber tarball → published alpha, ideally drop the
-   vite dual-entry alias.
+### CI (github.com/pmndrs/react-three-examples/actions)
 
-## Next work (M2 prep, in rough order)
+- checks (lint+build) + smoke (headed Chromium under Xvfb + SwiftShader Vulkan) —
+  **the research-designed WebGPU path is proven on free runners**.
+- `packageManager` pin + vendored fiber tarball (1.3MB, UPSTREAM.md A1) were needed
+  to make CI installable.
+- **SwiftShader stall pattern (open investigation)**: examples combining drei's Grid
+  WITH a custom node graph (render pipeline or custom outputNode) hang readiness
+  silently — zero page errors, 2×180s. Grid-only passes; custom-nodes-only passes.
+  Affected: skinning-instancing, rtt, tsl-halftone → `ciSkip` in the manifest
+  (exception list per SPEC §10, each with the reason). All three pass on Metal/real
+  GPUs. Bisect idea: CI matrix job rendering rtt with grid off vs on. Possibly a
+  drei-Grid-shader trigger (fwidth/discard under SwiftShader) — could merge with
+  UPSTREAM B6 once bisected.
 
-1. Fold Dennis's sign-off feedback (if any) into AGENTS.md before scaling.
-2. Screenshot-regression tier (tier 2): goldens from the smoke path, changed-examples
-   only; the readiness signal + contact-sheet plumbing make this mostly config.
-3. Batch pipeline dry run: pick ~5 of the 77 dual-renderer list, one Workflow wave
-   (port → self-verify → contact-sheet), per the ROADMAP Agent economics section.
-4. Site v1 gallery work can start any time (M2 list).
+## For Dennis
 
-## Upstream items for Dennis (all verified; details in AGENTS.md/code comments)
+1. **Review the wave**: `pnpm contact-sheet` → screenshots/index.html (9/9), or the
+   live routes. Per-port DIVERGENCE notes are in each file header.
+2. **UPSTREAM.md is the ledger you asked for**: Part A = the 8 things this repo
+   carries with unwind conditions; Part B = 11 agent-ready fix briefs (B1 fiber
+   UniformNode types — verified still real on v10 HEAD `dc6bbd7`, the improved alias
+   pins `TNodeType=unknown`; B9 useThree renderer union; B10 three Fn params;
+   B11 @types/three Scene.fogNode; plus the known packaging/rename items).
+3. When you push fiber/drei alphas: A1/A2 unwind steps are in the ledger.
+4. Repo hygiene when you get a minute: branch protection, and whether to keep
+   pushing straight to main or move to PR flow now that CI gates exist.
 
-1. fiber packaging: `.` vs `./webgpu` duplicate-runtime trap (vite alias is our shim)
-2. drei alpha vs three ≥0.183: `WebGLCubeRenderTarget` → `CubeRenderTarget` rename
-   (durable pnpm patch here; fresh alpha should ship the rename)
-3. drei: CameraControls not in `/core`//`/webgpu` subpaths (our wrapper now also has
-   minDistance/maxDistance, added for gate port #3's need)
-4. fiber npm canary broken (same rename)
-5. drei Grid (TSL): thin-line shimmer under WGSL coarse `fwidth` — consider
-   fwidthFine/thickness floor upstream
-6. **NEW — fiber `UniformNode<T>` typing**: pins the TSL node-type param to `unknown`,
-   so uniforms can't pass to TSL math expecting `Node<'float'>` under strict tsc
-   without an ugly double cast; render-pipeline.mdx's own bloom example wouldn't
-   compile. Both gate ports hit or dodged this — it'll bite every TSL port until
-   fiber ships a typed overload.
+## Next work (M2 continuation)
 
-## Key research conclusions already folded into SPEC (reports in research/)
-
-- Scope: 221 webgpu examples on dev (~187 teaching-value); webgl-only gap = 34 unique
-  non-loader + 47 loader-gallery after semantic dedup
-- Agent buttons: Claude Code web URL + StackBlitz subfolder + Codespaces + Cursor;
-  Codex has no URL scheme; CodeSandbox is dead (July 2026)
-- CI: WebGPU works on free runners via SwiftShader BUT headless Chrome never presents
-  the WebGPU canvas on Linux — headed under Xvfb (implemented in ci.yml, unproven in
-  a real run)
+1. Wave 2 (~5–10 ports) — pipeline is proven; candidates from the dual-renderer list
+   (shadowmap variants, reflection, tonemapping, procedural_texture, sprites/points
+   siblings). Same loop: port → review → doc amendments between waves.
+2. Screenshot-regression tier (tier 2): goldens on the SwiftShader path, changed
+   examples only.
+3. Site v1 gallery (M2 list): gallery grid, tag filters, per-example page (code
+   view + agent buttons) — the titleblock/manifest already carry the data.
+4. SwiftShader stall bisection (see CI section above).
 
 ## Session environment notes
 
-- `.claude/launch.json` defines the `dev` server config (port 5173). A background
-  `pnpm dev` from this session may still hold the port — kill/restart freely.
-- The repo (AGENTS.md + docs/) is the single source of truth; external memory is
-  stale relative to these docs.
+- A background `pnpm dev` may still hold :5173 — kill/restart freely.
+- `git config http.postBuffer` was raised locally (tarball push exceeded 1MB buffer).
+- The repo (AGENTS.md + docs/) is the single source of truth.

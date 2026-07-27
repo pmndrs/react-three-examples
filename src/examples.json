@@ -17,7 +17,7 @@
     "tags": ["animation", "skinning", "instancing", "gltf", "tsl", "post-processing", "leva"],
     "original": "https://threejs.org/examples/#webgpu_skinning_instancing",
     "credits": "Michelle model from the three.js examples",
-    "ciSkip": "SwiftShader never reaches readiness: 30 skinned instances + full-res gaussian blur exceed software-raster budget (verified 2x on ubuntu-latest, 180s timeout)"
+    "ciSkip": "SwiftShader readiness stall — fits the Grid+custom-node-graph pattern (see HANDOFF: grid-only passes, nodes-only passes, both hang pipeline compile silently)"
   },
   {
     "slug": "postprocessing-bloom-emissive",
@@ -39,7 +39,7 @@
     "tags": ["tsl", "render-to-texture", "post-processing", "pointer"],
     "original": "https://threejs.org/examples/#webgpu_rtt",
     "credits": "uv_grid_opengl texture from the three.js examples",
-    "ciSkip": "readiness stalls on SwiftShader with ZERO page errors (2x180s); passes on Metal/real GPUs. Suspected SwiftShader WGSL pipeline-compile hang for renderPipeline+Grid combination — bisect when CI iteration is cheaper"
+    "ciSkip": "SwiftShader readiness stall, zero page errors (2x180s); passes on Metal. Fits the Grid+custom-node-graph pattern (see HANDOFF)"
   },
   {
     "slug": "shadow-contact",
@@ -53,5 +53,12 @@
     "tags": ["tsl", "node-material", "gltf", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_halftone",
     "credits": "Michelle model from the three.js examples"
+  },
+  {
+    "slug": "sprites",
+    "title": "Sprites",
+    "tags": ["tsl", "node-material", "sprites", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_sprites",
+    "credits": "sprite1.png texture from the three.js examples"
   }
 ]

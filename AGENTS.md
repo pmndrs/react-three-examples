@@ -87,6 +87,10 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   typed TSL math (`rotate` etc.) may not resolve through them; cast to
   `Node<'float'|'vec3'|…>` with a comment (three-side typing gap, UPSTREAM.md B10 —
   same cast family as the fiber UniformNode gap).
+- Scene-level TSL fog is `scene.fogNode = fog(color, rangeFogFactor(near, far))` (the
+  legacy `Fog`/`FogExp2` objects are not the WebGPU path) — needs a documented cast,
+  `@types/three` doesn't declare `fogNode` (UPSTREAM.md B11; pattern in
+  src/examples/sprites.tsx).
 - Node materials are auto-extended by the `/webgpu` entry: `<meshStandardNodeMaterial>`
   etc. just work in JSX.
 - Post-processing: v10's `useRenderPipeline` (wraps THREE.PostProcessing). NOT
@@ -215,6 +219,13 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
   `.mdx` docs, and the M0/M1 gotcha log. Set the folder-pattern threshold at ~200
   lines (example #1 landed at ~110). Established: titleblock is shell furniture;
   readiness signal rides in DemoHelpers.
+- 2026-07-27 — v0.4 amendments from the M2 dry-run wave (5 ports: sky, rtt,
+  shadow-contact, tsl-halftone, sprites — all single-Sonnet): slug rule reworded
+  (prefix ALWAYS drops — sky port violated the ambiguous version); explicit `renderer`
+  prop rule; fiber-hooks-inside-Canvas rule; **WGSL identifier rule for useUniforms
+  scopes** (hyphens compile-error shaders at runtime; caught by the smoke console
+  assertion); Fn param cast (B10); scene.fogNode cast (B11); useThree renderer union
+  cast (B9); ciSkip exception-list mechanism; CameraControls gained pan lock.
 - 2026-07-27 — v0.3 amendments from gate port #3 (`postprocessing-bloom-emissive`,
   Sonnet, zero human edits, cheaper than #2 — doc steering works): documented the two
   pipeline-dynamism patterns (fiber useUniforms vs pass-owned uniform fields via
