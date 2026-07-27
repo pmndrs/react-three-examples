@@ -295,6 +295,18 @@ commit** (AGENTS.md points agents at this file).
   B8 family (setState-in-render from hooks) keeps growing — a lint-able contract
   ("no store writes during render") would kill the class.
 
+### B19 · fiber: `StorageLike` union misses `Storage3DTexture`
+
+- **What**: `useGPUStorage`'s value type (`StorageLike`) doesn't include
+  `Storage3DTexture`, even though `compute.mdx` documents storing one — strict tsc
+  rejects it at the hook boundary.
+- **Evidence**: `volume-fire` (eight Storage3DTextures for the fluid grids) —
+  worked around with `as unknown as StorageTexture` at the boundary, runtime is
+  fine.
+- **Suggested fix**: add `Storage3DTexture` (and audit for other storage classes,
+  e.g. `StorageInstancedBufferAttribute`) to the union; a type-level test against
+  the compute.mdx snippets would catch drift.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

@@ -416,5 +416,32 @@
     "tags": ["lensflare", "lights", "pointlight", "fog", "node-material", "leva"],
     "original": "https://threejs.org/examples/#webgpu_lensflares",
     "credits": "LensflareMesh addon by Mugen87 and mrdoob; lens flare textures from ro.me, via the three.js examples"
+  },
+  {
+    "slug": "volume-cloud",
+    "title": "Volume / Cloud",
+    "tags": ["tsl", "node-material", "volume", "raymarching", "3d-texture", "noise", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_volume_cloud",
+    "credits": "RaymarchingBox TSL utility and ImprovedNoise from the three.js examples"
+  },
+  {
+    "slug": "volume-fire",
+    "title": "Volume / Fire",
+    "tags": [
+      "tsl",
+      "compute",
+      "fluid-simulation",
+      "volume",
+      "raymarching",
+      "3d-texture",
+      "node-material",
+      "post-processing",
+      "bloom",
+      "shadows",
+      "leva"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_volume_fire",
+    "credits": "Volumetric fire simulation by the three.js authors; TeapotGeometry and the curl-noise TSL addon from the three.js examples",
+    "ciSkip": "2M-voxel GPU fluid sim + raymarched volume at 120 Hz substeps cannot reach readiness on SwiftShader software raster"
   }
 ]

@@ -91,6 +91,14 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   suite's console assertion will). camelCase scopes, kebab-case is fine for leva groups.
 - **Build-time vs run-time**: JS `if/for` in node builders runs ONCE when the graph is
   built; use TSL `If()/Loop()/select()` for anything that must react to uniforms.
+- TSL helpers that internally `.toVar()`/`.assign()` (`RaymarchingBox` et al.) need an
+  active TSL stack — call them inside an `Fn()`; the originals' `Fn` wrappers are
+  load-bearing, not cosmetic. Fails only at RUNTIME (`No stack defined for assign
+  operation`); tsc/build won't catch it (pattern: `volume-cloud`).
+- `useNodes`' returned wrapper object has a fresh identity every render (member nodes
+  are store-stable, the `{...nodes, utils}` spread is not) — key downstream `useMemo`s
+  on the individual nodes, never the wrapper (pattern: `tsl-raging-sea`,
+  `volume-fire`).
 - Prefer TSL built-ins (`time`, `cameraPosition`, …) over hand-driven uniforms;
   uniforms from RootState only for values with no built-in (viewport/size).
 - `uniform(someObject.vector3)` wraps the LIVE object — mutate it in `useFrame` and
@@ -216,7 +224,9 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   ONCE on the first RAF render and caches it (e.g. `morphReference()` caches
   `morphTargetInfluences` in a WeakMap — `null` forever if unset at that instant);
   passive effects can lose that race. Verified in `morphtargets` (`updateMorphTargets()`
-  after attaching a `geometry` prop).
+  after attaching a `geometry` prop). Same rule for renderer-level flags the first
+  render reads: `renderer.shadowMap.transmitted = true` for `castShadowNode` volumes
+  loses the race in a passive effect (`volume-fire`).
 - Declarative-first: the scene graph is JSX; imperative three.js calls are an
   intentional, showcased escape hatch (R3F is an AND with three.js, not an OR) — keep
   them visible in the component that owns them, not hidden in helpers.
@@ -336,6 +346,14 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.15 amendments from wave-8 pair 3 (volume-cloud + volume-fire,
+  both zero-review-fix; fire is the biggest port yet — full GPU fluid sim): TSL
+  stack rule (helpers with internal toVar/assign need Fn() — runtime-only
+  failure); useNodes wrapper-identity rule (2nd occurrence, now a bullet);
+  useLayoutEffect rule extended to renderer-level first-render flags
+  (shadowMap.transmitted); UPSTREAM B19 (fiber StorageLike misses
+  Storage3DTexture). volume-fire ships the corpus's 5th ciSkip (2M-voxel sim,
+  hopeless on software raster — legitimate, unlike the B17 four).
 - 2026-07-27 — v0.14 amendments from wave-8 pair 2 (lines-fat + lensflares, both
   zero-review-fix): WebGPU setViewport/setScissor TOP-origin rule (upstream
   originals' bottom-origin inset math silently lands wrong — second scissor port
