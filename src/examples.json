@@ -62,5 +62,12 @@
     "original": "https://threejs.org/examples/#webgpu_sprites",
     "credits": "sprite1.png texture from the three.js examples",
     "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
+  },
+  {
+    "slug": "tsl-earth",
+    "title": "TSL / Earth",
+    "tags": ["tsl", "node-material", "planet", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_earth",
+    "credits": "Earth textures from Solar System Scope (resized and merged), via the three.js examples"
   }
 ]
