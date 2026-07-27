@@ -40,6 +40,7 @@
  *   no use for a ground grid at the default 0.5 unit cell size (same call as the
  *   other loader-gltf-* ports).
  */
+import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -71,8 +72,14 @@ export default function LoaderGltfDispersion() {
       renderer={{ toneMapping: ReinhardToneMapping }}
       camera={{ position: [0.1, 0.05, 0.15], fov: 45, near: 0.01, far: 5 }}
     >
-      <Environment files={HDR_URL} background backgroundBlurriness={blurriness} />
-      <DispersionTest />
+      {/* One Suspense over environment + model: serializes the Environment HDR
+          resolve ahead of the model mount. Without it this example intermittently
+          hit the PMREM destroyed-texture race under full-suite contention (the
+          B15-family drei Environment race — same gate fix as tsl-procedural-terrain). */}
+      <Suspense fallback={null}>
+        <Environment files={HDR_URL} background backgroundBlurriness={blurriness} />
+        <DispersionTest />
+      </Suspense>
       <DemoHelpers
         grid={false}
         target={[0, 0, 0]}

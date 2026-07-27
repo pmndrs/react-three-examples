@@ -361,5 +361,19 @@
     "tags": ["postprocessing", "ao", "gtao", "traa", "mrt", "tsl", "gltf", "environment", "leva"],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_ao",
     "credits": "Tennyson bust from Three D Scans, via the three.js examples"
+  },
+  {
+    "slug": "postprocessing-afterimage",
+    "title": "Postprocessing / Afterimage",
+    "tags": ["postprocessing", "afterimage", "tsl", "sprites", "particles", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_afterimage",
+    "credits": "Based on Particle Spiral by oosmoxiecode; circle.png sprite from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-outline",
+    "title": "Postprocessing / Outline",
+    "tags": ["postprocessing", "outline", "tsl", "obj", "pointer", "shadows", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_outline",
+    "credits": "Outline Pass by Prashant Sharma and Ben Houston; tree model from the three.js examples"
   }
 ]
