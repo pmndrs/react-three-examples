@@ -17,6 +17,8 @@ export interface DemoHelpersProps {
   minDistance?: number
   /** Dolly-out limit, forwarded to CameraControls. */
   maxDistance?: number
+  /** Allow panning; false = orbit/dolly only. Forwarded to CameraControls. */
+  pan?: boolean
 }
 
 export function DemoHelpers({
@@ -25,6 +27,7 @@ export function DemoHelpers({
   target,
   minDistance,
   maxDistance,
+  pan,
 }: DemoHelpersProps) {
   return (
     <>
@@ -45,7 +48,7 @@ export function DemoHelpers({
         />
       )}
       {controls && (
-        <CameraControls target={target} minDistance={minDistance} maxDistance={maxDistance} />
+        <CameraControls target={target} minDistance={minDistance} maxDistance={maxDistance} pan={pan} />
       )}
       <ReadinessSignal />
     </>

@@ -22,11 +22,9 @@
  *   replaced with leva controls (same parameters/ranges); the "Clouds" GUI folder
  *   becomes a leva `folder()` group
  * - The original locks the view to orbit-only (OrbitControls `enableZoom`/`enablePan`
- *   both false, fixed camera distance). `src/utils/CameraControls.tsx` only forwards
- *   `target`/`minDistance`/`maxDistance` — no enableZoom/enablePan passthrough exists,
- *   so this is a real AGENTS.md/CameraControls gap, not routed around. `minDistance` =
- *   `maxDistance` = the initial camera distance reproduces the zoom-lock; panning
- *   remains enabled (flagged, not faked)
+ *   both false, fixed camera distance). Reproduced via DemoHelpers `minDistance` =
+ *   `maxDistance` (zoom lock) + `pan={false}` (pan lock — prop added to
+ *   CameraControls after this port flagged the gap)
  * - DemoHelpers grid disabled (`grid={false}`) — the sky dome fills the frame edge to
  *   edge; a ground grid would cut across open sky where the original has none
  */
@@ -184,7 +182,7 @@ export default function WebgpuSky() {
       />
       <ReflectiveSphere />
       <ToneMappingExposure exposure={exposure} />
-      <DemoHelpers grid={false} minDistance={CAMERA_DISTANCE} maxDistance={CAMERA_DISTANCE} />
+      <DemoHelpers grid={false} minDistance={CAMERA_DISTANCE} maxDistance={CAMERA_DISTANCE} pan={false} />
     </Canvas>
   )
 }

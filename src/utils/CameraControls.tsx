@@ -17,9 +17,12 @@ export interface CameraControlsProps {
   minDistance?: number
   /** Dolly-out limit (camera-controls `maxDistance`). */
   maxDistance?: number
+  /** Allow panning/trucking. Default true; false = orbit/dolly only (common in
+   * skybox/panorama-style originals that lock the viewpoint). */
+  pan?: boolean
 }
 
-export function CameraControls({ target, minDistance, maxDistance }: CameraControlsProps) {
+export function CameraControls({ target, minDistance, maxDistance, pan = true }: CameraControlsProps) {
   const camera = useThree((s) => s.camera)
   const domElement = useThree((s) => s.renderer.domElement)
 
@@ -45,6 +48,15 @@ export function CameraControls({ target, minDistance, maxDistance }: CameraContr
     controls.minDistance = minDistance ?? 0
     controls.maxDistance = maxDistance ?? Infinity
   }, [controls, minDistance, maxDistance])
+
+  // camera-controls has no enablePan boolean — panning is the TRUCK action on the
+  // right button / multi-touch gestures, so locking = remapping those actions.
+  useEffect(() => {
+    const { ACTION } = CameraControlsImpl
+    controls.mouseButtons.right = pan ? ACTION.TRUCK : ACTION.NONE
+    controls.touches.two = pan ? ACTION.TOUCH_DOLLY_TRUCK : ACTION.TOUCH_DOLLY
+    controls.touches.three = pan ? ACTION.TOUCH_TRUCK : ACTION.NONE
+  }, [controls, pan])
 
   useFrame((_, delta) => {
     controls.update(delta)
