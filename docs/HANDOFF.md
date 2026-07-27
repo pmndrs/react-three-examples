@@ -1,5 +1,26 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 5 (same night)
+
+8 ports, 4 pairs. **41 examples total, 41/41 smoke + contact sheet green on Metal.**
+
+| Example | Notes | Cost |
+|---|---|---|
+| lights-phong | pair 1 (commit 0524eb6) | — |
+| materials-basic | pair 1 (commit 0524eb6) | — |
+| camera-array | pair 2 (commit e882f96) | — |
+| backdrop-area | pair 2; review fix: grid={false} (double grid) | — |
+| loader-gltf-iridescence | KHR iridescence lamp; zero review fixes; both r185 assets existed verbatim | 84k |
+| loader-gltf-sheen | KHR sheen chair; leva → plain `material.sheen` (TSL materialSheen re-reads per frame, no uniforms); review fix: grid={false} (moiré vs HDR studio floor); UltraHDR swap #3 | 103k |
+| loader-gltf-anisotropy | KHR anisotropy barn lamp; zero review fixes; UltraHDR swap #4 (B13 evidence bumped) | 77k |
+| textures-anisotropy | split-scissor dual-scene via phase:'render' takeover + createPortal; corner labels upgraded to live per-pane leva selects | 87k |
+
+Wave-5 doc yield: screenshot-script WebGPU launch note (AGENTS §Verification);
+B13 evidence now 4 hits — the whole glTF-material-extension cluster ships UltraHDR
+upstream, so `loader-gltf-dispersion`/`-compressed` (queued candidates) will hit it
+too. Cumulative: **39 agent ports across 5 waves + 2 gate ports, zero manifest
+clobbers across 18+ concurrent pair-registrations.**
+
 ## Wave 4 (same night)
 
 8 ports, 4 pairs. **33 examples total, 33/33 smoke + contact sheet green on Metal.**

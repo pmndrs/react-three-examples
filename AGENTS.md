@@ -226,7 +226,10 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
    `"ciSkip": "<reason>"` in its manifest entry (exception list, SPEC §10) — used
    sparingly, never to paper over a local failure.
 4. Screenshot for review — collapse the leva panel first (it overlays center-frame
-   subjects at small viewports)
+   subjects at small viewports). Ad-hoc Playwright screenshot scripts must launch with
+   `channel: 'chromium'` + `--enable-unsafe-webgpu` (same as playwright.config.ts) —
+   plain `chromium.launch()` is headless-shell with no WebGPU on macOS and silently
+   never reaches readiness.
 
 ### Environment gotchas (do not rediscover)
 
@@ -252,6 +255,14 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.5 amendments from the wave-5 glTF-extension cluster (8 ports:
+  lights-phong, materials-basic, camera-array, backdrop-area, loader-gltf-iridescence,
+  loader-gltf-sheen, loader-gltf-anisotropy, textures-anisotropy): screenshot-script
+  WebGPU launch note (channel 'chromium' + --enable-unsafe-webgpu — two agents
+  independently rediscovered it); UPSTREAM B13 evidence bumped to 4 hits (whole
+  UltraHDR cluster). Patterns confirmed without amendment: leva → plain material
+  accessor (TSL material reference nodes re-read per frame, no uniform plumbing —
+  sheen); createPortal scenes + `<fog attach="fog">` compose fine (textures-anisotropy).
 - 2026-07-27 — v0.1 seeded from example #1 (`animation-skinning-blending`), the v10
   `.mdx` docs, and the M0/M1 gotcha log. Set the folder-pattern threshold at ~200
   lines (example #1 landed at ~110). Established: titleblock is shell furniture;

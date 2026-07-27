@@ -171,8 +171,11 @@ commit** (AGENTS.md points agents at this file).
 - **What**: three.js's newer examples ship UltraHDR JPEG environments
   (`*.hdr.jpg`, loaded via `UltraHDRLoader`); drei's `Environment` only wires
   HDR/EXR loaders, so `files="foo.hdr.jpg"` can't work on the `/webgpu` path.
-- **Evidence**: hit twice (`loader-gltf`, `loader-gltf-transmission`) — both ports
-  had to swap to plain-Radiance `.hdr` assets (documented DIVERGENCE each time).
+- **Evidence**: hit four times (`loader-gltf`, `loader-gltf-transmission`,
+  `loader-gltf-sheen`, `loader-gltf-anisotropy`) — every port had to swap to a
+  plain-Radiance `.hdr` asset (documented DIVERGENCE each time). The whole
+  glTF-material-extension cluster uses UltraHDR upstream, so every future port in
+  that family will hit this too.
 - **Suggested fix**: extension-sniff `.hdr.jpg`/`.jpg` (UltraHDR) in Environment's
   loader selection, or accept a `loader` prop override.
 

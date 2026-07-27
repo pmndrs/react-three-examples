@@ -265,5 +265,19 @@
     "tags": ["gltf", "loader", "sheen", "environment", "hdr", "leva"],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_sheen",
     "credits": "Sheen Chair (KHR_materials_sheen sample) from glTF-Sample-Models"
+  },
+  {
+    "slug": "loader-gltf-anisotropy",
+    "title": "Loader / glTF Anisotropy",
+    "tags": ["gltf", "loader", "anisotropy", "environment", "hdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_loader_gltf_anisotropy",
+    "credits": "Anisotropy Barn Lamp (KHR_materials_anisotropy sample) from glTF-Sample-Models; Pedestrian Overpass HDR from the three.js examples (Poly Haven)"
+  },
+  {
+    "slug": "textures-anisotropy",
+    "title": "Textures / Anisotropy",
+    "tags": ["textures", "anisotropy", "filtering", "scissor", "render-takeover", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_textures_anisotropy",
+    "credits": "crate.gif texture from the three.js examples"
   }
 ]
