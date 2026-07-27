@@ -616,5 +616,19 @@
     "tags": ["animation", "skinning", "points", "compute", "tsl", "node-material", "gltf", "leva"],
     "original": "https://threejs.org/examples/#webgpu_skinning_points",
     "credits": "Michelle model from the three.js examples"
+  },
+  {
+    "slug": "occlusion",
+    "title": "Occlusion",
+    "tags": ["occlusion-query", "custom-node", "tsl", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_occlusion",
+    "static": true
+  },
+  {
+    "slug": "layers",
+    "title": "Layers",
+    "tags": ["layers", "instancing", "tsl", "node-material", "sprites", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_layers",
+    "credits": "blossom.png sprite from the three.js examples"
   }
 ]
