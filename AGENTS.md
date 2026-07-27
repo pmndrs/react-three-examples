@@ -119,9 +119,10 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   `src/examples/<slug>/<slug>.tsx` entry (folder name must match) + sibling
   subcomponents. The split itself is a taught pattern — split by scene role, not by
   arbitrary size.
-- Slug = original three.js example name, kebab-case, renderer prefix dropped:
-  `webgpu_skinning_instancing` → `skinning-instancing` (when a dual-renderer original
-  exists, one port covers both).
+- Slug = original three.js example name, kebab-case, with the leading renderer prefix
+  (`webgpu_` / `webgl_`) ALWAYS dropped — every port here is WebGPU, the prefix carries
+  no information. `webgpu_skinning_instancing` → `skinning-instancing`; `webgpu_sky` →
+  `sky`. (When both a webgl and webgpu original exist, the one port covers both.)
 - Register in [src/examples.json](src/examples.json):
   `{ slug, title, tags, original?, credits? }`. `original` = threejs.org example URL;
   `credits` = asset/author attribution. The shell renders the Titleblock from this —

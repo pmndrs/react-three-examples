@@ -24,5 +24,12 @@
     "tags": ["postprocessing", "bloom", "mrt", "tsl", "gltf", "environment", "leva"],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_bloom_emissive",
     "credits": "DamagedHelmet model and moonless_golf_1k HDR from the three.js examples (glTF-Sample-Models / Poly Haven)"
+  },
+  {
+    "slug": "sky",
+    "title": "Sky",
+    "tags": ["tsl", "sky", "environment", "cubecamera", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_sky",
+    "credits": "SkyMesh (Preetham analytic sky model) from the three.js examples"
   }
 ]
