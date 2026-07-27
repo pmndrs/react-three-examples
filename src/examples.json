@@ -52,7 +52,8 @@
     "title": "TSL / Halftone",
     "tags": ["tsl", "node-material", "gltf", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_halftone",
-    "credits": "Michelle model from the three.js examples"
+    "credits": "Michelle model from the three.js examples",
+    "ciSkip": "SwiftShader readiness stall, zero page errors (2x180s); passes on Metal. Fits the Grid+custom-node-graph pattern (see HANDOFF)"
   },
   {
     "slug": "sprites",
