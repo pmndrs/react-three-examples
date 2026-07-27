@@ -196,5 +196,19 @@
     "tags": ["tsl", "node-material", "render-to-texture", "gltf", "animation", "leva"],
     "original": "https://threejs.org/examples/#webgpu_portal",
     "credits": "Xbot model from the three.js examples"
+  },
+  {
+    "slug": "materials-displacementmap",
+    "title": "Materials / Displacement Map",
+    "tags": ["materials", "node-material", "displacement", "obj", "environment", "cubemap", "orthographic", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_displacementmap",
+    "credits": "Ninja head model (normal/ao/displacement maps) from AMD GPU MeshMapper, via the three.js examples; SwedishRoyalCastle cube map from the three.js examples"
+  },
+  {
+    "slug": "geometry-loft",
+    "title": "Geometry / Loft",
+    "tags": ["geometry", "tsl", "node-material", "shadows", "environment", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_geometry_loft",
+    "credits": "LoftGeometry addon from the three.js examples"
   }
 ]
