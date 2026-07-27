@@ -17,6 +17,10 @@ export interface CameraControlsProps {
   minDistance?: number
   /** Dolly-out limit (camera-controls `maxDistance`). */
   maxDistance?: number
+  /** Polar (vertical orbit) limits in radians — e.g. keep the camera above the
+   * ground plane like OrbitControls' maxPolarAngle. */
+  minPolarAngle?: number
+  maxPolarAngle?: number
   /** Allow panning/trucking. Default true; false = orbit/dolly only (common in
    * skybox/panorama-style originals that lock the viewpoint). */
   pan?: boolean
@@ -35,6 +39,8 @@ export function CameraControls({
   target,
   minDistance,
   maxDistance,
+  minPolarAngle,
+  maxPolarAngle,
   pan = true,
   autoRotate = false,
   autoRotateSpeed = 2,
@@ -66,7 +72,9 @@ export function CameraControls({
   useEffect(() => {
     controls.minDistance = minDistance ?? 0
     controls.maxDistance = maxDistance ?? Infinity
-  }, [controls, minDistance, maxDistance])
+    controls.minPolarAngle = minPolarAngle ?? 0
+    controls.maxPolarAngle = maxPolarAngle ?? Math.PI
+  }, [controls, minDistance, maxDistance, minPolarAngle, maxPolarAngle])
 
   // camera-controls has no enablePan boolean — panning is the TRUCK action on the
   // right button / multi-touch gestures, so locking = remapping those actions.

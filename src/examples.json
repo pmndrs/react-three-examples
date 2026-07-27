@@ -142,5 +142,19 @@
     "tags": ["gltf", "loader", "environment", "hdr", "animation", "leva"],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf",
     "credits": "glTF sample models from the Khronos Group glTF-Sample-Assets repository; quarry_01 HDR from the three.js examples (Poly Haven)"
+  },
+  {
+    "slug": "lights-spotlight",
+    "title": "Lights / Spotlight",
+    "tags": ["lights", "spotlight", "shadows", "ply", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lights_spotlight",
+    "credits": "Lucy statue (Stanford 3D Scanning Repository) and disturb/colors/uv_grid_opengl textures from the three.js examples"
+  },
+  {
+    "slug": "materials-envmaps",
+    "title": "Materials / Environment Maps",
+    "tags": ["materials", "environment", "cubemap", "equirectangular", "reflection", "refraction", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_envmaps",
+    "credits": "Bridge2 cube map and equirectangular map (by Jón Ragnarsson) from the three.js examples"
   }
 ]
