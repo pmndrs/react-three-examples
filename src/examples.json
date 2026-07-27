@@ -403,5 +403,18 @@
     "tags": ["materials", "toon", "node-material", "postprocessing", "outline", "leva"],
     "original": "https://threejs.org/examples/#webgpu_materials_toon",
     "credits": "gentilis typeface font from the three.js examples"
+  },
+  {
+    "slug": "lines-fat",
+    "title": "Lines / Fat",
+    "tags": ["lines", "line2", "node-material", "scissor", "viewport", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lines_fat"
+  },
+  {
+    "slug": "lensflares",
+    "title": "Lens Flares",
+    "tags": ["lensflare", "lights", "pointlight", "fog", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lensflares",
+    "credits": "LensflareMesh addon by Mugen87 and mrdoob; lens flare textures from ro.me, via the three.js examples"
   }
 ]

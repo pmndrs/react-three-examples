@@ -70,6 +70,10 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 - **Registering any callback with `phase: 'render'` takes over rendering** — only do
   that when the example is about custom rendering, and never also call
   `renderer.render()` alongside the default loop.
+- WebGPURenderer's `setViewport`/`setScissor` y-origin is TOP-left, unlike WebGL's
+  bottom-left (verified in `WebGPUBackend.js` — no flip). Originals doing
+  bottom-origin inset math carry this silently — their inset lands in the wrong
+  corner on WebGPU. Recompute rects top-origin (pattern: `lines-fat/InsetView.tsx`).
 - `useFrame` returns pause/resume controls; prefer them over ad-hoc booleans for
   pause UX (mixer-level `timeScale` is fine when showcasing the three.js API itself).
 
@@ -332,6 +336,12 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.14 amendments from wave-8 pair 2 (lines-fat + lensflares, both
+  zero-review-fix): WebGPU setViewport/setScissor TOP-origin rule (upstream
+  originals' bottom-origin inset math silently lands wrong — second scissor port
+  exposed it). Flagged once, not yet rules: setHSL-without-colorSpace originals
+  produce linear components (fiber color props are sRGB-managed — precompute);
+  LensflareMesh mutates the caller's Color in place on first render.
 - 2026-07-27 — v0.13: corpus-wide B17 audit + repair (wave-8 interlude). A
   full-corpus pixel-diff + frameCount sweep found 14 more B17-frozen examples
   beyond flames' original three — every ungated suspending hook in the corpus,
