@@ -279,5 +279,19 @@
     "tags": ["textures", "anisotropy", "filtering", "scissor", "render-takeover", "fog", "leva"],
     "original": "https://threejs.org/examples/#webgpu_textures_anisotropy",
     "credits": "crate.gif texture from the three.js examples"
+  },
+  {
+    "slug": "loader-gltf-dispersion",
+    "title": "Loader / glTF Dispersion",
+    "tags": ["gltf", "loader", "dispersion", "transmission", "environment", "hdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_loader_gltf_dispersion",
+    "credits": "DispersionTest model (KHR_materials_dispersion sample) from glTF-Sample-Assets; Pedestrian Overpass HDR from the three.js examples (Poly Haven)"
+  },
+  {
+    "slug": "loader-gltf-compressed",
+    "title": "Loader / glTF Compressed",
+    "tags": ["gltf", "loader", "ktx2", "meshopt", "compression", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_loader_gltf_compressed",
+    "credits": "Coffeemat by Roman Red (Sketchfab), compressed with gltfpack, from the three.js examples"
   }
 ]

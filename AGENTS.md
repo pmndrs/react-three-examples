@@ -158,6 +158,14 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 - `useAnimations`: play clips BY NAME, never `Object.values(actions)` — GLTFs ship
   rest/utility clips (e.g. Soldier.glb's `TPose`) that pollute the blend at default
   weight 1.
+- Compressed glTF (KTX2/BasisU textures): drei's `useGLTF` wires Draco (arg 2) and
+  Meshopt (arg 3) itself; KTX2 needs the `extendLoader` callback —
+  `loader.setKTX2Loader(new KTX2Loader().setTranscoderPath(<r185 basis/ CDN>)
+  .detectSupport(renderer))` with the live renderer from `useThree`. Safe in render:
+  fiber awaits `renderer.init()` before children mount (`hasFeature()` throws
+  pre-init). The explicit `setTranscoderPath` is load-bearing, not cosmetic —
+  KTX2Loader's default path resolves via `import.meta.url` against the three package,
+  unreliable under Vite pre-bundling (pattern: `loader-gltf-compressed`).
 
 ## Layer 2 — corpus conventions (this repo's format)
 
@@ -221,7 +229,10 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
    transient: the FIRST-ever run of an example with multi-MB hotlinked assets and/or a
    fresh shader-graph build can blow the readiness timeout once (cold CDN fetch +
    compile), then pass in ~1s thereafter — one slow first run is not a broken example;
-   two is. CI runs the same suite on SwiftShader (software raster, ~1 fps on heavy
+   two is. Second cold-start signature: a one-time console assertion failure
+   `Destroyed texture [PMREM.cubeUv] used in a submit` (drei Environment PMREM disposed
+   mid-flight during a slow cold HDR fetch, StrictMode remount race) — same rule, gone
+   permanently on run 2; only recurring console errors are real. CI runs the same suite on SwiftShader (software raster, ~1 fps on heavy
    scenes): an example that verifiably cannot reach readiness there declares
    `"ciSkip": "<reason>"` in its manifest entry (exception list, SPEC §10) — used
    sparingly, never to paper over a local failure.
@@ -229,7 +240,8 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
    subjects at small viewports). Ad-hoc Playwright screenshot scripts must launch with
    `channel: 'chromium'` + `--enable-unsafe-webgpu` (same as playwright.config.ts) —
    plain `chromium.launch()` is headless-shell with no WebGPU on macOS and silently
-   never reaches readiness.
+   never reaches readiness. Keep such scripts under the repo root, not the scratchpad
+   (`@playwright/test` won't resolve from outside the workspace).
 
 ### Environment gotchas (do not rediscover)
 
@@ -255,6 +267,11 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.6 amendments from wave-6 pair 1 (loader-gltf-dispersion +
+  loader-gltf-compressed, both zero-review-fix): KTX2 `extendLoader` wiring became a
+  Layer 1 bullet (first compressed-asset port); cold-start transient broadened with
+  its second signature (one-time PMREM destroyed-texture console error, not just
+  readiness timeout); screenshot-script location note (repo root, not scratchpad).
 - 2026-07-27 — v0.5 amendments from the wave-5 glTF-extension cluster (8 ports:
   lights-phong, materials-basic, camera-array, backdrop-area, loader-gltf-iridescence,
   loader-gltf-sheen, loader-gltf-anisotropy, textures-anisotropy): screenshot-script
