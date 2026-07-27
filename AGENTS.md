@@ -192,7 +192,10 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 - `<DemoHelpers>` ([src/utils/DemoHelpers.tsx](src/utils/DemoHelpers.tsx)) goes in every
   example: grid + CameraControls baseline, toggleable via props (`grid={false}` etc.
   when the original look demands it). It also carries the render-readiness signal —
-  include it even with everything visual turned off.
+  include it even with everything visual turned off. For imperative camera moves
+  (`fitToBox`, `setLookAt` — e.g. Box3 auto-framing of loaded models) use the
+  `controlsRef` escape hatch; writing `camera.position` directly is futile,
+  camera-controls' `update()` overwrites it every frame.
 - Controls via leva `useControls('<group>', { … })`. Direct value controls beat
   buttons that hide state (e.g. weight sliders instead of crossfade buttons).
 - Assets: hotlink jsdelivr pinned to the three.js release —

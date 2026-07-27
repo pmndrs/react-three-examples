@@ -129,5 +129,18 @@
     "title": "Morph Targets",
     "tags": ["morphtargets", "geometry", "leva"],
     "original": "https://threejs.org/examples/#webgpu_morphtargets"
+  },
+  {
+    "slug": "clipping",
+    "title": "Clipping Planes",
+    "tags": ["clipping", "shadows", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_clipping"
+  },
+  {
+    "slug": "loader-gltf",
+    "title": "Loader / glTF",
+    "tags": ["gltf", "loader", "environment", "hdr", "animation", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_loader_gltf",
+    "credits": "glTF sample models from the Khronos Group glTF-Sample-Assets repository; quarry_01 HDR from the three.js examples (Poly Haven)"
   }
 ]

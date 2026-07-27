@@ -3,7 +3,7 @@
 // root export pulls the legacy WebGL bundle (plain `three` + legacy fiber entry),
 // which must never enter a WebGPU app.
 // TODO(drei-gap): replace with drei's CameraControls once it lands in /core upstream.
-import { useEffect, useMemo } from 'react'
+import { useEffect, useImperativeHandle, useMemo, type Ref } from 'react'
 import { useFrame, useThree } from '@react-three/fiber/webgpu'
 import CameraControlsImpl from 'camera-controls'
 import * as THREE from 'three'
@@ -25,6 +25,10 @@ export interface CameraControlsProps {
   autoRotate?: boolean
   /** OrbitControls-compatible speed: 2.0 ≈ one orbit per 30s. Default 2. */
   autoRotateSpeed?: number
+  /** Escape hatch: the live camera-controls instance, for imperative moves the
+   * wrapper doesn't model (`fitToBox`, `setLookAt`, `moveTo`, …). External
+   * `camera.position` writes are futile — `update()` overwrites them every frame. */
+  controlsRef?: Ref<CameraControlsImpl>
 }
 
 export function CameraControls({
@@ -34,6 +38,7 @@ export function CameraControls({
   pan = true,
   autoRotate = false,
   autoRotateSpeed = 2,
+  controlsRef,
 }: CameraControlsProps) {
   const camera = useThree((s) => s.camera)
   const domElement = useThree((s) => s.renderer.domElement)
@@ -50,6 +55,8 @@ export function CameraControls({
     controls.connect(domElement)
     return () => controls.disconnect()
   }, [controls, domElement])
+
+  useImperativeHandle(controlsRef, () => controls, [controls])
 
   const [tx, ty, tz] = target ?? []
   useEffect(() => {

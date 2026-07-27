@@ -3,7 +3,7 @@
 // with an inspector/perf slot to come. Examples opt out per-prop when the
 // original look demands it.
 import { Grid } from '@react-three/drei/webgpu'
-import { CameraControls } from './CameraControls'
+import { CameraControls, type CameraControlsProps } from './CameraControls'
 import { ReadinessSignal } from './ReadinessSignal'
 
 export interface DemoHelpersProps {
@@ -23,6 +23,8 @@ export interface DemoHelpersProps {
   autoRotate?: boolean
   /** OrbitControls-compatible auto-orbit speed (2 ≈ 30s/orbit). */
   autoRotateSpeed?: number
+  /** Escape hatch to the live camera-controls instance (fitToBox/setLookAt/…). */
+  controlsRef?: CameraControlsProps['controlsRef']
 }
 
 // Test-only escape hatch: `?nogrid` suppresses the grid regardless of props. CI uses
@@ -41,6 +43,7 @@ export function DemoHelpers({
   pan,
   autoRotate,
   autoRotateSpeed,
+  controlsRef,
 }: DemoHelpersProps) {
   return (
     <>
@@ -68,6 +71,7 @@ export function DemoHelpers({
           pan={pan}
           autoRotate={autoRotate}
           autoRotateSpeed={autoRotateSpeed}
+          controlsRef={controlsRef}
         />
       )}
       <ReadinessSignal />
