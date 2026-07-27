@@ -224,5 +224,19 @@
     "tags": ["tsl", "node-material", "backdrop", "water", "gltf", "post-processing", "shadows", "fog", "leva"],
     "original": "https://threejs.org/examples/#webgpu_backdrop_water",
     "credits": "Michelle model and water.jpg texture from the three.js examples"
+  },
+  {
+    "slug": "materials-basic",
+    "title": "Materials / Basic",
+    "tags": ["materials", "node-material", "instancing", "cubemap", "reflection", "refraction", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_basic",
+    "credits": "pisa cube map from the three.js examples"
+  },
+  {
+    "slug": "lights-phong",
+    "title": "Lights / Phong",
+    "tags": ["lights", "phong", "tsl", "node-material", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lights_phong",
+    "credits": "roughness_map and Water_1_M_Normal textures from the three.js examples"
   }
 ]
