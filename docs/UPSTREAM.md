@@ -124,6 +124,16 @@ commit** (AGENTS.md points agents at this file).
   `#three` alias the same way the runtime does).
 - **Local workaround**: single documented `as WebGPURenderer` cast per file.
 
+### B10 · three.js: TSL `Fn` destructured params lose their node type
+
+- **What**: params of `Fn(([count, color]) => …)` type as bare
+  `ShaderNodeObject<Node>` — no `'float'`/`'vec3'` parameter — so typed TSL overloads
+  (`rotate()` notably) fail to resolve on them under strict tsc.
+- **Evidence**: hit porting `webgpu_tsl_halftone` (tsl-halftone/halftoneEffect.ts —
+  eight casts). Same cast family as fiber's B1, but this one is three's typings.
+- **Suggested fix**: let `Fn`'s type accept a tuple of node-typed params (generic
+  parameter per arg, or a `Fn<[Node<'float'>, Node<'vec3'>]>` signature).
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

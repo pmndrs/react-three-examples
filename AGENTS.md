@@ -72,10 +72,21 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 - Hooks: `useUniforms`, `useNodes`, `useLocalNodes`, `useRenderPipeline`, `useBuffers`,
   `useGPUStorage` — `/webgpu` entry only. All creator hooks are create-if-not-exists
   and StrictMode-safe; calling twice shares the instance.
+- ALL fiber hooks (including the above and `useFrame`/`useThree`) only work INSIDE
+  `<Canvas>` children — leva's `useControls` works anywhere, don't let that mislead:
+  keep hook-using logic in a child component, controls in the page component.
+- **`useUniforms` scope and uniform names must be valid WGSL identifiers — no
+  hyphens.** The debug name (`${scope}_${name}`) feeds WGSL struct members; kebab-case
+  scopes compile-error the shader at runtime (tsc/build won't catch it; the smoke
+  suite's console assertion will). camelCase scopes, kebab-case is fine for leva groups.
 - **Build-time vs run-time**: JS `if/for` in node builders runs ONCE when the graph is
   built; use TSL `If()/Loop()/select()` for anything that must react to uniforms.
 - Prefer TSL built-ins (`time`, `cameraPosition`, …) over hand-driven uniforms;
   uniforms from RootState only for values with no built-in (viewport/size).
+- `Fn(([a, b]) => …)` destructured params type as bare `ShaderNodeObject<Node>` —
+  typed TSL math (`rotate` etc.) may not resolve through them; cast to
+  `Node<'float'|'vec3'|…>` with a comment (three-side typing gap, UPSTREAM.md B10 —
+  same cast family as the fiber UniformNode gap).
 - Node materials are auto-extended by the `/webgpu` entry: `<meshStandardNodeMaterial>`
   etc. just work in JSX.
 - Post-processing: v10's `useRenderPipeline` (wraps THREE.PostProcessing). NOT

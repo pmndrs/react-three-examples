@@ -46,5 +46,12 @@
     "title": "Shadow / Contact",
     "tags": ["tsl", "shadow", "render-to-texture", "gaussian-blur", "leva"],
     "original": "https://threejs.org/examples/#webgpu_shadow_contact"
+  },
+  {
+    "slug": "tsl-halftone",
+    "title": "TSL / Halftone",
+    "tags": ["tsl", "node-material", "gltf", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_halftone",
+    "credits": "Michelle model from the three.js examples"
   }
 ]
