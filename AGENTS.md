@@ -218,7 +218,25 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   `useUniforms` writes to the fiber store during render; deferred to the
   post-suspense re-render, that write lands after siblings have subscribed
   (`useRenderPipeline` calls bare `useThree()`) → React's setState-during-render
-  warning (UPSTREAM B18; pattern: `tsl-vfx-tornado`).
+  warning (UPSTREAM B18; pattern: `tsl-vfx-tornado`). **The same ordering applies
+  at the SIBLING level, and the failure escalates**: a creator-hook component
+  (`useNodes`/`useBuffers`/`useUniforms`) rendered AFTER a suspending sibling —
+  even a properly Suspense-gated one — can trigger the setState-in-render, then
+  the createRoot re-run and the full B17 pixel freeze. Render creator-hook
+  components BEFORE suspending siblings in tree order (`compute-particles-rain`:
+  `<Rain>` before `<Monkey>`). The smoke console assertion does NOT catch this
+  state — only a pixel-diff does.
+- Non-node instances captured by create-once hook closures (RenderTargets,
+  cameras, override materials in a `useNodes`/`useBuffers` creator) must be
+  identity-stable across StrictMode re-renders — hold them in lazy
+  `useState(() => …)`, not `useMemo` (a StrictMode memo re-run can hand the
+  component a DIFFERENT instance than the one the create-once kernel captured;
+  pattern: `compute-particles-snow`).
+- `scene.overrideMaterial` pre-passes (collision/height maps): the WebGPU
+  renderer transfers each object material's `positionNode` onto the override
+  material (`Renderer.js:3739`) — this is what makes GPU-instanced/displaced
+  geometry participate correctly in top-down height renders (patterns:
+  `compute-particles-snow`, `compute-particles-rain`).
 - **Imperative mesh setup that must precede the first render goes in
   `useLayoutEffect`, not `useEffect`.** The WebGPU shader-graph build reads mesh state
   ONCE on the first RAF render and caches it (e.g. `morphReference()` caches
@@ -348,6 +366,16 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.19 from wave-10 pair 1 (compute-particles-rain +
+  compute-particles-snow — the compute weather pair, both landed clean after
+  rain self-fixed a major find): **B18 escalation rule** (creator-hook
+  components before suspending SIBLINGS — the setState-in-render cascades into
+  the full B17 freeze, and smoke's console assertion passes while frozen:
+  pixel-diff tier now urgent); lazy-useState rule for non-node instances
+  captured by create-once closures; overrideMaterial positionNode-transfer
+  note. Also flagged (B10 family): `hash(instanceIndex.add(time))` needs a
+  uint cast under strict tsc. CI: custom-fog ciSkip #3 (WebGPU Device Lost on
+  SwiftShader, deterministic).
 - 2026-07-27 — v0.18 from wave-9 pairs 2–4 (mirror, materials-sss, custom-fog,
   fog-height, instance-points, instance-uniform — all zero-review-fix; wave 9
   closes at 73 examples). **CI milestone folded in: smoke is BLOCKING and green**

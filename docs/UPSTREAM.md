@@ -290,6 +290,12 @@ commit** (AGENTS.md points agents at this file).
 - **Evidence**: `tsl-vfx-tornado` (useTexture + useUniforms + useRenderPipeline
   sibling); verified against fiber source. Repo workaround: call `useUniforms`
   before any suspending hook (Layer 1 rule).
+- **Escalation (wave 10)**: the same deferred store-write fires at the SIBLING
+  level — a creator-hook component mounted after a properly-Suspense-gated
+  suspending sibling (`compute-particles-rain`: Rain after Monkey) triggered
+  setState-in-render AND the B17 createRoot re-run with full pixel freeze.
+  B17 and B18 are one interacting failure family, not two isolated bugs, and
+  console assertions pass while the page is frozen.
 - **Suggested fix**: defer the store write out of render (queue into a
   microtask/effect-phase flush), or narrow `useRenderPipeline`'s subscription; the
   B8 family (setState-in-render from hooks) keeps growing — a lint-able contract
