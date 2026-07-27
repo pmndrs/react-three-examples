@@ -124,6 +124,25 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   src/examples/sprites.tsx).
 - Node materials are auto-extended by the `/webgpu` entry: `<meshStandardNodeMaterial>`
   etc. just work in JSX.
+- **Compute pattern** (established by `compute-texture`/`compute-particles`): kernels
+  are `Fn(() => …)().compute(count)` built once in `useNodes`; storage in `useBuffers`
+  (`instancedArray`) / `useGPUStorage` (`StorageTexture`). fiber has no dispatch hook —
+  dispatch imperatively via `renderer.compute()` (B9 cast) at three cadences: ONCE in
+  a `useEffect` (sync `compute()` is safe there — fiber awaits `renderer.init()`
+  before children render; StrictMode double-runs the effect, so the kernel must be
+  idempotent), PER-FRAME in `useFrame({ phase: 'update' })` (compute is not a render
+  takeover — never `phase: 'render'`), ON DEMAND from event handlers (pointer →
+  `uniform(Vector3)` → dispatch).
+- **Scoped store hooks are WGSL-unsafe (UPSTREAM B16)**: scoped
+  `useNodes`/`useBuffers`/`useGPUStorage` name entries `${scope}.${name}` and the dot
+  reaches WGSL identifiers — always a runtime shader-compile error for storage
+  buffers, and for any node reaching codegen (texture bindings). Use ROOT-LEVEL
+  (unscoped) calls with prefixed keys until the fiber fix lands. `useUniforms`
+  scoping is fine (underscore separator — but see the B12 no-hyphens rule).
+- Creator-state ScopedStore reads widen to `BufferLike`/`StorageLike` (losing
+  `.element()`/`.toAttribute()` and concrete classes) — close over the TYPED returns
+  of the hooks instead of reading back through creator state. Don't `setName()`
+  inside creators; fiber overwrites it with the store key (name by key).
 - Post-processing: v10's `useRenderPipeline` (wraps THREE.PostProcessing). NOT
   `@react-three/postprocessing` (stalled, WebGL-only). Pipeline callbacks don't re-run
   on HMR — full-reload after editing them. Known sharp edges (verified porting
@@ -278,6 +297,13 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.8 amendments from wave-6 pair 3 — the first compute ports
+  (compute-texture + compute-particles, both zero-review-fix): the compute pattern
+  (kernels in useNodes, three dispatch cadences, no fiber dispatch hook — useCompute
+  is an upstream candidate); scoped-store WGSL-unsafety rule (new UPSTREAM B16:
+  fiber's `${scope}.${name}` separator is an illegal WGSL identifier char — found by
+  the smoke console assertion, invisible to tsc/build); ScopedStore type-widening +
+  setName-by-key notes.
 - 2026-07-27 — v0.7 amendments from wave-6 pair 2 (tsl-galaxy +
   tsl-procedural-terrain, both zero-review-fix): `frustumCulled = false` rule for
   positionNode-relocated geometry (latent upstream bug class, will recur across the

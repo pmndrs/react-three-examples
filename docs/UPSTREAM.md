@@ -210,6 +210,37 @@ commit** (AGENTS.md points agents at this file).
   the needsUpdate path appears to miss the env-map define/graph refresh when a
   shadow pass variant exists.
 
+### B16 · fiber: scoped `useNodes`/`useBuffers`/`useGPUStorage` debug name (`${scope}.${name}`) breaks WGSL codegen
+
+- **What**: the scoped paths of `useNodes`, `useBuffers`, and `useGPUStorage` all
+  label each created entry `setName(`` `${scope}.${name}` ``)` (useNodes.tsx;
+  useBuffers.tsx:285; useGPUStorage.tsx:287 — same "Apply label for debugging"
+  block). For anything whose name reaches WGSL codegen the dot lands inside a WGSL
+  identifier and the shader fails to compile at runtime — TextureNode bindings
+  (`@group(1) var computeTexture.colorNode_sampler : sampler;` → "expected ';' for
+  variable declaration") and storage-buffer struct declarations
+  (`struct computeParticles.positionsStruct {` → "expected '{' for struct
+  declaration"). tsc/lint/build all pass; only the smoke suite's console assertion
+  catches it.
+- **Evidence**: hit porting `webgpu_compute_texture` — a `texture(storageTexture)`
+  colorNode stored in `useNodes(creator, 'computeTexture')` broke the fragment
+  shader. Hit again porting `webgpu_compute_particles` — `instancedArray` storage
+  buffers in `useBuffers(creator, 'computeParticles')` broke BOTH compute kernels
+  and the sprite fragment stage (every shader touching the buffers), so scoped
+  `useBuffers` of TSL storage nodes is effectively always broken.
+  (`useGPUStorage` shares the code path but escapes for raw `StorageTexture`
+  values — `Texture` has no `setName`, so the guard skips it; a TSL
+  `storageTexture()` node stored scoped would hit it.) Same failure family as
+  B12, but WORSE: B12 requires the user to pick a bad scope name; here fiber
+  itself inserts the illegal character, so no naming discipline can avoid it —
+  the scoped forms are unusable for codegen-reaching entries.
+- **Local workaround**: root-level (unscoped) hooks for anything that reaches the
+  shader, with prefixed keys standing in for the lost scoping (bare keys are valid
+  WGSL identifiers) — see src/examples/compute-texture.tsx and
+  src/examples/compute-particles/Particles.tsx.
+- **Suggested fix**: use a WGSL-safe separator (`_`, matching useUniforms) and
+  sanitize both parts (shared fix with B12's validator).
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

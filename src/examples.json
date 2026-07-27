@@ -307,5 +307,18 @@
     "tags": ["tsl", "node-material", "terrain", "noise", "shadows", "environment", "hdr", "pointer", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_procedural_terrain",
     "credits": "Terrain shader based on Bruno Simon's Three.js Journey lessons; Pedestrian Overpass HDR from the three.js examples (Poly Haven)"
+  },
+  {
+    "slug": "compute-texture",
+    "title": "Compute / Texture",
+    "tags": ["compute", "tsl", "storage-texture", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_compute_texture",
+    "credits": "Sine interference pattern from Shadertoy (Xst3zN), via the three.js examples"
+  },
+  {
+    "slug": "compute-particles",
+    "title": "Compute / Particles",
+    "tags": ["compute", "tsl", "particles", "sprites", "pointer", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_compute_particles"
   }
 ]
