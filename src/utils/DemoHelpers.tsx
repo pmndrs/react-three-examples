@@ -21,6 +21,13 @@ export interface DemoHelpersProps {
   pan?: boolean
 }
 
+// Test-only escape hatch: `?nogrid` suppresses the grid regardless of props. CI uses
+// it for examples hitting the SwiftShader stall (Grid + custom node graph hangs
+// pipeline compile on software Vulkan — see docs/HANDOFF.md); also the bisection
+// probe for that bug. Read once at module load; not part of the component API.
+const NOGRID_OVERRIDE =
+  typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('nogrid')
+
 export function DemoHelpers({
   grid = true,
   controls = true,
@@ -31,7 +38,7 @@ export function DemoHelpers({
 }: DemoHelpersProps) {
   return (
     <>
-      {grid && (
+      {grid && !NOGRID_OVERRIDE && (
         <Grid
           position={[0, 0.002, 0]}
           infiniteGrid

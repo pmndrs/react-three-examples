@@ -17,7 +17,7 @@
     "tags": ["animation", "skinning", "instancing", "gltf", "tsl", "post-processing", "leva"],
     "original": "https://threejs.org/examples/#webgpu_skinning_instancing",
     "credits": "Michelle model from the three.js examples",
-    "ciSkip": "SwiftShader readiness stall — fits the Grid+custom-node-graph pattern (see HANDOFF: grid-only passes, nodes-only passes, both hang pipeline compile silently)"
+    "ciNoGrid": "SwiftShader stall when Grid + custom node graph coexist (see HANDOFF); grid suppressed via ?nogrid in CI so the example itself still smoke-tests"
   },
   {
     "slug": "postprocessing-bloom-emissive",
@@ -39,7 +39,7 @@
     "tags": ["tsl", "render-to-texture", "post-processing", "pointer"],
     "original": "https://threejs.org/examples/#webgpu_rtt",
     "credits": "uv_grid_opengl texture from the three.js examples",
-    "ciSkip": "SwiftShader readiness stall, zero page errors (2x180s); passes on Metal. Fits the Grid+custom-node-graph pattern (see HANDOFF)"
+    "ciNoGrid": "SwiftShader stall when Grid + custom node graph coexist (see HANDOFF); grid suppressed via ?nogrid in CI so the example itself still smoke-tests"
   },
   {
     "slug": "shadow-contact",
@@ -53,7 +53,7 @@
     "tags": ["tsl", "node-material", "gltf", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_halftone",
     "credits": "Michelle model from the three.js examples",
-    "ciSkip": "SwiftShader readiness stall, zero page errors (2x180s); passes on Metal. Fits the Grid+custom-node-graph pattern (see HANDOFF)"
+    "ciNoGrid": "SwiftShader stall when Grid + custom node graph coexist (see HANDOFF); grid suppressed via ?nogrid in CI so the example itself still smoke-tests"
   },
   {
     "slug": "sprites",

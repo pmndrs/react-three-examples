@@ -12,6 +12,9 @@ export interface ExampleMeta {
   credits?: string
   /** CI smoke-tier exception (SPEC §10): reason this example can't run on SwiftShader. */
   ciSkip?: string
+  /** CI runs this example with ?nogrid (DemoHelpers grid suppressed) — SwiftShader
+   * Grid+node-graph stall workaround that keeps smoke coverage. Value = reason. */
+  ciNoGrid?: string
 }
 
 export const exampleMeta = examples as ExampleMeta[]

@@ -13,6 +13,9 @@ const IGNORED_CONSOLE = [
 
 for (const { slug, ...meta } of examples) {
   const ciSkip = 'ciSkip' in meta ? String(meta.ciSkip) : undefined
+  // ciNoGrid: run the example in CI with DemoHelpers' grid suppressed (?nogrid) —
+  // works around the SwiftShader Grid+node-graph stall WITHOUT losing smoke coverage.
+  const ciNoGrid = 'ciNoGrid' in meta ? String(meta.ciNoGrid) : undefined
   test(`${slug}: WebGPU context, readiness signal, non-black canvas`, async ({ page }) => {
     // Exception list (SPEC §10, three.js-CI prior art): examples too heavy for
     // SwiftShader declare ciSkip WITH A REASON in the manifest. They still run locally.
@@ -26,7 +29,7 @@ for (const { slug, ...meta } of examples) {
       errors.push(`console.error: ${text}`)
     })
 
-    await page.goto(`/examples/${slug}`)
+    await page.goto(`/examples/${slug}${process.env.CI && ciNoGrid ? '?nogrid' : ''}`)
 
     // Readiness = loaders settled + clean frames (window.__exampleReady, set by
     // <ReadinessSignal> inside DemoHelpers). Poll instead of sleeping. CI gets a

@@ -135,6 +135,19 @@ commit** (AGENTS.md points agents at this file).
 - **Suggested fix**: let `Fn`'s type accept a tuple of node-typed params (generic
   parameter per arg, or a `Fn<[Node<'float'>, Node<'vec3'>]>` signature).
 
+### B12 · fiber: `useUniforms` scope/name strings flow unvalidated into WGSL identifiers
+
+- **What**: the debug name fiber generates for a uniform (`${scope}_${name}`) ends up
+  as a WGSL struct member identifier. WGSL forbids hyphens (and other JS-string-legal
+  characters), so a kebab-case scope name (`useUniforms('halftone-purple', …)`)
+  produces a **runtime fragment-shader compile error** — tsc and the build both pass;
+  nothing fails until the shader compiles in the browser.
+- **Evidence**: hit porting `webgpu_tsl_halftone`; caught only by our smoke suite's
+  console-error assertion. Renaming the scope to camelCase fixed it.
+- **Suggested fix**: sanitize the generated identifier (replace non-`[A-Za-z0-9_]`
+  chars) or throw early from `useUniforms` with a clear message naming the offending
+  scope/key. Silent pass-through into codegen is the worst of the options.
+
 ### B11 · @types/three: `Scene.fogNode` missing
 
 - **What**: `Scene.fogNode` is a real webgpu runtime property (read by
