@@ -307,6 +307,20 @@ commit** (AGENTS.md points agents at this file).
   e.g. `StorageInstancedBufferAttribute`) to the union; a type-level test against
   the compute.mdx snippets would catch drift.
 
+### B20 · fiber + drei: `Environment`/`useEnvironment` can't load HDR cubemaps
+
+- **What**: both fiber's Canvas `background` handling and drei's `useEnvironment`
+  route ANY 6-file array to plain `CubeTextureLoader` before extension sniffing
+  (`getExtension()`: `isCubemap → extension = "cube"`), so 6-face Radiance `.hdr`
+  cube sets (e.g. three's pisaHDR) are unloadable through the declarative APIs.
+- **Evidence**: `clearcoat` port — worked around with
+  `useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES])` (nested array → one load()
+  with six URLs) + manual `scene.background/environment` assignment in a layout
+  effect inside the Suspense gate.
+- **Suggested fix**: sniff the first entry's extension before the cube branch;
+  `.hdr` → `HDRCubeTextureLoader` (and `.exr` → EXR equivalent). B13 family
+  (Environment loader-selection gaps).
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

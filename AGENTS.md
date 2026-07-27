@@ -346,6 +346,13 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.17 amendments from wave-9 pair 1 (ocean + clearcoat, both
+  zero-review-fix): UPSTREAM B20 — Environment/useEnvironment hardwire
+  CubeTextureLoader for 6-file arrays (HDR cubemaps unloadable declaratively;
+  workaround `useLoader(HDRCubeTextureLoader, [files])` in `clearcoat`).
+  Pattern noted once (not yet a rule): reparenting a fiber-mounted primitive
+  into a side scene for `PMREMGenerator.fromScene` within one effect is safe —
+  fiber reconciles parents only on commits (`ocean/OceanSky.tsx`).
 - 2026-07-27 — v0.16 amendments from wave-8 pair 4 (shadowmap-vsm +
   shadowmap-pointlight, both zero-review-fix — wave 8 closes at 65 examples):
   clarification both shadow agents converged on independently — fiber dash-path

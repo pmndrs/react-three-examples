@@ -452,5 +452,19 @@
     "tags": ["shadows", "vsm", "spotlight", "directional-light", "fog", "leva"],
     "original": "https://threejs.org/examples/#webgpu_shadowmap_vsm",
     "credits": "VSM Shadows example by Paul Brunt"
+  },
+  {
+    "slug": "ocean",
+    "title": "Ocean",
+    "tags": ["water", "sky", "environment", "pmrem", "bloom", "postprocessing", "tsl", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_ocean",
+    "credits": "WaterMesh flat-mirror water after Slayvin, Stemkoski and 29a.ch; SkyMesh sky model by the three.js authors; waternormals texture from the three.js examples"
+  },
+  {
+    "slug": "clearcoat",
+    "title": "Clearcoat",
+    "tags": ["materials", "clearcoat", "physical", "environment", "hdr", "canvas-texture", "lights", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_clearcoat",
+    "credits": "Carbon fibre, golf ball, and scratched gold textures, FlakesTexture addon, and Pisa HDR cube map from the three.js examples"
   }
 ]
