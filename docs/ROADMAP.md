@@ -62,6 +62,12 @@ signs off on it without needing to touch the code.
 
 **Done when:** 77 ports merged, site deployed to Pages, CI green on tiers 1–2.
 
+**Verification policy (Dennis, 2026-07-27): local Metal smoke is the M2 oracle.**
+Ports ship when they pass tsc/lint/build/smoke locally + visual review. CI's
+SwiftShader smoke stays advisory; SwiftShader stalls are logged (`ciSkip` + HANDOFF
+matrix) and their resolution is a later-phase item — do NOT block or bisect during
+the porting push.
+
 ## M3 — Full WebGPU set (~144 webgpu-only: compute, TSL, MRT…)
 - [ ] Stricter review tier for thin-training-data territory (TSL/compute)
 - [ ] `utils/` drei-gap components accumulate; each ships with an upstream brief
@@ -102,6 +108,12 @@ tier below demonstrably fails, and record the escalation.
   diff catches the same class of error; each batch PR notes agents run/retries/
   escalations so cost drift is visible; adversarial multi-agent review is reserved for
   the launch pass (M4), not routine ports.
+
+## Later phase: CI hardening (deferred from M2, 2026-07-27)
+- SwiftShader stall bisection (HANDOFF matrix + frame-count instrumentation ready)
+- Flip smoke back to blocking once the exception list is stable
+- Screenshot-regression tier 2 goldens (SwiftShader-path, changed-examples-only)
+- Manual real-GPU dispatch runner (tier 4)
 
 ## Post-launch (standing)
 - Monthly: re-diff three.js `files.json` → port new webgpu examples; three version bump PR
