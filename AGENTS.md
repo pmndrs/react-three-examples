@@ -303,7 +303,9 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 ### Verification (do this before calling a port done)
 
 1. `npx tsc --noEmit` && `pnpm lint` && `pnpm build`
-2. Dev server: route renders, console clean, canvas context is `webgpu`
+2. Dev server: route renders, console clean, canvas context is `webgpu`.
+   Playwright `-g` matches the full `file › title` chain — quoted/anchored slug
+   patterns silently match nothing; verify with `--list` when a grep finds 0 tests.
 3. `pnpm test:smoke` (Playwright: readiness signal fires, canvas non-black). Expected
    transient: the FIRST-ever run of an example with multi-MB hotlinked assets and/or a
    fresh shader-graph build can blow the readiness timeout once (cold CDN fetch +

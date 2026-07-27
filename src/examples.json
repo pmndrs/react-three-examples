@@ -466,5 +466,19 @@
     "tags": ["materials", "clearcoat", "physical", "environment", "hdr", "canvas-texture", "lights", "leva"],
     "original": "https://threejs.org/examples/#webgpu_clearcoat",
     "credits": "Carbon fibre, golf ball, and scratched gold textures, FlakesTexture addon, and Pisa HDR cube map from the three.js examples"
+  },
+  {
+    "slug": "mirror",
+    "title": "Mirror",
+    "tags": ["tsl", "reflection", "reflector", "node-material", "lights", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_mirror",
+    "credits": "Checkerboard floor and decal textures from the three.js examples"
+  },
+  {
+    "slug": "materials-sss",
+    "title": "Materials / Subsurface Scattering",
+    "tags": ["materials", "sss", "node-material", "fbx", "lights", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_sss",
+    "credits": "Stanford bunny model and thickness map by Shaochun Lin, from the three.js examples"
   }
 ]
