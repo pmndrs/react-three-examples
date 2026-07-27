@@ -1,5 +1,27 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 3 (same night, Metal-oracle policy)
+
+8 more ports, 4 parallel pairs, zero manifest clobbers again. **25 examples total,
+25/25 smoke + contact sheet green.**
+
+| Example | Notes | Cost |
+|---|---|---|
+| instance-mesh | JSX instancedMesh + setMatrixAt; useLoader-cache clone rule | 92k |
+| morphtargets | found the useLayoutEffect-vs-first-RAF-render race (now a Layer 1 rule) | 119k |
+| clipping | nested clippingGroup JSX intrinsics (auto-derived, no extend) | 105k |
+| loader-gltf | live Khronos catalog (148 models); drove controlsRef escape hatch | 155k |
+| lights-spotlight | SpotLight.map projection, PLY loader; drove polar-limit props | 141k |
+| materials-envmaps | cube/equirect toggles; zero casts; build-vs-live semantics traced | 148k |
+| depth-texture | scene-pass depth node; added raw/linear select() toggle | 138k |
+| loader-gltf-transmission | KHR transmission; frame-probe correctly classified its one cold-start timeout (frames:4 = fetch crawl) | 85k |
+
+Wrapper additions this wave (all port-flagged): `controlsRef` (imperative
+fitToBox/setLookAt escape hatch), `minPolarAngle`/`maxPolarAngle`. UPSTREAM B13
+added: drei /webgpu Environment lacks UltraHDRLoader wiring (hit twice, forced
+HDR asset swaps). Follow-up queued: wire Box3 auto-framing in loader-gltf via
+controlsRef.
+
 ## Wave 2 (added after the dry run; Metal-oracle policy per Dennis)
 
 8 more ports, run as 4 parallel PAIRS of single-Sonnet agents (examples.json

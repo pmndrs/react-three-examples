@@ -156,5 +156,18 @@
     "tags": ["materials", "environment", "cubemap", "equirectangular", "reflection", "refraction", "leva"],
     "original": "https://threejs.org/examples/#webgpu_materials_envmaps",
     "credits": "Bridge2 cube map and equirectangular map (by Jón Ragnarsson) from the three.js examples"
+  },
+  {
+    "slug": "loader-gltf-transmission",
+    "title": "Loader / glTF Transmission",
+    "tags": ["gltf", "loader", "transmission", "environment", "hdr", "animation", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_loader_gltf_transmission",
+    "credits": "Iridescent Dish With Olives by Eric Chadwick (KHR_materials_transmission sample); San Giuseppe Bridge HDR from the three.js examples (Poly Haven)"
+  },
+  {
+    "slug": "depth-texture",
+    "title": "Depth Texture",
+    "tags": ["tsl", "render-to-texture", "depth", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_depth_texture"
   }
 ]

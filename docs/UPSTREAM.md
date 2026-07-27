@@ -164,6 +164,16 @@ commit** (AGENTS.md points agents at this file).
   `emissiveNode` (and friends read by `setupOutgoingLight`) up to the shared
   `NodeMaterial` declaration.
 
+### B13 · drei: `/webgpu` `Environment` doesn't wire `UltraHDRLoader`
+
+- **What**: three.js's newer examples ship UltraHDR JPEG environments
+  (`*.hdr.jpg`, loaded via `UltraHDRLoader`); drei's `Environment` only wires
+  HDR/EXR loaders, so `files="foo.hdr.jpg"` can't work on the `/webgpu` path.
+- **Evidence**: hit twice (`loader-gltf`, `loader-gltf-transmission`) — both ports
+  had to swap to plain-Radiance `.hdr` assets (documented DIVERGENCE each time).
+- **Suggested fix**: extension-sniff `.hdr.jpg`/`.jpg` (UltraHDR) in Environment's
+  loader selection, or accept a `loader` prop override.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component
