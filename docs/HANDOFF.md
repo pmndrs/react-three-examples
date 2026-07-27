@@ -1,5 +1,35 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 10 (same night) — and the animates tier
+
+8 ports, 4 pairs, plus two infra items between pairs. **81 examples total,
+81/81 smoke + contact sheet green on Metal, 80/81 animates (+1 ledgered
+skip). Fourth consecutive zero-review-fix wave** (rain self-fixed its own
+find pre-report).
+
+| Example | Notes | Cost |
+|---|---|---|
+| compute-particles-rain | live scene collision via layer-routed height prepass; **found the B18→B17 sibling escalation** | 131k |
+| compute-particles-snow | self-feeding accumulation (settled flakes render into the collision map); lazy-useState rule | 149k |
+| materials-transmission | 10 knobs → plain JSX props (reference-backed rule now default, 3rd confirmation); B13 hit #5 | 102k |
+| materials-alphahash | ssaaPass joins the samples:0 list (self-corrected mis-reasoning → bullet hardened) | 102k |
+| cubemap-dynamic | live CubeCamera reflections; pure pattern reuse, zero rediscovery | 108k |
+| materials-envmaps-groundprojected | Ferrari beach classic; TSL ground projection with live uniforms | 126k |
+| materials-lightmap | baked castle scene; slider starts at the value the JSON ships (upstream GUI quirk fixed) | 99k |
+| parallax-uv | ice-sheet parallaxUV + blendOverlay; zero rediscovery | 89k |
+
+**Infra shipped mid-wave:**
+- **The animates tier** (tests/animates.spec.ts, `pnpm test:animates`): two-frame
+  pixel diff + frame-loop liveness + dual-root-warning capture. 18 confirmed
+  statics flagged in the manifest; geometry-loft carries the one animatesSkip
+  (ledgered B17 anomaly). Port checklist gained step 0; local-only pending
+  SwiftShader window tuning. SPEC §10 tier-1.5 amendment is a candidate for
+  Dennis.
+- custom-fog ciSkip #3 (deterministic WebGPU Device Lost on SwiftShader).
+
+Cumulative: **79 agent ports across 10 waves + 2 gate ports, zero manifest
+clobbers across 40+ concurrent pair-registrations.** AGENTS.md v0.18→v0.21.
+
 ## Wave 9 (same night) — and the CI milestone
 
 8 ports, 4 pairs. **73 examples total, 73/73 smoke + contact sheet green on

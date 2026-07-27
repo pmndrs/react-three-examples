@@ -572,5 +572,20 @@
     "original": "https://threejs.org/examples/#webgpu_materials_envmaps_groundprojected",
     "credits": "Ferrari 458 Italia model by vicent091036 (Sketchfab); Blouberg Sunrise 2 HDR by Greg Zaal (Poly Haven), via the three.js examples",
     "static": true
+  },
+  {
+    "slug": "materials-lightmap",
+    "title": "Materials / Lightmap",
+    "tags": ["materials", "lightmap", "objectloader", "tsl", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_lightmap",
+    "credits": "Baked lightmap castle scene from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "parallax-uv",
+    "title": "Parallax UV",
+    "tags": ["tsl", "parallax", "textures", "materials", "environment", "hdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_parallax_uv",
+    "credits": "Ice textures by ambientCG; HDR by hdri-skies.com, via the three.js examples"
   }
 ]
