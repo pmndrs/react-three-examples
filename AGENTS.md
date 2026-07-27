@@ -135,6 +135,12 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 - StrictMode double-invokes effects: never `dispose()` a `useMemo`'d instance in an
   effect cleanup (kills the memoized instance for good). Use symmetric connect/
   disconnect effects — see [src/utils/CameraControls.tsx](src/utils/CameraControls.tsx).
+- **Imperative mesh setup that must precede the first render goes in
+  `useLayoutEffect`, not `useEffect`.** The WebGPU shader-graph build reads mesh state
+  ONCE on the first RAF render and caches it (e.g. `morphReference()` caches
+  `morphTargetInfluences` in a WeakMap — `null` forever if unset at that instant);
+  passive effects can lose that race. Verified in `morphtargets` (`updateMorphTargets()`
+  after attaching a `geometry` prop).
 - Declarative-first: the scene graph is JSX; imperative three.js calls are an
   intentional, showcased escape hatch (R3F is an AND with three.js, not an OR) — keep
   them visible in the component that owns them, not hidden in helpers.

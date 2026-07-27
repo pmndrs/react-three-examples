@@ -116,5 +116,18 @@
     "tags": ["lights", "rectarealight", "tsl", "node-material", "leva"],
     "original": "https://threejs.org/examples/#webgpu_lights_rectarealight",
     "credits": "RectAreaLight LTC BRDF approximation by Eric Heitz et al.; RectAreaLightHelper by abelnation, from the three.js examples"
+  },
+  {
+    "slug": "instance-mesh",
+    "title": "Instance Mesh",
+    "tags": ["instancing", "tsl", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_instance_mesh",
+    "credits": "Suzanne geometry from the three.js examples"
+  },
+  {
+    "slug": "morphtargets",
+    "title": "Morph Targets",
+    "tags": ["morphtargets", "geometry", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_morphtargets"
   }
 ]
