@@ -341,7 +341,12 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
    two is. Second cold-start signature: a one-time console assertion failure
    `Destroyed texture [PMREM.cubeUv] used in a submit` (drei Environment PMREM disposed
    mid-flight during a slow cold HDR fetch, StrictMode remount race) — same rule, gone
-   permanently on run 2; only recurring console errors are real. CI runs the same suite on SwiftShader (software raster, ~1 fps on heavy
+   permanently on run 2; only recurring console errors are real. Third signature: a
+   ONE-TIME `R3F.createRoot should only be called once!` on the first-ever run of a
+   heavy example (cold CDN fetch + fresh MRT shader build) even with every subtree
+   correctly Suspense-gated — RECURRING dual-root warnings are the B17 bug; a single
+   cold-start occurrence that never repeats is this transient
+   (postprocessing-motion-blur, verified 5/5 clean in both tree orderings after). CI runs the same suite on SwiftShader (software raster, ~1 fps on heavy
    scenes): an example that verifiably cannot reach readiness there declares
    `"ciSkip": "<reason>"` in its manifest entry (exception list, SPEC §10) — used
    sparingly, never to paper over a local failure.
@@ -376,6 +381,14 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.22 from wave-11 pair 1 (postprocessing-godrays +
+  postprocessing-motion-blur, both zero-review-fix): third cold-start signature
+  documented (one-time dual-root warning on cold fetch + fresh MRT build —
+  motion-blur falsified the ordering hypothesis deliberately before reporting;
+  recurring = B17, once-only = transient). Motion-blur is the first port using
+  setupCB MRT on the main scene pass — worked exactly as documented. Godrays
+  confirmed samples:0 applies to arbitrary-UV depth SAMPLING too, not just
+  copies.
 - 2026-07-27 — v0.21 from wave-10 pair 2 (materials-transmission +
   materials-alphahash, both zero-review-fix, both static-by-design, both ran
   the animates tier as step 0 on first use): samples:0 bullet extended with

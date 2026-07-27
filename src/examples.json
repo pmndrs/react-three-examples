@@ -587,5 +587,20 @@
     "tags": ["tsl", "parallax", "textures", "materials", "environment", "hdr", "leva"],
     "original": "https://threejs.org/examples/#webgpu_parallax_uv",
     "credits": "Ice textures by ambientCG; HDR by hdri-skies.com, via the three.js examples"
+  },
+  {
+    "slug": "postprocessing-motion-blur",
+    "title": "Postprocessing / Motion Blur",
+    "tags": ["postprocessing", "motion-blur", "velocity", "mrt", "tsl", "gltf", "animation", "skinning", "shadows", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_motion_blur",
+    "credits": "Xbot model, checkerboard floor and uv_grid textures from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-godrays",
+    "title": "Postprocessing / Godrays",
+    "tags": ["postprocessing", "godrays", "volumetric", "shadows", "pointlight", "tsl", "gltf", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_godrays",
+    "credits": "Godrays technique from three-good-godrays by Casey Primozic (Ameobea); godrays demo model from the three.js examples",
+    "static": true
   }
 ]
