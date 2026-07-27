@@ -92,7 +92,9 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   non-Standard node materials — the runtime reads them generically
   (`NodeMaterial.setupOutgoingLight`, `NodeManager`) but `@types/three` declares them
   narrowly. Cast with a comment; verify against the runtime source in
-  `reference/three.js/src/renderers/common/` first (UPSTREAM.md B11).
+  `reference/three.js/src/renderers/common/` first (UPSTREAM.md B11). Not every
+  `*Node` field needs it — e.g. `backdropNode`/`backdropAlphaNode` ARE typed on the
+  NodeMaterial base — so check `@types/three` before reaching for the cast.
 - `instancedBufferAttribute<T>(array, itemSize)` needs its explicit type argument
   under strict tsc (infers `unknown` otherwise) — same "typed TSL surface doesn't
   infer" family as the Fn-param cast.
