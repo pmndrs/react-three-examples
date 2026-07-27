@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test:smoke": "playwright test",
+    "test:smoke": "playwright test tests/smoke.spec.ts",
+    "test:animates": "playwright test tests/animates.spec.ts",
     "contact-sheet": "node scripts/contact-sheet.mjs"
   },
   "dependencies": {

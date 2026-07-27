@@ -321,6 +321,12 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 ### Verification (do this before calling a port done)
 
 1. `npx tsc --noEmit` && `pnpm lint` && `pnpm build`
+0. Animated example? It must pass `pnpm test:animates` (tier 1.5: two-frame
+   pixel diff + dual-root-warning capture — catches the B17/B18 freeze family
+   that smoke's console assertion misses). Static-by-design examples declare
+   `"static": true` in their manifest entry (the test then asserts live loop +
+   clean console); stop-go easings longer than ~2s declare `"animationWindowMs"`.
+   Run it for YOUR example: `npx playwright test tests/animates.spec.ts -g "<slug>"`.
 2. Dev server: route renders, console clean, canvas context is `webgpu`.
    Playwright `-g` matches the full `file › title` chain — quoted/anchored slug
    patterns silently match nothing; verify with `--list` when a grep finds 0 tests.
@@ -366,6 +372,17 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.20: **the animates tier ships** (tests/animates.spec.ts,
+  `pnpm test:animates`) — the pixel-diff assertion queued since v0.12, made
+  urgent by rain's finding that consoles stay clean while frozen. Two-frame
+  diff + frame-loop liveness + dual-root-warning capture per example; manifest
+  flags `static` (18 confirmed statics — loader-gltf and materials-envmaps
+  verified faithful-static against their originals' defaults),
+  `animationWindowMs` (geometry-loft), `animatesSkip` (geometry-loft's ledgered
+  B17 anomaly, skip-with-reason). 74 pass + 1 ledgered skip. Local-only for
+  now — SwiftShader's ~1fps would need window retuning before CI wiring
+  (candidate). Port checklist gained step 0. SPEC §10 tier-1.5 amendment is a
+  candidate for Dennis.
 - 2026-07-27 — v0.19 from wave-10 pair 1 (compute-particles-rain +
   compute-particles-snow — the compute weather pair, both landed clean after
   rain self-fixed a major find): **B18 escalation rule** (creator-hook

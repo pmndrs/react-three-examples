@@ -23,7 +23,8 @@
     "title": "Postprocessing / Bloom Emissive",
     "tags": ["postprocessing", "bloom", "mrt", "tsl", "gltf", "environment", "leva"],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_bloom_emissive",
-    "credits": "DamagedHelmet model and moonless_golf_1k HDR from the three.js examples (glTF-Sample-Models / Poly Haven)"
+    "credits": "DamagedHelmet model and moonless_golf_1k HDR from the three.js examples (glTF-Sample-Models / Poly Haven)",
+    "static": true
   },
   {
     "slug": "sky",
@@ -76,7 +77,8 @@
     "slug": "procedural-texture",
     "title": "Procedural Texture",
     "tags": ["tsl", "render-to-texture", "gaussian-blur", "leva"],
-    "original": "https://threejs.org/examples/#webgpu_procedural_texture"
+    "original": "https://threejs.org/examples/#webgpu_procedural_texture",
+    "static": true
   },
   {
     "slug": "reflection",
@@ -90,7 +92,8 @@
     "title": "Tone Mapping",
     "tags": ["tonemapping", "environment", "gltf", "hdr", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tonemapping",
-    "credits": "Venice Mask by DailyArt (CC BY-NC 4.0, Sketchfab); Venice Sunset HDR from HDRI Haven, via the three.js examples"
+    "credits": "Venice Mask by DailyArt (CC BY-NC 4.0, Sketchfab); Venice Sunset HDR from HDRI Haven, via the three.js examples",
+    "static": true
   },
   {
     "slug": "refraction",
@@ -124,7 +127,8 @@
     "slug": "morphtargets",
     "title": "Morph Targets",
     "tags": ["morphtargets", "geometry", "leva"],
-    "original": "https://threejs.org/examples/#webgpu_morphtargets"
+    "original": "https://threejs.org/examples/#webgpu_morphtargets",
+    "static": true
   },
   {
     "slug": "clipping",
@@ -137,7 +141,8 @@
     "title": "Loader / glTF",
     "tags": ["gltf", "loader", "environment", "hdr", "animation", "leva"],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf",
-    "credits": "glTF sample models from the Khronos Group glTF-Sample-Assets repository; quarry_01 HDR from the three.js examples (Poly Haven)"
+    "credits": "glTF sample models from the Khronos Group glTF-Sample-Assets repository; quarry_01 HDR from the three.js examples (Poly Haven)",
+    "static": true
   },
   {
     "slug": "lights-spotlight",
@@ -151,7 +156,8 @@
     "title": "Materials / Environment Maps",
     "tags": ["materials", "environment", "cubemap", "equirectangular", "reflection", "refraction", "leva"],
     "original": "https://threejs.org/examples/#webgpu_materials_envmaps",
-    "credits": "Bridge2 cube map and equirectangular map (by Jón Ragnarsson) from the three.js examples"
+    "credits": "Bridge2 cube map and equirectangular map (by Jón Ragnarsson) from the three.js examples",
+    "static": true
   },
   {
     "slug": "loader-gltf-transmission",
@@ -164,7 +170,8 @@
     "slug": "depth-texture",
     "title": "Depth Texture",
     "tags": ["tsl", "render-to-texture", "depth", "leva"],
-    "original": "https://threejs.org/examples/#webgpu_depth_texture"
+    "original": "https://threejs.org/examples/#webgpu_depth_texture",
+    "static": true
   },
   {
     "slug": "backdrop",
@@ -206,7 +213,9 @@
     "tags": ["geometry", "tsl", "node-material", "shadows", "environment", "leva"],
     "original": "https://threejs.org/examples/#webgpu_geometry_loft",
     "credits": "LoftGeometry addon from the three.js examples",
-    "ciSkip": "17-exhibit shader-graph compile + B17 open anomaly (createRoot warning with no suspending hook) exceeds readiness on SwiftShader; passes on Metal"
+    "ciSkip": "17-exhibit shader-graph compile + B17 open anomaly (createRoot warning with no suspending hook) exceeds readiness on SwiftShader; passes on Metal",
+    "animationWindowMs": 4500,
+    "animatesSkip": "B17 open anomaly: createRoot warning with no suspending hook (UPSTREAM B17); animates but loop degraded — upstream investigation"
   },
   {
     "slug": "animation-retargeting",
@@ -261,7 +270,8 @@
     "title": "Loader / glTF Sheen",
     "tags": ["gltf", "loader", "sheen", "environment", "hdr", "leva"],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_sheen",
-    "credits": "Sheen Chair (KHR_materials_sheen sample) from glTF-Sample-Models"
+    "credits": "Sheen Chair (KHR_materials_sheen sample) from glTF-Sample-Models",
+    "static": true
   },
   {
     "slug": "loader-gltf-anisotropy",
@@ -275,7 +285,8 @@
     "title": "Textures / Anisotropy",
     "tags": ["textures", "anisotropy", "filtering", "scissor", "render-takeover", "fog", "leva"],
     "original": "https://threejs.org/examples/#webgpu_textures_anisotropy",
-    "credits": "crate.gif texture from the three.js examples"
+    "credits": "crate.gif texture from the three.js examples",
+    "static": true
   },
   {
     "slug": "loader-gltf-dispersion",
@@ -289,7 +300,8 @@
     "title": "Loader / glTF Compressed",
     "tags": ["gltf", "loader", "ktx2", "meshopt", "compression", "leva"],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_compressed",
-    "credits": "Coffeemat by Roman Red (Sketchfab), compressed with gltfpack, from the three.js examples"
+    "credits": "Coffeemat by Roman Red (Sketchfab), compressed with gltfpack, from the three.js examples",
+    "static": true
   },
   {
     "slug": "tsl-galaxy",
@@ -303,20 +315,23 @@
     "title": "TSL / Procedural Terrain",
     "tags": ["tsl", "node-material", "terrain", "noise", "shadows", "environment", "hdr", "pointer", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_procedural_terrain",
-    "credits": "Terrain shader based on Bruno Simon's Three.js Journey lessons; Pedestrian Overpass HDR from the three.js examples (Poly Haven)"
+    "credits": "Terrain shader based on Bruno Simon's Three.js Journey lessons; Pedestrian Overpass HDR from the three.js examples (Poly Haven)",
+    "static": true
   },
   {
     "slug": "compute-texture",
     "title": "Compute / Texture",
     "tags": ["compute", "tsl", "storage-texture", "leva"],
     "original": "https://threejs.org/examples/#webgpu_compute_texture",
-    "credits": "Sine interference pattern from Shadertoy (Xst3zN), via the three.js examples"
+    "credits": "Sine interference pattern from Shadertoy (Xst3zN), via the three.js examples",
+    "static": true
   },
   {
     "slug": "compute-particles",
     "title": "Compute / Particles",
     "tags": ["compute", "tsl", "particles", "sprites", "pointer", "leva"],
-    "original": "https://threejs.org/examples/#webgpu_compute_particles"
+    "original": "https://threejs.org/examples/#webgpu_compute_particles",
+    "static": true
   },
   {
     "slug": "tsl-raging-sea",
@@ -371,7 +386,8 @@
     "title": "Postprocessing / Outline",
     "tags": ["postprocessing", "outline", "tsl", "obj", "pointer", "shadows", "leva"],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_outline",
-    "credits": "Outline Pass by Prashant Sharma and Ben Houston; tree model from the three.js examples"
+    "credits": "Outline Pass by Prashant Sharma and Ben Houston; tree model from the three.js examples",
+    "static": true
   },
   {
     "slug": "tsl-vfx-tornado",
@@ -392,7 +408,8 @@
     "title": "Materials / Matcap",
     "tags": ["materials", "node-material", "matcap", "gltf", "exr", "tonemapping", "leva"],
     "original": "https://threejs.org/examples/#webgpu_materials_matcap",
-    "credits": "Lee Perry-Smith head scan by Infinite Realities (CC BY 3.0); 040full.exr matcap by cyaoeu; porcelain white matcap by Milos Paripovic, from the three.js examples"
+    "credits": "Lee Perry-Smith head scan by Infinite Realities (CC BY 3.0); 040full.exr matcap by cyaoeu; porcelain white matcap by Milos Paripovic, from the three.js examples",
+    "static": true
   },
   {
     "slug": "materials-toon",
@@ -405,14 +422,16 @@
     "slug": "lines-fat",
     "title": "Lines / Fat",
     "tags": ["lines", "line2", "node-material", "scissor", "viewport", "leva"],
-    "original": "https://threejs.org/examples/#webgpu_lines_fat"
+    "original": "https://threejs.org/examples/#webgpu_lines_fat",
+    "static": true
   },
   {
     "slug": "lensflares",
     "title": "Lens Flares",
     "tags": ["lensflare", "lights", "pointlight", "fog", "node-material", "leva"],
     "original": "https://threejs.org/examples/#webgpu_lensflares",
-    "credits": "LensflareMesh addon by Mugen87 and mrdoob; lens flare textures from ro.me, via the three.js examples"
+    "credits": "LensflareMesh addon by Mugen87 and mrdoob; lens flare textures from ro.me, via the three.js examples",
+    "static": true
   },
   {
     "slug": "volume-cloud",
@@ -486,7 +505,8 @@
     "slug": "fog-height",
     "title": "Fog / Height",
     "tags": ["tsl", "fog", "instancing", "node-material", "leva"],
-    "original": "https://threejs.org/examples/#webgpu_fog_height"
+    "original": "https://threejs.org/examples/#webgpu_fog_height",
+    "static": true
   },
   {
     "slug": "custom-fog",
