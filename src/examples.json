@@ -69,5 +69,11 @@
     "tags": ["tsl", "node-material", "planet", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_earth",
     "credits": "Earth textures from Solar System Scope (resized and merged), via the three.js examples"
+  },
+  {
+    "slug": "shadowmap",
+    "title": "Shadow Map",
+    "tags": ["tsl", "shadow", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_shadowmap"
   }
 ]

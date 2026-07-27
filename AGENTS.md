@@ -87,9 +87,11 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   typed TSL math (`rotate` etc.) may not resolve through them; cast to
   `Node<'float'|'vec3'|…>` with a comment (three-side typing gap, UPSTREAM.md B10 —
   same cast family as the fiber UniformNode gap).
-- Scene-level TSL fog is `scene.fogNode = fog(color, rangeFogFactor(near, far))` (the
-  legacy `Fog`/`FogExp2` objects are not the WebGPU path) — needs a documented cast,
-  `@types/three` doesn't declare `fogNode` (UPSTREAM.md B11; pattern in
+- Fog, two paths (verified against `NodeManager.updateFog()`): plain `Fog`/`FogExp2`
+  set declaratively (`<fog attach="fog" args={…} />`) IS auto-wrapped into a fog node
+  by the WebGPU renderer — prefer it. Only a CUSTOM TSL fog graph needs
+  `scene.fogNode = fog(color, rangeFogFactor(near, far))`, which needs a documented
+  cast — `@types/three` doesn't declare `fogNode` (UPSTREAM.md B11; pattern in
   src/examples/sprites.tsx).
 - Node materials are auto-extended by the `/webgpu` entry: `<meshStandardNodeMaterial>`
   etc. just work in JSX.
