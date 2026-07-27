@@ -32,9 +32,19 @@ for (const { slug, ...meta } of examples) {
     // <ReadinessSignal> inside DemoHelpers). Poll instead of sleeping. CI gets a
     // bigger budget: SwiftShader renders heavy examples at ~1 fps, so settle frames
     // cost real wall-clock there (verified: 30 instances + blur blew 60s twice).
-    await page.waitForFunction(() => window.__exampleReady === true, undefined, {
-      timeout: process.env.CI ? 180_000 : 60_000,
-    })
+    try {
+      await page.waitForFunction(() => window.__exampleReady === true, undefined, {
+        timeout: process.env.CI ? 180_000 : 60_000,
+      })
+    } catch (cause) {
+      // Readiness timeouts are usually a dead render loop, not slowness — surface
+      // everything the page said so CI logs are diagnosable without an artifact dig.
+      throw new Error(
+        `readiness timeout for ${slug}; page reported ${errors.length} error(s):\n` +
+          (errors.join('\n') || '(no console/page errors captured)'),
+        { cause },
+      )
+    }
 
     // Real webgpu context, not a WebGL2 fallback: getContext returns the existing
     // context only if the canvas was created with the same type.
