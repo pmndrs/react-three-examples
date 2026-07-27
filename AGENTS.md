@@ -42,6 +42,8 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   build). Never mix entry points in one app.
 - `<Canvas renderer>` enables WebGPU with defaults (antialias/MSAA 4x is on by default);
   `renderer={{ ... }}` passes WebGPURenderer parameters. No manual renderer init.
+  The `/webgpu` entry creates a WebGPURenderer even without the prop — write `renderer`
+  anyway (corpus rule: explicit beats implicit; the prop is where parameters will land).
 - RootState exposes **`renderer`** — `gl` is a deprecated alias, do not write it.
 - Canvas-level options replace v9 patterns: `background` prop (color / hex / HDR URL /
   environment preset / expanded object) replaces `<color attach="background">`;
@@ -168,7 +170,10 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
    transient: the FIRST-ever run of an example with multi-MB hotlinked assets and/or a
    fresh shader-graph build can blow the readiness timeout once (cold CDN fetch +
    compile), then pass in ~1s thereafter — one slow first run is not a broken example;
-   two is.
+   two is. CI runs the same suite on SwiftShader (software raster, ~1 fps on heavy
+   scenes): an example that verifiably cannot reach readiness there declares
+   `"ciSkip": "<reason>"` in its manifest entry (exception list, SPEC §10) — used
+   sparingly, never to paper over a local failure.
 4. Screenshot for review — collapse the leva panel first (it overlays center-frame
    subjects at small viewports)
 

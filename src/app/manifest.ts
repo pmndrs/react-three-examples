@@ -10,6 +10,8 @@ export interface ExampleMeta {
   original?: string
   /** Asset/author attribution shown in the titleblock. */
   credits?: string
+  /** CI smoke-tier exception (SPEC §10): reason this example can't run on SwiftShader. */
+  ciSkip?: string
 }
 
 export const exampleMeta = examples as ExampleMeta[]

@@ -11,8 +11,12 @@ const IGNORED_CONSOLE = [
   /\[vite\]/,
 ]
 
-for (const { slug } of examples) {
+for (const { slug, ...meta } of examples) {
+  const ciSkip = 'ciSkip' in meta ? String(meta.ciSkip) : undefined
   test(`${slug}: WebGPU context, readiness signal, non-black canvas`, async ({ page }) => {
+    // Exception list (SPEC §10, three.js-CI prior art): examples too heavy for
+    // SwiftShader declare ciSkip WITH A REASON in the manifest. They still run locally.
+    test.skip(Boolean(process.env.CI && ciSkip), ciSkip)
     const errors: string[] = []
     page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
     page.on('console', (message) => {

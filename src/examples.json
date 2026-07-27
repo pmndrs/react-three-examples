@@ -16,7 +16,8 @@
     "title": "Skinning / Instancing",
     "tags": ["animation", "skinning", "instancing", "gltf", "tsl", "post-processing", "leva"],
     "original": "https://threejs.org/examples/#webgpu_skinning_instancing",
-    "credits": "Michelle model from the three.js examples"
+    "credits": "Michelle model from the three.js examples",
+    "ciSkip": "SwiftShader never reaches readiness: 30 skinned instances + full-res gaussian blur exceed software-raster budget (verified 2x on ubuntu-latest, 180s timeout)"
   },
   {
     "slug": "postprocessing-bloom-emissive",
@@ -31,5 +32,12 @@
     "tags": ["tsl", "sky", "environment", "cubecamera", "leva"],
     "original": "https://threejs.org/examples/#webgpu_sky",
     "credits": "SkyMesh (Preetham analytic sky model) from the three.js examples"
+  },
+  {
+    "slug": "rtt",
+    "title": "Render to Texture",
+    "tags": ["tsl", "render-to-texture", "post-processing", "pointer"],
+    "original": "https://threejs.org/examples/#webgpu_rtt",
+    "credits": "uv_grid_opengl texture from the three.js examples"
   }
 ]
