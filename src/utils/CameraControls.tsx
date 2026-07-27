@@ -20,9 +20,21 @@ export interface CameraControlsProps {
   /** Allow panning/trucking. Default true; false = orbit/dolly only (common in
    * skybox/panorama-style originals that lock the viewpoint). */
   pan?: boolean
+  /** Continuous auto-orbit (camera-controls has no built-in flag — implemented as an
+   * azimuth increment per frame). */
+  autoRotate?: boolean
+  /** OrbitControls-compatible speed: 2.0 ≈ one orbit per 30s. Default 2. */
+  autoRotateSpeed?: number
 }
 
-export function CameraControls({ target, minDistance, maxDistance, pan = true }: CameraControlsProps) {
+export function CameraControls({
+  target,
+  minDistance,
+  maxDistance,
+  pan = true,
+  autoRotate = false,
+  autoRotateSpeed = 2,
+}: CameraControlsProps) {
   const camera = useThree((s) => s.camera)
   const domElement = useThree((s) => s.renderer.domElement)
 
@@ -59,6 +71,8 @@ export function CameraControls({ target, minDistance, maxDistance, pan = true }:
   }, [controls, pan])
 
   useFrame((_, delta) => {
+    // OrbitControls parity: autoRotateSpeed 2.0 ≈ 30s per orbit.
+    if (autoRotate) controls.azimuthAngle += autoRotateSpeed * ((2 * Math.PI) / 60) * delta
     controls.update(delta)
   })
 

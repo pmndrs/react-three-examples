@@ -87,6 +87,15 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   typed TSL math (`rotate` etc.) may not resolve through them; cast to
   `Node<'float'|'vec3'|…>` with a comment (three-side typing gap, UPSTREAM.md B10 —
   same cast family as the fiber UniformNode gap).
+- Duck-typed `*Node` properties beyond a subclass's declared types are a PATTERN, not
+  one-offs: `scene.backgroundNode`, `scene.fogNode`, `material.emissiveNode` on
+  non-Standard node materials — the runtime reads them generically
+  (`NodeMaterial.setupOutgoingLight`, `NodeManager`) but `@types/three` declares them
+  narrowly. Cast with a comment; verify against the runtime source in
+  `reference/three.js/src/renderers/common/` first (UPSTREAM.md B11).
+- `instancedBufferAttribute<T>(array, itemSize)` needs its explicit type argument
+  under strict tsc (infers `unknown` otherwise) — same "typed TSL surface doesn't
+  infer" family as the Fn-param cast.
 - Fog, two paths (verified against `NodeManager.updateFog()`): plain `Fog`/`FogExp2`
   set declaratively (`<fog attach="fog" args={…} />`) IS auto-wrapped into a fog node
   by the WebGPU renderer — prefer it. Only a CUSTOM TSL fog graph needs

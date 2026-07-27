@@ -81,5 +81,12 @@
     "title": "Procedural Texture",
     "tags": ["tsl", "render-to-texture", "gaussian-blur", "leva"],
     "original": "https://threejs.org/examples/#webgpu_procedural_texture"
+  },
+  {
+    "slug": "reflection",
+    "title": "Reflection + Recursive Tree Cubes",
+    "tags": ["tsl", "reflection", "instancing", "post-processing", "shadows", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_reflection",
+    "credits": "Recursive Tree Cubes concept by oosmoxiecode; floor checkerboard textures from the three.js examples"
   }
 ]

@@ -148,16 +148,21 @@ commit** (AGENTS.md points agents at this file).
   chars) or throw early from `useUniforms` with a clear message naming the offending
   scope/key. Silent pass-through into codegen is the worst of the options.
 
-### B11 · @types/three: `Scene.fogNode` missing
+### B11 · @types/three: duck-typed `*Node` properties undeclared (fogNode, backgroundNode, emissiveNode…)
 
-- **What**: `Scene.fogNode` is a real webgpu runtime property (read by
-  `renderers/common/nodes/NodeManager.js` and `NodeMaterial`) — the TSL replacement
-  for legacy `Fog`/`FogExp2` — but `@types/three` doesn't declare it.
-- **Evidence**: hit porting `webgpu_sprites` (scene-level `fog(color, rangeFogFactor)`).
-- **Local workaround**: `(scene as unknown as { fogNode: Node | null }).fogNode = …`
-  with a comment (src/examples/sprites.tsx).
-- **Suggested fix**: add `fogNode: Node | null` to the `Scene` declaration in
-  @types/three (or three's own types if that's where Scene now lives).
+- **What**: the WebGPU renderer reads several `*Node` properties generically at
+  runtime that `@types/three` declares narrowly or not at all:
+  `Scene.fogNode`, `Scene.backgroundNode` (read by
+  `renderers/common/nodes/NodeManager.js`), and `emissiveNode` on ALL NodeMaterial
+  subclasses (`NodeMaterial.setupOutgoingLight()` reads it generically; @types only
+  declares it on `MeshStandardNodeMaterial`).
+- **Evidence**: hit three times across ports — `sprites` (fogNode), `reflection`
+  (backgroundNode + emissiveNode on MeshPhongNodeMaterial).
+- **Local workaround**: documented casts (see src/examples/sprites.tsx,
+  src/examples/reflection/).
+- **Suggested fix**: declare `fogNode`/`backgroundNode` on `Scene` and move
+  `emissiveNode` (and friends read by `setupOutgoingLight`) up to the shared
+  `NodeMaterial` declaration.
 
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 

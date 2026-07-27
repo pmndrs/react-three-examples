@@ -19,6 +19,10 @@ export interface DemoHelpersProps {
   maxDistance?: number
   /** Allow panning; false = orbit/dolly only. Forwarded to CameraControls. */
   pan?: boolean
+  /** Continuous auto-orbit. Forwarded to CameraControls. */
+  autoRotate?: boolean
+  /** OrbitControls-compatible auto-orbit speed (2 ≈ 30s/orbit). */
+  autoRotateSpeed?: number
 }
 
 // Test-only escape hatch: `?nogrid` suppresses the grid regardless of props. CI uses
@@ -35,6 +39,8 @@ export function DemoHelpers({
   minDistance,
   maxDistance,
   pan,
+  autoRotate,
+  autoRotateSpeed,
 }: DemoHelpersProps) {
   return (
     <>
@@ -55,7 +61,14 @@ export function DemoHelpers({
         />
       )}
       {controls && (
-        <CameraControls target={target} minDistance={minDistance} maxDistance={maxDistance} pan={pan} />
+        <CameraControls
+          target={target}
+          minDistance={minDistance}
+          maxDistance={maxDistance}
+          pan={pan}
+          autoRotate={autoRotate}
+          autoRotateSpeed={autoRotateSpeed}
+        />
       )}
       <ReadinessSignal />
     </>
