@@ -102,5 +102,19 @@
     "tags": ["tsl", "node-material", "refraction", "leva"],
     "original": "https://threejs.org/examples/#webgpu_refraction",
     "credits": "FloorsCheckerboard_S_Normal texture from the three.js examples"
+  },
+  {
+    "slug": "video-panorama",
+    "title": "Video Panorama",
+    "tags": ["video", "texture", "panorama", "equirectangular"],
+    "original": "https://threejs.org/examples/#webgpu_video_panorama",
+    "credits": "pano.webm video from the three.js examples"
+  },
+  {
+    "slug": "lights-rectarealight",
+    "title": "Lights / RectAreaLight",
+    "tags": ["lights", "rectarealight", "tsl", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lights_rectarealight",
+    "credits": "RectAreaLight LTC BRDF approximation by Eric Heitz et al.; RectAreaLightHelper by abelnation, from the three.js examples"
   }
 ]

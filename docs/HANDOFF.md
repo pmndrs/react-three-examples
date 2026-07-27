@@ -1,4 +1,34 @@
-# Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 dry-run wave)
+# Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
+
+## Wave 2 (added after the dry run; Metal-oracle policy per Dennis)
+
+8 more ports, run as 4 parallel PAIRS of single-Sonnet agents (examples.json
+append-discipline held — zero clobbers across 8 concurrent registrations):
+
+| Example | Notes | Cost |
+|---|---|---|
+| tsl-earth | day/night terminator + atmosphere on outputNode — showpiece | 107k |
+| shadowmap | maskNode discard + receivedShadowPositionNode; CORRECTED the fog rule (plain Fog auto-wraps; fogNode only for custom TSL fog) | 145k |
+| procedural-texture | convertToTexture/gaussianBlur self-bake, no pipeline | 108k |
+| reflection | reflector() floor, instanced voxel tree; TWEEN dropped for a useFrame ramp; drove the autoRotate util addition | 159k |
+| tonemapping | runtime operator swap; draco via useGLTF; cheapest yet (86k) | 86k |
+| refraction | backdropNode + viewportSharedTexture (typed! no cast needed) | 95k |
+| video-panorama | VideoTexture; geometry-baked scale(-1,1,1) (mesh-scale would flip winding); muted+playsInline load-bearing | 96k |
+| lights-rectarealight | LTC setup at module scope (rule clarified: idempotent lib registration ≠ mutable state) | 110k |
+
+**17 examples total, 17/17 smoke + contact sheet green on Metal.** CameraControls
+wrapper grew from real port needs: `pan` lock, `autoRotate`/`autoRotateSpeed`
+(OrbitControls-parity). AGENTS.md gained: fog two-paths correction, duck-typed
+`*Node` property pattern (+ check-@types-first caveat), instancedBufferAttribute
+type-arg, module-scope registration clarification. UPSTREAM B11 broadened
+(fogNode/backgroundNode/emissiveNode family), B12 added (useUniforms WGSL
+identifier validation).
+
+Review flags for Dennis: `tonemapping`'s HDR background reads very dark in the
+contact sheet (original is also dark — eyeball live); `lights-rectarealight`
+chunk is 250kB (LTC tables — expected, data not code).
+
+
 
 Read AGENTS.md first (v0.4 — conventions + stack pins + gotchas), then
 [UPSTREAM.md](UPSTREAM.md) (the patch/override ledger + upstream fix briefs Dennis

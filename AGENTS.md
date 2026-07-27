@@ -139,6 +139,9 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   intentional, showcased escape hatch (R3F is an AND with three.js, not an OR) — keep
   them visible in the component that owns them, not hidden in helpers.
 - No module-scope mutable state. Controls at the edge; props where they clarify.
+  (One-time idempotent library registration at module scope IS fine — e.g.
+  `RectAreaLightNode.setLTC(...)`, `CameraControlsImpl.install(...)` — the rule is
+  about state, not setup.)
 - `useAnimations`: play clips BY NAME, never `Object.values(actions)` — GLTFs ship
   rest/utility clips (e.g. Soldier.glb's `TPose`) that pollute the blend at default
   weight 1.
