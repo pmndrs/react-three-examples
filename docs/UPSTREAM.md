@@ -254,6 +254,23 @@ commit** (AGENTS.md points agents at this file).
   createRoot warning, all three had suspending `useTexture` with no explicit
   boundary. Adding `<Suspense fallback={null}>` inside Canvas fixes all of them
   (post-fix: 12k–75k px/s changing, zero warnings).
+- **Full-corpus audit (wave 8)**: a systematic sweep found 14 MORE affected
+  examples (every ungated suspending hook in the corpus): rtt,
+  skinning-instancing, tsl-halftone, instance-mesh, lights-phong,
+  lights-spotlight, materials-basic, materials-envmaps, tonemapping, and the five
+  loader-gltf-* single-model ports. All repaired the same way and verified
+  animating (or legitimately static with clean consoles + full-rate loops) by
+  pixel-diff + `__frameCount` probes. Mechanism note: the frame loop KEEPS
+  RUNNING (`__frameCount` advances) while the displayed canvas stays on the dead
+  root's last frame — "loop alive, pixels frozen" is the fingerprint.
+- **Likely explains the SwiftShader CI stall matrix**: all four stall examples
+  (skinning-instancing, rtt, tsl-halftone, sprites) were B17 cases — on
+  software raster the dual-root race plausibly lands so the readiness signal
+  never fires at all. Try removing the `ciSkip`s after this repair lands.
+- **Open anomaly**: `geometry-loft` logs the same createRoot warning with NO
+  suspending hook anywhere in the example (17 heavy LoftGeometry exhibits, slow
+  first render) — still animates, but the loop degraded to ~5fps under probe
+  conditions. Different trigger for the same re-entry?
 - **Workaround in repo**: Layer 1 rule — every suspending subtree inside Canvas
   gets an explicit Suspense boundary.
 - **Suggested fix**: guard the root-creation path against the re-entry that

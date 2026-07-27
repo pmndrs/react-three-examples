@@ -40,6 +40,7 @@
  *   y = -0.08) so the world-origin grid plane would slice straight through the subject
  *   of a macro shot (same call as the other loader-gltf-* ports).
  */
+import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -70,8 +71,12 @@ export default function LoaderGltfAnisotropy() {
       renderer={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.35 }}
       camera={{ position: [-0.35, -0.2, 0.35], fov: 40, near: 0.01, far: 10 }}
     >
-      <Environment files={HDR_URL} background backgroundBlurriness={blurriness} />
-      <BarnLamp />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <Environment files={HDR_URL} background backgroundBlurriness={blurriness} />
+        <BarnLamp />
+      </Suspense>
       <DemoHelpers
         grid={false}
         target={[0, -0.08, 0.11]}

@@ -32,7 +32,7 @@
  *   backdrop, and the mat's base sits at y = -0.8, so a ground grid at y ≈ 0 would
  *   slice through the middle of the model
  */
-import { useRef } from 'react'
+import { Suspense, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -78,7 +78,11 @@ export default function LoaderGltfCompressed() {
       background="#eeeeee"
       camera={{ position: [2, 2, 2], fov: 50, near: 1, far: 20 }}
     >
-      <CoffeeMat />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <CoffeeMat />
+      </Suspense>
       <Headlight power={power} />
       <DemoHelpers grid={false} minDistance={3} maxDistance={6} />
     </Canvas>

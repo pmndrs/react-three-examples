@@ -332,6 +332,16 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.13: corpus-wide B17 audit + repair (wave-8 interlude). A
+  full-corpus pixel-diff + frameCount sweep found 14 more B17-frozen examples
+  beyond flames' original three — every ungated suspending hook in the corpus,
+  including all four SwiftShader-stall examples (that CI mystery is plausibly
+  THIS bug; try dropping ciSkips). All repaired with explicit Suspense gates and
+  probe-verified. Fingerprint for the future: `__frameCount` advances while
+  pixels freeze = dual-root, check for the createRoot warning. Probe windows
+  must exceed stop-go animation periods (postprocessing-pixel false-alarmed at
+  1.5s; clean at 4s). Statics-by-design confirmed: morphtargets, depth-texture,
+  tonemapping, postprocessing-ao, compute-texture family.
 - 2026-07-27 — v0.12 amendments from wave-7 pair 4 (tsl-vfx-flames +
   tsl-vfx-tornado — wave 7 closes at 57 examples): **the explicit-Suspense rule**
   (Canvas-boundary suspension re-runs createRoot on alpha.3 and freezes all TSL

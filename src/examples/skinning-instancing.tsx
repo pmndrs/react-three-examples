@@ -23,7 +23,7 @@
  *   (original always renders the blur at full strength with no UI)
  * - DemoHelpers baseline (grid + camera controls) added; original had a fixed camera
  */
-import { useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -170,7 +170,11 @@ export default function SkinningInstancing() {
     <Canvas renderer background="#000000" camera={{ position: [1, 2, 3], fov: 50, near: 0.01, far: 40 }}>
       <pointLight color="#ff9900" position={[0, 4.5, -2]} power={400} />
       <CameraLight />
-      <Michelle instances={instances} timeScale={timeScale} paused={paused} />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <Michelle instances={instances} timeScale={timeScale} paused={paused} />
+      </Suspense>
       <PostFX blur={blur} />
       <DemoHelpers target={[0, 1, 0]} />
     </Canvas>

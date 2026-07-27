@@ -41,7 +41,7 @@
  *   declare `fogNode` even though the WebGPU renderer's `NodeManager` reads it directly
  *   off the live scene instance (same documented gap as `sprites.tsx`, AGENTS.md B11)
  */
-import { useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
@@ -214,12 +214,16 @@ export default function LightsPhong() {
   return (
     <Canvas renderer background="#000000" camera={{ position: [0, 0, 7], fov: 50, near: 0.01, far: 100 }}>
       <SceneFog fogColor={fogColor} near={fogNear} far={fogFar} />
-      <Teapots
-        leftLightKey={leftLightKey as LightKey}
-        rightLightKey={rightLightKey as LightKey}
-        centerShininess={centerShininess}
-        rightShininess={rightShininess}
-      />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <Teapots
+          leftLightKey={leftLightKey as LightKey}
+          rightLightKey={rightLightKey as LightKey}
+          centerShininess={centerShininess}
+          rightShininess={rightShininess}
+        />
+      </Suspense>
       <DemoHelpers grid={false} minDistance={3} maxDistance={25} />
     </Canvas>
   )

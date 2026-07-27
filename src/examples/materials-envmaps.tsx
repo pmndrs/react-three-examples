@@ -39,7 +39,7 @@
  *   (`grid={false}`) — the scene is a single sphere against a full skybox background
  *   with no ground plane in the original
  */
-import { useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { useCubeTexture, useTexture } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
@@ -124,14 +124,18 @@ export default function MaterialsEnvmaps() {
 
   return (
     <Canvas renderer camera={{ position: [0, 0, 2.5], fov: 70, near: 0.1, far: 100 }}>
-      <EnvMapSphere
-        type={type as EnvMapType}
-        refraction={refraction}
-        rotateX={rotateX}
-        rotateY={rotateY}
-        rotateZ={rotateZ}
-        syncMaterial={syncMaterial}
-      />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <EnvMapSphere
+          type={type as EnvMapType}
+          refraction={refraction}
+          rotateX={rotateX}
+          rotateY={rotateY}
+          rotateZ={rotateZ}
+          syncMaterial={syncMaterial}
+        />
+      </Suspense>
       <DemoHelpers grid={false} minDistance={1.5} maxDistance={6} />
     </Canvas>
   )

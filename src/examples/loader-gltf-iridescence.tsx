@@ -35,6 +35,7 @@
  *   ground grid at the default 0.5 unit cell size (same call as
  *   `loader-gltf-transmission`)
  */
+import { Suspense } from 'react'
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -65,8 +66,12 @@ export default function LoaderGltfIridescence() {
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       camera={{ position: [0.35, 0.05, 0.35], fov: 50, near: 0.05, far: 20 }}
     >
-      <Environment files={HDR_URL} background backgroundBlurriness={blurriness} />
-      <IridescenceLamp />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <Environment files={HDR_URL} background backgroundBlurriness={blurriness} />
+        <IridescenceLamp />
+      </Suspense>
       <DemoHelpers
         grid={false}
         target={[0, 0.2, 0]}

@@ -29,7 +29,7 @@
  * - DemoHelpers baseline (grid + camera controls) added; original had a fixed camera
  *   with no user interaction.
  */
-import { useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
 import { mix, normalWorld, oscSine, range, time } from 'three/tsl'
@@ -134,7 +134,11 @@ export default function InstanceMesh() {
       background="#000000"
       camera={{ position: [amount * 0.9, amount * 0.9, amount * 0.9], fov: 60, near: 0.1, far: 100 }}
     >
-      <InstancedSuzanne key={amount} amount={amount} visible={Math.min(visible, count)} />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <InstancedSuzanne key={amount} amount={amount} visible={Math.min(visible, count)} />
+      </Suspense>
       <DemoHelpers grid={false} />
     </Canvas>
   )

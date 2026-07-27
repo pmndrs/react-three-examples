@@ -30,7 +30,7 @@
  * - No leva controls: the only dynamic input in the original is the mouse position,
  *   already interactive via pointer movement — there's no extra parameter worth exposing
  */
-import { useRef } from 'react'
+import { Suspense, useRef } from 'react'
 import { Canvas, useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { hue, saturation, texture } from 'three/tsl'
@@ -91,7 +91,11 @@ function PostFX() {
 export default function Rtt() {
   return (
     <Canvas renderer background="#0066ff" camera={{ position: [0, 0, 3], fov: 70, near: 0.1, far: 10 }}>
-      <SpinningBox />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <SpinningBox />
+      </Suspense>
       <PostFX />
       <DemoHelpers />
     </Canvas>

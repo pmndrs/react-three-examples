@@ -33,7 +33,7 @@
  *   plane, and the infinite grid moiré-aliases across it, competing with the fabric study
  *   (same call as the other two loader-gltf-* ports).
  */
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -72,8 +72,12 @@ export default function LoaderGltfSheen() {
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       camera={{ position: [-0.75, 0.7, 1.25], fov: 45, near: 0.1, far: 20 }}
     >
-      <Environment files={HDR_URL} background />
-      <SheenChair sheen={sheen} />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <Environment files={HDR_URL} background />
+        <SheenChair sheen={sheen} />
+      </Suspense>
       <DemoHelpers grid={false} target={[0, 0.35, 0]} minDistance={1} maxDistance={10} />
     </Canvas>
   )

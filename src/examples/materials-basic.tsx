@@ -36,7 +36,7 @@
  *   parallax (no user-navigable orbit target) — DemoHelpers still renders the readiness
  *   signal
  */
-import { useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { useCubeTexture } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -161,13 +161,17 @@ export default function MaterialsBasic() {
 
   return (
     <Canvas renderer camera={{ position: [0, 0, 3], fov: 60, near: 0.01, far: 100 }}>
-      <SphereSwarm
-        color={color}
-        refraction={refraction}
-        refractionRatio={refractionRatio}
-        transparent={transparent}
-        opacity={opacity}
-      />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <SphereSwarm
+          color={color}
+          refraction={refraction}
+          refractionRatio={refractionRatio}
+          transparent={transparent}
+          opacity={opacity}
+        />
+      </Suspense>
       <ParallaxCamera />
       <DemoHelpers grid={false} controls={false} />
     </Canvas>

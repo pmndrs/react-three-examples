@@ -1,5 +1,26 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 8 interlude: corpus-wide B17 audit (same night)
+
+Flames' B17 find (wave 7) triggered a full-corpus animation audit: two-frame
+pixel-diff + `__frameCount` probes over all examples. Result: **14 more frozen
+examples repaired** (every ungated suspending hook in the corpus — rtt,
+skinning-instancing, tsl-halftone, instance-mesh, lights-phong, lights-spotlight,
+materials-basic, materials-envmaps, tonemapping, five loader-gltf-* ports), all
+verified animating post-fix. Fingerprint: loop alive (`__frameCount` advances) +
+pixels frozen + `R3F.createRoot should only be called once!` warning.
+
+**Big thread: all four SwiftShader CI stall examples were B17 cases.** The stall
+mystery is plausibly this bug — next CI pass, watch the advisory smoke job; if
+the four now pass on SwiftShader, drop their `ciSkip`s and consider flipping
+smoke back to blocking.
+
+Statics-by-design confirmed (0px, clean console, full-rate loop): morphtargets,
+depth-texture, tonemapping, geometry-loft*(see B17 open anomaly: warning with no
+suspending hook), postprocessing-ao, loader-gltf-sheen/-compressed.
+Follow-up still queued: the pixel-diff "animates" smoke assertion with a
+`static: true` manifest flag (probe windows must exceed stop-go periods — 4s).
+
 ## Wave 7 (same night)
 
 8 ports, 4 pairs — postprocessing cluster (6) + TSL VFX pair (2). **57 examples

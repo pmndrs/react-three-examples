@@ -43,7 +43,7 @@
  *   IS the shadow receiver this example is about; an infinite grid at y=0.002 would
  *   render through/under it, competing with the shadow for visual attention
  */
-import { useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
@@ -224,20 +224,24 @@ export default function LightsSpotlight() {
   return (
     <Canvas renderer shadows background="#000000" camera={{ position: [7, 4, 1], fov: 40, near: 0.1, far: 100 }}>
       <hemisphereLight color="#ffffff" groundColor="#8d8d8d" intensity={0.25} />
-      <SpotlightRig
-        mapKey={map as MapKey}
-        color={color}
-        intensity={intensity}
-        distance={distance}
-        angle={angle}
-        penumbra={penumbra}
-        decay={decay}
-        focus={focus}
-        shadowIntensity={shadowIntensity}
-        helpers={helpers}
-      />
-      <Floor />
-      <Lucy />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <SpotlightRig
+          mapKey={map as MapKey}
+          color={color}
+          intensity={intensity}
+          distance={distance}
+          angle={angle}
+          penumbra={penumbra}
+          decay={decay}
+          focus={focus}
+          shadowIntensity={shadowIntensity}
+          helpers={helpers}
+        />
+        <Floor />
+        <Lucy />
+      </Suspense>
       <DemoHelpers
         grid={false}
         target={[0, 1, 0]}

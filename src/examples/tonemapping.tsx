@@ -28,7 +28,7 @@
  *   false`; `minDistance`/`maxDistance` map directly to the original's OrbitControls
  *   values
  */
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -96,8 +96,12 @@ export default function Tonemapping() {
       camera={{ position: [-0.02, 0.03, 0.05], fov: 45, near: 0.01, far: 10 }}
     >
       <directionalLight color={0xfff3ee} intensity={3} position={[1, 0.05, 0.7]} />
-      <Environment files={HDR_URL} background backgroundBlurriness={blurriness} backgroundIntensity={intensity} />
-      <VeniceMask />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <Environment files={HDR_URL} background backgroundBlurriness={blurriness} backgroundIntensity={intensity} />
+        <VeniceMask />
+      </Suspense>
       <ToneMapping type={toneMapping as keyof typeof TONE_MAPPING_OPTIONS} exposure={exposure} />
       <DemoHelpers grid={false} target={[0, 0.03, 0]} minDistance={0.03} maxDistance={0.2} pan={false} />
     </Canvas>

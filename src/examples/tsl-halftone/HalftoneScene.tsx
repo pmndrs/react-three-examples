@@ -1,6 +1,7 @@
 // Everything that needs fiber's WebGPU hooks (`useUniforms`, `useFrame`) lives here,
 // as a child of <Canvas> — those hooks require the R3F reconciler context, unlike
 // leva's `useControls`, which the entry file calls one level up.
+import { Suspense } from 'react'
 import { useFrame, useUniforms } from '@react-three/fiber/webgpu'
 import type { Vector3 } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
@@ -79,7 +80,11 @@ export function HalftoneScene({
       <ambientLight intensity={ambientIntensity} />
       <directionalLight intensity={directionalIntensity} position={[4, 3, 1]} />
       <HalftonePrimitives materialColor={materialColor} halftones={halftones} />
-      <HalftoneMichelle halftones={halftones} />
+      {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
+          and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
+      <Suspense fallback={null}>
+        <HalftoneMichelle halftones={halftones} />
+      </Suspense>
       <DemoHelpers minDistance={0.1} maxDistance={50} />
     </>
   )
