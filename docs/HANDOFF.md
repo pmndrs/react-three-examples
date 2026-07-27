@@ -30,10 +30,12 @@ materials-basic, materials-envmaps, tonemapping, five loader-gltf-* ports), all
 verified animating post-fix. Fingerprint: loop alive (`__frameCount` advances) +
 pixels frozen + `R3F.createRoot should only be called once!` warning.
 
-**Big thread: all four SwiftShader CI stall examples were B17 cases.** The stall
-mystery is plausibly this bug — next CI pass, watch the advisory smoke job; if
-the four now pass on SwiftShader, drop their `ciSkip`s and consider flipping
-smoke back to blocking.
+**RESOLVED: the SwiftShader stall matrix WAS B17.** After the repair + ciSkip
+removal, all four former stalls PASS on SwiftShader (CI run 30261064018:
+skinning-instancing 27.9s, rtt 3.3s, tsl-halftone 7.4s, sprites 4.3s). The
+smoke job is BLOCKING again. Exception list is down to 2 legitimate ciSkips:
+volume-fire (perf) and geometry-loft (B17 open anomaly + 17-graph compile —
+the one remaining investigation thread).
 
 Statics-by-design confirmed (0px, clean console, full-rate loop): morphtargets,
 depth-texture, tonemapping, geometry-loft*(see B17 open anomaly: warning with no

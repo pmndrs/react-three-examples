@@ -205,7 +205,8 @@
     "title": "Geometry / Loft",
     "tags": ["geometry", "tsl", "node-material", "shadows", "environment", "leva"],
     "original": "https://threejs.org/examples/#webgpu_geometry_loft",
-    "credits": "LoftGeometry addon from the three.js examples"
+    "credits": "LoftGeometry addon from the three.js examples",
+    "ciSkip": "17-exhibit shader-graph compile + B17 open anomaly (createRoot warning with no suspending hook) exceeds readiness on SwiftShader; passes on Metal"
   },
   {
     "slug": "animation-retargeting",

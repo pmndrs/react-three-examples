@@ -27,10 +27,10 @@ jobs:
 
   smoke:
     runs-on: ubuntu-latest
-    # ADVISORY while the SwiftShader stall pattern is under investigation (see
-    # docs/HANDOFF.md): failures show in the Actions UI but don't fail the run or
-    # send failure emails. Flip back to blocking once the exception list is stable.
-    continue-on-error: true
+    # BLOCKING since the B17 repair resolved the SwiftShader stall matrix (all four
+    # former stalls pass on SwiftShader as of run 30261064018). Exception list:
+    # per-example `ciSkip` entries in src/examples.json (2: volume-fire perf,
+    # geometry-loft B17-anomaly).
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
