@@ -481,5 +481,18 @@
     "tags": ["materials", "sss", "node-material", "fbx", "lights", "leva"],
     "original": "https://threejs.org/examples/#webgpu_materials_sss",
     "credits": "Stanford bunny model and thickness map by Shaochun Lin, from the three.js examples"
+  },
+  {
+    "slug": "fog-height",
+    "title": "Fog / Height",
+    "tags": ["tsl", "fog", "instancing", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_fog_height"
+  },
+  {
+    "slug": "custom-fog",
+    "title": "Custom Fog",
+    "tags": ["tsl", "fog", "noise", "terrain", "instancing", "sky", "environment", "shadows", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_custom_fog",
+    "credits": "TerrainGenerator, ForestGenerator and SkyMesh addons from the three.js examples"
   }
 ]
