@@ -16,8 +16,7 @@
     "title": "Skinning / Instancing",
     "tags": ["animation", "skinning", "instancing", "gltf", "tsl", "post-processing", "leva"],
     "original": "https://threejs.org/examples/#webgpu_skinning_instancing",
-    "credits": "Michelle model from the three.js examples",
-    "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
+    "credits": "Michelle model from the three.js examples"
   },
   {
     "slug": "postprocessing-bloom-emissive",
@@ -38,8 +37,7 @@
     "title": "Render to Texture",
     "tags": ["tsl", "render-to-texture", "post-processing", "pointer"],
     "original": "https://threejs.org/examples/#webgpu_rtt",
-    "credits": "uv_grid_opengl texture from the three.js examples",
-    "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
+    "credits": "uv_grid_opengl texture from the three.js examples"
   },
   {
     "slug": "shadow-contact",
@@ -52,16 +50,14 @@
     "title": "TSL / Halftone",
     "tags": ["tsl", "node-material", "gltf", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_halftone",
-    "credits": "Michelle model from the three.js examples",
-    "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
+    "credits": "Michelle model from the three.js examples"
   },
   {
     "slug": "sprites",
     "title": "Sprites",
     "tags": ["tsl", "node-material", "sprites", "fog", "leva"],
     "original": "https://threejs.org/examples/#webgpu_sprites",
-    "credits": "sprite1.png texture from the three.js examples",
-    "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
+    "credits": "sprite1.png texture from the three.js examples"
   },
   {
     "slug": "tsl-earth",
