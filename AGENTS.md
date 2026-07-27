@@ -348,6 +348,16 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.18 from wave-9 pairs 2–4 (mirror, materials-sss, custom-fog,
+  fog-height, instance-points, instance-uniform — all zero-review-fix; wave 9
+  closes at 73 examples). **CI milestone folded in: smoke is BLOCKING and green**
+  (the B17 repair resolved the SwiftShader stall matrix; exception list is 2
+  legitimate ciSkips). Flagged once each, not yet rules: leva `onEditEnd` as the
+  commit gate for expensive synchronous bakes (custom-fog); uniform-driven
+  fogNode graphs beat rebuild-per-change (fog-height); `Material.alphaToCoverage`
+  has no version-bumping setter in 0.185.1 — toggle needs `needsUpdate`
+  (instance-points); InsetView now duplicated in two ports (third occurrence →
+  src/utils/). Playwright `-g`/--list note added to verification (v0.17.1).
 - 2026-07-27 — v0.17 amendments from wave-9 pair 1 (ocean + clearcoat, both
   zero-review-fix): UPSTREAM B20 — Environment/useEnvironment hardwire
   CubeTextureLoader for 6-file arrays (HDR cubemaps unloadable declaratively;

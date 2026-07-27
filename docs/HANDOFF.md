@@ -1,5 +1,30 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 9 (same night) — and the CI milestone
+
+8 ports, 4 pairs. **73 examples total, 73/73 smoke + contact sheet green on
+Metal. Third consecutive zero-review-fix wave.** And the big one: **CI smoke is
+BLOCKING and green** — the B17 repair resolved the SwiftShader stall matrix
+(all four former stalls pass; run 30261064018), exception list down to 2
+legitimate ciSkips (volume-fire perf, geometry-loft B17-anomaly).
+
+| Example | Notes | Cost |
+|---|---|---|
+| ocean | WaterMesh/SkyMesh + per-sun-move PMREM bake; safe primitive-reparenting pattern | 95k |
+| clearcoat | 4 physical spheres over Pisa HDR cube; found B20 (Environment can't load HDR cubemaps) | 114k |
+| mirror | two TSL reflectors (decal-masked floor, rippled blue wall) | 108k |
+| materials-sss | first FBX port; MeshSSSNodeMaterial, zero casts | 111k |
+| custom-fog | showpiece: procedural alpine valley, 500k trees, triNoise3D fog wisps; leva onEditEnd bake gate | 132k |
+| fog-height | exponential height fog, uniform-driven (no rebuilds) | 89k |
+| instance-points | PointsNodeMaterial fat points + compute pulse + inset (top-origin fix reapplied) | 121k |
+| instance-uniform | custom InstanceUniformNode (per-object uniform updates) ported faithfully | 115k |
+
+Watch: custom-fog (500k trees) may time out on blocking SwiftShader CI — if
+the next run goes red there, add its ciSkip (agent correctly didn't preempt).
+
+Cumulative: **71 agent ports across 9 waves + 2 gate ports, zero manifest
+clobbers across 36+ concurrent pair-registrations.** AGENTS.md v0.16→v0.18.
+
 ## Wave 8 (same night)
 
 8 ports, 4 pairs + the B17 audit interlude (below). **65 examples total, 65/65

@@ -494,5 +494,18 @@
     "tags": ["tsl", "fog", "noise", "terrain", "instancing", "sky", "environment", "shadows", "leva"],
     "original": "https://threejs.org/examples/#webgpu_custom_fog",
     "credits": "TerrainGenerator, ForestGenerator and SkyMesh addons from the three.js examples"
+  },
+  {
+    "slug": "instance-uniform",
+    "title": "Instance Uniform",
+    "tags": ["tsl", "node-material", "custom-node", "uniforms", "cubemap", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_instance_uniform",
+    "credits": "TeapotGeometry and SwedishRoyalCastle cube map from the three.js examples"
+  },
+  {
+    "slug": "instance-points",
+    "title": "Instance Points",
+    "tags": ["points", "instancing", "compute", "tsl", "node-material", "scissor", "viewport", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_instance_points"
   }
 ]
