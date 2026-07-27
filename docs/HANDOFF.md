@@ -1,5 +1,25 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 8 (same night)
+
+8 ports, 4 pairs + the B17 audit interlude (below). **65 examples total, 65/65
+smoke + contact sheet green on Metal.** Zero review fixes across all 8 ports —
+second consecutive zero-fix wave.
+
+| Example | Notes | Cost |
+|---|---|---|
+| materials-matcap | EXR/JPG matcap swap, both decode paths | 107k |
+| materials-toon | 6³ toon lattice + ToonOutlinePassNode; pattern-(c) wrinkle (constructor takes Nodes where factory types don't) | 106k |
+| lines-fat | Line2NodeMaterial vs native strip + PiP inset; **found WebGPU setViewport/setScissor TOP-origin rule** | 118k |
+| lensflares | LensflareMesh field; occlusion test verified live; sRGB/linear setHSL parity flagged | 109k |
+| volume-cloud | Data3DTexture raymarch; **found TSL stack rule** (helpers with internal toVar/assign need Fn) | 97k |
+| volume-fire | biggest port ever (258k): 8-kernel GPU fluid sim + volumetric shadows + draggable emitter; legitimate ciSkip #5; B19 filed | 258k |
+| shadowmap-vsm | shadows="variance" verified; VSM blur knobs live via dash-paths | 100k |
+| shadowmap-pointlight | cube shadow maps, striped shells; intensity/distance parity checked at review | 100k |
+
+Cumulative: **63 agent ports across 8 waves + 2 gate ports, zero manifest
+clobbers across 32+ concurrent pair-registrations.** AGENTS.md v0.12→v0.16.
+
 ## Wave 8 interlude: corpus-wide B17 audit (same night)
 
 Flames' B17 find (wave 7) triggered a full-corpus animation audit: two-frame

@@ -443,5 +443,18 @@
     "original": "https://threejs.org/examples/#webgpu_volume_fire",
     "credits": "Volumetric fire simulation by the three.js authors; TeapotGeometry and the curl-noise TSL addon from the three.js examples",
     "ciSkip": "2M-voxel GPU fluid sim + raymarched volume at 120 Hz substeps cannot reach readiness on SwiftShader software raster"
+  },
+  {
+    "slug": "shadowmap-pointlight",
+    "title": "Shadow Map / Point Light",
+    "tags": ["shadows", "pointlight", "cube-shadow-map", "canvas-texture", "node-material", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_shadowmap_pointlight"
+  },
+  {
+    "slug": "shadowmap-vsm",
+    "title": "Shadow Map / VSM",
+    "tags": ["shadows", "vsm", "spotlight", "directional-light", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_shadowmap_vsm",
+    "credits": "VSM Shadows example by Paul Brunt"
   }
 ]

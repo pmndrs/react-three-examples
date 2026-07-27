@@ -346,6 +346,13 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.16 amendments from wave-8 pair 4 (shadowmap-vsm +
+  shadowmap-pointlight, both zero-review-fix — wave 8 closes at 65 examples):
+  clarification both shadow agents converged on independently — fiber dash-path
+  props apply ANY `shadow.*` scalar at runtime (`shadow-radius`,
+  `shadow-blurSamples`, `shadow-bias` all work live); the lights-spotlight
+  imperative-sync precedent is about missing TYPED props, not capability.
+  `shadows="variance"` → VSMShadowMap confirmed against the fiber variant table.
 - 2026-07-27 — v0.15 amendments from wave-8 pair 3 (volume-cloud + volume-fire,
   both zero-review-fix; fire is the biggest port yet — full GPU fluid sim): TSL
   stack rule (helpers with internal toVar/assign need Fn() — runtime-only
