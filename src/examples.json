@@ -334,5 +334,18 @@
     "tags": ["compute", "tsl", "particles", "sprites", "attractors", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_compute_attractors_particles",
     "credits": "Particle attractor simulation by Bruno Simon, from the three.js examples"
+  },
+  {
+    "slug": "postprocessing",
+    "title": "Postprocessing",
+    "tags": ["postprocessing", "tsl", "dot-screen", "rgb-shift", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing"
+  },
+  {
+    "slug": "postprocessing-dof",
+    "title": "Postprocessing / Depth of Field",
+    "tags": ["postprocessing", "depth-of-field", "tsl", "instancing", "cubemap", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_dof",
+    "credits": "SwedishRoyalCastle cube map from the three.js examples"
   }
 ]

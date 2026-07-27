@@ -163,12 +163,17 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   - fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so passing a
     uniform to TSL math expecting `Node<'float'>` fails strict tsc — cast
     `uFoo as unknown as Node<'float'>` with a comment (upstream fiber typing gap).
-  - TWO dynamism patterns — pick by where the uniform lives: (a) values YOU introduce
-    into the graph → fiber `useUniforms` + the cast above; (b) knobs a three.js pass
-    already exposes as `uniform()`-backed fields (`bloom().strength/.radius` etc.) →
-    return the pass from the mainCB to register it on `passes`, then mutate
-    `pass.foo.value` in an effect. (b) needs no cast and no extra uniform — prefer it
-    when the field exists.
+  - THREE dynamism patterns — pick by where the uniform lives: (a) values YOU
+    introduce into the graph → fiber `useUniforms` + the cast above; (b) knobs a
+    three.js pass already exposes as `uniform()`-backed fields
+    (`bloom().strength/.radius` etc.) → return the pass from the mainCB to register
+    it on `passes`, then mutate `pass.foo.value` in an effect — no cast, prefer it
+    when the field exists; (c) pass factories that wrap numeric args in CONST nodes
+    (`dof()` — check the factory source before assuming bloom-style fields) → create
+    three/tsl `uniform()` nodes inside the mainCB, pass them to the factory, register
+    THEM via return-to-register, mutate `.value` in an effect (what the originals
+    themselves do; no cast — they're three-side uniforms, not fiber hook uniforms).
+    Pattern examples: (b) `postprocessing`, (c) `postprocessing-dof`.
   - `useRenderPipeline(mainCB, setupCB)`: setupCB is where MRT config goes
     (`scenePass.setMRT(...)`) — full details in
     `reference/react-three-fiber/docs/webgpu/render-pipeline.mdx`.
@@ -306,6 +311,12 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.10 amendments from wave-7 pair 1 (postprocessing +
+  postprocessing-dof, both zero-review-fix — postprocessing cluster opens): the
+  pipeline dynamism patterns grew from two to THREE — (c) const-wrapping pass
+  factories (dof) need user-created three/tsl uniform() nodes registered via
+  return-to-register. v0.9's tone-mapping rule applied correctly on first use by
+  both ports (both originals default NoToneMapping).
 - 2026-07-27 — v0.9 amendments from wave-6 pair 4 (tsl-raging-sea +
   tsl-compute-attractors-particles, both zero-review-fix — wave 6 closes at 49
   examples): tone-mapping parity trap (fiber Canvas defaults ACESFilmic, originals
