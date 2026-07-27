@@ -241,6 +241,43 @@ commit** (AGENTS.md points agents at this file).
 - **Suggested fix**: use a WGSL-safe separator (`_`, matching useUniforms) and
   sanitize both parts (shared fix with B12's validator).
 
+### B17 · fiber: Canvas-boundary suspension re-runs createRoot and freezes TSL `time`
+
+- **What**: when a child suspends all the way up to Canvas's own internal boundary
+  (no user `<Suspense>` in between), fiber alpha.3 logs `R3F.createRoot should only
+  be called once!` and every TSL `time`-driven node graph freezes permanently at
+  frame one. Scenes still render (non-black), so smoke tiers that only assert
+  pixels miss it entirely.
+- **Evidence**: found porting `tsl-vfx-flames`; a pixel-diff sweep (two frames
+  ~1s apart) then showed three ALREADY-SHIPPED corpus examples latently frozen
+  (`sprites` 1px, `tsl-earth` 2px, `refraction` 0px changed) — all three logged the
+  createRoot warning, all three had suspending `useTexture` with no explicit
+  boundary. Adding `<Suspense fallback={null}>` inside Canvas fixes all of them
+  (post-fix: 12k–75k px/s changing, zero warnings).
+- **Workaround in repo**: Layer 1 rule — every suspending subtree inside Canvas
+  gets an explicit Suspense boundary.
+- **Suggested fix**: guard the root-creation path against the re-entry that
+  Canvas-boundary suspension triggers (likely the Canvas component re-running its
+  init on the suspense retry); at minimum, make the createRoot warning an error so
+  the failure is loud.
+
+### B18 · fiber: creator-mode `useUniforms` setState-during-render on post-suspense creation
+
+- **What**: `useUniforms` creator mode calls `store.setState` inside `useMemo`
+  during render when a uniform is first created. If the component suspends BEFORE
+  `useUniforms` runs (e.g. `useTexture` called above it), creation defers to the
+  post-suspense re-render — by then sibling components subscribed to the whole
+  store (`useRenderPipeline` internally calls bare `useThree()`) are mounted, and
+  the mid-render write triggers React's "Cannot update a component while rendering
+  a different component" warning.
+- **Evidence**: `tsl-vfx-tornado` (useTexture + useUniforms + useRenderPipeline
+  sibling); verified against fiber source. Repo workaround: call `useUniforms`
+  before any suspending hook (Layer 1 rule).
+- **Suggested fix**: defer the store write out of render (queue into a
+  microtask/effect-phase flush), or narrow `useRenderPipeline`'s subscription; the
+  B8 family (setState-in-render from hooks) keeps growing — a lint-able contract
+  ("no store writes during render") would kill the class.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

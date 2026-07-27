@@ -1,5 +1,44 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 7 (same night)
+
+8 ports, 4 pairs — postprocessing cluster (6) + TSL VFX pair (2). **57 examples
+total, 57/57 smoke + contact sheet green on Metal.** Review fixes: 1 across the
+wave (outline's seeded initial selection); plus two REAL shipped-bug repairs the
+wave's finds triggered (below).
+
+| Example | Notes | Cost |
+|---|---|---|
+| postprocessing | dotScreen+rgbShift chain; pattern (b); corrected orchestrator's own prompt error (not bloom) | 95k |
+| postprocessing-dof | established dynamism pattern (c): const-wrapping factories need user uniform() via return-to-register | 85k |
+| postprocessing-pixel | pixelationPass as full-pipeline PassNode; manual ortho + frustum snap; drove minZoom/maxZoom wrapper props | 123k |
+| postprocessing-ao | GTAO into ambient via builtinAOContext + TRAA; found the samples:0 rule (fiber MSAA-4x default breaks depth copies) | 157k |
+| postprocessing-outline | OutlineNode masks in user TSL; bubbled pointer-event selection; review fix: seed torus selection | 109k |
+| postprocessing-afterimage | 50k-sprite spiral; history trails; outputNode-swap+needsUpdate bypass idiom | 112k |
+| tsl-vfx-flames | fragment-stage fire; **found B17** (Canvas-boundary suspension freezes TSL time) via pixel-diff bisect | 161k |
+| tsl-vfx-tornado | parabola-twisted funnel + bloom; **found B18** (useUniforms-after-suspense setState-in-render) | 140k |
+
+**Shipped-bug repairs this wave:**
+- `loader-gltf-dispersion` suite flake was NOT the cold-start transient — it was
+  the B15-family PMREM destroyed-texture race under suite contention. Suspense
+  gate fixed it; first back-to-back clean full-suite runs since it landed.
+- **B17 latent freezes**: `sprites`, `tsl-earth`, `refraction` shipped with TSL
+  `time` frozen at frame one (Canvas-boundary suspension; smoke's non-black check
+  can't see it). All three repaired with explicit Suspense boundaries and
+  verified animating by pixel-diff (31k–75k px/s).
+
+Wave-7 upstream yield: B17 (fiber createRoot re-run on Canvas-boundary
+suspension), B18 (useUniforms setState-in-render), the samples:0 MSAA rule, and
+dynamism pattern (c). AGENTS.md v0.9→v0.12.
+
+**Follow-up queued (test-tier gap the wave exposed): a two-frame pixel-diff
+"animates" assertion** — smoke's non-black check shipped three frozen examples;
+needs a manifest flag for intentionally-static examples (compute-texture, rtt…).
+
+Cumulative: **55 agent ports across 7 waves + 2 gate ports, 1 review fix + 2
+systemic-bug repairs this wave, zero manifest clobbers across 26+ concurrent
+pair-registrations.**
+
 ## Wave 6 (same night)
 
 8 ports, 4 pairs — the cluster wave: glTF loaders closed, TSL showpieces + first

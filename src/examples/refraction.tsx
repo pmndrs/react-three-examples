@@ -38,7 +38,7 @@
  *   this example is staged on, and DemoHelpers' world-space grid sits at y=0.002,
  *   coincident with (and visually clashing against) the room's bottom plane
  */
-import { useMemo, useRef } from 'react'
+import { Suspense, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
@@ -122,7 +122,12 @@ export default function Refraction() {
   return (
     <Canvas renderer camera={{ position: [0, 50, 160], fov: 45, near: 1, far: 500 }}>
       <OrbitingSphere orbitSpeed={orbitSpeed} />
-      <RefractorPlane normalScale={normalScale} uvTile={uvTile} />
+      {/* Explicit boundary: suspending up to Canvas's own boundary re-runs createRoot
+          on fiber alpha.3 and freezes every TSL `time` graph (see AGENTS.md; found by
+          tsl-vfx-flames' pixel-diff sweep — this example shipped frozen). */}
+      <Suspense fallback={null}>
+        <RefractorPlane normalScale={normalScale} uvTile={uvTile} />
+      </Suspense>
 
       {/* Room: floor, ceiling, back, and two side walls (front stays open to the camera). */}
       <mesh position={[0, 100, 0]} rotation={[Math.PI / 2, 0, 0]}>

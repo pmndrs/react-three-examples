@@ -39,7 +39,7 @@
  *   UPSTREAM.md entry — flagged here and in the port report as a candidate AGENTS.md
  *   note (same cast-with-comment convention as the documented fiber typing gaps)
  */
-import { useEffect, useMemo, useRef } from 'react'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
@@ -151,7 +151,12 @@ export default function Sprites() {
 
   return (
     <Canvas renderer background="#000000" camera={{ position: [0, 0, 1500], fov: 60, near: 1, far: 2100 }}>
-      <SpriteField amount={amount} radius={radius} spinSpeed={spinSpeed} />
+      {/* Explicit boundary: suspending up to Canvas's own boundary re-runs createRoot
+          on fiber alpha.3 and freezes every TSL `time` graph (see AGENTS.md; found by
+          tsl-vfx-flames' pixel-diff sweep — this example shipped frozen). */}
+      <Suspense fallback={null}>
+        <SpriteField amount={amount} radius={radius} spinSpeed={spinSpeed} />
+      </Suspense>
       <SceneFog near={near} far={far} fogColor={fogColor} />
       <DemoHelpers grid={false} />
     </Canvas>

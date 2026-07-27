@@ -375,5 +375,19 @@
     "tags": ["postprocessing", "outline", "tsl", "obj", "pointer", "shadows", "leva"],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_outline",
     "credits": "Outline Pass by Prashant Sharma and Ben Houston; tree model from the three.js examples"
+  },
+  {
+    "slug": "tsl-vfx-tornado",
+    "title": "TSL / VFX Tornado",
+    "tags": ["tsl", "node-material", "vfx", "noise", "postprocessing", "bloom", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_vfx_tornado",
+    "credits": "Tornado VFX by Bruno Simon, based on Three.js Journey lessons; perlin noise texture from the three.js examples"
+  },
+  {
+    "slug": "tsl-vfx-flames",
+    "title": "TSL / VFX Flames",
+    "tags": ["tsl", "node-material", "sprites", "vfx", "noise", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_vfx_flames",
+    "credits": "Flame VFX by Bruno Simon, inspired by @cmzw_; voronoi/perlin noise textures from the three.js examples"
   }
 ]

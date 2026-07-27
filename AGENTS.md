@@ -192,6 +192,21 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 - StrictMode double-invokes effects: never `dispose()` a `useMemo`'d instance in an
   effect cleanup (kills the memoized instance for good). Use symmetric connect/
   disconnect effects — see [src/utils/CameraControls.tsx](src/utils/CameraControls.tsx).
+- **Every suspending subtree inside `<Canvas>` gets its own explicit
+  `<Suspense fallback={null}>` — no exceptions.** Letting suspension reach Canvas's
+  own boundary re-runs createRoot on fiber alpha.3 (`R3F.createRoot should only be
+  called once!` console warning) and permanently freezes every TSL `time`-driven
+  graph at frame one (UPSTREAM B17). The freeze is invisible to the smoke tier
+  (non-black ≠ animating) — three shipped examples were latently frozen until a
+  pixel-diff sweep caught them. This supersedes "useGLTF suspends and Canvas
+  handles it": it doesn't, gate explicitly. (The B15 IBL gate and the dispersion
+  PMREM-race gate are special cases of this rule.)
+- In a component that both suspends (useTexture/useGLTF/useLoader) and calls
+  `useUniforms`: call `useUniforms` BEFORE the suspending hook. Creator-mode
+  `useUniforms` writes to the fiber store during render; deferred to the
+  post-suspense re-render, that write lands after siblings have subscribed
+  (`useRenderPipeline` calls bare `useThree()`) → React's setState-during-render
+  warning (UPSTREAM B18; pattern: `tsl-vfx-tornado`).
 - **Imperative mesh setup that must precede the first render goes in
   `useLayoutEffect`, not `useEffect`.** The WebGPU shader-graph build reads mesh state
   ONCE on the first RAF render and caches it (e.g. `morphReference()` caches
@@ -317,6 +332,15 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.12 amendments from wave-7 pair 4 (tsl-vfx-flames +
+  tsl-vfx-tornado — wave 7 closes at 57 examples): **the explicit-Suspense rule**
+  (Canvas-boundary suspension re-runs createRoot on alpha.3 and freezes all TSL
+  `time` graphs, UPSTREAM B17 — flames' pixel-diff sweep found THREE shipped
+  examples latently frozen: sprites/tsl-earth/refraction, all repaired this
+  commit); useUniforms-before-suspending-hooks ordering (setState-in-render via
+  useRenderPipeline's whole-store subscription, UPSTREAM B18). Follow-up queued:
+  a two-frame pixel-diff assertion tier — smoke's non-black check cannot see
+  animation freezes.
 - 2026-07-27 — v0.11 amendments from wave-7 pair 2 (postprocessing-pixel +
   postprocessing-ao): TRAA/depth-copy passes need `samples: 0` targets (fiber's
   MSAA-4x default propagates into pass() — real WebGPU validation error, found and

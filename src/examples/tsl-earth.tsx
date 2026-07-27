@@ -39,7 +39,7 @@
  *   void with no ground plane; dolly range set to the original OrbitControls'
  *   `minDistance`/`maxDistance` (0.1 / 50)
  */
-import { useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, useUniforms } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
@@ -186,13 +186,18 @@ export default function TslEarth() {
   return (
     <Canvas renderer background="#000000" camera={{ position: CAMERA_POSITION, fov: 25, near: 0.1, far: 100 }}>
       <directionalLight color="#ffffff" intensity={2} position={SUN_POSITION} />
-      <Globe
-        atmosphereDayColor={atmosphereDayColor}
-        atmosphereTwilightColor={atmosphereTwilightColor}
-        roughnessLow={roughnessLow}
-        roughnessHigh={roughnessHigh}
-        rotationSpeed={rotationSpeed}
-      />
+      {/* Explicit boundary: suspending up to Canvas's own boundary re-runs createRoot
+          on fiber alpha.3 and freezes every TSL `time` graph (see AGENTS.md; found by
+          tsl-vfx-flames' pixel-diff sweep — this example shipped frozen). */}
+      <Suspense fallback={null}>
+        <Globe
+          atmosphereDayColor={atmosphereDayColor}
+          atmosphereTwilightColor={atmosphereTwilightColor}
+          roughnessLow={roughnessLow}
+          roughnessHigh={roughnessHigh}
+          rotationSpeed={rotationSpeed}
+        />
+      </Suspense>
       <DemoHelpers grid={false} minDistance={0.1} maxDistance={50} />
     </Canvas>
   )
