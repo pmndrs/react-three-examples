@@ -182,5 +182,19 @@
     "title": "Camera",
     "tags": ["camera", "cameraHelper", "render-takeover", "scissor", "leva"],
     "original": "https://threejs.org/examples/#webgpu_camera"
+  },
+  {
+    "slug": "lights-pointlights",
+    "title": "Lights / Point Lights",
+    "tags": ["lights", "pointlight", "tsl", "node-material", "obj", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lights_pointlights",
+    "credits": "Walt Disney head by David OReilly; displacement effect by oosmoxiecode, from the three.js examples"
+  },
+  {
+    "slug": "portal",
+    "title": "Portal",
+    "tags": ["tsl", "node-material", "render-to-texture", "gltf", "animation", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_portal",
+    "credits": "Xbot model from the three.js examples"
   }
 ]

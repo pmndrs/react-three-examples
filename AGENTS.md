@@ -83,6 +83,13 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   built; use TSL `If()/Loop()/select()` for anything that must react to uniforms.
 - Prefer TSL built-ins (`time`, `cameraPosition`, …) over hand-driven uniforms;
   uniforms from RootState only for values with no built-in (viewport/size).
+- `uniform(someObject.vector3)` wraps the LIVE object — mutate it in `useFrame` and
+  the shader sees it, zero sync code (pattern: `lights-pointlights`, wrapping
+  `light.position`).
+- Second scene rendered inside a node graph: build a plain `THREE.Scene`, mount its
+  contents declaratively with fiber's `createPortal(children, scene)`, and feed
+  `pass(scene, camera)` into a material's `colorNode` (pattern: `portal/`). No
+  `useRenderPipeline` needed — that's for post-processing the MAIN pass.
 - `Fn(([a, b]) => …)` destructured params type as bare `ShaderNodeObject<Node>` —
   typed TSL math (`rotate` etc.) may not resolve through them; cast to
   `Node<'float'|'vec3'|…>` with a comment (three-side typing gap, UPSTREAM.md B10 —
