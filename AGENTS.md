@@ -45,6 +45,10 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   The `/webgpu` entry creates a WebGPURenderer even without the prop — write `renderer`
   anyway (corpus rule: explicit beats implicit; the prop is where parameters will land).
 - RootState exposes **`renderer`** — `gl` is a deprecated alias, do not write it.
+  Typing gap: `useThree` types it as the `WebGLRenderer | WebGPURenderer` union even on
+  the `/webgpu` entry, so WebGPU-only calls (`setRenderTarget` with a WebGPU target,
+  `compute`, …) fail strict tsc — cast once, `const renderer = rawRenderer as
+  WebGPURenderer`, with a comment (upstream fiber gap, UPSTREAM.md B9).
 - Canvas-level options replace v9 patterns: `background` prop (color / hex / HDR URL /
   environment preset / expanded object) replaces `<color attach="background">`;
   `shadows` accepts variant strings. `flat`/`linear`/`colorSpace`/`toneMapping` props

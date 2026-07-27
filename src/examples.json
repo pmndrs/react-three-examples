@@ -39,5 +39,11 @@
     "tags": ["tsl", "render-to-texture", "post-processing", "pointer"],
     "original": "https://threejs.org/examples/#webgpu_rtt",
     "credits": "uv_grid_opengl texture from the three.js examples"
+  },
+  {
+    "slug": "shadow-contact",
+    "title": "Shadow / Contact",
+    "tags": ["tsl", "shadow", "render-to-texture", "gaussian-blur", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_shadow_contact"
   }
 ]

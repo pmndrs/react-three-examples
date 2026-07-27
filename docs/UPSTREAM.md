@@ -111,6 +111,19 @@ commit** (AGENTS.md points agents at this file).
   Fix the snippets (add `if (!renderPipeline) return`, add the cast or land B1) or
   wire snippets into a typecheck.
 
+### B9 · fiber: `/webgpu` entry types `renderer` as the WebGL|WebGPU union
+
+- **What**: `useThree().renderer` (and RootState) is typed
+  `WebGLRenderer | WebGPURenderer` even in the `/webgpu` build, whose runtime renderer
+  is always `WebGPURenderer` (the hook's own JSDoc example assumes the narrow type).
+- **Why it breaks**: union-typed method calls must satisfy every member, so
+  WebGPU-only signatures (`setRenderTarget(RenderTarget)`, `compute`, …) fail strict
+  tsc. Hit in `shadow-contact`'s offscreen capture pass.
+- **Suggested fix**: the `/webgpu` entry's RootState should narrow `renderer` to
+  `WebGPURenderer` (each entry already has its own build — the type can follow the
+  `#three` alias the same way the runtime does).
+- **Local workaround**: single documented `as WebGPURenderer` cast per file.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component
