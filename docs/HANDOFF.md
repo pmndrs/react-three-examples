@@ -33,14 +33,24 @@ cheaper as AGENTS.md absorbed each round's lessons (now at v0.4, see its changel
   **the research-designed WebGPU path is proven on free runners**.
 - `packageManager` pin + vendored fiber tarball (1.3MB, UPSTREAM.md A1) were needed
   to make CI installable.
-- **SwiftShader stall pattern (open investigation)**: examples combining drei's Grid
-  WITH a custom node graph (render pipeline or custom outputNode) hang readiness
-  silently — zero page errors, 2×180s. Grid-only passes; custom-nodes-only passes.
-  Affected: skinning-instancing, rtt, tsl-halftone → `ciSkip` in the manifest
-  (exception list per SPEC §10, each with the reason). All three pass on Metal/real
-  GPUs. Bisect idea: CI matrix job rendering rtt with grid off vs on. Possibly a
-  drei-Grid-shader trigger (fwidth/discard under SwiftShader) — could merge with
-  UPSTREAM B6 once bisected.
+- **SwiftShader stall (open investigation — Grid hypothesis FALSIFIED)**: four
+  examples hang readiness silently on SwiftShader (zero page errors, 2×180s); all
+  pass on Metal. The `?nogrid` experiment disproved the Grid theory (rtt/halftone
+  still stall grid-less; sprites stalls with no grid at all). Full matrix:
+  - STALL: skinning-instancing, rtt, tsl-halftone, sprites
+  - PASS: animation-skinning-blending (9s), hello-webgpu (5s),
+    postprocessing-bloom-emissive (24s), sky (7s), shadow-contact (7s)
+  - Not yet separated by: render pipeline (bloom passes, rtt stalls), Grid
+    (falsified), fiber `useUniforms` (shadow-contact calls it and passes),
+    animation (anim-blending passes).
+  - Instrumentation added: readiness timeouts now report `__frameCount` /
+    `__loadersActive` in the failure message — next red run classifies the stall
+    (0 frames = dead loop; few = per-frame pipeline recompile crawl; many =
+    loaders never settle). Bisect from that data.
+  - Mechanisms: `ciSkip` (skip with reason) and `?nogrid`/`ciNoGrid` (run grid-less)
+    both exist in the manifest + smoke spec; the four stalls currently use `ciSkip`.
+  - Smoke job is `continue-on-error` (advisory) until this is resolved — no failure
+    emails; flip back in ci.yml when stable.
 
 ## For Dennis
 

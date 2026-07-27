@@ -14,6 +14,10 @@ import { useProgress } from '@react-three/drei/core'
 declare global {
   interface Window {
     __exampleReady?: boolean
+    /** Diagnostics for CI stall triage: total finish-phase frames since mount. */
+    __frameCount?: number
+    /** Diagnostics: last-seen loader activity (drei useProgress). */
+    __loadersActive?: boolean
   }
 }
 
@@ -26,12 +30,15 @@ export function ReadinessSignal() {
 
   useEffect(() => {
     window.__exampleReady = false
+    window.__frameCount = 0
     return () => {
       window.__exampleReady = false
     }
   }, [])
 
   useFrame(() => {
+    window.__frameCount = (window.__frameCount ?? 0) + 1
+    window.__loadersActive = useProgress.getState().active
     if (useProgress.getState().active) {
       settled.current = 0
       window.__exampleReady = false

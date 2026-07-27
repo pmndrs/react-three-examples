@@ -40,10 +40,19 @@ for (const { slug, ...meta } of examples) {
         timeout: process.env.CI ? 180_000 : 60_000,
       })
     } catch (cause) {
-      // Readiness timeouts are usually a dead render loop, not slowness — surface
-      // everything the page said so CI logs are diagnosable without an artifact dig.
+      // Surface everything the page can tell us so CI logs classify the stall:
+      // frames=0 → render loop never ran; frames tiny → crawl (per-frame pipeline
+      // recompile?); frames huge → loaders never settled (readiness logic).
+      const probe = await page
+        .evaluate(() => ({
+          frames: window.__frameCount ?? -1,
+          loadersActive: window.__loadersActive ?? null,
+          ready: window.__exampleReady ?? null,
+        }))
+        .catch(() => null)
       throw new Error(
-        `readiness timeout for ${slug}; page reported ${errors.length} error(s):\n` +
+        `readiness timeout for ${slug}; probe=${JSON.stringify(probe)}; ` +
+          `page reported ${errors.length} error(s):\n` +
           (errors.join('\n') || '(no console/page errors captured)'),
         { cause },
       )

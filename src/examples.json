@@ -17,7 +17,7 @@
     "tags": ["animation", "skinning", "instancing", "gltf", "tsl", "post-processing", "leva"],
     "original": "https://threejs.org/examples/#webgpu_skinning_instancing",
     "credits": "Michelle model from the three.js examples",
-    "ciNoGrid": "SwiftShader stall when Grid + custom node graph coexist (see HANDOFF); grid suppressed via ?nogrid in CI so the example itself still smoke-tests"
+    "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
   },
   {
     "slug": "postprocessing-bloom-emissive",
@@ -39,7 +39,7 @@
     "tags": ["tsl", "render-to-texture", "post-processing", "pointer"],
     "original": "https://threejs.org/examples/#webgpu_rtt",
     "credits": "uv_grid_opengl texture from the three.js examples",
-    "ciNoGrid": "SwiftShader stall when Grid + custom node graph coexist (see HANDOFF); grid suppressed via ?nogrid in CI so the example itself still smoke-tests"
+    "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
   },
   {
     "slug": "shadow-contact",
@@ -53,13 +53,14 @@
     "tags": ["tsl", "node-material", "gltf", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_halftone",
     "credits": "Michelle model from the three.js examples",
-    "ciNoGrid": "SwiftShader stall when Grid + custom node graph coexist (see HANDOFF); grid suppressed via ?nogrid in CI so the example itself still smoke-tests"
+    "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
   },
   {
     "slug": "sprites",
     "title": "Sprites",
     "tags": ["tsl", "node-material", "sprites", "fog", "leva"],
     "original": "https://threejs.org/examples/#webgpu_sprites",
-    "credits": "sprite1.png texture from the three.js examples"
+    "credits": "sprite1.png texture from the three.js examples",
+    "ciSkip": "SwiftShader readiness stall (passes on Metal/real GPUs) — cause under investigation, see HANDOFF stall matrix"
   }
 ]
