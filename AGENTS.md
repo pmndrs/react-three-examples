@@ -53,6 +53,12 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   environment preset / expanded object) replaces `<color attach="background">`;
   `shadows` accepts variant strings. `flat`/`linear`/`colorSpace`/`toneMapping` props
   are gone — configure via `renderer={{ toneMapping, outputColorSpace }}`.
+- **Tone-mapping parity trap**: fiber's Canvas defaults to ACESFilmic; three.js
+  originals render with the WebGPURenderer default (NoToneMapping) unless they set
+  one. An unexamined default visibly mutes emissive/unlit palettes — decide
+  `renderer={{ toneMapping }}` deliberately on EVERY port, and compare against the
+  LIVE original at a matched canvas size, not the threejs.org gallery thumbnail
+  (those are stale, wider-crop captures). Caught on `tsl-raging-sea`.
 
 ### Frame loop
 
@@ -113,9 +119,12 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   `reference/three.js/src/renderers/common/` first (UPSTREAM.md B11). Not every
   `*Node` field needs it — e.g. `backdropNode`/`backdropAlphaNode` ARE typed on the
   NodeMaterial base — so check `@types/three` before reaching for the cast.
-- `instancedBufferAttribute<T>(array, itemSize)` needs its explicit type argument
-  under strict tsc (infers `unknown` otherwise) — same "typed TSL surface doesn't
-  infer" family as the Fn-param cast.
+- Typed-TSL creators need explicit type arguments under strict tsc — they don't
+  infer from their value/literal args: `instancedBufferAttribute<T>(array, itemSize)`
+  (infers `unknown`), `uniformArray<'vec3'>(values, 'vec3')` (infers bare `string`,
+  losing `.element()`'s fluent surface). Same "typed TSL surface doesn't infer"
+  family as the Fn-param cast. (`UniformArrayNode.array` also types as `unknown[]` —
+  cast to the concrete element type with a comment when mutating live values.)
 - Fog, two paths (verified against `NodeManager.updateFog()`): plain `Fog`/`FogExp2`
   set declaratively (`<fog attach="fog" args={…} />`) IS auto-wrapped into a fog node
   by the WebGPU renderer — prefer it. Only a CUSTOM TSL fog graph needs
@@ -297,6 +306,13 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.9 amendments from wave-6 pair 4 (tsl-raging-sea +
+  tsl-compute-attractors-particles, both zero-review-fix — wave 6 closes at 49
+  examples): tone-mapping parity trap (fiber Canvas defaults ACESFilmic, originals
+  default NoToneMapping — compare against the LIVE original, not gallery
+  thumbnails); instancedBufferAttribute bullet generalized to all typed-TSL
+  creators (uniformArray<'vec3'> joins it). v0.8's compute bullets verified on
+  first use by the attractors port: applied verbatim, zero rediscovery.
 - 2026-07-27 — v0.8 amendments from wave-6 pair 3 — the first compute ports
   (compute-texture + compute-particles, both zero-review-fix): the compute pattern
   (kernels in useNodes, three dispatch cadences, no fiber dispatch hook — useCompute

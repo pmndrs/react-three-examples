@@ -320,5 +320,19 @@
     "title": "Compute / Particles",
     "tags": ["compute", "tsl", "particles", "sprites", "pointer", "leva"],
     "original": "https://threejs.org/examples/#webgpu_compute_particles"
+  },
+  {
+    "slug": "tsl-raging-sea",
+    "title": "TSL / Raging Sea",
+    "tags": ["tsl", "node-material", "water", "noise", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_raging_sea",
+    "credits": "Raging sea shader based on Bruno Simon's Three.js Journey lessons"
+  },
+  {
+    "slug": "tsl-compute-attractors-particles",
+    "title": "TSL / Compute Attractors Particles",
+    "tags": ["compute", "tsl", "particles", "sprites", "attractors", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_compute_attractors_particles",
+    "credits": "Particle attractor simulation by Bruno Simon, from the three.js examples"
   }
 ]

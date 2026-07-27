@@ -1,5 +1,35 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 6 (same night)
+
+8 ports, 4 pairs — the cluster wave: glTF loaders closed, TSL showpieces + first
+compute ports opened. **49 examples total, 49/49 smoke + contact sheet green on
+Metal.** ZERO review fixes across all 8 ports (doc steering fully compounding).
+
+| Example | Notes | Cost |
+|---|---|---|
+| loader-gltf-dispersion | KHR dispersion test card; clamped dolly inside original's far plane | 66k |
+| loader-gltf-compressed | first KTX2/Meshopt port; extendLoader wiring → Layer 1 bullet | 89k |
+| tsl-galaxy | 20k GPU sprites; build-vs-run-time split visible in leva; frustumCulled rule | 74k |
+| tsl-procedural-terrain | found + verified three 0.185.1 IBL race (B15); Suspense-gate fix; drag-to-scroll via pointer events | 164k |
+| compute-texture | first compute port; explicit-dispatch pattern; found fiber B16 (scoped useNodes breaks WGSL) | 110k |
+| compute-particles | 200k particles; three dispatch cadences; proved B16 worse (scoped useBuffers always broken) | 159k |
+| tsl-raging-sea | displaced sea + emissive troughs; caught the tone-mapping parity trap (fiber ACESFilmic default vs originals' NoToneMapping) | 128k |
+| tsl-compute-attractors-particles | 262k attractor sim; v0.8 compute bullets verified on first use — zero rediscovery; uniformArray type-arg gap | 114k |
+
+Wave-6 upstream yield (best wave yet): **B15** (three: env-change rebuild misses
+custom-node materials — real three.js bug, verified both ways) and **B16** (fiber:
+scoped store hooks inject `.` into WGSL identifiers — caught only by the smoke
+console assertion). AGENTS.md v0.6→v0.9.
+
+Watch item: `loader-gltf-dispersion` intermittently times out ONLY on the first
+full-suite pass right after new examples land (fresh Vite transforms + multi-MB GLB
+under contention); passes 4/4 solo and on all clean suite runs. Documented transient
+class — but if it starts failing twice in a row, investigate for real.
+
+Cumulative: **47 agent ports across 6 waves + 2 gate ports, zero manifest clobbers
+across 22+ concurrent pair-registrations.**
+
 ## Wave 5 (same night)
 
 8 ports, 4 pairs. **41 examples total, 41/41 smoke + contact sheet green on Metal.**
