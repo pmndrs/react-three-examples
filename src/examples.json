@@ -602,5 +602,19 @@
     "original": "https://threejs.org/examples/#webgpu_postprocessing_godrays",
     "credits": "Godrays technique from three-good-godrays by Casey Primozic (Ameobea); godrays demo model from the three.js examples",
     "static": true
+  },
+  {
+    "slug": "mesh-batch",
+    "title": "Mesh / Batch",
+    "tags": ["batchedmesh", "instancing", "tsl", "node-material", "performance", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_mesh_batch",
+    "credits": "Hybrid radix sort (SortUtils) from the three.js examples"
+  },
+  {
+    "slug": "skinning-points",
+    "title": "Skinning / Points",
+    "tags": ["animation", "skinning", "points", "compute", "tsl", "node-material", "gltf", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_skinning_points",
+    "credits": "Michelle model from the three.js examples"
   }
 ]

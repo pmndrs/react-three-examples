@@ -77,8 +77,9 @@ function Michelle({ instances, timeScale, paused }: MichelleProps) {
   const { actions, mixer } = useAnimations(animations, scene)
 
   useEffect(() => {
-    const first = Object.values(actions)[0]
-    first?.play()
+    // Play BY NAME (corpus rule): Michelle.glb also ships a TPose utility clip —
+    // index-based selection predated the rule (retrofitted, wave 11).
+    actions.SambaDance?.play()
   }, [actions])
 
   useEffect(() => {

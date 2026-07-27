@@ -131,6 +131,11 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   `reference/three.js/src/renderers/common/` first (UPSTREAM.md B11). Not every
   `*Node` field needs it — e.g. `backdropNode`/`backdropAlphaNode` ARE typed on the
   NodeMaterial base — so check `@types/three` before reaching for the cast.
+- Chained `.mix` is `mixElement` — the CALLING node is the interpolation FACTOR
+  (`speed.mix(a, b)` ≡ `mix(a, b, speed)`). An arg-order landmine when translating
+  originals' chained calls to functional form; `.mix` is also missing from @types'
+  fluent surface (caught by screenshot review in `skinning-points` — wrong order
+  renders plausibly wrong colors, nothing errors).
 - Typed-TSL creators need explicit type arguments under strict tsc — they don't
   infer from their value/literal args: `instancedBufferAttribute<T>(array, itemSize)`
   (infers `unknown`), `uniformArray<'vec3'>(values, 'vec3')` (infers bare `string`,
@@ -381,6 +386,15 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.23 from wave-11 pair 2 (mesh-batch + skinning-points, both
+  zero-review-fix): UPSTREAM B21 (fiber's three/tsl module augmentation SHADOWS
+  @types' Fn overloads — new mechanism, statement-form `Fn(fn,'void')` fails
+  strict tsc); `.mix`-is-mixElement arg-order landmine bullet (wrong order
+  renders wrong colors silently — screenshot review caught it);
+  `computeSkinning` @types return-type bug flagged (DefinitelyTyped candidate).
+  Retrofit: skinning-instancing now plays SambaDance BY NAME (predated the
+  rule). BatchedMesh port confirmed lazy-useState + remount-over-dispose for
+  count changes.
 - 2026-07-27 — v0.22 from wave-11 pair 1 (postprocessing-godrays +
   postprocessing-motion-blur, both zero-review-fix): third cold-start signature
   documented (one-time dual-root warning on cold fetch + fresh MRT build —

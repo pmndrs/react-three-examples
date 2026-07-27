@@ -327,6 +327,21 @@ commit** (AGENTS.md points agents at this file).
   `.hdr` → `HDRCubeTextureLoader` (and `.exr` → EXR equivalent). B13 family
   (Environment loader-selection gaps).
 
+### B21 · fiber: `declare module 'three/tsl'` augmentation shadows @types' `Fn` overloads
+
+- **What**: fiber's `/webgpu` build augments `three/tsl` (dist/index.d.ts:1272-1305)
+  and the merged `Fn` symbol exposes ONLY fiber's 4 overloads — @types/three's own
+  signatures (including the statement-call form `Fn(fn, 'void')`, load-bearing at
+  runtime via TSLCore's toStack) vanish under strict tsc with a misleading
+  `{ layout?: unknown }` error. A NEW B10-family mechanism: module-augmentation
+  shadowing, not inference failure.
+- **Evidence**: `skinning-points` — the original's `Fn(fn, 'void')` kernels fail to
+  typecheck; worked around by build-time inlining via a plain JS closure emitting
+  the same statements (identical node graph, zero casts).
+- **Suggested fix**: make fiber's augmentation additive (re-declare the upstream
+  overloads alongside, or interface-merge instead of value shadowing); add a
+  compile test that `Fn(fn, 'void')` still typechecks with fiber installed.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component
