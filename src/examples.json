@@ -75,5 +75,11 @@
     "title": "Shadow Map",
     "tags": ["tsl", "shadow", "node-material", "leva"],
     "original": "https://threejs.org/examples/#webgpu_shadowmap"
+  },
+  {
+    "slug": "procedural-texture",
+    "title": "Procedural Texture",
+    "tags": ["tsl", "render-to-texture", "gaussian-blur", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_procedural_texture"
   }
 ]
