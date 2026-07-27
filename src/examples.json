@@ -210,5 +210,19 @@
     "tags": ["geometry", "tsl", "node-material", "shadows", "environment", "leva"],
     "original": "https://threejs.org/examples/#webgpu_geometry_loft",
     "credits": "LoftGeometry addon from the three.js examples"
+  },
+  {
+    "slug": "animation-retargeting",
+    "title": "Animation / Retargeting",
+    "tags": ["animation", "skinning", "gltf", "retargeting", "tsl", "reflection", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_animation_retargeting",
+    "credits": "Michelle and Soldier models from the three.js examples"
+  },
+  {
+    "slug": "backdrop-water",
+    "title": "Backdrop Water",
+    "tags": ["tsl", "node-material", "backdrop", "water", "gltf", "post-processing", "shadows", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_backdrop_water",
+    "credits": "Michelle model and water.jpg texture from the three.js examples"
   }
 ]

@@ -1,5 +1,25 @@
 # Session Handoff — 2026-07-27 (overnight, continued: repo live + M2 waves 1–2)
 
+## Wave 4 (same night)
+
+8 ports, 4 pairs. **33 examples total, 33/33 smoke + contact sheet green on Metal.**
+
+| Example | Notes | Cost |
+|---|---|---|
+| backdrop | 8-sphere viewportSharedTexture ring; first controlsRef consumer | 122k |
+| camera | split-viewport dual camera — scissor/viewport intact, first phase:'render' takeover; NO blocker | 150k |
+| portal | first createPortal-second-scene port (pattern → Layer 1) | 171k |
+| lights-pointlights | uniform(light.position) live-wrap pattern (→ Layer 1) | 127k |
+| materials-displacementmap | first orthographic port; zoom-sync frustum derivation | 111k |
+| geometry-loft | biggest port yet: 17-exhibit LoftGeometry gallery, 4 files | 186k |
+| animation-retargeting | SkeletonUtils.retargetClip via useMemo + dual useAnimations | 149k |
+| backdrop-water | water refraction + inlined voronoi (addon missing from npm three 0.185.1 — clone is newer; AGENTS rule added) | 178k |
+
+New ledger items: B14 (TSL Loop/Fn-layout typed-surface lag), B9 extended (camera
+union), B11 family confirmed again. Cumulative session stats: **31 agent ports across
+4 waves + 2 gate ports, ~1.2 sign-off fixes per port, zero manifest clobbers across
+14 concurrent pair-registrations.**
+
 ## Wave 3 (same night, Metal-oracle policy)
 
 8 more ports, 4 parallel pairs, zero manifest clobbers again. **25 examples total,

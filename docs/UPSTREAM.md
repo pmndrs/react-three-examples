@@ -124,6 +124,8 @@ commit** (AGENTS.md points agents at this file).
   `WebGPURenderer` (each entry already has its own build — the type can follow the
   `#three` alias the same way the runtime does).
 - **Local workaround**: single documented `as WebGPURenderer` cast per file.
+- **Same family**: `RootState.camera` types as base `Camera` — `.near`/`.fov` etc.
+  need the analogous cast (hit in `backdrop-water/RenderPipelineFX.tsx`).
 
 ### B10 · three.js: TSL `Fn` destructured params lose their node type
 
@@ -173,6 +175,19 @@ commit** (AGENTS.md points agents at this file).
   had to swap to plain-Radiance `.hdr` assets (documented DIVERGENCE each time).
 - **Suggested fix**: extension-sniff `.hdr.jpg`/`.jpg` (UltraHDR) in Environment's
   loader selection, or accept a `loader` prop override.
+
+### B14 · @types/three: TSL `Loop()` typed surface lags the runtime
+
+- **What**: only unnamed single (`{i}`) and flattened-double (`{i,j}`) loop forms are
+  typed; the runtime supports named loop variables and arbitrary nesting
+  (`LoopNode.js` auto-names by nesting index). Also: `Fn()`'s abbreviated-layout 3rd
+  argument fails to typecheck with destructured callbacks even in the shape its own
+  `AbbreviatedLayout` declares (resolves to a wrong overload) — B10-family symptom.
+- **Evidence**: `backdrop-water` (voronoi noise graphs) — worked around with nested
+  separate `Loop()` calls + aliased destructuring (verified identical shader output)
+  and by dropping the optional layout argument.
+- **Suggested fix**: type the `name` option and deeper overloads on `Loop`; fix the
+  `Fn` layout-arg overload resolution.
 
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 

@@ -244,6 +244,11 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
   vite.config.ts scopes it; don't remove.
 - v10 docs exist only as `.mdx` in `reference/react-three-fiber/docs/` (the public site
   404s on v10 pages). Check `webgpu/` and `migration/v10.mdx` before inventing API.
+- The `reference/three.js` clone is NEWER than npm `three@0.185.1` on the same release
+  line — an addon the original imports (`three/addons/...`) may not exist in
+  `node_modules/three/examples/jsm/`. CHECK node_modules before importing; if missing,
+  inline the addon's code into the example with attribution (pattern:
+  `backdrop-water/voronoiNoise.ts`) — never import from the gitignored clone.
 
 ## Changelog
 
