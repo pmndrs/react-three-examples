@@ -389,5 +389,19 @@
     "tags": ["tsl", "node-material", "sprites", "vfx", "noise", "leva"],
     "original": "https://threejs.org/examples/#webgpu_tsl_vfx_flames",
     "credits": "Flame VFX by Bruno Simon, inspired by @cmzw_; voronoi/perlin noise textures from the three.js examples"
+  },
+  {
+    "slug": "materials-matcap",
+    "title": "Materials / Matcap",
+    "tags": ["materials", "node-material", "matcap", "gltf", "exr", "tonemapping", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_matcap",
+    "credits": "Lee Perry-Smith head scan by Infinite Realities (CC BY 3.0); 040full.exr matcap by cyaoeu; porcelain white matcap by Milos Paripovic, from the three.js examples"
+  },
+  {
+    "slug": "materials-toon",
+    "title": "Materials / Toon",
+    "tags": ["materials", "toon", "node-material", "postprocessing", "outline", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_toon",
+    "credits": "gentilis typeface font from the three.js examples"
   }
 ]
