@@ -645,5 +645,21 @@
     "tags": ["tsl", "reflection", "reflector", "hash-blur", "depth", "node-material", "gltf", "animation", "leva"],
     "original": "https://threejs.org/examples/#webgpu_reflection_blurred",
     "credits": "Michelle model and uv_grid texture from the three.js examples; hash blur after shadertoy 4lXXWn; circle effect after shadertoy 3tdSRn"
+  },
+  {
+    "slug": "tsl-angular-slicing",
+    "title": "TSL / Angular Slicing",
+    "tags": ["tsl", "node-material", "masknode", "gltf", "environment", "ultrahdr", "shadows", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_angular_slicing",
+    "credits": "Based on the Three.js Journey sliced-model lesson (Bruno Simon); gears model and Royal Esplanade UltraHDR environment from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "tsl-wood",
+    "title": "TSL / Wood",
+    "tags": ["tsl", "node-material", "procedural", "wood", "clearcoat", "environment", "text", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_wood",
+    "credits": "WoodNodeMaterial by Logan Seeley, based on Lance Phan's Blender tutorial; San Giuseppe Bridge HDR and helvetiker font from the three.js examples",
+    "static": true
   }
 ]
