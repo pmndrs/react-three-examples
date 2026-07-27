@@ -169,5 +169,18 @@
     "title": "Depth Texture",
     "tags": ["tsl", "render-to-texture", "depth", "leva"],
     "original": "https://threejs.org/examples/#webgpu_depth_texture"
+  },
+  {
+    "slug": "backdrop",
+    "title": "Backdrop",
+    "tags": ["tsl", "node-material", "backdrop", "gltf", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_backdrop",
+    "credits": "Michelle model from the three.js examples"
+  },
+  {
+    "slug": "camera",
+    "title": "Camera",
+    "tags": ["camera", "cameraHelper", "render-takeover", "scissor", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_camera"
   }
 ]
