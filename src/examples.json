@@ -557,5 +557,20 @@
     "tags": ["materials", "instancing", "postprocessing", "pmrem", "environment", "leva"],
     "original": "https://threejs.org/examples/#webgpu_materials_alphahash",
     "static": true
+  },
+  {
+    "slug": "cubemap-dynamic",
+    "title": "Cubemap / Dynamic",
+    "tags": ["cubecamera", "cubemap", "reflection", "environment", "hdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_cubemap_dynamic",
+    "credits": "Pisa HDR cube map and uv_grid_opengl texture from the three.js examples"
+  },
+  {
+    "slug": "materials-envmaps-groundprojected",
+    "title": "Materials / Envmaps Ground Projected",
+    "tags": ["materials", "environment", "hdr", "cubemap", "tsl", "node-material", "gltf", "physical", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_materials_envmaps_groundprojected",
+    "credits": "Ferrari 458 Italia model by vicent091036 (Sketchfab); Blouberg Sunrise 2 HDR by Greg Zaal (Poly Haven), via the three.js examples",
+    "static": true
   }
 ]
