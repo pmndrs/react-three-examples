@@ -661,5 +661,19 @@
     "original": "https://threejs.org/examples/#webgpu_tsl_wood",
     "credits": "WoodNodeMaterial by Logan Seeley, based on Lance Phan's Blender tutorial; San Giuseppe Bridge HDR and helvetiker font from the three.js examples",
     "static": true
+  },
+  {
+    "slug": "instance-sprites",
+    "title": "Instance Sprites",
+    "tags": ["sprites", "instancing", "tsl", "node-material", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_instance_sprites",
+    "credits": "Snowflake sprite texture from the three.js examples"
+  },
+  {
+    "slug": "compute-water",
+    "title": "Compute / Water",
+    "tags": ["compute", "tsl", "water", "struct", "instancing", "pointer", "gltf", "environment", "hdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_compute_water",
+    "credits": "Duck model from the three.js examples; Blouberg Sunrise 2 HDR by Greg Zaal (Poly Haven), via the three.js examples"
   }
 ]

@@ -131,6 +131,15 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
   `reference/three.js/src/renderers/common/` first (UPSTREAM.md B11). Not every
   `*Node` field needs it — e.g. `backdropNode`/`backdropAlphaNode` ARE typed on the
   NodeMaterial base — so check `@types/three` before reaching for the cast.
+- Struct storage (`instancedArray(data, Struct)`) has no typed overload
+  (ArrayFunction stops at vec4) and struct member `.get('name')` returns bare
+  `Node` — documented casts, B10 family (first port: `compute-water`). Same
+  family: `select()`'s cond param is typed `Node<'bool'>` but the runtime
+  converts numeric uniforms.
+- Typed TSL has NO integer `min`/`max`/`mod` (functional or fluent) — originals
+  doing int neighbour math can't port verbatim under strict tsc; do the math in
+  float (exact below 2^24) and convert with `uint()` where an index is needed
+  (pattern: `compute-water`).
 - Chained `.mix` is `mixElement` — the CALLING node is the interpolation FACTOR
   (`speed.mix(a, b)` ≡ `mix(a, b, speed)`). An arg-order landmine when translating
   originals' chained calls to functional form; `.mix` is also missing from @types'
@@ -392,6 +401,15 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-28 — v0.25 from wave-12 pair 2 (compute-water + instance-sprites,
+  both zero-review-fix): first struct-storage port — new bullets for the
+  struct-storage/select() cast family and the missing integer min/max/mod in
+  typed TSL (float math + uint() workaround). Confirmed: `requiredLimits`
+  passes through the Canvas `renderer` prop to the WebGPURenderer constructor;
+  r185 `SpriteNodeMaterial.sizeAttenuation` setter self-bumps needsUpdate
+  (inverse of the alphaToCoverage finding). Orchestration note: subagent
+  screenshot scripts must NOT kill the shared :5173 dev server when done —
+  Playwright's webServer reuse and the contact-sheet script depend on it.
 - 2026-07-28 — v0.24 from wave-11 pair 4 (pmrem-equirectangular +
   reflection-blurred, both zero-review-fix — wave 11 closes at 89 examples,
   the whole wave zero-fix): B13 sharpened (UltraHDRLoader works via useLoader
