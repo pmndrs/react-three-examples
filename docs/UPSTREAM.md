@@ -192,6 +192,24 @@ commit** (AGENTS.md points agents at this file).
 - **Suggested fix**: type the `name` option and deeper overloads on `Loop`; fix the
   `Fn` layout-arg overload resolution.
 
+### B15 · three: env-change rebuild unreliable for custom-node materials (0.185.1)
+
+- **What**: when `scene.environment` is set AFTER a material with custom
+  `positionNode`/`normalNode`/`colorNode` (+ shadow variant) has already compiled,
+  the renderer intermittently (~2/5 fresh loads) never folds the IBL into that
+  material — shadowed areas render pitch black, sometimes the HDR background is
+  lost too. Env set BEFORE first compile is always correct.
+- **Evidence**: `tsl-procedural-terrain` port. Verified both ways: a vanilla
+  three-0.185.1 repro of the original's exact code (env before compile) renders
+  correctly every time; the black state reproduced only in the mount-first,
+  env-later flow. 12/12 clean loads after Suspense-gating the scene on the HDR.
+- **Workaround in repo**: Layer 1 rule — one `<Suspense>` wrapping
+  `Environment` + lights + custom-node meshes so the first build sees the env.
+- **Suggested fix**: investigate `NodeMaterialObserver`/cache-key handling of
+  `scene.environment` changes for materials with custom vertex-stage nodes;
+  the needsUpdate path appears to miss the env-map define/graph refresh when a
+  shadow pass variant exists.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

@@ -293,5 +293,19 @@
     "tags": ["gltf", "loader", "ktx2", "meshopt", "compression", "leva"],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_compressed",
     "credits": "Coffeemat by Roman Red (Sketchfab), compressed with gltfpack, from the three.js examples"
+  },
+  {
+    "slug": "tsl-galaxy",
+    "title": "TSL / Galaxy",
+    "tags": ["tsl", "node-material", "particles", "instancing", "sprites", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_galaxy",
+    "credits": "Galaxy generator based on Bruno Simon's Three.js Journey lessons"
+  },
+  {
+    "slug": "tsl-procedural-terrain",
+    "title": "TSL / Procedural Terrain",
+    "tags": ["tsl", "node-material", "terrain", "noise", "shadows", "environment", "hdr", "pointer", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_tsl_procedural_terrain",
+    "credits": "Terrain shader based on Bruno Simon's Three.js Journey lessons; Pedestrian Overpass HDR from the three.js examples (Poly Haven)"
   }
 ]

@@ -86,6 +86,17 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 - `uniform(someObject.vector3)` wraps the LIVE object — mutate it in `useFrame` and
   the shader sees it, zero sync code (pattern: `lights-pointlights`, wrapping
   `light.position`).
+- A mesh whose `positionNode` fully relocates its geometry (GPU-placed particles,
+  `range()`-driven instancing) needs `frustumCulled = false` — three builds the
+  culling sphere from the CPU-side geometry (e.g. a unit plane at origin), so the
+  whole object pops out of view the moment that point leaves the frustum (pattern:
+  `tsl-galaxy`; several upstream originals carry this latent bug and just never pan).
+- Custom-node materials (`positionNode`/`normalNode`/`colorNode`) + an async
+  `Environment`: Suspense-gate the lit scene on the HDR fetch so the FIRST shader
+  build already sees `scene.environment` — if the graph compiles before the HDR
+  lands, three 0.185.1 intermittently never folds IBL in on the env change
+  (shadowed areas render pitch black; UPSTREAM B15). Pattern:
+  `tsl-procedural-terrain` (one `<Suspense>` wrapping Environment + lights + meshes).
 - Second scene rendered inside a node graph: build a plain `THREE.Scene`, mount its
   contents declaratively with fiber's `createPortal(children, scene)`, and feed
   `pass(scene, camera)` into a material's `colorNode` (pattern: `portal/`). No
@@ -267,6 +278,13 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-07-27 — v0.7 amendments from wave-6 pair 2 (tsl-galaxy +
+  tsl-procedural-terrain, both zero-review-fix): `frustumCulled = false` rule for
+  positionNode-relocated geometry (latent upstream bug class, will recur across the
+  particle/compute cluster); Suspense-gate custom-node materials on async
+  Environment (three 0.185.1 IBL race, new UPSTREAM B15 — found and verified by the
+  terrain port, 12/12 clean loads after the fix). Uniform-driven `Loop` octave
+  count (terrain) confirmed the build-vs-run-time doc holds for loop bounds.
 - 2026-07-27 — v0.6 amendments from wave-6 pair 1 (loader-gltf-dispersion +
   loader-gltf-compressed, both zero-review-fix): KTX2 `extendLoader` wiring became a
   Layer 1 bullet (first compressed-asset port); cold-start transient broadened with
