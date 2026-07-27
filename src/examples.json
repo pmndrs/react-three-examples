@@ -493,7 +493,8 @@
     "title": "Custom Fog",
     "tags": ["tsl", "fog", "noise", "terrain", "instancing", "sky", "environment", "shadows", "leva"],
     "original": "https://threejs.org/examples/#webgpu_custom_fog",
-    "credits": "TerrainGenerator, ForestGenerator and SkyMesh addons from the three.js examples"
+    "credits": "TerrainGenerator, ForestGenerator and SkyMesh addons from the three.js examples",
+    "ciSkip": "500k instanced trees + 512^2 terrain + 4096^2 shadow map loses the WebGPU device on SwiftShader (Device Lost, both attempts, run 30263967034); passes on Metal"
   },
   {
     "slug": "instance-uniform",
@@ -507,5 +508,19 @@
     "title": "Instance Points",
     "tags": ["points", "instancing", "compute", "tsl", "node-material", "scissor", "viewport", "leva"],
     "original": "https://threejs.org/examples/#webgpu_instance_points"
+  },
+  {
+    "slug": "compute-particles-rain",
+    "title": "Compute / Particles Rain",
+    "tags": ["compute", "tsl", "particles", "collision", "render-target", "layers", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_compute_particles_rain",
+    "credits": "Suzanne model by the Blender Foundation, from the three.js examples"
+  },
+  {
+    "slug": "compute-particles-snow",
+    "title": "Compute / Particles Snow",
+    "tags": ["compute", "tsl", "particles", "collision", "render-target", "layers", "postprocessing", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_compute_particles_snow",
+    "credits": "TeapotGeometry and GaussianBlurNode addons from the three.js examples"
   }
 ]
