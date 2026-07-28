@@ -1,4 +1,74 @@
-# Session Handoff — 2026-07-27/28 (overnight, continued: repo live + M2 waves 1–2)
+# Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–2)
+
+## Wave 13 (2026-07-29) — the CHEAP-MODE wave: cluster batches, 95 → 131
+
+Dennis approved resuming under the cost plan from the 07-28 policy change. This wave
+changed HOW we port, not just what:
+
+| Change | Effect |
+|---|---|
+| **4 sibling examples per agent** (was 1) | The ~15k-token doc read + pattern discovery amortize across the batch |
+| **Agents own visual review** | Screenshots never enter the orchestrator context; justified by 40 consecutive zero-review-fix ports |
+| **Scoped tests during the batch** (`-g "<slug>"`) | Full suite runs ONCE at wave end |
+| **Agents don't commit or edit docs** | Rule candidates reported; one batched doc pass (this entry + AGENTS.md v0.26) instead of 4 per wave |
+| **`model: 'sonnet'` pinned explicitly** | Session parent is Opus; unpinned agents would inherit it |
+
+**Measured result: ~115k → ~60k tokens per port**, roughly 2× cheaper, on top of a
+much smaller orchestrator burn (no per-pair screenshot reads, gate output, or doc
+edits).
+
+| Quartet | Ports | Tokens | Per port |
+|---|---|---|---|
+| postprocessing | sobel, fxaa, smaa, ca | 171k | 43k |
+| lights | selective, ies-spotlight, projector, physical | 209k | 52k |
+| bloom/glow | bloom, bloom-selective, anamorphic, lensflare | 230k | 58k |
+| materials-texture | arrays, video, texture-manualmipmap, cubemap-mipmaps | 162k | 41k |
+| shadowmap | opacity, array, csm, progressive | 317k | 79k |
+| compute | points, geometry, texture-pingpong, texture-3d | 352k | 88k |
+| MRT/render-target | mrt, mrt-mask, multiple-rendertargets, …-readback | 271k | 68k |
+| volume | perlin, caustics, lighting, lighting-rectarea | 269k | 67k |
+| array-texture | partialupdate, 2d-array, 2d-array-compressed, rendertarget-2d-array-3d | (stalled 3×) | — |
+
+Hard clusters (shadowmap, compute) ran hot as expected — thin training data, three
+folder-pattern ports, addons with no `.d.ts`. Routine clusters landed near 40k.
+
+**Findings worth keeping:**
+- **A real bug in a shipped three.js example** (UPSTREAM B22): `MRTNode.setup()`
+  name-matches outputs against the bound target's textures and silently drops
+  unmatched ones; `webgpu_multiple_rendertargets_readback` never names its readback
+  target's textures, so that path compiles to an empty struct. Our port fixes it.
+- Two originals carried dead/no-op code (unused floor texture in `volume_caustics`,
+  no-op per-frame `lookAt()` in `volume_lighting`), plus unreachable animation code in
+  `postprocessing_ca`. All dropped with DIVERGENCE bullets → new AGENTS.md rule.
+- `compute-points` shipped a pointer-uniform bug that collapsed 300k particles into
+  the origin in ~2s — **caught by the animates tier, invisible to smoke**. Second time
+  that tier has paid for itself.
+- `shadowmap-csm`'s tone-mapping error was caught **only by the agent's screenshot** —
+  both test tiers passed it. Evidence that agent-owned visual review is load-bearing,
+  not ceremony.
+- New util extracted: `src/utils/VolumetricFog.ts` (the tiled-3D-Perlin density block
+  three volume originals duplicate verbatim).
+- Flagged once, not yet a rule: drei's `useKTX2` types its result's `image` as
+  `unknown` (documented cast in `textures-2d-array-compressed`).
+
+**Process notes for next time:**
+- The array-texture agent **stalled three times**, always on an open-ended screenshot
+  wait. Resuming via message preserved its context and lost no work, but the fix is
+  prescriptive: screenshot scripts need a hard timeout + always-run `browser.close()`
+  (now in AGENTS.md §Verification). Its 4th port needed a `tsc` fix by hand — an agent
+  that stalls before its own verification step can leave a registered-but-unverified
+  example, so the wave-end full gate is non-negotiable.
+- Full smoke is now **18.7m** locally and animates **1.4h** at 131 examples. Both
+  produce contention flakes (1 smoke, 5 animates this run — all passing in isolation).
+  The suites need sharding or a scoped default before the corpus grows much further.
+- **Watch item: `loader-gltf-iridescence`** failed animates TWICE (full suite, then
+  again immediately after 16.8m of same-process loader-gltf runs), then passed 4/4
+  consecutively in isolation. Both failures followed long multi-example processes, so
+  the read is contention — but it is the only example to fail twice, so re-check it
+  before assuming. Every other failure this run passed first retry.
+
+Cumulative: **131 examples**, 36 ports this wave.
+
 
 ## POLICY CHANGE — porting cadence + CI cost (2026-07-28, Dennis)
 

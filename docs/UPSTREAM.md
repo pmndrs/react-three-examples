@@ -345,6 +345,55 @@ commit** (AGENTS.md points agents at this file).
   overloads alongside, or interface-merge instead of value shadowing); add a
   compile test that `Fn(fn, 'void')` still typechecks with fiber installed.
 
+### B22 · three.js: `MRTNode.setup()` silently drops outputs whose names don't match the bound target
+
+- **What**: `MRTNode.setup()` (src/nodes/core/MRTNode.js) resolves each named MRT
+  output by matching it against the CURRENTLY BOUND render target's `texture.name`s,
+  and `continue`s past any it can't match. Reuse one `mrt()` config across two targets
+  and the second silently produces an EMPTY output struct — surfacing only as a WGSL
+  "structures must have at least one member" compile error with no hint about which
+  material or target is responsible.
+- **Evidence**: `multiple-rendertargets-readback`. The three.js ORIGINAL carries this
+  bug: it names only the full-res `renderTarget`'s textures, never `readbackTarget`'s,
+  so the readback path compiles to an empty struct. Diagnosed by reading `MRTNode`
+  source after instrumentation (three same-typed `NodeMaterial`s made the error
+  unattributable); our port names both targets' textures.
+- **Suggested fix**: warn instead of silently `continue`ing on an unmatched output, or
+  fall back to positional/index binding when the bound target's textures are unnamed.
+  Fixing the shipped example is a separate, smaller PR.
+
+### B23 · @types/three: `Points` doesn't declare `count`
+
+- **What**: `RenderObject.js` reads `object.count` generically, and `Sprite` declares
+  it, but `Points` does not — so the standard "draw N of M GPU-resident points" pattern
+  needs an undeclared-property cast.
+- **Evidence**: `compute-points` (300k-point storage buffer, drawn via `<points>`).
+- **Suggested fix**: DefinitelyTyped PR adding `count?: number` to `Points`.
+
+### B24 · @types/three: `BloomNode.highPassFn` declared to return `void`
+
+- **What**: the declared return type is `void`, but the runtime — including the addon's
+  own default `luminosityHighPass` — always returns a `Node`. Any custom high-pass
+  override has to fight the declaration.
+- **Evidence**: `postprocessing-anamorphic` (horizontal-only high-pass via `rtt()` +
+  `Loop()`). Distinct from B21, though both bite the same assignment.
+- **Suggested fix**: DefinitelyTyped PR correcting the return type to `Node`.
+
+### B25 · three.js (OPEN QUESTION): compute-driven `geometryNode` seeding race
+
+- **What**: a `NodeMaterial.geometryNode` backed by a compute kernel auto-dispatches on
+  the first rendered frame. If that first dispatch runs against unseeded storage, a
+  spring/verlet kernel diverges to NaN permanently (mesh renders blank forever).
+- **Evidence**: `compute-geometry`. Empirically the ONLY seeding that worked was a
+  synchronous dispatch inline at the end of the `useMemo` that builds the graph. The
+  original's own `onInit()` reentrant `renderer.compute()` call, a plain `useEffect`,
+  AND a `useLayoutEffect` all left the mesh permanently blank — the last of which
+  contradicts our usual "useLayoutEffect wins the first-render race" rule.
+- **Status**: NOT root-caused. Why `useLayoutEffect` also loses this particular race is
+  unexplained; the reentrant-compute path completes with zero console errors while the
+  seed doesn't reliably land. Needs someone with WebGPU-backend source access before
+  this becomes a rule. Documented in the example's header, deliberately not promoted.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

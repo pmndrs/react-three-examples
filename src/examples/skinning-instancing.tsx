@@ -12,8 +12,10 @@
  * - `useRenderPipeline` with a depth-driven `gaussianBlur` post-process, blended via a
  *   leva-controlled uniform (pipeline callbacks don't re-run on render, so the blend
  *   amount must live in a uniform, not a closure value)
- * - Escape hatch: a point light attached to the camera via `camera.add()` in an effect
- *   (no declarative "light as camera child" in R3F)
+ * - Escape hatch: a point light attached to the camera via `camera.add()` in an effect —
+ *   kept deliberately as the imperative-interop demo (a declarative equivalent DOES
+ *   exist: `<PerspectiveCamera makeDefault><pointLight/></PerspectiveCamera>`, shown in
+ *   `postprocessing-bloom` and `mrt-mask`)
  *
  * DIVERGENCE from original
  * - Original's large invisible black ground plane (pure depth-catcher for the blur's
@@ -46,8 +48,10 @@ type InstancedSkinnedMesh = Mesh & {
   count: number
 }
 
-// Point light rigidly attached to the camera (a "headlight"). No declarative
-// "light as camera child" pattern exists in R3F, so this is wired imperatively.
+// Point light rigidly attached to the camera (a "headlight"), wired imperatively to
+// showcase the escape hatch. drei's <PerspectiveCamera makeDefault> accepts children,
+// so the declarative form works too (see postprocessing-bloom) — this port keeps the
+// imperative version on purpose, since it attaches to whatever camera is already default.
 function CameraLight() {
   const camera = useThree((s) => s.camera)
   const light = useMemo(() => {

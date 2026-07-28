@@ -441,6 +441,73 @@
     "credits": "RaymarchingBox TSL utility and ImprovedNoise from the three.js examples"
   },
   {
+    "slug": "volume-perlin",
+    "title": "Volume / Perlin",
+    "tags": ["tsl", "node-material", "volume", "raymarching", "3d-texture", "noise", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_volume_perlin",
+    "credits": "RaymarchingBox TSL utility and ImprovedNoise from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "volume-caustics",
+    "title": "Volume / Caustics",
+    "tags": [
+      "tsl",
+      "node-material",
+      "volume",
+      "raymarching",
+      "3d-texture",
+      "noise",
+      "post-processing",
+      "bloom",
+      "shadows",
+      "glTF",
+      "leva"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_volume_caustics",
+    "credits": "Duck model from the Khronos glTF sample assets, via the three.js examples; Caustic_Free.jpg from opengameart.org, via the three.js examples"
+  },
+  {
+    "slug": "volume-lighting",
+    "title": "Volume / Lighting",
+    "tags": [
+      "tsl",
+      "node-material",
+      "volume",
+      "raymarching",
+      "3d-texture",
+      "noise",
+      "post-processing",
+      "gaussian-blur",
+      "shadows",
+      "lights",
+      "spotlight",
+      "pointlight",
+      "leva"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_volume_lighting",
+    "credits": "TeapotGeometry and colors.png light-cookie texture from the three.js examples"
+  },
+  {
+    "slug": "volume-lighting-rectarea",
+    "title": "Volume / Lighting RectArea",
+    "tags": [
+      "tsl",
+      "node-material",
+      "volume",
+      "raymarching",
+      "3d-texture",
+      "noise",
+      "post-processing",
+      "gaussian-blur",
+      "lights",
+      "rectarealight",
+      "leva"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_volume_lighting_rectarea",
+    "credits": "RectAreaLight LTC BRDF approximation by Eric Heitz et al., from the three.js examples"
+  },
+  {
     "slug": "volume-fire",
     "title": "Volume / Fire",
     "tags": [
@@ -689,5 +756,227 @@
     "tags": ["compute", "tsl", "cloth", "verlet", "physics", "vertex-node", "environment", "hdr", "leva"],
     "original": "https://threejs.org/examples/#webgpu_compute_cloth",
     "credits": "Royal Esplanade UltraHDR environment from the three.js examples (Poly Haven)"
+  },
+  {
+    "slug": "lights-selective",
+    "title": "Lights / Selective",
+    "tags": ["lights", "pointlight", "tsl", "node-material", "lightsNode", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lights_selective"
+  },
+  {
+    "slug": "postprocessing-sobel",
+    "title": "Postprocessing / Sobel",
+    "tags": ["postprocessing", "tsl", "render-pipeline", "sobel", "edge-detection", "gltf", "environment", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_sobel",
+    "credits": "DragonAttenuation model from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "postprocessing-fxaa",
+    "title": "Postprocessing / FXAA",
+    "tags": ["postprocessing", "tsl", "render-pipeline", "fxaa", "antialiasing", "instancing", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_fxaa",
+    "static": true
+  },
+  {
+    "slug": "postprocessing-smaa",
+    "title": "Postprocessing / SMAA",
+    "tags": ["postprocessing", "tsl", "render-pipeline", "smaa", "antialiasing", "textures", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_smaa"
+  },
+  {
+    "slug": "postprocessing-ca",
+    "title": "Postprocessing / Chromatic Aberration",
+    "tags": ["postprocessing", "tsl", "render-pipeline", "chromatic-aberration", "environment", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_ca"
+  },
+  {
+    "slug": "lights-ies-spotlight",
+    "title": "Lights / IES Spotlight",
+    "tags": ["lights", "spotlight", "ies", "shadows", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lights_ies_spotlight"
+  },
+  {
+    "slug": "lights-projector",
+    "title": "Lights / Projector",
+    "tags": ["lights", "spotlight", "tsl", "node-material", "video", "shadows", "ply", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lights_projector",
+    "credits": "Lucy statue (Stanford 3D Scanning Repository), colors.png texture, and sintel.mp4 video from the three.js examples"
+  },
+  {
+    "slug": "lights-physical",
+    "title": "Lights / Physical",
+    "tags": ["lights", "pointlight", "hemispherelight", "photometric", "shadows", "tonemapping", "bumpmap", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_lights_physical",
+    "credits": "Physically accurate incandescent bulb concept by Ben Houston; hardwood2/brick/earth textures from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-bloom",
+    "title": "Postprocessing / Bloom",
+    "tags": ["postprocessing", "tsl", "render-pipeline", "bloom", "gltf", "animation", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_bloom",
+    "credits": "Primary Ion Drive model by Mike Murdock (CC BY 4.0)"
+  },
+  {
+    "slug": "postprocessing-bloom-selective",
+    "title": "Postprocessing / Selective Bloom",
+    "tags": ["postprocessing", "tsl", "render-pipeline", "bloom", "mrt", "interaction", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_bloom_selective",
+    "static": true
+  },
+  {
+    "slug": "postprocessing-anamorphic",
+    "title": "Postprocessing / Anamorphic",
+    "tags": ["postprocessing", "tsl", "render-pipeline", "bloom", "instancing", "custom-node", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_anamorphic"
+  },
+  {
+    "slug": "postprocessing-lensflare",
+    "title": "Postprocessing / Lensflare",
+    "tags": ["postprocessing", "tsl", "render-pipeline", "bloom", "lensflare", "mrt", "environment", "gltf", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_lensflare",
+    "credits": "Space Ship Hallway by yeeyeeman (CC BY 4.0, via Sketchfab); Ice Planet Close HDR from Space Spheremaps",
+    "static": true
+  },
+  {
+    "slug": "materials-arrays",
+    "title": "Materials / Arrays",
+    "tags": ["materials", "geometry-groups", "material-array", "wireframe", "basics"],
+    "original": "https://threejs.org/examples/#webgpu_materials_arrays"
+  },
+  {
+    "slug": "materials-video",
+    "title": "Materials / Video",
+    "tags": ["materials", "video", "texture", "drei", "phong"],
+    "original": "https://threejs.org/examples/#webgpu_materials_video",
+    "credits": "sintel.mp4 (Sintel trailer, Blender Foundation) from the three.js examples"
+  },
+  {
+    "slug": "materials-texture-manualmipmap",
+    "title": "Materials / Texture Manual Mipmap",
+    "tags": ["materials", "texture", "mipmap", "filtering", "render-takeover", "scissor"],
+    "original": "https://threejs.org/examples/#webgpu_materials_texture_manualmipmap",
+    "credits": "Basket of Fruit painting by Caravaggio, from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "materials-cubemap-mipmaps",
+    "title": "Materials / Cubemap Mipmaps",
+    "tags": ["materials", "cubemap", "mipmap", "envmap", "reflection"],
+    "original": "https://threejs.org/examples/#webgpu_materials_cubemap_mipmaps",
+    "credits": "angus cube mipmap photo set from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "shadowmap-opacity",
+    "title": "Shadow Map / Opacity",
+    "tags": ["shadows", "castShadowNode", "transmission", "gltf", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_shadowmap_opacity",
+    "credits": "DragonAttenuation.glb from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "shadowmap-array",
+    "title": "Shadow Map / Array",
+    "tags": ["shadows", "tileshadownode", "batchedmesh", "instancing", "tsl", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_shadowmap_array"
+  },
+  {
+    "slug": "compute-points",
+    "title": "Compute / Points",
+    "tags": ["compute", "tsl", "points", "instancedarray", "pointer", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_compute_points"
+  },
+  {
+    "slug": "compute-geometry",
+    "title": "Compute / Geometry",
+    "tags": ["compute", "tsl", "geometrynode", "storage", "pointer", "leva", "gltf"],
+    "original": "https://threejs.org/examples/#webgpu_compute_geometry",
+    "credits": "LeePerrySmith model from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "compute-texture-pingpong",
+    "title": "Compute / Texture Ping-Pong",
+    "tags": ["compute", "tsl", "storage-texture", "pingpong"],
+    "original": "https://threejs.org/examples/#webgpu_compute_texture_pingpong"
+  },
+  {
+    "slug": "shadowmap-csm",
+    "title": "Shadow Map / CSM",
+    "tags": ["shadows", "csm", "cascaded-shadow-maps", "directional-light", "orthographic", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_shadowmap_csm",
+    "credits": "Cascaded Shadow Maps technique by StrandedKitty (three-csm)",
+    "static": true
+  },
+  {
+    "slug": "compute-texture-3d",
+    "title": "Compute / Texture 3D",
+    "tags": ["compute", "tsl", "storage-texture", "raymarching", "volume"],
+    "original": "https://threejs.org/examples/#webgpu_compute_texture_3d"
+  },
+  {
+    "slug": "shadowmap-progressive",
+    "title": "Shadow Map / Progressive",
+    "tags": ["shadows", "lightmap", "gltf", "transformcontrols", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_shadowmap_progressive",
+    "credits": "Progressive Lightmap Accumulator by zalo; ShadowmappableMesh.glb from the three.js examples"
+  },
+  {
+    "slug": "mrt",
+    "title": "MRT",
+    "tags": ["mrt", "tsl", "post-processing", "gltf", "hdr", "g-buffer"],
+    "original": "https://threejs.org/examples/#webgpu_mrt",
+    "credits": "DamagedHelmet model and royal_esplanade HDR from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "mrt-mask",
+    "title": "MRT Mask",
+    "tags": ["mrt", "tsl", "post-processing", "gltf", "animation", "gaussian-blur", "glow"],
+    "original": "https://threejs.org/examples/#webgpu_mrt_mask",
+    "credits": "Michelle model from the three.js examples"
+  },
+  {
+    "slug": "multiple-rendertargets",
+    "title": "Multiple Render Targets",
+    "tags": ["mrt", "tsl", "g-buffer", "normals", "textures"],
+    "original": "https://threejs.org/examples/#webgpu_multiple_rendertargets",
+    "credits": "hardwood2_diffuse texture from the three.js examples"
+  },
+  {
+    "slug": "multiple-rendertargets-readback",
+    "title": "Multiple Render Targets / Readback",
+    "tags": ["mrt", "tsl", "g-buffer", "readback", "gpu-cpu", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_multiple_rendertargets_readback",
+    "credits": "hardwood2_diffuse texture from the three.js examples"
+  },
+  {
+    "slug": "textures-partialupdate",
+    "title": "Textures / Partial Update",
+    "tags": ["textures", "data-texture", "webgpu-only", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_textures_partialupdate",
+    "credits": "Carbon.png texture from the three.js examples"
+  },
+  {
+    "slug": "textures-2d-array",
+    "title": "Textures / 2D Array",
+    "tags": ["textures", "data-array-texture", "tsl", "volume", "webgpu-only"],
+    "original": "https://threejs.org/examples/#webgpu_textures_2d-array",
+    "credits": "Scanned head data by Divine Augustine (CPOL), from the three.js examples"
+  },
+  {
+    "slug": "textures-2d-array-compressed",
+    "title": "Textures / 2D Array Compressed",
+    "tags": ["textures", "ktx2", "compressed-textures", "tsl", "webgpu-only", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_textures_2d-array_compressed",
+    "credits": "Spirited Away clip (Studio Ghibli), from the three.js examples"
+  },
+  {
+    "slug": "rendertarget-2d-array-3d",
+    "title": "Render Target / 2D Array & 3D",
+    "tags": ["render-target", "data-array-texture", "data-3d-texture", "multi-view", "tsl", "webgpu-only", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_rendertarget_2d-array_3d",
+    "credits": "Scanned head data by Divine Augustine (CPOL), from the three.js examples"
   }
 ]
