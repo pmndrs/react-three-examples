@@ -10,6 +10,13 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+  schedule:
+    # Nightly 04:00 UTC. The SwiftShader smoke suite is ~30 min of wall clock at
+    # corpus scale (software raster, 95 examples) — far too slow to sit on every
+    # push during the porting phase. Metal-local is the oracle (SPEC §10); CI is
+    # the regression net, and once nightly is enough for that.
+    - cron: '0 4 * * *'
 
 jobs:
   checks:
@@ -27,10 +34,15 @@ jobs:
 
   smoke:
     runs-on: ubuntu-latest
-    # BLOCKING since the B17 repair resolved the SwiftShader stall matrix (all four
-    # former stalls pass on SwiftShader as of run 30261064018). Exception list:
-    # per-example `ciSkip` entries in src/examples.json (2: volume-fire perf,
-    # geometry-loft B17-anomaly).
+    # NOT on push (porting-phase policy, 2026-07-28): ~30 min per run at corpus
+    # scale is too slow to gate a push-per-pair cadence, and every port is already
+    # verified on Metal locally (smoke + animates + contact sheet) before it lands.
+    # Runs on PRs, nightly, and on demand (`gh workflow run ci.yml`). Revisit when
+    # the corpus is complete and pushes drop to a few a month — then per-push is
+    # cheap insurance again.
+    # BLOCKING when it does run: the B17 repair resolved the SwiftShader stall
+    # matrix (run 30261064018). Exceptions: per-example `ciSkip` in examples.json.
+    if: github.event_name != 'push'
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4

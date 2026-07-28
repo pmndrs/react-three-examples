@@ -1,5 +1,35 @@
 # Session Handoff — 2026-07-27/28 (overnight, continued: repo live + M2 waves 1–2)
 
+## POLICY CHANGE — porting cadence + CI cost (2026-07-28, Dennis)
+
+Dennis hit Claude usage limits and called a slowdown. Two decisions:
+
+1. **CI smoke no longer runs on push.** ~30 min per run at corpus scale (95
+   examples × SwiftShader software raster). Now: PRs + nightly 04:00 UTC +
+   `gh workflow run ci.yml`. The fast `checks` job (lint/build, ~2 min) still
+   gates every push. Local Metal remains the oracle (SPEC §10) — every port is
+   verified green on smoke + animates + contact sheet before it lands, so
+   per-push SwiftShader was belt-and-braces. Revisit when the corpus is complete
+   and pushes drop to a few a month.
+   - Cloudflare Workers were considered and rejected: Workers are V8 isolates
+     with no browser/GPU, and Browser Rendering is headless Chrome — which never
+     presents the WebGPU canvas on Linux (the reason our CI runs headed under
+     Xvfb; see research/webgpu-ci-github.md). No offload path exists; running it
+     less often IS the fix.
+
+2. **Porting waves paused.** The 8-ports-per-wave cadence is what consumes the
+   budget: ~120k subagent tokens per port, ~1M per wave, and 95 examples ≈ 11M
+   tokens of agent work. Everything else (CI polling, screenshot review, gates)
+   is under ~5% combined. Marginal doc/upstream yield has also plateaued — the
+   last several waves were zero-review-fix AND zero-rediscovery.
+   - **Cost lever for resumption: pin `model: 'sonnet'` on port agents.** They
+     were Sonnet all session by inheriting a Sonnet parent; the session is now
+     Opus, so unpinned agents would inherit Opus and cost several times more per
+     port. Never launch an unpinned port agent again.
+   - Resume shape when Dennis says go: 1 pair (2 ports) per check-in, ~250-300k
+     tokens, Sonnet-pinned; scope smoke/contact-sheet to the new slugs during the
+     pair and run the full sweep only at wave end.
+
 ## Wave 11 (into the early hours of 07-28)
 
 8 ports, 4 pairs. **89 examples total, 89/89 smoke + contact sheet + animates

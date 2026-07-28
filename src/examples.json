@@ -675,5 +675,19 @@
     "tags": ["compute", "tsl", "water", "struct", "instancing", "pointer", "gltf", "environment", "hdr", "leva"],
     "original": "https://threejs.org/examples/#webgpu_compute_water",
     "credits": "Duck model from the three.js examples; Blouberg Sunrise 2 HDR by Greg Zaal (Poly Haven), via the three.js examples"
+  },
+  {
+    "slug": "compute-birds",
+    "title": "Compute / Birds",
+    "tags": ["compute", "boids", "tsl", "instancing", "vertex-node", "pointer", "fog", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_compute_birds",
+    "ciSkip": "O(N^2) boids kernel (8192^2 pair tests per frame, ~67M loop iterations) cannot reach readiness on SwiftShader software raster"
+  },
+  {
+    "slug": "compute-cloth",
+    "title": "Compute / Cloth",
+    "tags": ["compute", "tsl", "cloth", "verlet", "physics", "vertex-node", "environment", "hdr", "leva"],
+    "original": "https://threejs.org/examples/#webgpu_compute_cloth",
+    "credits": "Royal Esplanade UltraHDR environment from the three.js examples (Poly Haven)"
   }
 ]

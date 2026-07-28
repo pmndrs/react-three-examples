@@ -360,8 +360,11 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
    heavy example (cold CDN fetch + fresh MRT shader build) even with every subtree
    correctly Suspense-gated — RECURRING dual-root warnings are the B17 bug; a single
    cold-start occurrence that never repeats is this transient
-   (postprocessing-motion-blur, verified 5/5 clean in both tree orderings after). CI runs the same suite on SwiftShader (software raster, ~1 fps on heavy
-   scenes): an example that verifiably cannot reach readiness there declares
+   (postprocessing-motion-blur, verified 5/5 clean in both tree orderings after). CI runs the same suite on SwiftShader — but **NOT on every push**:
+   at corpus scale that job is ~30 min of software raster, so it runs on PRs,
+   nightly, and on demand (`gh workflow run ci.yml`) only (porting-phase policy,
+   2026-07-28). Local Metal is the oracle — land nothing not green here first.
+   An example that verifiably cannot reach readiness on SwiftShader declares
    `"ciSkip": "<reason>"` in its manifest entry (exception list, SPEC §10) — used
    sparingly, never to paper over a local failure.
 4. Screenshot for review — collapse the leva panel first (it overlays center-frame
