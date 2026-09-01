@@ -1,18 +1,10 @@
 // The whole fire system: storage 3D textures + uniforms + compute kernels (fiber
 // stores), the raymarched volume meshes, the emitting teapot (draggable), the fire
 // point light, and the layered render pipeline (main pass + half-res volumetric pass
-// -> denoise -> compose -> bloom). Uses fiber hooks throughout, so it lives inside
-// <Canvas>; the page shell owns leva.
+// -> denoise -> compose -> bloom). Controls and fiber hooks live together here,
+// inside <Canvas>.
 import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react'
-import {
-  useFrame,
-  useGPUStorage,
-  useNodes,
-  useRenderPipeline,
-  useThree,
-} from '@react-three/fiber/webgpu'
-import { DragControls } from '@react-three/drei/webgpu'
-import { pass, saturation, storageTexture, texture3D, uniform, vec4, storage } from 'three/tsl'
+import { pass, saturation, storage, storageTexture, texture3D, vec4 } from 'three/tsl'
 import {
   ClampToEdgeWrapping,
   HalfFloatType,
@@ -31,14 +23,23 @@ import {
   type PointLight,
   type SpotLight,
   type StorageTexture,
-  type WebGPURenderer,
   type Wrapping,
 } from 'three/webgpu'
-import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
-import { bloom } from 'three/addons/tsl/display/BloomNode.js'
-import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js'
 import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js'
+import { bloom } from 'three/addons/tsl/display/BloomNode.js'
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
+import {
+  useFrame,
+  useGPUStorage,
+  useNodes,
+  useRenderPipeline,
+  useThree,
+  useUniforms,
+} from '@react-three/fiber/webgpu'
+import { DragControls } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import type CameraControlsImpl from 'camera-controls'
+import { TeapotGeometry } from '../../assets/TeapotGeometry'
 import {
   FIRE_INTENSITY,
   FLOOR_Y,
@@ -75,64 +76,77 @@ function createStorage3D(wrap: Wrapping = ClampToEdgeWrapping): StorageTexture {
   return texture as unknown as StorageTexture
 }
 
-export interface VolumeFireProps {
-  // simulation
-  simulate: boolean
-  simSpeed: number
-  turbulence: number
-  buoyancy: number
-  fireLifespan: number
-  smokeLifespan: number
-  // emitter
-  temperature: number
-  density: number
-  teapotEmissive: number
-  // appearance
-  fireHue: number // degrees
-  glowSpread: number
-  fireSaturation: number
-  startColor: string
-  midColor: string
-  endColor: string
-  // quality / post
-  steps: number
-  resolution: number
-  denoise: number
-  bloomStrength: number
-  bloomRadius: number
-  bloomThreshold: number
-  /** camera-controls instance (DemoHelpers escape hatch) — disabled while dragging. */
-  cameraControlsRef: RefObject<CameraControlsImpl | null>
-}
-
 export function VolumeFire({
-  simulate,
-  simSpeed,
-  turbulence,
-  buoyancy,
-  fireLifespan,
-  smokeLifespan,
-  temperature,
-  density,
-  teapotEmissive,
-  fireHue,
-  glowSpread,
-  fireSaturation,
-  startColor,
-  midColor,
-  endColor,
-  steps,
-  resolution,
-  denoise,
-  bloomStrength,
-  bloomRadius,
-  bloomThreshold,
   cameraControlsRef,
-}: VolumeFireProps) {
-  const rawRenderer = useThree((state) => state.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` is WebGPURenderer-only.
-  const renderer = rawRenderer as WebGPURenderer
+}: {
+  cameraControlsRef: RefObject<CameraControlsImpl | null>
+}) {
+  //* Controls =====================================================
+  const { simulate, simSpeed, turbulence, buoyancy, fireLifespan, smokeLifespan } = useControls(
+    'volume-fire simulation',
+    {
+      simulate: true,
+      simSpeed: { value: 1.2, min: 0, max: 2, step: 0.01 },
+      turbulence: { value: 3.2, min: 0, max: 5, step: 0.05 },
+      buoyancy: { value: 3.0, min: 0, max: 10, step: 0.1 },
+      fireLifespan: { value: 1.3, min: 0.5, max: 10, step: 0.1 },
+      smokeLifespan: { value: 3.5, min: 1, max: 100, step: 0.5 },
+    },
+  )
+  const { temperature, density, teapotEmissive } = useControls('volume-fire emitter', {
+    temperature: { value: 5.5, min: 0, max: 8, step: 0.05 },
+    density: { value: 7.0, min: 0, max: 20, step: 0.1 },
+    teapotEmissive: { value: 0.2, min: 0, max: 1, step: 0.001 },
+  })
+  const { fireHue, glowSpread, fireSaturation, startColor, midColor, endColor } = useControls(
+    'volume-fire look',
+    {
+      fireHue: { value: 0, min: 0, max: 360, step: 1 },
+      glowSpread: { value: 5.0, min: 1, max: 5, step: 0.1 },
+      fireSaturation: { value: 1.1, min: 0, max: 2, step: 0.05 },
+      startColor: '#ffe68c',
+      midColor: '#ff7305',
+      endColor: '#ff0000',
+    },
+  )
+  const { steps, resolution, denoise, bloomStrength, bloomRadius, bloomThreshold } = useControls(
+    'volume-fire quality',
+    {
+      steps: { value: 16, min: 4, max: 42, step: 1 },
+      resolution: { value: 0.5, min: 0.1, max: 1, step: 0.05 },
+      denoise: { value: 0.5, min: 0, max: 1, step: 0.01 },
+      bloomStrength: { value: 0.1, min: 0, max: 3, step: 0.01 },
+      bloomRadius: { value: 1.0, min: 0, max: 1, step: 0.01 },
+      bloomThreshold: { value: 0.5, min: 0, max: 1, step: 0.01 },
+    },
+  )
+
+  //* Uniforms =====================================================
+  // Register every canonical uniform once, then let the Leva-backed call update
+  // only its controlled subset. Frame-driven values retain their imperative state.
+  const fireUniforms = useUniforms(() => createFireUniforms(), 'volumeFire')
+  useUniforms(
+    {
+      uBuoyancy: buoyancy,
+      uEmitDensity: density,
+      uEmitTemperature: temperature,
+      uFireGlowSpread: glowSpread,
+      uFireStartColor: startColor,
+      uFireMidColor: midColor,
+      uFireEndColor: endColor,
+      uFireHue: MathUtils.degToRad(fireHue),
+      uSaturation: fireSaturation,
+      uTeapotEmissiveIntensity: teapotEmissive,
+      uShadowSteps: steps,
+      uDenoise: denoise,
+      uBloomStrength: bloomStrength,
+      uBloomRadius: bloomRadius,
+      uBloomThreshold: bloomThreshold,
+    },
+    'volumeFire',
+  )
+
+  const renderer = useThree((state) => state.renderer)
 
   const teapotRef = useRef<Mesh>(null)
   const volumeMeshRef = useRef<Mesh>(null)
@@ -150,10 +164,9 @@ export function VolumeFire({
     }
   }, [])
 
-  // The simulation's voxel fields. useGPUStorage is create-once (StrictMode-safe) and
-  // owns disposal. UNSCOPED on purpose with prefixed keys: scoped entries are named
-  // `${scope}.${name}` and the dot reaches WGSL binding identifiers — runtime shader
-  // compile error (fiber bug, UPSTREAM.md B16).
+  //* GPU State ====================================================
+  // The simulation's voxel fields. useGPUStorage is create-once, StrictMode-safe,
+  // and owns disposal.
   const {
     fireVelTexA,
     fireVelTexB,
@@ -163,52 +176,53 @@ export function VolumeFire({
     firePressTexA,
     firePressTexB,
     fireCurlTex,
-  } = useGPUStorage(() => ({
-    fireVelTexA: createStorage3D(), // velocity field (xyz)
-    fireVelTexB: createStorage3D(),
-    fireDyeTexA: createStorage3D(), // r = density, g = temperature, b = age
-    fireDyeTexB: createStorage3D(),
-    fireDivTex: createStorage3D(), // divergence
-    firePressTexA: createStorage3D(), // pressure (Jacobi ping-pong)
-    firePressTexB: createStorage3D(),
-    fireCurlTex: createStorage3D(RepeatWrapping), // precomputed curl noise
-  }))
+  } = useGPUStorage(
+    () => ({
+      fireVelTexA: createStorage3D(), // velocity field (xyz)
+      fireVelTexB: createStorage3D(),
+      fireDyeTexA: createStorage3D(), // r = density, g = temperature, b = age
+      fireDyeTexB: createStorage3D(),
+      fireDivTex: createStorage3D(), // divergence
+      firePressTexA: createStorage3D(), // pressure (Jacobi ping-pong)
+      firePressTexB: createStorage3D(),
+      fireCurlTex: createStorage3D(RepeatWrapping), // precomputed curl noise
+    }),
+    'volumeFire',
+  )
 
-  // Uniforms + kernels + the ping-ponged dye nodes, built exactly once in the node
-  // store — everything downstream (materials, pipeline, frame loop) closes over these
-  // store-stable instances, so a StrictMode double-render can't split the graph.
-  // ROOT-LEVEL useNodes (UPSTREAM.md B16): the keys double as WGSL-legal debug names.
-  const nodes = useNodes(() => {
-    const u = createFireUniforms()
+  //* Compute Graph =================================================
+  const nodes = useNodes(
+    () => {
+      const dyeTexNode = texture3D(fireDyeTexA)
+      const dyeTexWriteNode = storageTexture(fireDyeTexB).toWriteOnly()
+      const curlNoiseTexNode = texture3D(fireCurlTex)
 
-    const dyeTexNode = texture3D(fireDyeTexA)
-    const dyeTexWriteNode = storageTexture(fireDyeTexB).toWriteOnly()
-    const curlNoiseTexNode = texture3D(fireCurlTex)
+      // Teapot vertices as a read-only storage buffer for the emitter kernel.
+      const teapotVerts = storage(
+        teapotGeometry.attributes.position as BufferAttribute,
+        'vec3',
+        vertexCount,
+      ).toReadOnly()
 
-    // Teapot vertices as a read-only storage buffer for the emitter kernel.
-    const teapotVerts = storage(
-      teapotGeometry.attributes.position as BufferAttribute,
-      'vec3',
-      vertexCount,
-    ).toReadOnly()
+      const kernels = createFluidKernels({
+        u: fireUniforms,
+        velTexA: fireVelTexA,
+        velTexB: fireVelTexB,
+        divTex: fireDivTex,
+        pressTexA: firePressTexA,
+        pressTexB: firePressTexB,
+        curlNoiseTex: fireCurlTex,
+        dyeTexNode,
+        dyeTexWriteNode,
+        curlNoiseTexNode,
+        teapotVerts,
+        vertexCount,
+      })
 
-    const kernels = createFluidKernels({
-      u,
-      velTexA: fireVelTexA,
-      velTexB: fireVelTexB,
-      divTex: fireDivTex,
-      pressTexA: firePressTexA,
-      pressTexB: firePressTexB,
-      curlNoiseTex: fireCurlTex,
-      dyeTexNode,
-      dyeTexWriteNode,
-      curlNoiseTexNode,
-      teapotVerts,
-      vertexCount,
-    })
-
-    return { ...u, ...kernels, dyeTexNode, dyeTexWriteNode }
-  })
+      return { ...kernels, dyeTexNode, dyeTexWriteNode }
+    },
+    'volumeFire',
+  )
 
   const { dyeTexNode, dyeTexWriteNode, computeCurlNoise } = nodes
 
@@ -217,7 +231,7 @@ export function VolumeFire({
   const { volumetricMaterial, shadowMaterial, pointLightColorNode, teapotEmissiveNode } = useMemo(
     () =>
       createFireShading({
-        u: nodes,
+        u: fireUniforms,
         velTexA: fireVelTexA,
         dyeTexA: fireDyeTexA,
         dyeTexNode,
@@ -258,64 +272,13 @@ export function VolumeFire({
     ;(pointLight as PointLight & { colorNode: Node }).colorNode = pointLightColorNode
   }, [pointLightColorNode])
 
-  // Leva-driven uniforms + material knobs (mutate in place, no graph rebuild).
-  const {
-    uBuoyancy,
-    uEmitDensity,
-    uEmitTemperature,
-    uFireGlowSpread,
-    uFireStartColor,
-    uFireMidColor,
-    uFireEndColor,
-    uFireHue,
-    uSaturation,
-    uTeapotEmissiveIntensity,
-    uShadowSteps,
-  } = nodes
+  // VolumeNodeMaterial's CPU-side step count is not a uniform-backed field.
   useEffect(() => {
-    uBuoyancy.value = buoyancy
-    uEmitDensity.value = density
-    uEmitTemperature.value = temperature
-    uFireGlowSpread.value = glowSpread
-    uFireStartColor.value.set(startColor)
-    uFireMidColor.value.set(midColor)
-    uFireEndColor.value.set(endColor)
-    uFireHue.value = MathUtils.degToRad(fireHue)
-    uSaturation.value = fireSaturation
-    uTeapotEmissiveIntensity.value = teapotEmissive
-    // `steps` is read live by the volume raymarcher; the shadow march mirrors it
-    // through a uniform-driven Loop bound.
     volumetricMaterial.steps = steps
     shadowMaterial.steps = steps
-    uShadowSteps.value = steps
-  }, [
-    uBuoyancy,
-    uEmitDensity,
-    uEmitTemperature,
-    uFireGlowSpread,
-    uFireStartColor,
-    uFireMidColor,
-    uFireEndColor,
-    uFireHue,
-    uSaturation,
-    uTeapotEmissiveIntensity,
-    uShadowSteps,
-    volumetricMaterial,
-    shadowMaterial,
-    buoyancy,
-    density,
-    temperature,
-    glowSpread,
-    startColor,
-    midColor,
-    endColor,
-    fireHue,
-    fireSaturation,
-    teapotEmissive,
-    steps,
-  ])
+  }, [volumetricMaterial, shadowMaterial, steps])
 
-  // --- Render pipeline: main pass + half-res volumetric pass -> blur -> compose ---
+  //* Render Pipeline ==============================================
   const { passes } = useRenderPipeline(({ renderPipeline, passes, scene, camera }) => {
     if (!renderPipeline) return
 
@@ -327,39 +290,32 @@ export function VolumeFire({
     volumetricPass.setLayers(volumetricLayer)
     volumetricPass.setResolutionScale(0.5)
 
-    // three-side uniform created here and registered below (pattern (c) — the blur
-    // factory would const-fold a plain number).
-    const denoiseStrength = uniform(0.5)
-    const blurredVolumetric = gaussianBlur(volumetricPass, denoiseStrength, 1)
+    const blurredVolumetric = gaussianBlur(volumetricPass, fireUniforms.uDenoise, 1)
 
     // Saturation boost + halved contribution, then max/add-composited over the scene
     // (the original's compose), and bloom on top.
-    const adjustedRGB = saturation(blurredVolumetric.rgb, nodes.uSaturation)
+    const adjustedRGB = saturation(blurredVolumetric.rgb, fireUniforms.uSaturation)
     const adjustedVolumetric = vec4(adjustedRGB, blurredVolumetric.a).mul(0.5)
 
     const sceneColor = passes.scenePass.getTextureNode()
     const scenePassColor = sceneColor.max(adjustedVolumetric).add(adjustedVolumetric)
 
     const bloomPass = bloom(scenePassColor)
+    bloomPass.strength = fireUniforms.uBloomStrength
+    bloomPass.radius = fireUniforms.uBloomRadius
+    bloomPass.threshold = fireUniforms.uBloomThreshold
     renderPipeline.outputNode = scenePassColor.add(bloomPass)
 
-    // Return to register — the effect below mutates their uniform-backed knobs.
-    return { volumetricPass, bloomPass, denoiseStrength }
+    return { volumetricPass }
   })
 
   useEffect(() => {
     const volumetricPass = passes.volumetricPass as PassNode | undefined
-    const bloomPass = passes.bloomPass as ReturnType<typeof bloom> | undefined
-    const denoiseStrength = passes.denoiseStrength as { value: number } | undefined
-    if (!volumetricPass || !bloomPass || !denoiseStrength) return
+    if (!volumetricPass) return
     volumetricPass.setResolutionScale(resolution)
-    denoiseStrength.value = denoise
-    bloomPass.strength.value = bloomStrength
-    bloomPass.radius.value = bloomRadius
-    bloomPass.threshold.value = bloomThreshold
-  }, [passes, resolution, denoise, bloomStrength, bloomRadius, bloomThreshold])
+  }, [passes, resolution])
 
-  // --- Fixed-timestep simulation loop (phase 'update': before the default render) ---
+  //* Simulation Loop ===============================================
   const cpuNoise = useMemo(() => new ImprovedNoise(), [])
   const simState = useRef({ simulationTime: 0, accumulator: 0 })
   const prevTeapotPos = useRef(new Vector3())
@@ -367,7 +323,7 @@ export function VolumeFire({
   const teapotVelocity = useRef(new Vector3())
 
   useFrame(
-    (_, rawDelta) => {
+    ({ delta: rawDelta }) => {
       const teapotMesh = teapotRef.current
       if (!teapotMesh) return
       const state = simState.current
@@ -375,23 +331,23 @@ export function VolumeFire({
 
       // CPU-noise flame animation + emitter matrix, at simulation time
       const updateTemporalUniforms = (time: number) => {
-        nodes.uTime.value = time % 1000
+        fireUniforms.uTime.value = time % 1000
 
-        nodes.uFlameHeight.value = 3.5 + cpuNoise.noise(0, time * 2.5, 0) * 0.8
+        fireUniforms.uFlameHeight.value = 3.5 + cpuNoise.noise(0, time * 2.5, 0) * 0.8
 
         const swayX = cpuNoise.noise(time * 3.5, 0, 0) * 0.4
         const swayZ = cpuNoise.noise(0, 0, time * 3.5) * 0.4
-        nodes.uSway.value.set(swayX, 0, swayZ)
+        fireUniforms.uSway.value.set(swayX, 0, swayZ)
 
         const slowNoise = cpuNoise.noise(0, time * 0.8, 0)
         const fastNoise = cpuNoise.noise(0, time * 15.0, 0)
-        nodes.uFlicker.value = slowNoise * 0.12 + fastNoise * 0.06 + 0.82
+        fireUniforms.uFlicker.value = slowNoise * 0.12 + fastNoise * 0.06 + 0.82
 
-        nodes.uColorNoise.value = cpuNoise.noise(time * 5.0, time * 5.0, 0) * 0.08
+        fireUniforms.uColorNoise.value = cpuNoise.noise(time * 5.0, time * 5.0, 0) * 0.08
 
         teapotMesh.rotation.y = time * 0.25
         teapotMesh.updateMatrixWorld()
-        nodes.uTeapotMatrix.value.copy(teapotMesh.matrixWorld)
+        fireUniforms.uTeapotMatrix.value.copy(teapotMesh.matrixWorld)
       }
 
       // Teapot speed and velocity drive the wind + emission boost while dragging
@@ -403,18 +359,18 @@ export function VolumeFire({
       }
       prevTeapotPos.current.copy(currentPos)
 
-      nodes.uTeapotSpeed.value = speed
-      nodes.uTeapotVelocity.value.copy(teapotVelocity.current)
-      nodes.uTeapotPosition.value.copy(currentPos)
+      fireUniforms.uTeapotSpeed.value = speed
+      fireUniforms.uTeapotVelocity.value.copy(teapotVelocity.current)
+      fireUniforms.uTeapotPosition.value.copy(currentPos)
 
       if (simulate && simSpeed > 0) {
         const simStep = SIM_STEP * simSpeed
         state.accumulator = Math.min(state.accumulator + delta * simSpeed, simStep * MAX_SUBSTEPS)
 
-        nodes.uDt.value = simStep
-        nodes.uTurbulence.value = turbulence / Math.sqrt(simSpeed)
-        nodes.uDissipation.value = smokeLifespan >= 100.0 ? 0.0 : 1.0 / smokeLifespan
-        nodes.uCooling.value = 1.0 / fireLifespan
+        fireUniforms.uDt.value = simStep
+        fireUniforms.uTurbulence.value = turbulence / Math.sqrt(simSpeed)
+        fireUniforms.uDissipation.value = smokeLifespan >= 100.0 ? 0.0 : 1.0 / smokeLifespan
+        fireUniforms.uCooling.value = 1.0 / fireLifespan
 
         while (state.accumulator >= simStep) {
           state.simulationTime += simStep
@@ -444,8 +400,8 @@ export function VolumeFire({
       // Point light range follows fire size (temperature/density/intensity), with a
       // 3-second smoothstep fade-in from ignition.
       const sizeFactor = Math.sqrt(
-        (nodes.uEmitTemperature.value / 8.34) *
-          (nodes.uEmitDensity.value / 11.02) *
+        (fireUniforms.uEmitTemperature.value / 8.34) *
+          (fireUniforms.uEmitDensity.value / 11.02) *
           (FIRE_INTENSITY / 5.63),
       )
       const t = MathUtils.clamp(state.simulationTime / 3.0, 0, 1)

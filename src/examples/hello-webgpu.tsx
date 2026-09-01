@@ -11,8 +11,8 @@
  * - n/a (placeholder, will be retired once real ports cover the basics)
  */
 import { useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import type { Mesh } from 'three'
+import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../utils/DemoHelpers'
 
 function TorusKnot() {

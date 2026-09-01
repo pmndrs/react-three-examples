@@ -10,11 +10,9 @@
  *   instead of thresholding the whole scene color the way a naive bloom would
  * - A per-MRT-output blend mode (`mrtNode.setBlendMode('emissive', new BlendMode(...))`)
  *   configured before `scenePass.setMRT()` runs
- * - `bloom()`'s returned node carries its OWN `uniform()`-backed `.strength`/`.radius`
- *   fields (three.js TSL, not fiber's `useUniforms`) — registering the pass via
- *   `useRenderPipeline`'s return-to-register mechanism lets a later effect mutate
- *   `.value` directly on leva changes, with no `rebuild()` and no fiber `UniformNode`
- *   cast needed (that cast is only a fiber-hook-uniform gotcha, not a three.js one)
+ * - `useUniforms` feeding live Leva values directly into `bloom()`'s writable
+ *   `.strength`/`.radius` fields before shader compilation — no synchronization
+ *   effect or pipeline rebuild
  * - `renderer.toneMappingExposure` driven live from leva via `useThree` — a renderer
  *   property mutated imperatively in an effect, not a TSL uniform or Canvas prop
  * - drei's `Environment` (`/webgpu`) supplying a shared HDR background + IBL texture
@@ -33,7 +31,7 @@
  *   gap, not routed around here; `target` is supported and used
  */
 import { Suspense, useEffect } from 'react'
-import { Canvas, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
+import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
@@ -53,7 +51,10 @@ function DamagedHelmet() {
 
 // Sets renderer.toneMappingExposure imperatively — a WebGPURenderer property, not a
 // TSL uniform, so it has no place in the render pipeline graph.
-function ToneMappingExposure({ exposure }: { exposure: number }) {
+function ToneMappingExposure() {
+  const { exposure } = useControls('postprocessing-bloom-emissive', {
+    exposure: { value: 1, min: 0.1, max: 2, step: 0.01 },
+  })
   const renderer = useThree((s) => s.renderer)
 
   useEffect(() => {
@@ -63,16 +64,19 @@ function ToneMappingExposure({ exposure }: { exposure: number }) {
   return null
 }
 
-interface PostFXProps {
-  bloomStrength: number
-  bloomRadius: number
-}
-
 // Selective bloom: MRT isolates the emissive channel into its own render target so
 // `bloom()` only sees emissive-tagged surfaces, then the bloom result is added back
 // onto the regular color output.
-function PostFX({ bloomStrength, bloomRadius }: PostFXProps) {
-  const { passes } = useRenderPipeline(
+function PostFX() {
+  //* Controls =====================================================
+  const values = useControls('postprocessing-bloom-emissive', {
+    bloomStrength: { value: 2.5, min: 0, max: 5, step: 0.05 },
+    bloomRadius: { value: 0.5, min: 0, max: 1, step: 0.01 },
+  })
+  const uniforms = useUniforms(values, 'postprocessingBloomEmissive')
+
+  //* Render Pipeline ==============================================
+  useRenderPipeline(
     ({ renderPipeline, passes }) => {
       if (!renderPipeline) return
 
@@ -83,12 +87,10 @@ function PostFX({ bloomStrength, bloomRadius }: PostFXProps) {
       // the original). `getTexture` (raw RT texture), not `getTextureNode` (TSL node).
       passes.scenePass.getTexture('emissive').type = UnsignedByteType
 
-      const bloomPass = bloom(emissiveTexture, bloomStrength, bloomRadius)
+      const bloomPass = bloom(emissiveTexture)
+      bloomPass.strength = uniforms.bloomStrength
+      bloomPass.radius = uniforms.bloomRadius
       renderPipeline.outputNode = colorTexture.add(bloomPass)
-
-      // Return to register — makes `bloomPass` available on `passes` for the effect
-      // below to mutate `.strength`/`.radius` without a pipeline rebuild.
-      return { bloomPass }
     },
     ({ passes }) => {
       const mrtNode = mrt({ output, emissive: vec4(emissive, output.a) })
@@ -97,34 +99,21 @@ function PostFX({ bloomStrength, bloomRadius }: PostFXProps) {
     },
   )
 
-  useEffect(() => {
-    const bloomPass = passes.bloomPass as ReturnType<typeof bloom> | undefined
-    if (!bloomPass) return
-    bloomPass.strength.value = bloomStrength
-    bloomPass.radius.value = bloomRadius
-  }, [passes, bloomStrength, bloomRadius])
-
   return null
 }
 
 export default function PostprocessingBloomEmissive() {
-  const { bloomStrength, bloomRadius, exposure } = useControls('postprocessing-bloom-emissive', {
-    bloomStrength: { value: 2.5, min: 0, max: 5, step: 0.05 },
-    bloomRadius: { value: 0.5, min: 0, max: 1, step: 0.01 },
-    exposure: { value: 1, min: 0.1, max: 2, step: 0.01 },
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       camera={{ position: [-1.8, 0.6, 2.7], fov: 45, near: 0.25, far: 20 }}
     >
+      <PostFX />
+      <ToneMappingExposure />
       <Suspense fallback={null}>
         <Environment files={HDR_URL} background />
         <DamagedHelmet />
       </Suspense>
-      <PostFX bloomStrength={bloomStrength} bloomRadius={bloomRadius} />
-      <ToneMappingExposure exposure={exposure} />
       <DemoHelpers grid={false} target={[0, 0, -0.2]} />
     </Canvas>
   )

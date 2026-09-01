@@ -31,10 +31,10 @@
  *   already interactive via pointer movement — there's no extra parameter worth exposing
  */
 import { Suspense, useRef } from 'react'
-import { Canvas, useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import { hue, saturation, texture } from 'three/tsl'
 import type { Mesh, Node } from 'three/webgpu'
+import { Canvas, useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../utils/DemoHelpers'
 
 const UV_GRID_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/uv_grid_opengl.jpg'
@@ -73,6 +73,7 @@ function PostFX() {
   })
 
   useRenderPipeline(({ renderPipeline, passes }) => {
+    // NOTE not needed in the mainCB will be fixed in upstrem B7
     if (!renderPipeline) return
 
     const sceneColor = passes.scenePass.getTextureNode()

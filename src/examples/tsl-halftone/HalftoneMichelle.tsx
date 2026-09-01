@@ -3,13 +3,11 @@
 // unlike HalftonePrimitives' statically-known meshes).
 import { useEffect } from 'react'
 import { useGLTF } from '@react-three/drei/webgpu'
-import { output } from 'three/tsl'
-import type { Material, Mesh } from 'three/webgpu'
-import type { HalftonesFn } from './halftoneEffect'
+import type { Material, Mesh, Node } from 'three/webgpu'
 
 const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
 
-export function HalftoneMichelle({ halftones }: { halftones: HalftonesFn }) {
+export function HalftoneMichelle({ outputNode }: { outputNode: Node }) {
   const { scene } = useGLTF(MICHELLE_URL)
 
   useEffect(() => {
@@ -20,9 +18,9 @@ export function HalftoneMichelle({ halftones }: { halftones: HalftonesFn }) {
       // not part of its type (matches the original's untyped `child.material.outputNode
       // = ...` assignment).
       const material = (child as Mesh).material as Material & { outputNode: unknown }
-      material.outputNode = halftones(output)
+      material.outputNode = outputNode
     })
-  }, [scene, halftones])
+  }, [scene, outputNode])
 
   return <primitive object={scene} position={[0, -2, 0]} scale={2.5} />
 }

@@ -40,39 +40,21 @@
  *   baseline with the original's target (0,-8,0) and dolly limits (5/200)
  * - The original's `GridHelper(90, 45, 0x303030)` becomes the DemoHelpers
  *   infinite grid (corpus baseline furniture)
- * - `useBuffers`/`useNodes` are used UNSCOPED with prefixed keys: scoped entries
- *   get debug-named `${scope}.${name}` by fiber and the dot reaches WGSL
- *   identifiers (storage-buffer struct names here) — runtime shader compile
- *   failure (fiber bug, UPSTREAM.md B16; this port extends its evidence from
- *   useNodes to useBuffers). The original's `.setName('Init Particles')` labels
- *   are dropped for the same reason — fiber re-labels stored nodes by key
- * - Kernel uniforms are fiber `useUniforms` driven by leva instead of module-scope
- *   `uniform()` consts, with the documented `as unknown as Node<'float'>` casts
- *   (fiber UniformNode typing gap). `uClickPos` stays a plain TSL `uniform()`
- *   inside the `useNodes` creator: it is mutated imperatively per pointer event and
- *   a React re-render must never write it back (same rationale as
- *   tsl-procedural-terrain's drag offset)
+ * - Kernel uniforms are driven directly by colocated leva controls through
+ *   `useUniforms`; the pointer uniform remains graph-owned because React must never
+ *   overwrite its imperative event updates
  * - Split into a folder (this file + Particles.tsx): the single-file port runs
- *   past the ~200-line threshold — split by scene role (page shell/controls vs
- *   the compute pipeline + sprite field, which needs fiber hooks and so must
- *   live inside `<Canvas>`)
+ *   past the ~200-line threshold — split by scene role (page shell vs the compute
+ *   pipeline, controls, and sprite field that need fiber hooks inside `<Canvas>`)
  */
 import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 import { Particles } from './Particles'
 
 export default function ComputeParticles() {
-  const { gravity, bounce, friction, size } = useControls('compute-particles', {
-    gravity: { value: -0.00098, min: -0.0098, max: 0, step: 0.0001 },
-    bounce: { value: 0.8, min: 0.1, max: 1, step: 0.01 },
-    friction: { value: 0.99, min: 0.96, max: 0.99, step: 0.01 },
-    size: { value: 0.12, min: 0.12, max: 0.5, step: 0.01 },
-  })
-
   return (
     <Canvas renderer background="#000000" camera={{ position: [0, 5, 20], fov: 50, near: 0.1, far: 1000 }}>
-      <Particles gravity={gravity} bounce={bounce} friction={friction} size={size} />
+      <Particles />
       <DemoHelpers target={[0, -8, 0]} minDistance={5} maxDistance={200} />
     </Canvas>
   )

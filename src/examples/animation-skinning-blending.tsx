@@ -16,10 +16,10 @@
  * - DemoHelpers baseline (grid + camera controls) added; original had a fixed camera
  */
 import { Suspense, useEffect, useMemo } from 'react'
+import { Mesh, SkeletonHelper } from 'three'
 import { Canvas } from '@react-three/fiber/webgpu'
 import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { Mesh, SkeletonHelper } from 'three'
 import { DemoHelpers } from '../utils/DemoHelpers'
 
 const SOLDIER_URL =

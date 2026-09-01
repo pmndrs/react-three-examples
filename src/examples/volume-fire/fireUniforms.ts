@@ -1,9 +1,6 @@
-// All live uniforms of the fire simulation and its shading graphs, created in one
-// place. These are plain three-side TSL `uniform()` nodes (typed, no fiber casts)
-// built ONCE inside the component's `useNodes` creator, so they live in fiber's
-// node store and survive StrictMode remounts together with the compute kernels
-// that close over them. Leva-driven values are synced in an effect, frame-driven
-// values in `useFrame` — the same split the original's render loop uses.
+// All live uniforms of the fire simulation, shading, and display graphs. The
+// three-side nodes are registered once through fiber's `useUniforms`; a second
+// Leva-backed call updates only controlled values, leaving frame-driven values intact.
 import { uniform } from 'three/tsl'
 import { Color, Matrix4, Vector3 } from 'three/webgpu'
 import {
@@ -62,6 +59,12 @@ export function createFireUniforms() {
     // Raymarch step count of the volume's shadow caster — mirrors the leva `steps`
     // knob (the original tracked `material.steps` with an onRenderUpdate uniform).
     uShadowSteps: uniform(16),
+
+    // --- display pipeline (leva) ---
+    uDenoise: uniform(0.5),
+    uBloomStrength: uniform(0.1),
+    uBloomRadius: uniform(1.0),
+    uBloomThreshold: uniform(0.5),
   }
 }
 

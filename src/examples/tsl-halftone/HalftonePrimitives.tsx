@@ -1,28 +1,23 @@
-// Two primitive shapes, each its own `meshStandardNodeMaterial` — `outputNode` is
-// memoized per mesh so it's only (re)built when `halftones`' identity changes
-// (effectively once; see halftoneEffect.ts for why that identity stays stable).
-import { useMemo } from 'react'
-import { output } from 'three/tsl'
-import type { HalftonesFn } from './halftoneEffect'
+// Two primitive shapes sharing the scene's stable halftone output graph.
+import type { Node } from 'three/webgpu'
+import { folder, useControls } from 'leva'
 
-interface HalftonePrimitivesProps {
-  materialColor: string
-  halftones: HalftonesFn
-}
-
-export function HalftonePrimitives({ materialColor, halftones }: HalftonePrimitivesProps) {
-  const torusOutput = useMemo(() => halftones(output), [halftones])
-  const sphereOutput = useMemo(() => halftones(output), [halftones])
+export function HalftonePrimitives({ outputNode }: { outputNode: Node }) {
+  const { materialColor } = useControls('tsl-halftone', {
+    material: folder({
+      materialColor: { value: '#ff622e', label: 'color' },
+    }),
+  })
 
   return (
     <>
       <mesh position={[3, 0, 0]}>
         <torusKnotGeometry args={[0.6, 0.25, 128, 32]} />
-        <meshStandardNodeMaterial color={materialColor} outputNode={torusOutput} />
+        <meshStandardNodeMaterial color={materialColor} outputNode={outputNode} />
       </mesh>
       <mesh position={[-3, 0, 0]}>
         <sphereGeometry args={[1, 64, 64]} />
-        <meshStandardNodeMaterial color={materialColor} outputNode={sphereOutput} />
+        <meshStandardNodeMaterial color={materialColor} outputNode={outputNode} />
       </mesh>
     </>
   )

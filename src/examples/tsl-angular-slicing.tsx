@@ -65,7 +65,7 @@ interface SliceControls {
 function SlicedGears({ sliceStart, sliceArc, sliceColor }: SliceControls) {
   const scene = useThree((s) => s.scene)
   const envMap = useLoader(UltraHDRLoader, HDR_URL)
-  const gltf = useGLTF(MODEL_URL, true) // Draco-compressed; arg 2 wires drei's decoder
+  const gltf = useGLTF(MODEL_URL, { draco: true })
 
   // Live uniform nodes (three-side, like the original's) — leva edits mutate `.value`
   // below; the graphs are built once and never rebuilt.

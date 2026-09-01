@@ -11,7 +11,13 @@ const IGNORED_CONSOLE = [
   /\[vite\]/,
 ]
 
-for (const { slug, ...meta } of examples) {
+// SLUGS=a,b restricts the run to those examples (set by `pnpm test:changed`).
+// The full 131-example sweep is ~19 min locally and produces contention flakes;
+// day-to-day work should only ever run what it touched.
+const ONLY = process.env.SLUGS?.split(',').filter(Boolean)
+const selected = ONLY ? examples.filter((e) => ONLY.includes(e.slug)) : examples
+
+for (const { slug, ...meta } of selected) {
   const ciSkip = 'ciSkip' in meta ? String(meta.ciSkip) : undefined
   // ciNoGrid: run the example in CI with DemoHelpers' grid suppressed (?nogrid) —
   // works around the SwiftShader Grid+node-graph stall WITHOUT losing smoke coverage.

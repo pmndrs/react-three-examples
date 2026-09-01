@@ -1,5 +1,103 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–2)
 
+## Halftone graph simplification (2026-09-01)
+
+- Replaced `useHalftoneComposite` and its manual uniform-node dependency list with
+  one `useNodes`-owned output graph shared by the primitive and GLTF materials.
+- Co-located the controls and graph wiring in the entry file as a local Canvas child;
+  removed the now-unnecessary `HalftoneScene.tsx`.
+- Kept the original per-layer TSL math as a typed graph helper. This avoids the
+  current `Fn` parameter-width inference gap without TypeScript casts or runtime
+  coercion nodes; Leva's plain-object purple direction is normalized to `Vector3`
+  at the uniform boundary.
+- Verification: typecheck, scoped lint, `test:changed tsl-halftone` (smoke +
+  animates), and screenshot all pass.
+
+## Postprocessing controls cleanup (2026-09-01)
+
+- Moved the dot-screen and RGB-shift Leva controls into `PostFX`, beside the
+  uniforms they update. Removed the page-level controls, props interface, and prop
+  drilling.
+- `useUniforms` now creates the canonical nodes and assigns them directly to the
+  addon's public pass fields before shader compilation. This removes pass registration
+  and the synchronization effect; live Leva edits were verified in-browser. Logged
+  the factory's supplied-uniform identity loss as three.js#34416 / UPSTREAM B29.
+- Applied the same pattern to `postprocessing-bloom-emissive`: bloom controls now
+  live in `PostFX`, exposure lives in `ToneMappingExposure`, and creator hooks render
+  before the suspending Environment/model subtree.
+- Verification: typecheck, scoped lint, scoped smoke + animates, and screenshots pass
+  for both postprocessing examples.
+
+## Compute texture controls cleanup (2026-09-01)
+
+- Moved the pattern-scale Leva control into `ComputedPlane`, beside its `useUniforms`
+  node and dispatch effect. Removed prop drilling, redundant manual uniform
+  assignment, obsolete alpha.3 casts, and the old unscoped-node workaround.
+- Scoped `useNodes` is now used directly on fiber alpha.4. A live browser edit from
+  scale 50 to 100 confirmed that the uniform updates before the on-demand compute
+  redispatch.
+- Verification: typecheck, scoped lint, `test:changed compute-texture`, and screenshot
+  pass.
+
+## Compute particles controls cleanup (2026-09-01)
+
+- Moved gravity, bounce, friction, and size controls into `Particles`, directly beside
+  their `useUniforms` nodes. Removed the page props/interface and all obsolete
+  UniformNode/WebGPU renderer casts.
+- Re-enabled scoped `useBuffers` and `useNodes` on fiber alpha.4 and simplified the
+  three compute kernels without changing their once/frame/event dispatch cadences.
+  The event-driven pointer uniform remains graph-owned so React cannot reset it.
+- Restored the init dispatch to `useEffect` so the `useNodes` creator remains pure.
+  Opened [react-three-fiber#3896](https://github.com/pmndrs/react-three-fiber/issues/3896)
+  for root-scoped, versioned dirty signals that let independent frame jobs react once
+  to shared mutable-state changes; targeted to the v10.1 milestone.
+- Verification: typecheck, scoped lint, `test:changed compute-particles`, and
+  screenshot pass.
+
+## Geometry loft + volume fire controls cleanup (2026-09-01)
+
+- Moved geometry-loft's display/turntable controls into `Exhibits`, their actual
+  consumer. These remain ordinary React values because they drive CPU scene state,
+  not shader inputs.
+- Removed volume-fire's 20-value prop chain. `VolumeFire` now owns its four Leva
+  groups and registers one canonical uniform bag through creator-form `useUniforms`;
+  a same-scope value-form call updates only the controlled subset.
+- Denoise and bloom controls now feed their TSL nodes directly before pipeline
+  compilation. Removed the broad uniform synchronization effect; only CPU-side
+  material step count and pass resolution retain focused effects.
+- Scoped `useGPUStorage`/`useNodes` now use the alpha.4-safe `volumeFire` scope, and
+  frame-driven uniforms remain isolated from React control updates.
+- Verification: typecheck and scoped lint pass. `test:changed geometry-loft` passes
+  smoke with its existing ledgered animation skip; `test:changed volume-fire` passes
+  smoke + animation. Both screenshots pass.
+
+## Shared teapot geometry (2026-08-31)
+
+- Centralized the `TeapotGeometry` addon import and idempotent JSX registration in
+  `src/assets/TeapotGeometry.ts`; its shared `teapotGeometry` intrinsic declaration
+  now lives in `src/types/r3f.d.ts`.
+- Migrated all six consumers to the shared asset. `lights-phong` now uses a single
+  side-effect import instead of repeating `extend()` and module augmentation, while
+  imperative consumers still construct the size/segment variant they need.
+- Verification: typecheck, lint, build, and scoped `lights-phong` smoke + animation
+  tests pass.
+
+## Raging sea cleanup (2026-07-29)
+
+- Replaced the original `tsl-raging-sea` port's prop-heavy `Sea` wrapper with the
+  existing v10 example pattern: Leva values feed `useUniforms`, then one `useNodes`
+  creator builds the position, normal, and emissive graph for a declarative
+  `meshStandardNodeMaterial`.
+- Consolidated the reusable graph and control definitions in
+  `src/examples/tsl-raging-sea/seaNodes.tsx`; removed the duplicate
+  `Sea.tsx` and `WebGPURagingSea.tsx` implementations.
+- Promoted `TerrainGeometry` to `src/utils/` and changed its guarded geometry
+  rotation to `useLayoutEffect`, ensuring the horizontal vertex data is ready before
+  the first shader build.
+- Verification: typecheck, scoped lint, build, `test:changed tsl-raging-sea`
+  (smoke + animates), and screenshot all pass. Visual output retains the original
+  black background, directional lighting, violet water, and emissive pink troughs.
+
 ## Wave 13 (2026-07-29) — the CHEAP-MODE wave: cluster batches, 95 → 131
 
 Dennis approved resuming under the cost plan from the 07-28 policy change. This wave

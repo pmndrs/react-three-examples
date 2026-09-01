@@ -9,6 +9,8 @@ import { ReadinessSignal } from './ReadinessSignal'
 export interface DemoHelpersProps {
   /** Infinite ground grid. Default on. */
   grid?: boolean
+  /** Vertical offset from the grid's default ground position. */
+  gridOffset?: number
   /** camera-controls orbit controls. Default on. */
   controls?: boolean
   /** Orbit/look-at target. */
@@ -42,6 +44,7 @@ const NOGRID_OVERRIDE =
 
 export function DemoHelpers({
   grid = true,
+  gridOffset = 0,
   controls = true,
   target,
   minDistance,
@@ -59,7 +62,7 @@ export function DemoHelpers({
     <>
       {grid && !NOGRID_OVERRIDE && (
         <Grid
-          position={[0, 0.002, 0]}
+          position={[0, 0.002 + gridOffset, 0]}
           infiniteGrid
           cellSize={0.5}
           sectionSize={2.5}

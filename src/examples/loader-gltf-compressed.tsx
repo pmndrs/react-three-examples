@@ -6,15 +6,10 @@
  * DEMONSTRATES
  * - Loading a gltfpack-compressed GLB (KTX2/BasisU compressed textures + Meshopt
  *   compressed geometry) through drei's `useGLTF` on the WebGPU path
- * - `useGLTF`'s `extendLoader` escape hatch: the one loader extension drei does NOT
- *   wire up itself is KTX2 — a `KTX2Loader` is created inside the callback, pointed at
- *   the r185 BasisU transcoder, and `detectSupport()`ed against the LIVE
- *   `WebGPURenderer` from `useThree` (safe here: fiber awaits `renderer.init()` before
- *   children render, and `detectSupport` probes GPU compressed-texture features via
- *   `renderer.hasFeature()`, which throws pre-init)
- * - `useGLTF`'s built-in Meshopt wiring: the third argument (`useMeshopt: true`)
- *   attaches `MeshoptDecoder`, replacing the original's manual
- *   `loader.setMeshoptDecoder(MeshoptDecoder)`
+ * - `useGLTF`'s options object wires all three compression extensions itself —
+ *   `{ draco, meshopt, ktx2 }`. Passing a STRING for `ktx2` sets the BasisU
+ *   transcoder path; drei creates a shared `KTX2Loader` and calls
+ *   `detectSupport()` against the live renderer for you.
  * - Headlight pattern: a `pointLight` copying the camera position every `useFrame`
  *   tick — physically-based `power` in lumens (the original's `light.power = 1300`)
  * - Reinhard tone mapping configured once via `<Canvas renderer={{ toneMapping }}>`
@@ -33,11 +28,10 @@
  *   slice through the middle of the model
  */
 import { Suspense, useRef } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
+import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { ReinhardToneMapping, type PointLight } from 'three/webgpu'
-import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js'
 import { DemoHelpers } from '../utils/DemoHelpers'
 
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/coffeemat.glb'
@@ -46,14 +40,8 @@ const BASIS_TRANSCODER_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/
 
 // coffeemat.glb was produced from the source scene with `gltfpack -cc -tc`:
 // Meshopt-compressed geometry (-cc) + KTX2/BasisU-compressed textures (-tc).
-// Draco (arg 2) and Meshopt (arg 3) are wired by drei itself; KTX2 needs the
-// extendLoader escape hatch. detectSupport() reads the initialized renderer's
-// compressed-texture capabilities to pick the BasisU transcode target.
 function CoffeeMat() {
-  const renderer = useThree((s) => s.renderer)
-  const { scene } = useGLTF(MODEL_URL, true, true, (loader) => {
-    loader.setKTX2Loader(new KTX2Loader().setTranscoderPath(BASIS_TRANSCODER_PATH).detectSupport(renderer))
-  })
+  const { scene } = useGLTF(MODEL_URL, { draco: true, meshopt: true, ktx2: BASIS_TRANSCODER_PATH })
   return <primitive object={scene} position={[0, -0.8, 0]} scale={0.01} />
 }
 

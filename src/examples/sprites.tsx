@@ -13,7 +13,9 @@
  *   (`textureNode.mul(uv()).mul(2).saturate()` / `textureNode.a`), the same
  *   node-composition style used by the other node-material ports in this repo
  * - Scene-level TSL fog (`fog(color(...), rangeFogFactor(near, far))` assigned to
- *   `scene.fogNode`) in place of the legacy `Fog`/`FogExp2` objects
+ *   `scene.fogNode`) in place of the legacy `Fog`/`FogExp2` objects. Leva values flow
+ *   through stable `useUniforms` nodes, so control changes update the GPU values
+ *   without rebuilding the fog graph
  *
  * DIVERGENCE from original
  * - Per-frame mutation loop (rotation increment, breathing scale, group spin) ported
@@ -39,36 +41,36 @@
  *   UPSTREAM.md entry — flagged here and in the port report as a candidate AGENTS.md
  *   note (same cast-with-comment convention as the documented fiber typing gaps)
  */
-import { Suspense, useEffect, useMemo, useRef } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
-import { color, fog, rangeFogFactor, texture, userData, uv } from 'three/tsl'
-import { SpriteNodeMaterial } from 'three/webgpu'
-import type { Group, Node } from 'three/webgpu'
-import { DemoHelpers } from '../utils/DemoHelpers'
+import { Suspense, useMemo, useRef } from "react";
+import { fog, rangeFogFactor, texture, userData, uv } from "three/tsl";
+import { SpriteNodeMaterial } from "three/webgpu";
+import type { Group } from "three/webgpu";
+import {
+  Canvas,
+  useFrame,
+  useLocalNodes,
+  useNodes,
+  useUniforms,
+  useTexture,
+  fromRef,
+} from "@react-three/fiber/webgpu";
+import { useControls } from "leva";
+import { DemoHelpers } from "../utils/DemoHelpers";
 
-const SPRITE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sprite1.png'
+const SPRITE_URL =
+  "https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sprite1.png";
 
 interface SpriteFieldProps {
-  amount: number
-  radius: number
-  spinSpeed: number
+  amount: number;
+  radius: number;
+  spinSpeed: number;
 }
 
 // One SpriteNodeMaterial shared by the whole field — see header DEMONSTRATES.
 function SpriteField({ amount, radius, spinSpeed }: SpriteFieldProps) {
-  const map = useTexture(SPRITE_URL)
-  const groupRef = useRef<Group>(null)
-
-  const material = useMemo(() => {
-    const textureNode = texture(map)
-    const mat = new SpriteNodeMaterial()
-    mat.colorNode = textureNode.mul(uv()).mul(2).saturate()
-    mat.opacityNode = textureNode.a
-    mat.rotationNode = userData('rotation', 'float') // reads sprite.userData.rotation
-    return mat
-  }, [map])
+  const map = useTexture(SPRITE_URL);
+  const groupRef = useRef<Group>(null);
+  const { textureNode } = useLocalNodes(() => ({ textureNode: texture(map) }));
 
   // Positions drawn once on a unit sphere * radius (no THREE.Vector3 allocation, to
   // dodge @react-three/eslint-plugin's no-new-in-loop for this Array.from body);
@@ -77,88 +79,102 @@ function SpriteField({ amount, radius, spinSpeed }: SpriteFieldProps) {
   const positions = useMemo<[number, number, number][]>(
     () =>
       Array.from({ length: amount }, () => {
-        const x = Math.random() - 0.5
-        const y = Math.random() - 0.5
-        const z = Math.random() - 0.5
-        const scale = radius / (Math.hypot(x, y, z) || 1)
-        return [x * scale, y * scale, z * scale]
+        const x = Math.random() - 0.5;
+        const y = Math.random() - 0.5;
+        const z = Math.random() - 0.5;
+        const scale = radius / (Math.hypot(x, y, z) || 1);
+        return [x * scale, y * scale, z * scale];
       }),
     [amount, radius],
-  )
+  );
 
   // Texture.image types as `unknown` (@types/three's generic default, since the loader
   // could hand back canvases/video/bitmaps) — cast to the shape TextureLoader's decoded
   // HTMLImageElement actually has.
-  const { width: imageWidth, height: imageHeight } = map.image as { width: number; height: number }
+  const { width: imageWidth, height: imageHeight } = map.image as {
+    width: number;
+    height: number;
+  };
 
-  useFrame((state) => {
-    const group = groupRef.current
-    if (!group) return
+  useFrame(({ elapsed }) => {
+    const group = groupRef.current;
+    if (!group) return;
 
-    const time = state.elapsed
-    const children = group.children
-    const l = children.length
+    const children = group.children;
 
-    for (let i = 0; i < l; i++) {
-      const sprite = children[i]
-      const scale = Math.sin(time + sprite.position.x * 0.01) * 0.3 + 1.0
-      const rotation = typeof sprite.userData.rotation === 'number' ? sprite.userData.rotation : 0
-      sprite.userData.rotation = rotation + 0.1 * spinSpeed * (i / l)
-      sprite.scale.set(scale * imageWidth, scale * imageHeight, 1)
+    for (let i = 0; i < children.length; i++) {
+      const sprite = children[i];
+      const data = sprite.userData as { rotation: number };
+      const scale = Math.sin(elapsed + sprite.position.x * 0.01) * 0.3 + 1.0;
+      data.rotation += 0.1 * spinSpeed * (i / children.length);
+      sprite.scale.set(scale * imageWidth, scale * imageHeight, 1);
     }
 
-    group.rotation.x = time * 0.5 * spinSpeed
-    group.rotation.y = time * 0.75 * spinSpeed
-    group.rotation.z = time * 1.0 * spinSpeed
-  })
+    group.rotation.x = elapsed * 0.5 * spinSpeed;
+    group.rotation.y = elapsed * 0.75 * spinSpeed;
+    group.rotation.z = elapsed * 1.0 * spinSpeed;
+  });
+
+  const materialRef = useRef<SpriteNodeMaterial>(null);
 
   return (
     <group ref={groupRef}>
+      <spriteNodeMaterial
+        ref={materialRef}
+        colorNode={textureNode.mul(uv()).mul(2).saturate()}
+        opacityNode={textureNode.a}
+        rotationNode={userData("rotation", "float")} // reads sprite.userData.rotation
+      />
       {positions.map((position, i) => (
-        <sprite key={i} material={material} position={position} userData={{ rotation: 0 }} />
+        <sprite
+          key={i}
+          material={fromRef(materialRef)}
+          position={position}
+          userData={{ rotation: 0 }}
+        />
       ))}
     </group>
-  )
+  );
 }
 
 // Scene-level TSL fog. Cast: `@types/three`'s `Scene` doesn't declare `fogNode` — see
 // header DIVERGENCE.
-function SceneFog({ near, far, fogColor }: { near: number; far: number; fogColor: string }) {
-  const scene = useThree((s) => s.scene)
+function SceneFog() {
+  const fogValues = useControls("sprites fog", {
+    fogColor: "#0000ff",
+    near: { value: 1500, min: 500, max: 2000, step: 10 },
+    far: { value: 2100, min: 1600, max: 3000, step: 10 },
+  });
+  useUniforms(fogValues);
+  useNodes(({ scene, uniforms }) => {
+    scene.fogNode = fog(
+      uniforms.fogColor,
+      rangeFogFactor(uniforms.near, uniforms.far),
+    );
+    return { fogNode: scene.fogNode };
+  });
 
-  useEffect(() => {
-    const fogged = scene as unknown as { fogNode: Node | null }
-    fogged.fogNode = fog(color(fogColor), rangeFogFactor(near, far))
-    return () => {
-      fogged.fogNode = null
-    }
-  }, [scene, near, far, fogColor])
-
-  return null
+  return null;
 }
 
 export default function Sprites() {
-  const { amount, radius, spinSpeed, fogColor, near, far } = useControls('sprites', {
+  const { amount, radius, spinSpeed } = useControls("sprites", {
     amount: { value: 200, min: 20, max: 400, step: 10 },
     radius: { value: 500, min: 100, max: 900, step: 10 },
     spinSpeed: { value: 1, min: 0, max: 2, step: 0.05 },
-    fog: folder({
-      fogColor: '#0000ff',
-      near: { value: 1500, min: 500, max: 2000, step: 10 },
-      far: { value: 2100, min: 1600, max: 3000, step: 10 },
-    }),
-  })
+  });
 
   return (
-    <Canvas renderer background="#000000" camera={{ position: [0, 0, 1500], fov: 60, near: 1, far: 2100 }}>
-      {/* Explicit boundary: suspending up to Canvas's own boundary re-runs createRoot
-          on fiber alpha.3 and freezes every TSL `time` graph (see AGENTS.md; found by
-          tsl-vfx-flames' pixel-diff sweep — this example shipped frozen). */}
+    <Canvas
+      renderer
+      background="#000000"
+      camera={{ position: [0, 0, 1500], fov: 60, near: 1, far: 2100 }}
+    >
+      <SceneFog />
       <Suspense fallback={null}>
         <SpriteField amount={amount} radius={radius} spinSpeed={spinSpeed} />
       </Suspense>
-      <SceneFog near={near} far={far} fogColor={fogColor} />
       <DemoHelpers grid={false} />
     </Canvas>
-  )
+  );
 }

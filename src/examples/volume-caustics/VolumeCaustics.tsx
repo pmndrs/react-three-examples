@@ -42,7 +42,7 @@ export function VolumeCaustics({
   steps,
   resolution,
 }: VolumeCausticsProps) {
-  const gltf = useGLTF(DUCK_URL, true) // Draco-compressed; arg 2 wires drei's decoder
+  const gltf = useGLTF(DUCK_URL, { draco: true })
   const causticMap = useTexture(CAUSTIC_MAP_URL)
 
   // WebGPU-only renderer flag (no Canvas prop) required for the duck's transmitted

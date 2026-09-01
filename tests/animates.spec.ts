@@ -41,7 +41,12 @@ function diffPixels(a: PNG, b: PNG): number {
   return diff
 }
 
-for (const { slug, ...meta } of examples) {
+// SLUGS=a,b restricts the run to those examples (set by `pnpm test:changed`).
+// The full sweep is ~1.4h locally at 131 examples — scope it during normal work.
+const ONLY = process.env.SLUGS?.split(',').filter(Boolean)
+const selected = ONLY ? examples.filter((e) => ONLY.includes(e.slug)) : examples
+
+for (const { slug, ...meta } of selected) {
   const ciSkip = 'ciSkip' in meta ? String(meta.ciSkip) : undefined
   const isStatic = 'static' in meta && meta.static === true
   const windowMs = 'animationWindowMs' in meta ? Number(meta.animationWindowMs) : DEFAULT_WINDOW_MS

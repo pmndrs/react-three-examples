@@ -8,7 +8,6 @@
 // components for no benefit: this is a direct, mostly 1:1 port of the original's own
 // imperative `init()`.
 import { useEffect, useMemo } from 'react'
-import { useFrame } from '@react-three/fiber/webgpu'
 import {
   BufferGeometry,
   CircleGeometry,
@@ -21,6 +20,8 @@ import {
 } from 'three/webgpu'
 import type { Material, Vector3 } from 'three/webgpu'
 import type { LoftGeometry } from 'three/addons/geometries/LoftGeometry.js'
+import { useFrame } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
 import {
   createCupGeometry,
   createCurtainGeometry,
@@ -59,14 +60,6 @@ import {
   createToothpasteMaterial,
   createVaseMaterial,
 } from './materials'
-
-export interface ExhibitsProps {
-  wireframe: boolean
-  showSkeleton: boolean
-  /** Turntable speed in rad/s (original: fixed `+= 0.001` rad PER FRAME — see header
-   * DIVERGENCE for why this is delta-scaled instead). */
-  rotationSpeed: number
-}
 
 // One entry per loft mesh: the mesh itself (for visibility toggling) and its ring
 // positions in LOCAL space (built once from `geometry.parameters`, transformed into
@@ -309,10 +302,21 @@ function buildExhibits(): BuiltExhibits {
   }
 }
 
-export function Exhibits({ wireframe, showSkeleton, rotationSpeed }: ExhibitsProps) {
+export function Exhibits() {
+  //* Controls =====================================================
+  const { wireframe, showSkeleton, rotationSpeed } = useControls('geometry-loft', {
+    display: folder({
+      wireframe: false,
+      showSkeleton: false,
+    }),
+    turntable: folder({
+      rotationSpeed: { value: 0.06, min: 0, max: 0.3, step: 0.01 },
+    }),
+  })
+
   const built = useMemo(() => buildExhibits(), [])
 
-  useFrame((_state, delta) => {
+  useFrame(({ delta }) => {
     built.group.rotation.y += rotationSpeed * delta
   })
 

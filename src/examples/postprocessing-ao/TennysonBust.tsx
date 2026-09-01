@@ -14,7 +14,7 @@ const PEDESTAL_TOP_Y = -0.7
 
 export function TennysonBust() {
   // Second arg `true` = Draco decode with drei's default hosted decoder.
-  const { scene: bust } = useGLTF(BUST_URL, true)
+  const { scene: bust } = useGLTF(BUST_URL, { draco: true })
 
   // Imperative fit must precede the first render (bounding volumes / shader build read
   // mesh state on the first RAF) — useLayoutEffect, not useEffect. Reset the transform

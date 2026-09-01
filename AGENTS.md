@@ -19,13 +19,17 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 
 ## Stack pins (July 2026 — alpha-era, versions matter)
 
-- `@react-three/fiber` **10.0.0-alpha.3, built from the local v10 branch clone**,
-  installed from `reference/react-three-fiber-10.0.0-alpha.3.tgz` (npm alpha/canary
-  lag or are broken). Rebuild: in `reference/react-three-fiber`,
-  `pnpm install --no-frozen-lockfile && pnpm --filter @react-three/fiber build`, then
-  `npm pack` in `packages/fiber` and `pnpm install` here (package.json points at the
-  tarball).
-- `three` 0.185.1, `@react-three/drei` 11.0.0-alpha.5 (patched — see gotchas), `leva`,
+- `@react-three/fiber` **10.0.0-alpha.4, from npm** (2026-08-31: the vendored tarball
+  and its `.gitignore` exception are GONE — UPSTREAM A1 unwound). alpha.4 fixes four
+  things this doc used to work around: B9 (`useThree`/`useFrame` on `/webgpu` are typed
+  `WebGPURootState`, no renderer cast), B12 + B16 (scoped store names are sanitised into
+  valid WGSL identifiers — scoped `useNodes`/`useBuffers`/`useGPUStorage` are SAFE now,
+  and the read-back idiom `useNodes(creator,'scope')` → `useNodes('scope')` is the
+  preferred shape), B17 (Suspense no longer tears down the renderer root), and
+  `useRenderPipeline`'s nullable-callback param. **Rules below that predate alpha.4 and
+  reference B9/B12/B16/B17 are stale — verify before applying.**
+- `three` 0.185.1, `@react-three/drei` **11.0.0-alpha.6, unpatched** (`patches/` deleted,
+  UPSTREAM A2 unwound — alpha.6 ships the `CubeRenderTarget` rename), `leva`,
   `camera-controls` v3, react-router **7** (pinned `version-7` dist-tag; npm latest is
   v8 — do not bump). TypeScript strict, Tailwind v4, single flat tsconfig.
 - `typescript` pinned **^6** (not 7): typescript-eslint has no TS7 support yet
@@ -229,20 +233,36 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
     `if (!renderPipeline) return` (the mdx examples omit this; strict mode won't).
   - Pipeline callbacks don't re-run on React re-render either: any dynamic value
     (leva control etc.) must flow through a uniform, never a closed-over prop.
-  - fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so passing a
-    uniform to TSL math expecting `Node<'float'>` fails strict tsc — cast
-    `uFoo as unknown as Node<'float'>` with a comment (upstream fiber typing gap).
+  - **`useUniforms` results need NO cast — do not write `as unknown as Node<'float'>`
+    in new code.** fiber shipped `useUniforms` returning
+    `Record<string, UniformNode<unknown, unknown>>` (it captures the input record type
+    and discards it), which lost both the node type and the value type and forced a
+    double cast at 40+ sites. This repo patches that locally, types-only, via
+    `scripts/patch-fiber-types.mjs` (postinstall; UPSTREAM B1 + Part A A9) so uniforms
+    carry three's real types: `useUniforms(() => ({ uBlur: 1 }))` gives a
+    `UniformNode<'float', number>` that flows straight into TSL math, `.value` is
+    `number`, and a wrong write is an error. Older ports still carry the redundant
+    cast — harmless (a cast through `unknown` always compiles), removed opportunistically.
+  - Hybrid uniform bags (some values controlled, others mutated per frame): register
+    every canonical three-side `UniformNode` once with creator-form `useUniforms`,
+    then call value-form `useUniforms` with the SAME scope and only the controlled
+    subset. Existing nodes win, Leva updates their values, and frame-driven uniforms
+    are never reset on React renders (pattern: `volume-fire`).
   - THREE dynamism patterns — pick by where the uniform lives: (a) values YOU
-    introduce into the graph → fiber `useUniforms` + the cast above; (b) knobs a
-    three.js pass already exposes as `uniform()`-backed fields
-    (`bloom().strength/.radius` etc.) → return the pass from the mainCB to register
-    it on `passes`, then mutate `pass.foo.value` in an effect — no cast, prefer it
-    when the field exists; (c) pass factories that wrap numeric args in CONST nodes
+    introduce into the graph → fiber `useUniforms`, no cast; (b) knobs a three.js
+    pass exposes as writable `uniform()`-backed fields
+    (`dotScreen().scale/.angle`, `rgbShift().amount/.angle`) → create the canonical
+    nodes with `useUniforms` and assign them to those fields inside the mainCB BEFORE
+    shader compilation. This removes the pass-registration + synchronization-effect
+    dance. Passing existing uniforms as factory arguments does NOT preserve identity
+    in r185: the constructor's `uniform(existingNode)` copies `.value` into a new
+    node (three.js#34416, UPSTREAM B29; pattern: `postprocessing`). (c) Pass factories
+    that wrap numeric args in CONST nodes
     (`dof()` — check the factory source before assuming bloom-style fields) → create
     three/tsl `uniform()` nodes inside the mainCB, pass them to the factory, register
     THEM via return-to-register, mutate `.value` in an effect (what the originals
     themselves do; no cast — they're three-side uniforms, not fiber hook uniforms).
-    Pattern examples: (b) `postprocessing`, (c) `postprocessing-dof`.
+    Pattern example: (c) `postprocessing-dof`.
   - `useRenderPipeline(mainCB, setupCB)`: setupCB is where MRT config goes
     (`scenePass.setMRT(...)`) — full details in
     `reference/react-three-fiber/docs/webgpu/render-pipeline.mdx`.
@@ -320,14 +340,14 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
 - `useAnimations`: play clips BY NAME, never `Object.values(actions)` — GLTFs ship
   rest/utility clips (e.g. Soldier.glb's `TPose`) that pollute the blend at default
   weight 1.
-- Compressed glTF (KTX2/BasisU textures): drei's `useGLTF` wires Draco (arg 2) and
-  Meshopt (arg 3) itself; KTX2 needs the `extendLoader` callback —
-  `loader.setKTX2Loader(new KTX2Loader().setTranscoderPath(<r185 basis/ CDN>)
-  .detectSupport(renderer))` with the live renderer from `useThree`. Safe in render:
-  fiber awaits `renderer.init()` before children mount (`hasFeature()` throws
-  pre-init). The explicit `setTranscoderPath` is load-bearing, not cosmetic —
-  KTX2Loader's default path resolves via `import.meta.url` against the three package,
-  unreliable under Vite pre-bundling (pattern: `loader-gltf-compressed`).
+- `useGLTF` takes an **options object** as of drei alpha.6 —
+  `useGLTF(url, { draco: true, meshopt: true, ktx2: <r185 basis/ CDN> })`. Positional
+  boolean args still work but log a one-time deprecation warning; don't write them.
+  drei now wires KTX2 itself (shared `KTX2Loader`, `setTranscoderPath` from a string
+  `ktx2`, automatic `detectSupport(renderer)`), so the old `extendLoader` +
+  `new KTX2Loader()` dance is GONE. Still pass the explicit transcoder path — the
+  default resolves via `import.meta.url` against the three package and is unreliable
+  under Vite pre-bundling (pattern: `loader-gltf-compressed`).
 - `useLoader(Loader, [urls])` generalizes to N resources in ONE call, not just the
   1-resource `[files]` wrapper the HDR-cubemap workaround shows: pass a genuinely
   multi-element outer array (each element whatever shape that loader's `.load()`
@@ -440,11 +460,18 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
    that smoke's console assertion misses). Static-by-design examples declare
    `"static": true` in their manifest entry (the test then asserts live loop +
    clean console); stop-go easings longer than ~2s declare `"animationWindowMs"`.
-   Run it for YOUR example: `npx playwright test tests/animates.spec.ts -g "<slug>"`.
+   **Run both tiers for YOUR example only: `pnpm test:changed <slug>`** (smoke +
+   animates, scoped via the `SLUGS` env var; `pnpm test:changed` with no args picks up
+   everything changed vs origin/main).
 2. Dev server: route renders, console clean, canvas context is `webgpu`.
    Playwright `-g` matches the full `file › title` chain — quoted/anchored slug
    patterns silently match nothing; verify with `--list` when a grep finds 0 tests.
-3. `pnpm test:smoke` (Playwright: readiness signal fires, canvas non-black). Expected
+3. Smoke tier (readiness signal fires, canvas non-black) — again via
+   `pnpm test:changed <slug>`. **The full `pnpm test:smoke` / `pnpm test:animates`
+   sweeps are WAVE-END ONLY** (~19 min and ~1.4h respectively at 131 examples, and
+   running many heavy WebGPU examples in one process throws contention flakes that
+   cost more to triage than they catch — 7 of them in wave 13, every one passing in
+   isolation). Nightly CI covers the full sweep; don't run it in the edit loop. Expected
    transient: the FIRST-ever run of an example with multi-MB hotlinked assets and/or a
    fresh shader-graph build can blow the readiness timeout once (cold CDN fetch +
    compile), then pass in ~1s thereafter — one slow first run is not a broken example;
@@ -463,19 +490,19 @@ end up as an example fix OR an amendment here (with a changelog entry) — never
    An example that verifiably cannot reach readiness on SwiftShader declares
    `"ciSkip": "<reason>"` in its manifest entry (exception list, SPEC §10) — used
    sparingly, never to paper over a local failure.
-4. Screenshot for review — collapse the leva panel first (it overlays center-frame
-   subjects at small viewports). Ad-hoc Playwright screenshot scripts must launch with
-   `channel: 'chromium'` + `--enable-unsafe-webgpu` (same as playwright.config.ts) —
-   plain `chromium.launch()` is headless-shell with no WebGPU on macOS and silently
-   never reaches readiness. Keep such scripts under the repo root, not the scratchpad
-   (`@playwright/test` won't resolve from outside the workspace).
-   **leva persists control values in localStorage across separate browser launches** —
-   a script that assumes coded defaults can silently capture a PREVIOUS run's slider
-   drags (`lights-physical` shot exposure 0.26 instead of its coded 0.68).
-   `localStorage.clear()` + reload before capturing. Give every such script a hard
-   timeout and an always-run `browser.close()`: an open-ended wait on `__exampleReady`
-   is the one step that has hung porting agents for 10 minutes at a stretch. Delete the
-   script and its PNGs when done.
+4. Screenshot for review: **`pnpm shot <slug>`** (dev server running on :5173) →
+   `screenshots/<slug>.png` + a refreshed `screenshots/index.html`. Also
+   `pnpm shot --changed` (everything touched vs origin/main) and `pnpm contact-sheet`
+   (the whole corpus, wave-end only).
+   **Never hand-roll a screenshot script.** `scripts/contact-sheet.mjs` already
+   handles every trap that cost time to find: `channel: 'chromium'` +
+   `--enable-unsafe-webgpu` (plain `chromium.launch()` is headless-shell with no
+   WebGPU on macOS and silently never reaches readiness), the leva panel hidden
+   before capture, `localStorage.clear()` first (leva persists control values across
+   browser launches — `lights-physical` once captured a previous run's 0.26 exposure
+   instead of its coded 0.68), a hard per-example timeout, and an always-run
+   `browser.close()` in a `finally`. Open-ended waits in throwaway scripts hung three
+   porting agents for 10 minutes each in wave 13; that is why this script exists.
 5. Test SCOPED, one example at a time (`-g "<slug>"`). Batching many heavy WebGPU
    examples into a single Playwright process — even at `--workers=1` — intermittently
    produces `Cannot update a component` warnings from shared GPU-device pressure, on a
@@ -492,9 +519,15 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 - fiber `.` vs `./webgpu` are two separate builds of the same runtime — the regex alias
   in [vite.config.ts](vite.config.ts) forces one; keep it until fiber fixes packaging.
-- drei alpha.5 is patched via `pnpm patch` for three ≥0.183's `WebGLCubeRenderTarget` →
-  `CubeRenderTarget` rename; a drei version bump errors on the stale patch — that's the
-  cue to delete `patches/` (fresh alphas ship the rename).
+- **After ANY dependency version bump, kill the dev server and `rm -rf node_modules/.vite`
+  before testing.** Vite serves the previously pre-bundled dep, so a running server
+  keeps handing out the OLD package — the drei alpha.5→.6 bump presented as two
+  phantom runtime errors (`extendLoader is not a function`,
+  `setKTX2Loader must be called before loading KTX2 textures`) against source that was
+  already correct. Cost real debugging time; check this BEFORE suspecting the new API.
+- `patches/` no longer exists (drei alpha.6 shipped the `CubeRenderTarget` rename, A2
+  unwound). `pnpm-workspace.yaml` is now empty — if you add a patch, re-add
+  `patchedDependencies` there.
 - Vite's dep scanner would crawl `reference/**/*.html` — `optimizeDeps.entries` in
   vite.config.ts scopes it; don't remove.
 - v10 docs exist only as `.mdx` in `reference/react-three-fiber/docs/` (the public site
@@ -513,6 +546,13 @@ override lands with an UPSTREAM.md entry in the same commit.** Highlights:
 
 ## Changelog
 
+- 2026-09-01 — v0.27 style cleanup: controls now live beside their consumers instead
+ of being drilled from page roots; `postprocessing` established direct
+ `useUniforms` replacement of addon-owned uniform fields before shader compilation,
+ and `volume-fire` established creator-form registration plus same-scope value updates
+ for hybrid controlled/frame-driven uniform bags. Removed their synchronization
+ effects. Logged three.js#34416 / UPSTREAM B29 for display-pass factories discarding
+ supplied UniformNode identity.
 - 2026-07-29 — v0.26 from wave 13, the first **cluster-batch** wave (8 quartets, one
   agent per 4 sibling examples instead of one per example; 95 → 131). Cost fell from
   ~115k to ~60k tokens/port, and doc bookkeeping moved from per-pair to one batched

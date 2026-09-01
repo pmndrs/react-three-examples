@@ -40,7 +40,7 @@ import { folder, useControls } from 'leva'
 import { color, fog, lights, normalMap, rangeFogFactor, texture } from 'three/tsl'
 import { MeshStandardNodeMaterial, NoToneMapping, RepeatWrapping, SphereGeometry } from 'three/webgpu'
 import type { Node, PointLight, Texture } from 'three/webgpu'
-import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js'
+import { TeapotGeometry } from '../assets/TeapotGeometry'
 import { DemoHelpers } from '../utils/DemoHelpers'
 
 const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'

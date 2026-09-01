@@ -32,27 +32,16 @@
  *   line) rather than decomposed into JSX node-material props — the node graph has too
  *   many shared intermediate terms (`fresnel`, `sunOrientation`, `atmosphereColor`) to
  *   split across two declarative materials without duplicating the math
- * - `useUniforms`' `UniformNode<T>` pins its TSL type param to `unknown` (documented
- *   fiber typing gap, see skinning-instancing/rtt/shadow-contact) — casts to
- *   `Node<'vec3'>`/`Node<'float'>` where the uniforms feed `mix()`/`remap()`
  * - DemoHelpers grid disabled (`grid={false}`) — the original is a globe in a black
  *   void with no ground plane; dolly range set to the original OrbitControls'
  *   `minDistance`/`maxDistance` (0.1 / 50)
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { Canvas, useFrame, useUniforms } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
+import { Suspense, useRef } from 'react'
 import { bumpMap, cameraPosition, max, mix, normalWorldGeometry, normalize, output, positionWorld, step, texture, uv, vec3, vec4 } from 'three/tsl'
-import {
-  BackSide,
-  Mesh,
-  MeshBasicNodeMaterial,
-  MeshStandardNodeMaterial,
-  SphereGeometry,
-  SRGBColorSpace,
-} from 'three/webgpu'
-import type { Node } from 'three/webgpu'
+import { BackSide, SRGBColorSpace } from 'three/webgpu'
+import type { Mesh } from 'three/webgpu'
+import { Canvas, useFrame, useLocalNodes, useTexture, useUniforms } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
 import { DemoHelpers } from '../utils/DemoHelpers'
 
 const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/planets'
@@ -67,136 +56,107 @@ const BUMP_ROUGHNESS_CLOUDS_URL = `${TEXTURE_BASE}/earth_bump_roughness_clouds_4
 const SUN_POSITION: [number, number, number] = [0, 0, 3]
 const CAMERA_POSITION: [number, number, number] = [4.5, 2, 3]
 
-interface GlobeProps {
-  atmosphereDayColor: string
-  atmosphereTwilightColor: string
-  roughnessLow: number
-  roughnessHigh: number
-  rotationSpeed: number
-}
+function Globe() {
+  //* Controls =====================================================
+  const { rotationSpeed, ...uniformValues } = useControls('tsl-earth', {
+    atmosphere: folder({
+      uDayColor: { value: '#4db2ff', label: 'day color' },
+      uTwilightColor: { value: '#bc490b', label: 'twilight color' },
+    }),
+    roughness: folder({
+      uRoughnessLow: { value: 0.25, min: 0, max: 1, step: 0.001, label: 'low' },
+      uRoughnessHigh: { value: 0.35, min: 0, max: 1, step: 0.001, label: 'high' },
+    }),
+    rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
+  })
 
-function Globe({ atmosphereDayColor, atmosphereTwilightColor, roughnessLow, roughnessHigh, rotationSpeed }: GlobeProps) {
+  const { uDayColor, uTwilightColor, uRoughnessLow, uRoughnessHigh } = useUniforms(
+    uniformValues,
+    'earth',
+  )
+
   const textures = useTexture({
     day: DAY_URL,
     night: NIGHT_URL,
     bumpRoughnessClouds: BUMP_ROUGHNESS_CLOUDS_URL,
   })
 
-  const { uDayColor, uTwilightColor, uRoughnessLow, uRoughnessHigh } = useUniforms(
-    {
-      uDayColor: atmosphereDayColor,
-      uTwilightColor: atmosphereTwilightColor,
-      uRoughnessLow: roughnessLow,
-      uRoughnessHigh: roughnessHigh,
-    },
-    'earth',
-  )
+  //* Refs ---------------
+  const globeRef = useRef<Mesh>(null);
+  const atmosphereRef = useRef<Mesh>(null);
 
-  // Color-critical textures need sRGB decoding; the packed bump/roughness/clouds map is
-  // data, not color, so it's left alone. `useTexture` (drei) doesn't set either — the
-  // original's raw `TextureLoader.load` + manual property assignment, ported verbatim.
-  useEffect(() => {
-    textures.day.colorSpace = SRGBColorSpace
-    textures.day.anisotropy = 8
-    textures.night.colorSpace = SRGBColorSpace
-    textures.night.anisotropy = 8
-    textures.bumpRoughnessClouds.anisotropy = 8
-  }, [textures])
 
-  // Casts: `useUniforms` pins its TSL type param to `unknown` — see header DIVERGENCE.
-  const uDayColorNode = uDayColor as unknown as Node<'vec3'>
-  const uTwilightColorNode = uTwilightColor as unknown as Node<'vec3'>
-  const uRoughnessLowNode = uRoughnessLow as unknown as Node<'float'>
-  const uRoughnessHighNode = uRoughnessHigh as unknown as Node<'float'>
+  //* Nodes ---------------
+  const { globeColorNode, globeRoughnessNode, globeNormalNode, globeOutputNode, atmosphereOutputNode } =
+    useLocalNodes(() => {
+      // Color-critical textures need sRGB decoding; the packed bump/roughness/clouds
+      // texture is data, not color, so it is left in its default color space.
+      textures.day.colorSpace = SRGBColorSpace
+      textures.day.anisotropy = 8
+      textures.night.colorSpace = SRGBColorSpace
+      textures.night.anisotropy = 8
+      textures.bumpRoughnessClouds.anisotropy = 8
 
-  // Built once per texture/uniform-node-identity change — `useUniforms` returns the same
-  // node instances across re-renders (values mutate in place via `.value`), so in
-  // practice this graph builds exactly once, matching the original's single `init()`.
-  const rig = useMemo(() => {
-    const viewDirection = positionWorld.sub(cameraPosition).normalize()
-    const fresnel = viewDirection.dot(normalWorldGeometry).abs().oneMinus().toVar()
+      const viewDirection = positionWorld.sub(cameraPosition).normalize()
+      const fresnel = viewDirection.dot(normalWorldGeometry).abs().oneMinus().toVar()
+      const sunOrientation = normalWorldGeometry.dot(normalize(vec3(...SUN_POSITION))).toVar()
+      const atmosphereColor = mix(uTwilightColor, uDayColor, sunOrientation.smoothstep(-0.25, 0.75))
 
-    const sunOrientation = normalWorldGeometry.dot(normalize(vec3(...SUN_POSITION))).toVar()
+      // Globe
+      const cloudsStrength = texture(textures.bumpRoughnessClouds, uv()).b.smoothstep(0.2, 1)
+      const globeColorNode = mix(texture(textures.day), vec3(1), cloudsStrength.mul(2))
 
-    const atmosphereColor = mix(uTwilightColorNode, uDayColorNode, sunOrientation.smoothstep(-0.25, 0.75))
+      const roughness = max(texture(textures.bumpRoughnessClouds).g, step(0.01, cloudsStrength))
+      const globeRoughnessNode = roughness.remap(0, 1, uRoughnessLow, uRoughnessHigh)
 
-    // globe
-    const globeMaterial = new MeshStandardNodeMaterial()
+      const night = texture(textures.night)
+      const dayStrength = sunOrientation.smoothstep(-0.25, 0.5)
 
-    const cloudsStrength = texture(textures.bumpRoughnessClouds, uv()).b.smoothstep(0.2, 1)
-    globeMaterial.colorNode = mix(texture(textures.day), vec3(1), cloudsStrength.mul(2))
+      const atmosphereDayStrength = sunOrientation.smoothstep(-0.5, 1)
+      const atmosphereMix = atmosphereDayStrength.mul(fresnel.pow(2)).clamp(0, 1)
 
-    const roughness = max(texture(textures.bumpRoughnessClouds).g, step(0.01, cloudsStrength))
-    globeMaterial.roughnessNode = roughness.remap(0, 1, uRoughnessLowNode, uRoughnessHighNode)
+      const finalOutput = mix(mix(night.rgb, output.rgb, dayStrength), atmosphereColor, atmosphereMix)
+      const globeOutputNode = vec4(finalOutput, output.a)
 
-    const night = texture(textures.night)
-    const dayStrength = sunOrientation.smoothstep(-0.25, 0.5)
+      const bumpElevation = max(texture(textures.bumpRoughnessClouds).r, cloudsStrength)
+      const globeNormalNode = bumpMap(bumpElevation)
 
-    const atmosphereDayStrength = sunOrientation.smoothstep(-0.5, 1)
-    const atmosphereMix = atmosphereDayStrength.mul(fresnel.pow(2)).clamp(0, 1)
+      // Atmosphere
+      const alpha = fresnel.remap(0.73, 1, 1, 0).pow(3).mul(sunOrientation.smoothstep(-0.5, 1))
+      const atmosphereOutputNode = vec4(atmosphereColor, alpha)
 
-    let finalOutput = mix(night.rgb, output.rgb, dayStrength)
-    finalOutput = mix(finalOutput, atmosphereColor, atmosphereMix)
+      return { globeColorNode, globeRoughnessNode, globeNormalNode, globeOutputNode, atmosphereOutputNode }
+    })
 
-    globeMaterial.outputNode = vec4(finalOutput, output.a)
-
-    const bumpElevation = max(texture(textures.bumpRoughnessClouds).r, cloudsStrength)
-    globeMaterial.normalNode = bumpMap(bumpElevation)
-
-    const sphereGeometry = new SphereGeometry(1, 64, 64)
-    const globe = new Mesh(sphereGeometry, globeMaterial)
-
-    // atmosphere
-    const atmosphereMaterial = new MeshBasicNodeMaterial({ side: BackSide, transparent: true })
-    let alpha = fresnel.remap(0.73, 1, 1, 0).pow(3)
-    alpha = alpha.mul(sunOrientation.smoothstep(-0.5, 1))
-    atmosphereMaterial.outputNode = vec4(atmosphereColor, alpha)
-
-    const atmosphere = new Mesh(sphereGeometry, atmosphereMaterial)
-    atmosphere.scale.setScalar(1.04)
-
-    return { globe, atmosphere }
-  }, [textures.day, textures.night, textures.bumpRoughnessClouds, uDayColorNode, uTwilightColorNode, uRoughnessLowNode, uRoughnessHighNode])
-
-  useFrame((_state, delta) => {
-    rig.globe.rotation.y += delta * 0.025 * rotationSpeed
+  useFrame(({ delta }) => {
+    if (globeRef.current) globeRef.current.rotation.y += delta * 0.025 * rotationSpeed
   })
 
   return (
     <>
-      <primitive object={rig.globe} />
-      <primitive object={rig.atmosphere} />
+      <mesh ref={globeRef}>
+        <sphereGeometry  args={[1, 64, 64]} />
+        <meshStandardNodeMaterial
+          colorNode={globeColorNode}
+          roughnessNode={globeRoughnessNode}
+          normalNode={globeNormalNode}
+          outputNode={globeOutputNode}
+        />
+      </mesh>
+      <mesh ref={atmosphereRef} scale={1.04}>
+        <sphereGeometry />
+        <meshBasicNodeMaterial side={BackSide} transparent outputNode={atmosphereOutputNode} />
+      </mesh>
     </>
   )
 }
 
 export default function TslEarth() {
-  const { atmosphereDayColor, atmosphereTwilightColor, roughnessLow, roughnessHigh, rotationSpeed } = useControls('tsl-earth', {
-    atmosphere: folder({
-      atmosphereDayColor: '#4db2ff',
-      atmosphereTwilightColor: '#bc490b',
-    }),
-    roughness: folder({
-      roughnessLow: { value: 0.25, min: 0, max: 1, step: 0.001 },
-      roughnessHigh: { value: 0.35, min: 0, max: 1, step: 0.001 },
-    }),
-    rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
-
   return (
     <Canvas renderer background="#000000" camera={{ position: CAMERA_POSITION, fov: 25, near: 0.1, far: 100 }}>
       <directionalLight color="#ffffff" intensity={2} position={SUN_POSITION} />
-      {/* Explicit boundary: suspending up to Canvas's own boundary re-runs createRoot
-          on fiber alpha.3 and freezes every TSL `time` graph (see AGENTS.md; found by
-          tsl-vfx-flames' pixel-diff sweep — this example shipped frozen). */}
       <Suspense fallback={null}>
-        <Globe
-          atmosphereDayColor={atmosphereDayColor}
-          atmosphereTwilightColor={atmosphereTwilightColor}
-          roughnessLow={roughnessLow}
-          roughnessHigh={roughnessHigh}
-          rotationSpeed={rotationSpeed}
-        />
+        <Globe />
       </Suspense>
       <DemoHelpers grid={false} minDistance={0.1} maxDistance={50} />
     </Canvas>

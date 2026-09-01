@@ -12,11 +12,14 @@
     "lint": "eslint .",
     "test:smoke": "playwright test tests/smoke.spec.ts",
     "test:animates": "playwright test tests/animates.spec.ts",
+    "postinstall": "node scripts/patch-fiber-types.mjs",
+    "test:changed": "node scripts/test-changed.mjs",
+    "shot": "node scripts/contact-sheet.mjs",
     "contact-sheet": "node scripts/contact-sheet.mjs"
   },
   "dependencies": {
-    "@react-three/drei": "^11.0.0-alpha.5",
-    "@react-three/fiber": "file:reference/react-three-fiber-10.0.0-alpha.3.tgz",
+    "@react-three/drei": "11.0.0-alpha.6",
+    "@react-three/fiber": "10.0.0-alpha.4",
     "camera-controls": "^3.1.2",
     "leva": "^0.10.1",
     "react": "^19.2.8",

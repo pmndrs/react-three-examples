@@ -33,11 +33,11 @@
  *   plane, and the infinite grid moiré-aliases across it, competing with the fabric study
  *   (same call as the other two loader-gltf-* ports).
  */
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect, useMemo } from 'react'
+import { ACESFilmicToneMapping, type Mesh, type MeshPhysicalNodeMaterial } from 'three/webgpu'
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { ACESFilmicToneMapping, type Mesh, type MeshPhysicalNodeMaterial } from 'three/webgpu'
 import { DemoHelpers } from '../utils/DemoHelpers'
 
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/SheenChair.glb'
@@ -48,18 +48,21 @@ const HDR_URL =
 // plain number accessor that TSL's `materialSheen` reference node re-reads every frame,
 // so no useUniforms/build-graph plumbing is needed (see header DEMONSTRATES).
 function SheenChair({ sheen }: { sheen: number }) {
-  const { scene } = useGLTF(MODEL_URL)
+  const { scene } = useGLTF(MODEL_URL);
+  const material = useMemo(() => {
+    const fabric = scene.getObjectByName('SheenChair_fabric') as Mesh | undefined
+    return fabric?.material as MeshPhysicalNodeMaterial | undefined;
+  }, [scene]);
 
   useEffect(() => {
-    const fabric = scene.getObjectByName('SheenChair_fabric') as Mesh | undefined
-    const material = fabric?.material as MeshPhysicalNodeMaterial | undefined
     if (material) material.sheen = sheen
-  }, [scene, sheen])
+  }, [material, sheen])
 
   return <primitive object={scene} />
 }
 
 export default function LoaderGltfSheen() {
+  // NOTE: would be cleaner just to put this in the component, but we are showing passing values down. 
   const { sheen } = useControls('loader-gltf-sheen', {
     // SheenChair.glb authors `KHR_materials_sheen` with an implicit sheen factor of 1 —
     // matches the original's un-set dat.gui default (it only wires the slider, never

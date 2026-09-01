@@ -19,7 +19,7 @@ export interface DucksProps {
 }
 
 export function Ducks({ positionNode, visible, wireframe }: DucksProps) {
-  const gltf = useGLTF(DUCK_URL, true) // Draco-compressed; arg 2 wires drei's decoder
+  const gltf = useGLTF(DUCK_URL, { draco: true })
   const duck = gltf.nodes.duck as Mesh
   // The loaded material is a core-three MeshStandardMaterial — NOT a node material,
   // so the original's `material.positionNode = ...` mutation has nothing to land on

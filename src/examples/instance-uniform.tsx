@@ -32,10 +32,10 @@ import { Suspense, useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { useCubeTexture } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js'
 import { cubeTexture, uniform } from 'three/tsl'
 import { Color, MeshBasicNodeMaterial, Node, NodeUpdateType, NoToneMapping } from 'three/webgpu'
 import type { Mesh, NodeFrame } from 'three/webgpu'
+import { TeapotGeometry } from '../assets/TeapotGeometry'
 import { DemoHelpers } from '../utils/DemoHelpers'
 
 const CUBE_PATH =

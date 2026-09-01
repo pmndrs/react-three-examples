@@ -8,7 +8,6 @@ import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/web
 import { useTexture } from '@react-three/drei/webgpu'
 import { bayer16 } from 'three/addons/tsl/math/Bayer.js'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
-import { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js'
 import { pass, screenCoordinate, screenUV } from 'three/tsl'
 import {
   DoubleSide,
@@ -19,6 +18,7 @@ import {
   type PointLight,
   type SpotLight,
 } from 'three/webgpu'
+import { TeapotGeometry } from '../../assets/TeapotGeometry'
 import { createFogScatteringNode, createFogTexture3D } from '../../utils/VolumetricFog'
 import { COLORS_MAP_URL, LAYER_VOLUMETRIC_LIGHTING } from './constants'
 

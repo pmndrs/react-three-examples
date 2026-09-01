@@ -51,12 +51,11 @@
  *   with the theater curtain's 58-unit-radius footprint
  */
 import { useEffect } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { Environment } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
 import { color, screenUV } from 'three/tsl'
 import { NeutralToneMapping } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+import { Canvas, useThree } from '@react-three/fiber/webgpu'
+import { Environment } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 import { Exhibits } from './Exhibits'
 
@@ -78,16 +77,6 @@ function SceneBackground() {
 }
 
 export default function GeometryLoft() {
-  const { wireframe, showSkeleton, rotationSpeed } = useControls('geometry-loft', {
-    display: folder({
-      wireframe: false,
-      showSkeleton: false,
-    }),
-    turntable: folder({
-      rotationSpeed: { value: 0.06, min: 0, max: 0.3, step: 0.01 },
-    }),
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: NeutralToneMapping }}
@@ -110,7 +99,7 @@ export default function GeometryLoft() {
         shadow-mapSize-height={4096}
         shadow-bias={-0.0005}
       />
-      <Exhibits wireframe={wireframe} showSkeleton={showSkeleton} rotationSpeed={rotationSpeed} />
+      <Exhibits />
       <DemoHelpers grid={false} target={[0, -3, 0]} minDistance={15} maxDistance={50} />
     </Canvas>
   )
