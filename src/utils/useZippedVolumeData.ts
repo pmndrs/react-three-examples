@@ -5,9 +5,9 @@
 // (arraybuffer response) behind fiber's `useLoader` — Suspense-compatible,
 // cached by URL — then unpacks one named entry with fflate's `unzipSync`.
 import { useMemo } from 'react'
-import { useLoader } from '@react-three/fiber/webgpu'
 import { FileLoader } from 'three/webgpu'
 import { unzipSync } from 'three/addons/libs/fflate.module.js'
+import { useLoader } from '@react-three/fiber/webgpu'
 
 export function useZippedVolumeData(url: string, entryName: string): Uint8Array {
   const buffer = useLoader(FileLoader, url, (loader) => {

@@ -5,6 +5,7 @@ import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
 import * as r3f from '@react-three/eslint-plugin'
 import requireHeaderBlock from './eslint-rules/require-header-block.js'
+import importHierarchy from './eslint-rules/import-hierarchy.js'
 
 export default tseslint.config(
   { ignores: ['dist/', 'reference/', 'node_modules/', 'patches/', 'test-results/'] },
@@ -14,7 +15,12 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       '@react-three': r3f,
-      corpus: { rules: { 'require-header-block': requireHeaderBlock } },
+      corpus: {
+        rules: {
+          'require-header-block': requireHeaderBlock,
+          'import-hierarchy': importHierarchy,
+        },
+      },
     },
     rules: {
       'react-hooks/rules-of-hooks': 'error',
@@ -22,6 +28,10 @@ export default tseslint.config(
       '@react-three/no-clone-in-loop': 'error',
       '@react-three/no-new-in-loop': 'warn',
       'corpus/require-header-block': 'error',
+      // Ratchet: 137 pre-existing violations corpus-wide when this landed, so it warns
+      // rather than failing the build under the in-flight restyle waves. Each wave fixes
+      // its own category; promote to 'error' once the corpus is clean.
+      'corpus/import-hierarchy': 'warn',
       // AGENTS.md Layer 1: single fiber entry, renderer-split drei subpaths only.
       'no-restricted-imports': [
         'error',

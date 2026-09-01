@@ -4,9 +4,9 @@
 // which must never enter a WebGPU app.
 // TODO(drei-gap): replace with drei's CameraControls once it lands in /core upstream.
 import { useEffect, useImperativeHandle, useMemo, type Ref } from 'react'
+import * as THREE from 'three'
 import { useFrame, useThree } from '@react-three/fiber/webgpu'
 import CameraControlsImpl from 'camera-controls'
-import * as THREE from 'three'
 
 CameraControlsImpl.install({ THREE })
 

@@ -26,9 +26,13 @@ export function changedSlugs() {
   ]
   const found = new Set()
   for (const path of paths) {
-    // src/examples/<slug>.tsx  OR  src/examples/<slug>/anything
-    const match = path.trim().match(/^src\/examples\/([^/]+?)(?:\.tsx)?(?:\/|$)/)
-    if (match && ALL.includes(match[1])) found.add(match[1])
+    // Examples live at src/examples/<category>/<slug>.tsx or
+    // <category>/<slug>/<file>. Match ANY path segment against the manifest so the
+    // folder depth can change without touching this.
+    if (!path.trim().startsWith('src/examples/')) continue
+    for (const segment of path.trim().replace(/\.tsx?$/, '').split('/')) {
+      if (ALL.includes(segment)) found.add(segment)
+    }
   }
   return [...found]
 }

@@ -1,7 +1,11 @@
-# pmndrs/r3f-examples — Spec (v1.0)
+# pmndrs/r3f-examples — Spec (v1.1)
 
-> Status: FINAL (2026-07-26) — all round-1/2/3 decisions folded in; executing per
-> docs/ROADMAP.md. Name note: "r3f-examples" chosen as pragmatic working name; may fold
+> Status: FINAL (2026-07-26), **amended 2026-09-01** after the first style review of
+> the ported corpus. §5, §7 and §8 changed — see §15. The amendments reconcile this
+> spec with [AGENTS.md](../AGENTS.md) v1.0, which is the operational contract agents
+> read; where the two ever disagree, AGENTS.md is what actually steers the work and
+> this file should be corrected to match.
+> Executing per docs/ROADMAP.md. Name note: "r3f-examples" chosen as pragmatic working name; may fold
 > into pmndrs/examples someday — not the current intent.
 > Context: promoting the react-three-fiber v10 release. Research reports live in `research/`.
 
@@ -65,23 +69,31 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
 ## 5. Example format
 
 - **Language: TypeScript.** No JS examples.
-- One file per example where possible; folder with matching-name entry file when subcomponents
-  are needed. **Line-count threshold on the index file** triggers the folder/subcomponent
-  pattern — and that split is itself a taught, standardized pattern.
+- Examples live in **category folders**: `src/examples/<category>/<slug>.tsx`, or
+  `<category>/<slug>/<slug>.tsx` when subcomponents are needed (entry filename matches the
+  folder). The category never appears in the URL — the route is always `/examples/<slug>`.
+  **~200 lines on the index file** triggers the folder pattern, and that split is itself a
+  taught, standardized pattern: split by scene role, not by arbitrary size.
 - **The example owns its `<Canvas>`.** The scene lives self-contained inside `<Canvas>` —
   no forced `<Scene>` extraction (real-world r3f almost never does that). The *file* is the
   unit of reuse; extraction into a user's project is handled by tooling (§6), not by file
   structure contortions.
-- **Header comment block** at the top of every index file addressing both HUMAN and AGENT:
-  what this demonstrates, the original example link, key APIs, divergence notes. Exact
-  schema TBD in conventions doc.
-- No module-scope mutable state; controls at the edge; props where they clarify.
-- **Controls: leva `useControls`** — solid, trusted, first choice. The v10 TSL hooks are
-  designed to work with useControls outputs (see existing v10 examples).
-- **Inspector: include the new three.js `Inspector`** at minimum as the perf/FPS tracker.
-  v10 has a root-state slot for it; drei react-hook wrappers are an open PR — use the slot
-  now, adopt the drei component when it lands. Leva covers the control-surface side until
-  its upgrade addresses advanced cases (renderTarget outputs, etc.).
+- **Header comment block** at the top of every entry file, written for an intermediate
+  R3F reader first: one or two plain sentences on what you are looking at, the original
+  link, then DEMONSTRATES. **DIVERGENCE is optional** — a faithful port says nothing, and
+  requiring the section only manufactures boilerplate. Schema in AGENTS.md § House style.
+- No module-scope mutable state. (One-time idempotent registration at module scope is
+  fine — `extend()`, `RectAreaLightNode.setLTC`.)
+- **Controls: leva `useControls`, placed NEXT TO what they control** — never at the page
+  root and drilled down as props. leva merges multiple `useControls` calls into one panel,
+  and the v10 TSL hooks are designed to consume its output directly
+  (`useControls` -> `useUniforms` -> `useNodes`). The only hard constraint is that fiber
+  hooks must be inside `<Canvas>`, so the consuming component is a Canvas child.
+  *(Amended: the original "controls at the edge" wording is what produced corpus-wide
+  prop drilling.)*
+- **Inspector: deferred.** v10 has a root-state slot but this repo has never wired it;
+  every port drops `renderer.inspector` and leva covers the control surface. Revisit when
+  the drei wrapper lands — until then do not write it into examples.
 - **Shared `utils/` folder**: our own reusable components built for the demos — both
   drei-gap fillers (each one a documented candidate/brief for a future drei component) and
   demo furniture (stages, grids, loaders' UX).
@@ -133,10 +145,17 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
 
 ## 7. Conventions doc — structure and co-evolution
 
-- Two layers, explicitly labeled so agents know which transfers:
-  1. **R3F core idioms** — general rules valid in any app (the "how R3F works" layer).
-  2. **Corpus conventions** — this repo's format (header schema, thresholds, metadata).
+- Three sections, explicitly labeled so agents know which transfers:
+  1. **House style** — what makes a port good, and the FIRST thing an agent reads. The
+     mandate: a port that is longer, more indirect, or more imperative than the vanilla
+     original has failed even if it renders perfectly.
+  2. **R3F v10 idioms** — general rules valid in any app (the "how R3F works" layer).
+  3. **Repo format** — this repo's shape (categories, header schema, thresholds, manifest).
   The doc states that examples are micro-scoped by design and points to the patterns track.
+- **Prune on every dependency bump.** The doc went stale against fiber alpha.4 and kept
+  mandating workarounds for four bugs that had been fixed (B9/B12/B16/B17), which is how
+  agents ended up writing `useMemo` where v10 hooks belong and prop-drilling nodes that a
+  scoped store could have carried. A rule that outlives its bug is worse than no rule.
 - **Co-evolution loop:** seed from known v10/v11 idioms → port a batch → every review
   divergence becomes an example fix OR a doc amendment, never silent → periodically
   re-conform older examples. Doc carries a changelog for later agent batches.
@@ -148,13 +167,22 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
 
 - **Idiomatic-primary. Divergence from the originals is expected and fine.**
 - **"Poimandres baseline" = a visible, generic `<DemoHelpers>` component** (working name):
-  infinite grid, CameraControls, Inspector/perf slot — a real toggleable component users
-  see and can turn off, not hidden furniture. Tonemapping: R3F's ACES default, not picky.
-  The baseline is SET BY BUILDING THE FIRST EXAMPLE TOGETHER (Dennis + Fable) — that
-  example is the golden path everything else conforms to.
-- **Enhancements encouraged** where they showcase better: richer drei component options, a
-  better GLB, added controls — restrained, not over-complicated. Enhancements are recorded
-  in the example's divergence notes.
+  infinite grid, CameraControls, readiness signal — a real toggleable component users
+  see and can turn off, not hidden furniture. The baseline was SET BY BUILDING THE FIRST
+  EXAMPLE TOGETHER (Dennis + Fable) — that example is the golden path everything else
+  conforms to.
+- **Tone mapping is a per-port decision, not a default.** fiber's Canvas defaults to
+  ACESFilmic while the three.js originals render with the WebGPURenderer default
+  (NoToneMapping) unless they set one; taking the default visibly mutes emissive and unlit
+  palettes. Decide `renderer={{ toneMapping }}` deliberately on every port and compare
+  against the LIVE original, not the (stale) gallery thumbnail.
+  *(Amended: "not picky" was wrong — it silently changed the look of emissive examples.)*
+- **Enhancements: restrained, and NOT extra controls.** A richer drei option or a better
+  GLB is welcome. Adding UI the original never had is not: we are comparing this demo to
+  that demo, so a control that doubles or triples the code is a net loss even when it is
+  fun. If a control forces state lifting, registries or instance plumbing, drop it.
+  *(Amended: "added controls" as a blanket encouragement is a direct cause of the bloat
+  found in the first style review.)*
 - Quality/perf drift vs vanilla would be surprising (thin wrapper over core) — not a
   primary test axis.
 
@@ -183,13 +211,25 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   puppeteer + mesa/xvfb, 5-way sharding, pixelmatch with loose thresholds, a readiness
   signal (`window._renderFinished`-style) instead of sleeps, exception list for
   non-deterministic demos. We adopt a readiness signal in the shell from day one.
-  - **Tier 1** (every PR): full smoke suite — renders + non-black canvas, no pixel diff,
-    sharded on free runners.
+  - **Tier 1** (every PR): full smoke suite — readiness signal fires, canvas context is
+    really `webgpu`, canvas non-black, console clean.
+  - **Tier 1.5 — "animates"** (SHIPPED, `tests/animates.spec.ts`): two-frame pixel diff
+    plus dual-root-warning capture. Added because smoke's non-black check cannot see a
+    FROZEN scene — a corpus sweep found 17 examples rendering a static first frame with a
+    clean console. Examples that are static by design declare `"static": true` in the
+    manifest (the test then asserts a live loop instead); long stop-go easings declare
+    `"animationWindowMs"`. Local-only for now: SwiftShader's frame rate would need the
+    window retuned before this can gate CI.
   - **Tier 2** (every PR): screenshot regression on *changed* examples only; goldens
     generated on the same SwiftShader path (never mix GPU/software goldens).
   - **Tier 3** (nightly): full-corpus screenshot run (catches shared-utils regressions).
   - **Tier 4** (manual dispatch): real-GPU runner (GitHub gpu-t4 or cheaper third-party)
     to disambiguate SwiftShader flakiness when nightly goes red.
+  - **Cadence (amended 2026-07-28, porting phase):** smoke does NOT run on every push —
+    at corpus scale that is ~30 min of software raster. It runs on PRs, nightly, and on
+    demand (`gh workflow run ci.yml`); the fast lint/build job still gates every push.
+    **Local Metal is the oracle** — land nothing that is not green there first. Revisit
+    when the corpus is complete and pushes drop to a few a month.
   - Cloudflare Browser Rendering investigated and rejected: headless Chrome underneath,
     same black-canvas limitation.
   - Follow-up: clone pmndrs/examples' packages/e2e and read its Canvas-monkeypatch Vite
@@ -222,4 +262,23 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
 - Loader gallery scope (all 47 formats vs representative subset) — decide at Phase 2.
 - Asset hosting: hotlink threejs.org for now; must self-host when examples swap in
   alternate/better models.
-- `<DemoHelpers>` exact API — set while building example #1 together (M1).
+- `<DemoHelpers>` exact API — SETTLED in M1 (grid, CameraControls with dolly/polar/zoom
+  clamps, `controlsRef` escape hatch, readiness signal).
+- Restyle scale: the first style review (2026-09-01) left 115 of 131 examples needing a
+  pass. Whether to restyle all of them or a flagship subset is decided at the pilot gate.
+
+## 15. Amendment log
+
+- **v1.1 (2026-09-01)** — first style review of the ported corpus (131 examples, 16
+  hand-tuned by Dennis). Three spec clauses turned out to be *causes* of the drift, not
+  just silent about it:
+  - §5 "controls at the edge" -> **controls next to what they control**. The old wording
+    produced corpus-wide prop drilling of leva values into `useUniforms`.
+  - §8 "Enhancements encouraged … added controls" -> **restrained, and not extra
+    controls**. Invented UI is the main reason several ports are 2-3x the size they need.
+  - §8 "Tonemapping: R3F's ACES default, not picky" -> **a deliberate per-port decision**.
+    The default silently mutes emissive palettes against the originals.
+  Also: §5 folder categories + ~200-line threshold + DIVERGENCE made optional; §5
+  Inspector marked deferred (never wired, every port drops it); §7 restructured to three
+  labelled sections with a prune-on-bump rule; §10 records the shipped animates tier and
+  the real CI cadence. Operational detail lives in [AGENTS.md](../AGENTS.md) v1.0.

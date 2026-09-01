@@ -1,5 +1,132 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–2)
 
+## Restyle wave 2 — lights, animation, camera, geometry (2026-09-01)
+
+25 more examples restyled against AGENTS.md v1.1 (brief v2). **44 of 131 done**
+(postprocessing 17, lights 8, geometry 8, camera 6, animation 5); **87 remaining.**
+
+**This wave proved the thesis where the pilot could not.** Verified against the real r185
+sources:
+
+| example | ours | vanilla original |
+|---|---|---|
+| `animation-skinning-blending` | **102** | **514** (`webgl_animation_skinning_blending`) |
+| `clipping` | **157** | **278** |
+| `materials-displacementmap` | **191** | **267** |
+| `camera` | 268 | 268 — parity, viewport/scissor-heavy, expected |
+
+`lensflares`: the original builds **3000 individual `THREE.Mesh`** objects and bakes
+transforms with `matrixAutoUpdate = false`; now one drei `<Instances>` — one draw call,
+and the ref + `useLayoutEffect` + matrix machinery is gone.
+
+### Real bugs found (not style)
+
+- **Three files carried a FALSE comment** asserting no declarative form exists for a
+  camera-attached light (`morphtargets`, `materials-displacementmap`, `layers`). AGENTS.md
+  documents `<PerspectiveCamera makeDefault><pointLight/></PerspectiveCamera>` and
+  `skinning-instancing`'s own header cites it correctly. Fixed all three;
+  `skinning-instancing` keeps its imperative version as the deliberate showcase.
+- `layers` lost an imperative `useLayoutEffect` + `camera.layers.enable/disable` component
+  for a declarative `layers-mask` prop.
+- Two more rule-10 violations (`useFrame((_, delta) =>`) in `lights-rectarealight` and
+  `instance-uniform` — endemic, worth an eslint rule of its own later.
+
+### Mechanized: `eslint-rules/import-hierarchy.js`
+
+Import order was wrong in 9 of 11 files in one category, and every batch had been fixing
+it by hand. New local rule (no new dependency, matches `require-header-block`). Found
+**137 violations corpus-wide**; now 132 and set to **`warn`** as a ratchet so it cannot
+turn the corpus red under an in-flight agent. **Promote to `error` once clean.**
+The remaining warning count is an exact progress meter for the restyle backlog:
+`scene` 29, `compute` 21, `shadows` 15, `tsl` 14, `materials` 13, `reflections` 12,
+`volume` 9, `render-targets` 8, `loaders` 6, `textures` 5. All restyled categories: 0.
+
+### Verification, and a false alarm worth remembering
+
+Final: `tsc` 0, `pnpm lint` 0 errors, `pnpm build` clean, **smoke 129/131** with both
+failures characterized as known flakes (below).
+
+An intermediate sweep failed 6 examples and took **32.6m instead of 2.5m**. Not a
+regression: a subagent had run `rm -rf node_modules/.vite` against the RUNNING dev server,
+so it served `504 (Outdated Optimize Dep)` for every dynamic import, and the smoke tests
+run against that server. Kill server -> clear cache -> restart, and all 6 passed in
+1.4-4.8s. **A sweep that suddenly takes 10x longer is an environment tell, not a code
+tell.** AGENTS.md § Environment gotchas amended; brief v2 forbids agents touching shared
+state (vite cache, dev server, `pnpm install`, git).
+
+### B28 rescoped with measurement
+
+B28 is NOT `tsl-wood`-specific. 5 scoped runs each: `tsl-wood` fails 1/5, but
+**`loader-gltf-dispersion` fails 3/5 and every failure carries the `PMREM.cubeUv`
+signature** — it is the better upstream repro. Both drive `scene.environment` from an HDR
+via drei `<Environment>`; **27 corpus examples import it**. Console-only: the canvas
+renders, the console-clean assertion fails. Details in UPSTREAM B28.
+
+### Still open for Dennis
+
+- Scale: 87 examples left to restyle (materials 14, scene 13, compute 11, tsl 10,
+  shadows 8, loaders 7, render-targets 7, reflections 6, volume 6, textures 5), 85 left
+  to port. Streams C (sidebar/search) and D
+  (upstream fixes) still parked.
+
+
+## Postprocessing restyle pilot — COMPLETE (2026-09-01)
+
+The M1-style gate on restyling the corpus against AGENTS.md v1.0. All 17
+`postprocessing` examples (31 files) restyled: 1 by hand as the worked exemplar
+(`postprocessing-bloom`), 16 by five Sonnet cluster batches.
+
+**Result: 2641 -> 2395 code lines (-9.3%), 3981 -> 3400 total.** Entry files carried it
+(`-lensflare` -40, `-anamorphic` -27, `-ao` -24, `-godrays` -20, `-outline` -18). One
+file went UP: `postprocessing-ca/Shapes.tsx` +2, the cost of colocating `useControls` to
+delete a prop-drill — accepted.
+
+Verification: tsc 0, lint clean, build clean, **smoke 131/131** (tsl-wood's B28 flake did
+not reproduce), animates 130 passed + 1 skipped, all 17 screenshots reviewed by eye.
+
+### What the pilot changed in the doc (AGENTS.md v1.1)
+
+The doc was wrong in ways only running it could reveal:
+
+- **§ Post-processing: 3 dynamism patterns -> 4, and the selection rule now stated.**
+  Its absence was the single biggest source of agent guessing. `dof()` was misfiled
+  under (c) — it exposes public writable `*Node` fields like every node-class factory.
+  (c) narrows to two verified cases: `Fn()` helpers with no instance (`depthAwareBlend`)
+  and int/uint fields `useUniforms` can't produce (`godrays().raymarchSteps`).
+- **New (d) structural toggle**, with an explicit carve-out from rule 5. Its read-back
+  cast is forced by `PassRecord = Record<string, any>` — filed as **B30**.
+- **B29 rescoped**: identity loss on factory arguments is per-factory and invisible at
+  the call site (`bloom`/`dof` preserve, `dotScreen`/`rgbShift` don't). Only
+  assign-after-construct is right everywhere.
+- **Rule 1**: added the two-sibling-consumer case, and the colocation -> B18 hazard —
+  colocating controls makes a component a creator-hook component, which is a live bug if
+  it renders after a Suspense boundary. Found as an actual latent bug in
+  `postprocessing-ao`.
+- **Rule 7**: markers are file-level only.
+
+### Open, needs Dennis
+
+1. **Rule 3 vs. shared material instances.** `postprocessing-ao/Furniture.tsx` and
+   `Gallery.tsx` use `useMemo(() => new MeshStandardMaterial())` + `material={...}`
+   across many meshes — literally what rule 3 forbids, but inlining would create N
+   instances instead of 1. Read literally, rule 3 makes those files worse. Left
+   unchanged pending a ruling.
+2. **`postprocessing.tsx` has 4 leva sliders the original hard-codes** (dotScreen
+   scale/angle, rgbShift amount/angle). Strictly rule 4; costs ~8 lines; rule 4 does
+   permit exposing a hidden constant. Left in, flagged.
+3. **Scale decision**: whether to run the remaining ~98 restyles, a flagship subset, or
+   stop. That was always the point of gating here.
+
+### Corpus debt this surfaced (not fixed — outside the pilot's scope)
+
+- The **retired B9 cast is still live in 3 files**: `materials-envmaps-groundprojected`,
+  `scene/custom-fog/SunSky`, `scene/ocean/OceanSky` still carry
+  `useThree((s) => s.renderer) as WebGPURenderer`. Retiring a rule did not clean the
+  corpus — sweep these when those categories are restyled.
+- Working tree is STAGED BUT UNCOMMITTED (230 files: the category reorg, AGENTS.md v1.1,
+  SPEC v1.1, the pilot). Pre-restyle sources snapshotted outside the repo.
+
+
 ## Halftone graph simplification (2026-09-01)
 
 - Replaced `useHalftoneComposite` and its manual uniform-node dependency list with

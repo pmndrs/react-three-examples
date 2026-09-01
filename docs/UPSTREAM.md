@@ -559,12 +559,36 @@ do not count those as fixed.
   then instrument three's environment/PMREM disposal. Until then `tsl-wood` is a known
   flaky example, NOT a blocker.
 
+- **Rescoped 2026-09-01 (wave-2 measurement)**: this is NOT `tsl-wood`-specific. Measured
+  5 scoped runs per example on a healthy dev server:
+
+  | example | pass | fail | failures carrying the `PMREM.cubeUv` signature |
+  |---|---|---|---|
+  | `tsl-wood` | 4/5 | 1/5 | 1 of 1 |
+  | `loader-gltf-dispersion` | 2/5 | **3/5** | **3 of 3** |
+
+  `loader-gltf-dispersion` reproduces at ~60% versus `tsl-wood`'s ~20%, so **it is the
+  better repro case** for anyone chasing this upstream. Both drive `scene.environment`
+  from an HDR through drei's `<Environment>` (`/webgpu`), which is what builds the PMREM.
+  **27 corpus examples import `Environment`**, so the blast radius is far wider than the
+  two that happen to trip it in CI.
+- The failure is console-only: the canvas renders and the non-black assertion passes; it
+  is the `expect(errors).toEqual([])` console-clean assertion that fails. So it degrades
+  the test signal rather than the demo.
+
 ### B29 · three.js: TSL display passes discard supplied `UniformNode` identity
 
 - **What**: `DotScreenNode` and `RGBShiftNode` call `uniform(value)` for their scalar
   controls. In r185, `uniform(existingNode)` extracts the node's current `.value` and
   creates a new `UniformNode`; later writes to the caller's uniform never reach the
   pass. The typings likewise accept only numbers.
+- **Scope, measured 2026-09-01**: the behaviour is INCONSISTENT across the display
+  addons, which is the real problem — the call site gives no hint which you get.
+  `BloomNode` guards (`strength.isNode ? strength : uniform( strength )`) and `dof()`
+  wraps with `nodeObject()`; both preserve a supplied node. `DotScreenNode` and
+  `RGBShiftNode` do not. A caller cannot tell without reading each factory's source.
+  Worth fixing as a consistency pass across `examples/jsm/tsl/display/*`, not just the
+  two named nodes.
 - **Cost**: uniform registries such as fiber's `useUniforms` cannot feed these pass
   factories directly. Apps must synchronize two uniform sets or replace the pass
   fields after construction.
@@ -573,6 +597,24 @@ do not count those as fixed.
   Leva edits update the live effect without a pipeline rebuild or synchronization
   effect.
 - **Upstream**: [three.js#34416](https://github.com/mrdoob/three.js/issues/34416).
+
+### B30 · fiber: `useRenderPipeline` should be generic over its mainCB return type
+
+- **What**: `useRenderPipeline(mainCB)` registers whatever the callback returns into
+  `state.passes`, but `PassRecord = Record<string, any>` and the hook is not generic
+  (`@react-three/fiber/dist/webgpu/index.d.ts:1341,1355,4124`). Every registered pass
+  must therefore be cast back out at the read site:
+  `passes.bloomPass as ReturnType<typeof bloom> | undefined`.
+- **Cost**: 16 casts in this repo alone, across `postprocessing-*`, `materials-alphahash`,
+  `tsl-vfx-tornado` and `scene/ocean`. Worse, it makes the "casts are a bug report" house
+  rule ambiguous — agents cannot tell this forced cast apart from a real typing gap, and
+  two independently proposed removing it during the restyle pilot.
+- **Fix**: infer the record from the callback's return type, e.g.
+  `useRenderPipeline<T extends PassRecord>(mainCB: (s) => T | void, …): { passes: T, … }`.
+  The register/read-back round-trip then typechecks end to end and the casts disappear.
+- **Where it bites**: any structural toggle — a leva boolean swapping `outputNode`
+  between two graphs has no uniform field to assign onto, so the read-back is the ONLY
+  available pattern (AGENTS.md § Post-processing (d)).
 
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
