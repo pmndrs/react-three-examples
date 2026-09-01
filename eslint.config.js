@@ -30,10 +30,8 @@ export default tseslint.config(
       '@react-three/no-clone-in-loop': 'error',
       '@react-three/no-new-in-loop': 'warn',
       'corpus/require-header-block': 'error',
-      // Ratchet: 137 pre-existing violations corpus-wide when this landed, so it warns
-      // rather than failing the build under the in-flight restyle waves. Each wave fixes
-      // its own category; promote to 'error' once the corpus is clean.
-      'corpus/import-hierarchy': 'warn',
+      // Swept to zero 2026-09-02 (137 violations at introduction) — now an error.
+      'corpus/import-hierarchy': 'error',
       // Swept to zero 2026-09-02 (36 sites) — now an error so they cannot come back.
       'corpus/no-retired-patterns': 'error',
       // AGENTS.md Layer 1: single fiber entry, renderer-split drei subpaths only.

@@ -3,10 +3,10 @@
 // blended additively into `MeshPhongNodeMaterial.emissiveNode` (not `colorNode` — the
 // reflection ADDS onto the checkerboard diffuse, it doesn't replace it).
 import { useMemo } from 'react'
-import { useTexture } from '@react-three/drei/webgpu'
 import { reflector, texture, uv } from 'three/tsl'
 import { BoxGeometry, Mesh, MeshPhongNodeMaterial, RepeatWrapping, SRGBColorSpace } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
 
 const FLOOR_COLOR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/floors/FloorsCheckerboard_S_Diffuse.jpg'

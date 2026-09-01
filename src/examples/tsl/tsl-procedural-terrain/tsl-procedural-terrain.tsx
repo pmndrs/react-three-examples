@@ -26,16 +26,12 @@
  *   original's equirectangular `scene.background`/`scene.environment` pair
  *
  * DIVERGENCE from original
- * - `renderer.inspector` GUI (Inspector addon) replaced with leva groups (terrain +
- *   water folders, same parameters, same ranges and defaults); the Inspector overlay
- *   itself is dropped repo-wide
  * - The drag interaction is ported from a hand-rolled `Raycaster` + DOM listeners to
  *   R3F pointer events on the (invisible) drag plane, with `window` `pointerup` to end
  *   drags that release off-canvas — same 10x plane grow-while-dragging trick as the
  *   original so the pointer can't escape the hit area mid-drag
- * - OrbitControls → DemoHelpers' camera-controls baseline (same `maxPolarAngle`,
- *   `minDistance`/`maxDistance`, and `target.y = -0.5`); during a drag the controls are
- *   disabled via the `controlsRef` escape hatch, mirroring `controls.enabled = false`
+ * - During a drag the camera-controls are disabled via the `controlsRef` escape
+ *   hatch, mirroring `controls.enabled = false`
  * - `normalLookUpShift` folded into a constant (0.01) — the original declares it as a
  *   uniform but never exposes it in the GUI
  * - The scene (light/terrain/water) is Suspense-gated on the `<Environment>` HDR
@@ -44,19 +40,15 @@
  *   intermittently never folds the IBL into this material (custom position/normal/
  *   color nodes + shadows), leaving shadowed valleys pitch black — race verified both
  *   ways locally; gating makes the first build deterministic
- * - DemoHelpers grid disabled (`grid={false}`): terrain + water occupy the ground plane
- *   the grid would z-fight with
- * - Split into a folder (this file + Terrain.tsx): the single-file port runs well past
- *   the ~200-line threshold — split by scene role (page shell/water/lights vs the
- *   terrain node graph + drag wiring, which needs fiber hooks and so must live inside
- *   `<Canvas>`)
  */
 import { Suspense, useRef } from 'react'
+import { ACESFilmicToneMapping } from 'three/webgpu'
+
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
 import type CameraControlsImpl from 'camera-controls'
-import { ACESFilmicToneMapping } from 'three/webgpu'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { Terrain } from './Terrain'
 
@@ -64,31 +56,9 @@ const HDR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/pedestrian_overpass_1k.hdr'
 
 export default function TslProceduralTerrain() {
-  const {
-    noiseIterations,
-    positionFrequency,
-    strength,
-    warpFrequency,
-    warpStrength,
-    colorSand,
-    colorGrass,
-    colorSnow,
-    colorRock,
-    waterRoughness,
-    waterIor,
-    waterColor,
-  } = useControls('tsl-procedural-terrain', {
-    terrain: folder({
-      noiseIterations: { value: 3, min: 0, max: 10, step: 1 },
-      positionFrequency: { value: 0.175, min: 0, max: 1, step: 0.001 },
-      strength: { value: 10, min: 0, max: 20, step: 0.001 },
-      warpFrequency: { value: 6, min: 0, max: 20, step: 0.001 },
-      warpStrength: { value: 1, min: 0, max: 2, step: 0.001 },
-      colorSand: '#ffe894',
-      colorGrass: '#85d534',
-      colorSnow: '#ffffff',
-      colorRock: '#bfbd8d',
-    }),
+  // Only consumed by the water mesh right here — the terrain's own knobs live next
+  // to Terrain, the only thing that reads them (merges into the same leva panel).
+  const { waterRoughness, waterIor, waterColor } = useControls('tsl-procedural-terrain', {
     water: folder({
       waterRoughness: { value: 0.5, min: 0, max: 1, step: 0.01, label: 'roughness' },
       waterIor: { value: 1.333, min: 1, max: 2, step: 0.001, label: 'ior' },
@@ -133,18 +103,7 @@ export default function TslProceduralTerrain() {
           shadow-normalBias={0.05}
         />
 
-        <Terrain
-          noiseIterations={noiseIterations}
-          positionFrequency={positionFrequency}
-          strength={strength}
-          warpFrequency={warpFrequency}
-          warpStrength={warpStrength}
-          colorSand={colorSand}
-          colorGrass={colorGrass}
-          colorSnow={colorSnow}
-          colorRock={colorRock}
-          controlsRef={controlsRef}
-        />
+        <Terrain controlsRef={controlsRef} />
 
         {/* Water: a plain transmissive physical material — no node graph needed. */}
         <mesh rotation-x={-Math.PI * 0.5} position-y={-0.1}>

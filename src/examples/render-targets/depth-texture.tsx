@@ -33,10 +33,10 @@
  *   a radius-5 sphere shell, random rotations)
  */
 import { useEffect, useLayoutEffect, useMemo } from 'react'
+import { select, vec3, vec4 } from 'three/tsl'
+import { MeshBasicNodeMaterial, TorusKnotGeometry } from 'three/webgpu'
 import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
-import { select, vec3, vec4 } from 'three/tsl'
-import { MeshBasicNodeMaterial, TorusKnotGeometry, type Node } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const KNOT_COUNT = 50
@@ -113,12 +113,8 @@ function DepthPipeline({ linearDepth }: DepthPipelineProps) {
 
     const rawDepth = passes.scenePass.getTextureNode('depth')
     const linearOut = vec4(vec3(passes.scenePass.getLinearDepthNode('depth')), 1)
-    // fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so it never
-    // structurally narrows to `Node<'float'>` even though it is one at runtime
-    // (documented fiber typing gap, see rtt/skinning-instancing).
-    const mode = uLinear as unknown as Node<'float'>
 
-    renderPipeline.outputNode = select(mode.greaterThan(0.5), linearOut, rawDepth)
+    renderPipeline.outputNode = select(uLinear.greaterThan(0.5), linearOut, rawDepth)
   })
 
   return null

@@ -28,10 +28,10 @@
  *   slice through the middle of the model
  */
 import { Suspense, useRef } from 'react'
+import { ReinhardToneMapping, type PointLight } from 'three/webgpu'
 import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { ReinhardToneMapping, type PointLight } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/coffeemat.glb'

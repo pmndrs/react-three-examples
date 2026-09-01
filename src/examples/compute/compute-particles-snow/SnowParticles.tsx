@@ -3,7 +3,6 @@
 // flake meshes (falling + settled). Uses fiber hooks throughout, so it lives inside
 // <Canvas>, not in the page shell.
 import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import {
   Fn,
   hash,
@@ -25,7 +24,8 @@ import {
   RedFormat,
   RenderTarget,
   SphereGeometry } from 'three/webgpu'
-import type { Node} from 'three/webgpu'
+import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { button, useControls } from 'leva'
 
 const PARTICLE_COUNT = 100_000
 // Flake radius — also the per-flake surface clearance in the landing test.
@@ -37,16 +37,7 @@ const SURFACE_OFFSET = 0.2
 const STATIC_LAYER_MASK = 1 << 1
 const DYNAMIC_LAYER_MASK = 1 << 2
 
-export interface SnowParticlesProps {
-  /** Wobble frequency of the airborne drift (the original's `speed` const, 0.4). */
-  driftSpeed: number
-  /** Multiplier on each flake's fall velocity (original ×1). */
-  fallSpeed: number
-  /** Bump to re-dispatch the init kernel (leva "reset snow"). */
-  resetNonce: number
-}
-
-export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticlesProps) {
+export function SnowParticles() {
   const scene = useThree((state) => state.scene)
   const camera = useThree((state) => state.camera)
   const renderer = useThree((state) => state.renderer)
@@ -57,16 +48,21 @@ export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticl
     return () => camera.layers.disable(2)
   }, [camera])
 
+  //* Controls =====================================================
+  const [resetNonce, setResetNonce] = useState(0)
+  const { driftSpeed, fallSpeed } = useControls('compute-particles-snow', {
+    driftSpeed: { value: 0.4, min: 0, max: 2, step: 0.01 },
+    fallSpeed: { value: 1, min: 0, max: 5, step: 0.05 },
+    'reset snow': button(() => setResetNonce((nonce) => nonce + 1)) })
   // Leva knobs → live uniforms (create-or-update semantics sync values on re-render).
   const { uDriftSpeed, uFallSpeed } = useUniforms(
     { uDriftSpeed: driftSpeed, uFallSpeed: fallSpeed },
     'snowParticles', // WGSL-identifier rule: camelCase scope, never kebab-case
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see compute-particles et al.).
-  const uDriftSpeedNode = uDriftSpeed as unknown as Node<'float'>
-  const uFallSpeedNode = uFallSpeed as unknown as Node<'float'>
+  const uDriftSpeedNode = uDriftSpeed
+  const uFallSpeedNode = uFallSpeed
 
+  //* Collision Rig =================================================
   // The collision rig: top-down ortho camera + height RenderTarget + the override
   // material that writes world-height into it. Lazy useState, NOT useMemo: the
   // update kernel below closes over `collision.rt.texture`, so the rig's identity
@@ -95,6 +91,7 @@ export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticl
     return { orthoCamera, rt, heightMaterial }
   })
 
+  //* GPU State ======================================================
   // Flake state, GPU-only. UNSCOPED with prefixed keys on purpose: scoped useBuffers
   // names each buffer `${scope}.${name}` and the dot lands in the WGSL struct name —
   // runtime shader compile error (fiber bug, UPSTREAM.md B16).
@@ -105,6 +102,7 @@ export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticl
     // x/z: spawn column, y: fall velocity, w: per-flake random seed
     snowData: instancedArray(PARTICLE_COUNT, 'vec4') }))
 
+  //* Compute Graph ==================================================
   // Kernels + render position nodes, built once. Closing over the TYPED hook returns
   // above (creator-state reads widen to fiber's BufferLike, losing `.element()` /
   // `.toAttribute()`). Also UNSCOPED (UPSTREAM.md B16) — these reach WGSL codegen.
@@ -179,6 +177,7 @@ export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticl
           .add(snowStaticPositions.toAttribute()) }
     })
 
+  //* Dispatch =======================================================
   // ONCE at mount + ON DEMAND from the leva reset button (nonce-keyed): seed the
   // buffers. Sync compute() is safe here — fiber awaits renderer.init() before
   // children render; StrictMode's double run re-writes the same values (idempotent).
@@ -206,7 +205,10 @@ export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticl
     { phase: 'update' },
   )
 
-  // One low-poly sphere shared by both instanced meshes (as the original).
+  //* Scene ==========================================================
+  // REVIEW(shared-instance): one low-poly sphere shared by both instanced meshes
+  // below (as the original) — a real perf win at 100k instances each, so it stays
+  // imperative rather than two separate <sphereGeometry> elements.
   const flakeGeometry = useMemo(() => new SphereGeometry(SURFACE_OFFSET, 5, 5), [])
 
   return (

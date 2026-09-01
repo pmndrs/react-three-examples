@@ -4,7 +4,6 @@
 // Per-instance position/normal/color/size-time-seed data is packed into plain
 // `InstancedBufferAttribute`s and read back in TSL via `instancedBufferAttribute()`.
 import { useEffect, useMemo } from 'react'
-import { useFrame, useUniforms } from '@react-three/fiber/webgpu'
 import {
   abs,
   float,
@@ -23,6 +22,8 @@ import {
 } from 'three/tsl'
 import { BoxGeometry, Color, InstancedBufferAttribute, Mesh, MeshStandardNodeMaterial, Vector3 } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+import { useFrame, useUniforms } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
 
 const MAX_STEPS = 5
 const LENGTH_MULT = 0.8
@@ -138,12 +139,13 @@ function effectorValue(elapsed: number, delay: number, period: number) {
   return -0.2 + 1.4 * sineInOut(phase)
 }
 
-export interface TreeProps {
-  /** Multiplier on the traveling-pulse animation speed (leva `effectorSpeed`). */
-  effectorSpeed: number
-}
+export function Tree() {
+  const { effectorSpeed } = useControls('reflection', {
+    Tree: folder({
+      effectorSpeed: { value: 1, min: 0.1, max: 3, step: 0.05 },
+    }),
+  })
 
-export function Tree({ effectorSpeed }: TreeProps) {
   // Two independent uniforms driving the "energy pulse" traveling along the branches
   // (`uniformEffector1/2` in the original, there animated via TWEEN.js).
   const { uEffector1, uEffector2 } = useUniforms(() => ({ uEffector1: -0.2, uEffector2: -0.2 }))
@@ -170,12 +172,6 @@ export function Tree({ effectorSpeed }: TreeProps) {
     const instanceColor = instancedBufferAttribute<'vec3'>(attributeColor, 'vec3')
     const instanceData = instancedBufferAttribute<'vec3'>(attributeData, 'vec3')
 
-    // Cast: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so it
-    // never structurally narrows to `Node<'float'>` for TSL math (documented fiber
-    // typing gap, see skinning-instancing/rtt/shadow-contact).
-    const effector1 = uEffector1 as unknown as Node<'float'>
-    const effector2 = uEffector2 as unknown as Node<'float'>
-
     const material = new MeshStandardNodeMaterial()
 
     material.positionNode = Fn(() => {
@@ -184,12 +180,12 @@ export function Tree({ effectorSpeed }: TreeProps) {
 
       // Effectors: blob-like scale bumps as the traveling pulse passes each instance's
       // `instanceTime` position along the branch.
-      const dif1 = abs(instanceTime.sub(effector1)).toConst()
+      const dif1 = abs(instanceTime.sub(uEffector1)).toConst()
       let effect = dif1
         .lessThanEqual(0.15)
         .select(sub(0.15, dif1).mul(sub(1.7, instanceTime).mul(10)), float(0))
 
-      const dif2 = abs(instanceTime.sub(effector2)).toConst()
+      const dif2 = abs(instanceTime.sub(uEffector2)).toConst()
       effect = dif2.lessThanEqual(0.15).select(sub(0.15, dif2).mul(sub(1.7, instanceTime).mul(10)), effect)
 
       // Accumulate different vertex animations. Widened to `Node<'vec3'>`: `.toVar()`
@@ -218,12 +214,12 @@ export function Tree({ effectorSpeed }: TreeProps) {
     material.emissiveNode = Fn(() => {
       const instanceTime = instanceData.y
 
-      const dif1 = abs(instanceTime.sub(effector1)).toConst()
+      const dif1 = abs(instanceTime.sub(uEffector1)).toConst()
       const effect1 = dif1
         .lessThanEqual(0.15)
         .select(sub(0.15, dif1).mul(sub(1.7, instanceTime).mul(10)), float(0))
 
-      const dif2 = abs(instanceTime.sub(effector2)).toConst()
+      const dif2 = abs(instanceTime.sub(uEffector2)).toConst()
       const effect2 = dif2.lessThanEqual(0.15).select(sub(0.15, dif2).mul(sub(1.7, instanceTime).mul(10)), effect1)
 
       return pow2(vec3(effect1, 0, effect2)).mul(instanceColor)

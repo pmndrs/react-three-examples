@@ -2,7 +2,7 @@
 // DEMONSTRATES) plus the four static pillars around it.
 import { useRef } from 'react'
 import { mx_fractal_noise_float, positionLocal } from 'three/tsl'
-import type { Mesh, Node } from 'three/webgpu'
+import type { Mesh } from 'three/webgpu'
 
 import { useFrame, useNodes, useUniforms } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
@@ -27,11 +27,8 @@ export function TorusKnot({ spinSpeed }: TorusKnotProps) {
   const meshRef = useRef<Mesh>(null)
   const { threshold } = useUniforms({ threshold: maskThreshold }, 'shadowmapMask')
 
-  // Cast: fiber's `UniformNode<T>` pins the value type to `unknown` (documented fiber
-  // typing gap, see tsl-halftone/skinning-instancing) — this uniform really is a float.
   const { maskNode } = useNodes(() => ({
-    maskNode: mx_fractal_noise_float(positionLocal.mul(0.1)).x.greaterThan(threshold as unknown as Node<'float'>),
-  }))
+    maskNode: mx_fractal_noise_float(positionLocal.mul(0.1)).x.greaterThan(threshold) }))
 
   useFrame(({ delta }) => {
     const mesh = meshRef.current

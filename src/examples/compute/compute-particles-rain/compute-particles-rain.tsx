@@ -27,45 +27,22 @@
  *   and three's `Mesh.count` as a live draw-count throttle from leva
  *
  * DIVERGENCE from original
- * - The original's `renderer.inspector.createParameters` panel becomes leva
- *   (position/scale/drop count, same ranges and defaults); the Inspector addon is
- *   dropped (this repo's shell has no inspector; leva is the panel)
- * - OrbitControls becomes the DemoHelpers/camera-controls baseline with the
- *   original's dolly limits (5/50); grid off — the near-black floor and the faint
- *   additive-looking streaks/ripples ARE the look, a grid would wash them out
- * - `THREE.Timer` + manual `animate()` loop become fiber's phase scheduler: the
- *   collision pass + compute dispatch ride one `useFrame({ before: 'render' })`,
- *   monkey spin and box lerp ride plain `useFrame`s with `delta`; the box lerp t
- *   is clamped to 1 (the original's `10 * delta` overshoots below ~10 fps —
- *   matters on CI's software raster)
- * - Suzanne is hotlinked from jsdelivr r185 and loaded via fiber's
- *   `useLoader(BufferGeometryLoader, url)` behind an explicit Suspense gate
- *   (AGENTS.md B17) instead of the original's load callback
+ * - Grid off — the near-black floor and the faint additive-looking streaks/ripples
+ *   ARE the look here, a grid would wash them out
+ * - The box lerp's `t` is clamped to 1: the original's unclamped `10 * delta`
+ *   overshoots below ~10 fps, which matters on CI's software rasterizer
  * - `useBuffers`/`useNodes` are UNSCOPED with prefixed keys (fiber's scoped-store
  *   dot separator is WGSL-illegal, UPSTREAM.md B16); the original's
  *   `.setName('Particles')` label is dropped — fiber re-labels stored nodes by key
- * - `frustumCulled={false}` on both particle meshes: positions exist only on the
- *   GPU, three's culling sphere is the unit source geometry at origin — the
- *   original carries this latent bug and just never pans (AGENTS.md rule)
- * - Explicit `toneMapping: NoToneMapping` — the original relies on the
- *   WebGPURenderer default; fiber's Canvas would silently apply ACESFilmic and
- *   mute the streaks (tone-mapping parity rule)
  */
 import { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { NoToneMapping } from 'three/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { CollisionBox, Monkey } from './Colliders'
-import { MAX_PARTICLE_COUNT, Rain } from './Rain'
+import { Rain } from './Rain'
 
 export default function ComputeParticlesRain() {
-  const { position, scale, dropCount } = useControls('compute-particles-rain', {
-    position: { value: 0, min: -50, max: 50, step: 0.001 },
-    scale: { value: 3.5, min: 0.1, max: 3.5, step: 0.01 },
-    dropCount: { value: MAX_PARTICLE_COUNT / 2, min: 200, max: MAX_PARTICLE_COUNT, step: 1 },
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
@@ -87,9 +64,9 @@ export default function ComputeParticlesRain() {
           write must land before a sibling suspension defers it to a pass where
           other components have already subscribed (B18's ordering rule, applied
           at the sibling level). */}
-      <Rain dropCount={dropCount} />
+      <Rain />
 
-      <CollisionBox z={position} scaleX={scale} />
+      <CollisionBox />
       {/* B17 gate: the JSON fetch suspends; letting it reach Canvas's boundary
           re-runs createRoot and freezes every time-driven graph (AGENTS.md). */}
       <Suspense fallback={null}>

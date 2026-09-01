@@ -32,12 +32,12 @@
  * - DemoHelpers grid disabled (flat texture-mapped plane facing the camera, no
  *   ground plane in the original — same rationale as the two sibling texture ports)
  */
-import { Suspense, useMemo } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useKTX2 } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { Suspense } from 'react'
 import { texture, time, uv } from 'three/tsl'
 import { NoToneMapping } from 'three/webgpu'
+import { Canvas, useLocalNodes, useUniforms } from '@react-three/fiber/webgpu'
+import { useKTX2 } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const KTX2_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/spiritedaway.ktx2'
@@ -47,7 +47,13 @@ const BASIS_TRANSCODER_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/
 const PLANE_WIDTH = 50
 const PLANE_HEIGHT = 25
 
-function AnimatedClipPlane({ layersPerSecond }: { layersPerSecond: number }) {
+function AnimatedClipPlane() {
+  const { layersPerSecond } = useControls('textures-2d-array-compressed', {
+    layersPerSecond: { value: 2, min: 0.5, max: 10, step: 0.5, label: 'layers / second' },
+  })
+
+  const { uLayersPerSecond } = useUniforms({ uLayersPerSecond: layersPerSecond })
+
   const map = useKTX2(KTX2_URL, BASIS_TRANSCODER_PATH)
   // drei's `useKTX2` types the result's `image` as `unknown` (it can't know what the
   // transcoder produced); a KTX2 array texture's image carries the layer count.
@@ -55,13 +61,12 @@ function AnimatedClipPlane({ layersPerSecond }: { layersPerSecond: number }) {
 
   // Linear ramp through [0, layerCount) that wraps — the TSL-builtin replacement for
   // the original's JS `Timer` + per-frame `uniform.value = depthStep % 5` (see
-  // DIVERGENCE). `layerCount` is a plain JS number read once the texture is loaded,
-  // embedded as a literal into the graph below (not a uniform — it never changes).
-  const layerNode = useMemo(
-    () => time.mul(layersPerSecond).mod(layerCount),
-    [layersPerSecond, layerCount],
-  )
-  const colorNode = texture(map, uv().flipY()).depth(layerNode)
+  // DIVERGENCE). Create-once: the ramp rate is a uniform, so dragging the leva slider
+  // mutates `.value` instead of rebuilding the shader graph. `layerCount` is a plain
+  // JS number read once the texture is loaded, embedded as a literal (it never changes).
+  const { colorNode } = useLocalNodes(() => ({
+    colorNode: texture(map, uv().flipY()).depth(time.mul(uLayersPerSecond).mod(layerCount)),
+  }))
 
   return (
     <mesh>
@@ -72,10 +77,6 @@ function AnimatedClipPlane({ layersPerSecond }: { layersPerSecond: number }) {
 }
 
 export default function TexturesArray2DCompressed() {
-  const { layersPerSecond } = useControls('textures-2d-array-compressed', {
-    layersPerSecond: { value: 2, min: 0.5, max: 10, step: 0.5, label: 'layers / second' },
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
@@ -85,7 +86,7 @@ export default function TexturesArray2DCompressed() {
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>
-        <AnimatedClipPlane layersPerSecond={layersPerSecond} />
+        <AnimatedClipPlane />
       </Suspense>
       <DemoHelpers grid={false} minDistance={20} maxDistance={200} />
     </Canvas>

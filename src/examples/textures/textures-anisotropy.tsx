@@ -38,11 +38,11 @@
  *   mounted for the readiness signal
  */
 import { Suspense, useEffect, useMemo } from 'react'
+import { MathUtils, RepeatWrapping, Scene, SRGBColorSpace } from 'three/webgpu'
+import type { Texture } from 'three/webgpu'
 import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { MathUtils, RepeatWrapping, Scene, SRGBColorSpace } from 'three/webgpu'
-import type { Texture} from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const CRATE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/crate.gif'
@@ -84,7 +84,12 @@ function CrateGround({ texture }: { texture: Texture }) {
   )
 }
 
-function AnisotropySplit({ leftAnisotropy, rightAnisotropy }: { leftAnisotropy: number; rightAnisotropy: number }) {
+function AnisotropySplit() {
+  const { left: leftAnisotropy, right: rightAnisotropy } = useControls('anisotropy', {
+    left: { label: 'left pane', value: 16, options: ANISOTROPY_LEVELS },
+    right: { label: 'right pane', value: 1, options: ANISOTROPY_LEVELS },
+  })
+
   const renderer = useThree((state) => state.renderer)
 
   // Original: texture1.anisotropy = renderer.getMaxAnisotropy() — the WebGPU backend
@@ -143,14 +148,10 @@ function AnisotropySplit({ leftAnisotropy, rightAnisotropy }: { leftAnisotropy: 
 }
 
 export default function TexturesAnisotropyExample() {
-  const { left, right } = useControls('anisotropy', {
-    left: { label: 'left pane', value: 16, options: ANISOTROPY_LEVELS },
-    right: { label: 'right pane', value: 1, options: ANISOTROPY_LEVELS } })
-
   return (
     <Canvas renderer camera={{ fov: 35, near: 1, far: 25000, position: [0, 200, 1500] }}>
       <Suspense fallback={null}>
-        <AnisotropySplit leftAnisotropy={left} rightAnisotropy={right} />
+        <AnisotropySplit />
       </Suspense>
       <DemoHelpers grid={false} controls={false} />
     </Canvas>

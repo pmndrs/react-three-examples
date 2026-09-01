@@ -44,10 +44,10 @@
  *   for a ground grid at the default 0.5 unit cell size.
  */
 import { Suspense, useLayoutEffect, useRef } from 'react'
+import { AnimationMixer, ACESFilmicToneMapping } from 'three/webgpu'
 import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { AnimationMixer, ACESFilmicToneMapping } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MODEL_URL =

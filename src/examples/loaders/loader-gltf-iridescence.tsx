@@ -36,10 +36,10 @@
  *   `loader-gltf-transmission`)
  */
 import { Suspense } from 'react'
+import { ACESFilmicToneMapping } from 'three/webgpu'
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { ACESFilmicToneMapping } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MODEL_URL =

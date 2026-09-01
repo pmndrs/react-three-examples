@@ -4,7 +4,6 @@
 // continuously refilled one layer at a time. See the header block in
 // `rendertarget-2d-array-3d.tsx` for the full DEMONSTRATES/DIVERGENCE notes.
 import { useEffect, useRef, useState } from 'react'
-import { useFrame, useThree } from '@react-three/fiber/webgpu'
 import { attribute, color, diffuseColor, screenUV, smoothstep, texture, uniform, vec2, vec3, vec4 } from 'three/tsl'
 import {
   Data3DTexture,
@@ -21,6 +20,8 @@ import {
 import type { Node, WebGPURenderer } from 'three/webgpu'
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
 import { TextureHelper } from 'three/addons/helpers/TextureHelperGPU.js'
+import { useFrame, useThree } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 
 const SIZE = { width: 256, height: 256, depth: 109 }
 // World-space "thickness" the TextureHelper spreads its slice stack across — the
@@ -170,7 +171,11 @@ function buildRig(renderer: WebGPURenderer, data: Uint8Array, aspect: number) {
 
 type Rig = ReturnType<typeof buildRig>
 
-export function MultiViewRig({ data, layersPerSecond }: { data: Uint8Array; layersPerSecond: number }) {
+export function MultiViewRig({ data }: { data: Uint8Array }) {
+  const { layersPerSecond } = useControls('rendertarget-2d-array-3d', {
+    layersPerSecond: { value: 20, min: 2, max: 60, step: 1, label: 'layers / second' },
+  })
+
   const renderer = useThree((state) => state.renderer)
   const size = useThree((state) => state.size)
 

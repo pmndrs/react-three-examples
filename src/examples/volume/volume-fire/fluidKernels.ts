@@ -20,6 +20,7 @@ import {
   vec4,
 } from 'three/tsl'
 import type { Node, StorageTexture } from 'three/webgpu'
+import { snoiseVec3 } from 'three/addons/tsl/math/curlNoise.js'
 import {
   CELL_COUNT,
   GRID_SIZE_X,
@@ -39,7 +40,6 @@ import {
   WIND_STRENGTH,
 } from './constants'
 import type { FireUniforms } from './fireUniforms'
-import { snoiseVec3 } from 'three/addons/tsl/math/curlNoise.js'
 
 // instanceIndex (flat 1D dispatch) -> voxel coordinate (3D)
 const getVoxelCoord = (id: typeof instanceIndex) => {

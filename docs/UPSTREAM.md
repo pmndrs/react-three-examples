@@ -182,7 +182,9 @@ do not count those as fixed.
   Fix the snippets (add `if (!renderPipeline) return`, add the cast or land B1) or
   wire snippets into a typecheck.
 
-### B9 · fiber: `/webgpu` entry types `renderer` as the WebGL|WebGPU union
+### B9 · ~~FIXED in fiber alpha.4~~ · fiber: `/webgpu` entry types `renderer` as the WebGL|WebGPU union
+
+> **RETIRED 2026-09-01 (fiber alpha.4)** — the `/webgpu` entry now types `state.renderer` as `WebGPURenderer`. All 24 corpus casts swept 2026-09-02; `corpus/no-retired-patterns` now errors on reintroduction. Kept for history; do NOT cite this brief in new code.
 
 - **What**: `useThree().renderer` (and RootState) is typed
   `WebGLRenderer | WebGPURenderer` even in the `/webgpu` build, whose runtime renderer
@@ -207,7 +209,9 @@ do not count those as fixed.
 - **Suggested fix**: let `Fn`'s type accept a tuple of node-typed params (generic
   parameter per arg, or a `Fn<[Node<'float'>, Node<'vec3'>]>` signature).
 
-### B12 · fiber: `useUniforms` scope/name strings flow unvalidated into WGSL identifiers
+### B12 · ~~FIXED in fiber alpha.4~~ · fiber: `useUniforms` scope/name strings flow unvalidated into WGSL identifiers
+
+> **RETIRED 2026-09-01 (fiber alpha.4)** — alpha.4 sanitises scope/name strings into valid WGSL identifiers. Kept for history; do NOT cite this brief in new code.
 
 - **What**: the debug name fiber generates for a uniform (`${scope}_${name}`) ends up
   as a WGSL struct member identifier. WGSL forbids hyphens (and other JS-string-legal
@@ -283,7 +287,9 @@ do not count those as fixed.
   the needsUpdate path appears to miss the env-map define/graph refresh when a
   shadow pass variant exists.
 
-### B16 · fiber: scoped `useNodes`/`useBuffers`/`useGPUStorage` debug name (`${scope}.${name}`) breaks WGSL codegen
+### B16 · ~~FIXED in fiber alpha.4~~ · fiber: scoped `useNodes`/`useBuffers`/`useGPUStorage` debug name (`${scope}.${name}`) breaks WGSL codegen
+
+> **RETIRED 2026-09-01 (fiber alpha.4)** — scoped stores are safe — alpha.4 sanitises the debug name. Examples that went UNSCOPED citing this brief should be re-scoped as they are restyled. Kept for history; do NOT cite this brief in new code.
 
 - **What**: the scoped paths of `useNodes`, `useBuffers`, and `useGPUStorage` all
   label each created entry `setName(`` `${scope}.${name}` ``)` (useNodes.tsx;
@@ -314,7 +320,9 @@ do not count those as fixed.
 - **Suggested fix**: use a WGSL-safe separator (`_`, matching useUniforms) and
   sanitize both parts (shared fix with B12's validator).
 
-### B17 · fiber: Canvas-boundary suspension re-runs createRoot and freezes TSL `time`
+### B17 · ~~FIXED in fiber alpha.4~~ · fiber: Canvas-boundary suspension re-runs createRoot and freezes TSL `time`
+
+> **RETIRED 2026-09-01 (fiber alpha.4)** — alpha.4 no longer tears down the renderer root when a child suspends. Suspense boundaries added solely to work around this can be simplified — but see B28: two independently-suspending resources in ONE boundary can be protective, so do not reflexively split. Kept for history; do NOT cite this brief in new code.
 
 - **What**: when a child suspends all the way up to Canvas's own internal boundary
   (no user `<Suspense>` in between), fiber alpha.3 logs `R3F.createRoot should only

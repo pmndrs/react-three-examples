@@ -49,7 +49,7 @@
 import { Suspense, useLayoutEffect } from 'react'
 import { color, Fn, mix } from 'three/tsl'
 import { AgXToneMapping, Color } from 'three/webgpu'
-import type { Mesh, MeshPhysicalNodeMaterial, Node } from 'three/webgpu'
+import type { Mesh, MeshPhysicalNodeMaterial } from 'three/webgpu'
 
 import { Canvas, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { useGLTF } from '@react-three/drei/webgpu'
@@ -124,11 +124,11 @@ function DragonScene() {
 
     // opacity by color (mix(1, color, opacity)) — opacity by blending (mix into the
     // alpha channel instead) is the original's commented-out alternative.
-    const opacityNode = uOpacity as unknown as Node<'float'>
+    const opacityNode = uOpacity
     const customShadow = Fn(([shadowColorIn]) => {
       // Fn's destructured params come back as bare `ShaderNodeObject<Node>` (AGENTS.md
       // B10) — cast to the concrete vec3 type mix() needs.
-      const shadowColor = shadowColorIn as unknown as Node<'vec3'>
+      const shadowColor = shadowColorIn
       return mix(1, shadowColor, opacityNode)
     })
 

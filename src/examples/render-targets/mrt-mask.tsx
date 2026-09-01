@@ -26,22 +26,17 @@
  *   OrbitControls' `start`/`end` events; ported using `camera-controls`' equivalent
  *   `controlstart`/`controlend` events on the `controlsRef` escape hatch (the
  *   showcased imperative path for behavior CameraControls doesn't model declaratively)
- * - `renderer.inspector` is not wired in this repo (no divergence in controls — the
- *   original ships no GUI either, this example has none)
- * - DemoHelpers baseline (camera-controls only, `grid={false}`: the original has no
- *   ground plane, just the gradient sky) replaces the bare `OrbitControls`
  * - Michelle's dance clip is played BY NAME (its single clip, read off
  *   `animations[0].name`) rather than the original's `gltf.animations[0]` index
  */
 import { Suspense, useEffect, useLayoutEffect, useRef } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { PerspectiveCamera, useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import { color, mrt, output, screenUV, vec4 } from 'three/tsl'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { NeutralToneMapping, MathUtils } from 'three/webgpu'
-import type { Group, Mesh, Node } from 'three/webgpu'
+import type { Group, Mesh, MeshStandardNodeMaterial, Node, NodeMaterial } from 'three/webgpu'
+import { Canvas, useFrame, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
+import { PerspectiveCamera, useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import type CameraControlsImpl from 'camera-controls'
-import { useRenderPipeline } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
@@ -72,9 +67,8 @@ function GradientBackground() {
 
 // The animated dancer, marked with a stronger per-material mask ('glow effect' in
 // the original) than the plain spheres below — `output.add(1)` overdrives the mask
-// channel for a hotter blur. `.mrtNode` is duck-typed (same B11 family as
-// backgroundNode) and must land before the first shader-graph build (AGENTS.md
-// imperative-setup rule), hence useLayoutEffect.
+// channel for a hotter blur. `mrtNode` must land before the first shader-graph
+// build (AGENTS.md imperative-setup rule), hence useLayoutEffect.
 function Michelle() {
   const { scene, animations } = useGLTF(MICHELLE_URL)
   const { actions } = useAnimations(animations, scene)
@@ -90,7 +84,7 @@ function Michelle() {
       if (applied) return
       const mesh = child as Mesh
       if (mesh.isMesh) {
-        const material = mesh.material as unknown as { mrtNode: Node | null }
+        const material = mesh.material as NodeMaterial
         material.mrtNode = mrt({ mask: output.add(1) })
         applied = true
       }
@@ -107,7 +101,7 @@ interface SphereProps {
 }
 
 function GlowSphere({ position, colorHex, glow }: SphereProps) {
-  const materialRef = useRef<{ mrtNode: Node | null }>(null)
+  const materialRef = useRef<MeshStandardNodeMaterial>(null)
 
   useLayoutEffect(() => {
     const material = materialRef.current
@@ -121,8 +115,7 @@ function GlowSphere({ position, colorHex, glow }: SphereProps) {
   return (
     <mesh position={position}>
       <sphereGeometry args={[0.3, 32, 16]} />
-      {/* mrtNode cast: same B11 duck-typed *Node family as scene.backgroundNode. */}
-      <meshStandardNodeMaterial ref={materialRef as never} color={colorHex} />
+      <meshStandardNodeMaterial ref={materialRef} color={colorHex} />
     </mesh>
   )
 }

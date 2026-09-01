@@ -4,7 +4,6 @@
 // volumetric pass -> gaussian denoise -> additive compose). Uses fiber hooks
 // throughout, so it lives inside <Canvas>; the page shell owns leva.
 import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react'
-import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
 import { bayer16 } from 'three/addons/tsl/math/Bayer.js'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js'
@@ -15,9 +14,10 @@ import {
   RectAreaLightNode,
   VolumeNodeMaterial,
   type Mesh,
-  type Node,
   type RectAreaLight,
 } from 'three/webgpu'
+import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog'
 import { LAYER_VOLUMETRIC_LIGHTING } from './constants'
 
@@ -27,15 +27,6 @@ import { LAYER_VOLUMETRIC_LIGHTING } from './constants'
 RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init())
 
 const KNOT_POSITION: [number, number, number] = [0, 5.5, 0]
-
-interface VolumeLightingRectareaProps {
-  fogIntensity: number
-  smokeAmount: number
-  steps: number
-  resolution: number
-  denoiseStrength: number
-  rotationSpeed: number
-}
 
 // A RectAreaLight with a visible panel as a real scene-graph child — a dark backing
 // plane plus a color-matched emissive-looking front face (`BackSide` so it faces the
@@ -67,23 +58,26 @@ function RectLightPanel({
   )
 }
 
-export function VolumeLightingRectarea({
-  fogIntensity,
-  smokeAmount,
-  steps,
-  resolution,
-  denoiseStrength,
-  rotationSpeed,
-}: VolumeLightingRectareaProps) {
-  const { uSmokeAmount, uFogIntensity, uDenoiseStrength } = useUniforms(
+export function VolumeLightingRectarea() {
+  const { fogIntensity, smokeAmount, rotationSpeed } = useControls('volume-lighting-rectarea scene', {
+    fogIntensity: { value: 1, min: 0, max: 2, step: 0.01 },
+    smokeAmount: { value: 2, min: 0, max: 3, step: 0.05 },
+    rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
+  })
+  const { steps, resolution, denoiseStrength } = useControls('volume-lighting-rectarea quality', {
+    steps: { value: 12, min: 2, max: 16, step: 1 },
+    resolution: { value: 0.25, min: 0.1, max: 1, step: 0.05 },
+    denoiseStrength: { value: 0.6, min: 0, max: 1, step: 0.01 },
+  })
+
+  const {
+    uSmokeAmount: uSmokeAmountNode,
+    uFogIntensity: uFogIntensityNode,
+    uDenoiseStrength: uDenoiseStrengthNode,
+  } = useUniforms(
     { uSmokeAmount: smokeAmount, uFogIntensity: fogIntensity, uDenoiseStrength: denoiseStrength },
     'volumeLightingRectarea',
   )
-  // useUniforms' UniformNode<T> pins its TSL type param to `unknown` (fiber typing
-  // gap, see AGENTS.md) — cast to the concrete node type the graphs below need.
-  const uSmokeAmountNode = uSmokeAmount as unknown as Node<'float'>
-  const uFogIntensityNode = uFogIntensity as unknown as Node<'float'>
-  const uDenoiseStrengthNode = uDenoiseStrength as unknown as Node<'float'>
 
   const roughnessNode = useMemo(() => checker(uv().mul(400)), [])
 

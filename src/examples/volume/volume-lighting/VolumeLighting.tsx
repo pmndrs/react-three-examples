@@ -4,54 +4,43 @@
 // additive compose). Uses fiber hooks throughout, so it lives inside <Canvas>; the
 // page shell owns leva and Suspense.
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import { bayer16 } from 'three/addons/tsl/math/Bayer.js'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { pass, screenCoordinate, screenUV } from 'three/tsl'
-import {
-  DoubleSide,
-  Layers,
-  VolumeNodeMaterial,
-  type Mesh,
-  type Node,
-  type PointLight,
-  type SpotLight,
-} from 'three/webgpu'
+import { DoubleSide, Layers, VolumeNodeMaterial, type Mesh, type PointLight, type SpotLight } from 'three/webgpu'
+import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { TeapotGeometry } from '../../../assets/TeapotGeometry'
 import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog'
 import { COLORS_MAP_URL, LAYER_VOLUMETRIC_LIGHTING } from './constants'
 
-interface VolumeLightingProps {
-  pointLightIntensity: number
-  spotIntensity: number
-  fogIntensity: number
-  smokeAmount: number
-  steps: number
-  resolution: number
-  denoiseStrength: number
-}
+export function VolumeLighting() {
+  const { pointLightIntensity, spotIntensity, fogIntensity, smokeAmount } = useControls(
+    'volume-lighting scene',
+    {
+      pointLightIntensity: { value: 3, min: 0, max: 6, step: 0.1 },
+      spotIntensity: { value: 100, min: 0, max: 200, step: 1 },
+      fogIntensity: { value: 1, min: 0, max: 2, step: 0.01 },
+      smokeAmount: { value: 2, min: 0, max: 3, step: 0.05 },
+    },
+  )
+  const { steps, resolution, denoiseStrength } = useControls('volume-lighting quality', {
+    steps: { value: 12, min: 2, max: 16, step: 1 },
+    resolution: { value: 0.25, min: 0.1, max: 1, step: 0.05 },
+    denoiseStrength: { value: 0.6, min: 0, max: 1, step: 0.01 },
+  })
 
-export function VolumeLighting({
-  pointLightIntensity,
-  spotIntensity,
-  fogIntensity,
-  smokeAmount,
-  steps,
-  resolution,
-  denoiseStrength,
-}: VolumeLightingProps) {
   const colorsMap = useTexture(COLORS_MAP_URL) // spot light cookie
 
-  const { uSmokeAmount, uFogIntensity, uDenoiseStrength } = useUniforms(
+  const {
+    uSmokeAmount: uSmokeAmountNode,
+    uFogIntensity: uFogIntensityNode,
+    uDenoiseStrength: uDenoiseStrengthNode,
+  } = useUniforms(
     { uSmokeAmount: smokeAmount, uFogIntensity: fogIntensity, uDenoiseStrength: denoiseStrength },
     'volumeLighting',
   )
-  // useUniforms' UniformNode<T> pins its TSL type param to `unknown` (fiber typing
-  // gap, see AGENTS.md) — cast to the concrete node type the graphs below need.
-  const uSmokeAmountNode = uSmokeAmount as unknown as Node<'float'>
-  const uFogIntensityNode = uFogIntensity as unknown as Node<'float'>
-  const uDenoiseStrengthNode = uDenoiseStrength as unknown as Node<'float'>
 
   const teapotGeometry = useMemo(() => new TeapotGeometry(0.8, 18), [])
 

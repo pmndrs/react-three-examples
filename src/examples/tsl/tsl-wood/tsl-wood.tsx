@@ -22,8 +22,6 @@
  *   no analytic lights — clearcoat finishes read entirely from the HDR
  *
  * DIVERGENCE from original
- * - `renderer.inspector` GUI (Inspector addon) replaced with leva (same 20
- *   parameters, same ranges/defaults); Inspector overlay dropped repo-wide
  * - The custom material's `clearcoat` slider actually works here: the r185
  *   `WoodNodeMaterial` constructor bakes `clearcoatNode` to a CONSTANT, which
  *   overrides the `clearcoat` property the original's GUI mutates (inert
@@ -36,16 +34,15 @@
  * - Grid-Fn parameters (`gridSize`/`dotWidth`/`lineWidth`, `radius`/`falloff`)
  *   folded into build-time JS constants — the original passes them as TSL Fn
  *   defaults but never varies them
- * - OrbitControls -> DemoHelpers' camera-controls baseline (same top-down
- *   camera + target; DemoHelpers grid off — the example draws its own)
  * - `dpr={1}` mirrors the original's `setPixelRatio(1.0)` ("important for
  *   performance": 41 clearcoat physical materials)
  */
 import { Suspense } from 'react'
+import { NeutralToneMapping } from 'three/webgpu'
+
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { NeutralToneMapping } from 'three/webgpu'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { GridPlane } from './GridPlane'
 import { WoodShowcase } from './WoodShowcase'
@@ -54,31 +51,6 @@ const HDR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/san_giuseppe_bridge_2k.hdr'
 
 export default function TslWood() {
-  // Same 20 knobs, ranges, and defaults as the original's Inspector GUI (the
-  // "custom" block in the corner of the swatch grid).
-  const custom = useControls('custom wood', {
-    centerSize: { value: 1.11, min: 0, max: 2, step: 0.01 },
-    largeWarpScale: { value: 0.32, min: 0, max: 1, step: 0.001 },
-    largeGrainStretch: { value: 0.24, min: 0, max: 1, step: 0.001 },
-    smallWarpStrength: { value: 0.059, min: 0, max: 0.2, step: 0.001 },
-    smallWarpScale: { value: 2, min: 0, max: 5, step: 0.01 },
-    fineWarpStrength: { value: 0.006, min: 0, max: 0.05, step: 0.001 },
-    fineWarpScale: { value: 32.8, min: 0, max: 50, step: 0.1 },
-    ringThickness: { value: 1 / 34, min: 0, max: 0.1, step: 0.001 },
-    ringBias: { value: 0.03, min: -0.2, max: 0.2, step: 0.001 },
-    ringSizeVariance: { value: 0.03, min: 0, max: 0.2, step: 0.001 },
-    ringVarianceScale: { value: 4.4, min: 0, max: 10, step: 0.1 },
-    barkThickness: { value: 0.3, min: 0, max: 1, step: 0.01 },
-    splotchScale: { value: 0.2, min: 0, max: 1, step: 0.01 },
-    splotchIntensity: { value: 0.541, min: 0, max: 1, step: 0.01 },
-    cellScale: { value: 910, min: 100, max: 2000, step: 1 },
-    cellSize: { value: 0.1, min: 0.01, max: 0.5, step: 0.001 },
-    darkGrainColor: '#0c0504',
-    lightGrainColor: '#926c50',
-    clearcoat: { value: 1, min: 0, max: 1, step: 0.01 },
-    clearcoatRoughness: { value: 0.2, min: 0, max: 1, step: 0.01 },
-  })
-
   return (
     <Canvas
       // Original: NeutralToneMapping, exposure 1, white background,
@@ -97,7 +69,7 @@ export default function TslWood() {
             original): scene.environment + environmentIntensity = 2. */}
         <Environment files={HDR_URL} environmentIntensity={2} />
         <GridPlane />
-        <WoodShowcase custom={custom} />
+        <WoodShowcase />
       </Suspense>
       <DemoHelpers grid={false} target={[0, 0, 0.548]} />
     </Canvas>

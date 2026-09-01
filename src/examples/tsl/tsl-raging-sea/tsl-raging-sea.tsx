@@ -14,10 +14,9 @@
  * - Leva replaces the three.js Inspector panel
  * - The node graph is long, so it lives in `seaNodes.tsx`
  */
-import { useControls } from 'leva'
 import { NoToneMapping } from 'three/webgpu'
-
 import { Canvas, useNodes, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { makeSeaNodes, seaControls, TerrainGeometry } from './seaNodes'

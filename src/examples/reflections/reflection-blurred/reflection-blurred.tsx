@@ -37,12 +37,11 @@
  *   same B11-family gap as the `reflection` cousin)
  */
 import { Suspense, useEffect, useMemo } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { useTexture } from '@react-three/drei/webgpu'
 import { color, hue, mix, normalWorld, time, vec3 } from 'three/tsl'
 import { DoubleSide, NeutralToneMapping, SRGBColorSpace } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+import { Canvas, useThree } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { BlurredFloor } from './BlurredFloor'
 import { Michelle } from './Michelle'
@@ -85,12 +84,6 @@ function UvPlane() {
 }
 
 export default function ReflectionBlurred() {
-  const { roughness, radius, resolutionScale } = useControls('reflection-blurred', {
-    roughness: { value: 0.9, min: 0, max: 1, step: 0.01 },
-    radius: { value: 0.2, min: 0, max: 1, step: 0.01 },
-    resolutionScale: { value: 0.5, min: 0.25, max: 1, step: 0.05 },
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: NeutralToneMapping, toneMappingExposure: 1.3 }}
@@ -98,7 +91,7 @@ export default function ReflectionBlurred() {
     >
       <SceneBackground />
       <hemisphereLight color={0xffffff} groundColor={0x0066ff} intensity={10} />
-      <BlurredFloor roughness={roughness} radius={radius} resolutionScale={resolutionScale} />
+      <BlurredFloor />
       <Suspense fallback={null}>
         <Michelle />
       </Suspense>

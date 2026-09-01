@@ -36,12 +36,12 @@
  *   in the Pisa skybox with no ground plane
  */
 import { Suspense, useLayoutEffect, useRef } from 'react'
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { useCubeCamera, useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
 import { ACESFilmicToneMapping, LinearFilter, LinearMipmapLinearFilter } from 'three/webgpu'
 import type { Mesh } from 'three/webgpu'
 import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js'
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu'
+import { useCubeCamera, useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
@@ -54,7 +54,11 @@ const UV_GRID_URL = `${TEXTURE_BASE}uv_grid_opengl.jpg`
 // see header DEMONSTRATES) hands back the CubeRenderTarget so the original's mipmap
 // filter setup survives, plus the camera and an update() that re-renders the scene
 // into the target; the hide/update/show cycle runs in this component's useFrame.
-function ReflectiveSphere({ roughness, metalness }: { roughness: number; metalness: number }) {
+function ReflectiveSphere() {
+  const { roughness, metalness } = useControls('cubemap-dynamic', {
+    roughness: { value: 0.05, min: 0, max: 1, step: 0.01 },
+    metalness: { value: 1, min: 0, max: 1, step: 0.01 },
+  })
   const { fbo, camera, update } = useCubeCamera({ resolution: 256, near: 1, far: 1000 })
   const sphereRef = useRef<Mesh>(null)
 
@@ -110,7 +114,10 @@ function PisaEnvironment() {
 // The two orbiting subjects the mirror tracks: a uv-grid cube lit by scene.environment
 // alone, and a torus knot carrying the STATIC Pisa cube texture as its own envMap
 // (useLoader cache — same six-face load as PisaEnvironment, no second fetch).
-function OrbitingObjects({ envMapIntensity }: { envMapIntensity: number }) {
+function OrbitingObjects() {
+  const { envMapIntensity } = useControls('cubemap-dynamic', {
+    envMapIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
+  })
   const uvTexture = useTexture(UV_GRID_URL)
   const [envCube] = useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES])
   const cubeRef = useRef<Mesh>(null)
@@ -152,7 +159,11 @@ function OrbitingObjects({ envMapIntensity }: { envMapIntensity: number }) {
 
 // toneMappingExposure is a WebGPURenderer property and environmentIntensity a Scene
 // property — neither is a TSL uniform, so both are set imperatively (pattern `sky`).
-function RendererSettings({ exposure, environmentIntensity }: { exposure: number; environmentIntensity: number }) {
+function RendererSettings() {
+  const { exposure, environmentIntensity } = useControls('cubemap-dynamic', {
+    exposure: { value: 1, min: 0, max: 2, step: 0.01 },
+    environmentIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
+  })
   const renderer = useThree((s) => s.renderer)
   const scene = useThree((s) => s.scene)
 
@@ -165,30 +176,19 @@ function RendererSettings({ exposure, environmentIntensity }: { exposure: number
 }
 
 export default function CubemapDynamic() {
-  const { roughness, metalness, exposure, environmentIntensity, envMapIntensity } = useControls(
-    'cubemap-dynamic',
-    {
-      roughness: { value: 0.05, min: 0, max: 1, step: 0.01 },
-      metalness: { value: 1, min: 0, max: 1, step: 0.01 },
-      exposure: { value: 1, min: 0, max: 2, step: 0.01 },
-      environmentIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
-      envMapIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
-    },
-  )
-
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       camera={{ position: [0, 0, 75], fov: 60, near: 1, far: 1000 }}
     >
-      <ReflectiveSphere roughness={roughness} metalness={metalness} />
+      <ReflectiveSphere />
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>
         <PisaEnvironment />
-        <OrbitingObjects envMapIntensity={envMapIntensity} />
+        <OrbitingObjects />
       </Suspense>
-      <RendererSettings exposure={exposure} environmentIntensity={environmentIntensity} />
+      <RendererSettings />
       <DemoHelpers grid={false} autoRotate />
     </Canvas>
   )

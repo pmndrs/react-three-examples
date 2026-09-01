@@ -1,9 +1,7 @@
 // Terrain scene role: the TSL-displaced plane (position/normal/color node graph) plus
 // the invisible drag plane that scrolls the noise domain. Everything here needs fiber
 // hooks (`useUniforms`/`useThree`), so it lives inside <Canvas>, not in the page shell.
-import { useEffect, useMemo, useRef, type RefObject } from 'react'
-import { useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
-import type CameraControlsImpl from 'camera-controls'
+import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
 import {
   Fn,
   Loop,
@@ -19,39 +17,47 @@ import {
   varying,
   vec3,
 } from 'three/tsl'
-import { Mesh, MeshStandardNodeMaterial, PlaneGeometry, Vector2, Vector3 } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
+import { Mesh, PlaneGeometry, Vector2, Vector3 } from 'three/webgpu'
+
+import { useThree, useNodes, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
+import type CameraControlsImpl from 'camera-controls'
 
 // The original declares this as a uniform but never exposes it — folded to a constant
 // (see header DIVERGENCE). It's the finite-difference step for normal reconstruction.
 const NORMAL_LOOKUP_SHIFT = 0.01
 
 export interface TerrainProps {
-  noiseIterations: number
-  positionFrequency: number
-  strength: number
-  warpFrequency: number
-  warpStrength: number
-  colorSand: string
-  colorGrass: string
-  colorSnow: string
-  colorRock: string
   /** Live camera-controls instance — suspended while dragging the terrain. */
   controlsRef: RefObject<CameraControlsImpl | null>
 }
 
-export function Terrain({
-  noiseIterations,
-  positionFrequency,
-  strength,
-  warpFrequency,
-  warpStrength,
-  colorSand,
-  colorGrass,
-  colorSnow,
-  colorRock,
-  controlsRef,
-}: TerrainProps) {
+export function Terrain({ controlsRef }: TerrainProps) {
+  //* Controls ====================================================
+  const {
+    noiseIterations,
+    positionFrequency,
+    strength,
+    warpFrequency,
+    warpStrength,
+    colorSand,
+    colorGrass,
+    colorSnow,
+    colorRock,
+  } = useControls('tsl-procedural-terrain', {
+    terrain: folder({
+      noiseIterations: { value: 3, min: 0, max: 10, step: 1 },
+      positionFrequency: { value: 0.175, min: 0, max: 1, step: 0.001 },
+      strength: { value: 10, min: 0, max: 20, step: 0.001 },
+      warpFrequency: { value: 6, min: 0, max: 20, step: 0.001 },
+      warpStrength: { value: 1, min: 0, max: 2, step: 0.001 },
+      colorSand: '#ffe894',
+      colorGrass: '#85d534',
+      colorSnow: '#ffffff',
+      colorRock: '#bfbd8d',
+    }),
+  })
+
   const {
     uNoiseIterations,
     uPositionFrequency,
@@ -77,23 +83,10 @@ export function Terrain({
     'terrain',
   )
 
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so the
-  // uniforms won't feed typed TSL math under strict tsc (upstream fiber gap — same cast
-  // family as tsl-earth / skinning-instancing).
-  const uNoiseIterationsNode = uNoiseIterations as unknown as Node<'float'>
-  const uPositionFrequencyNode = uPositionFrequency as unknown as Node<'float'>
-  const uStrengthNode = uStrength as unknown as Node<'float'>
-  const uWarpFrequencyNode = uWarpFrequency as unknown as Node<'float'>
-  const uWarpStrengthNode = uWarpStrength as unknown as Node<'float'>
-  const uColorSandNode = uColorSand as unknown as Node<'vec3'>
-  const uColorGrassNode = uColorGrass as unknown as Node<'vec3'>
-  const uColorSnowNode = uColorSnow as unknown as Node<'vec3'>
-  const uColorRockNode = uColorRock as unknown as Node<'vec3'>
-
-  // Built once — `useUniforms` returns stable node instances across re-renders (leva
-  // edits mutate `.value` in place), so this graph never rebuilds after the first pass,
-  // matching the original's single `init()`.
-  const rig = useMemo(() => {
+  // Built once — `useNodes` is create-if-not-exists, and `useUniforms` returns stable
+  // node instances across re-renders (leva edits mutate `.value` in place), so this
+  // graph never rebuilds after the first pass, matching the original's single `init()`.
+  const { positionNode, normalNode, colorNode, uOffset } = useNodes(() => {
     // Drag-driven noise-domain scroll. Plain TSL `uniform()` wrapping a live Vector2
     // (not `useUniforms`): the drag handlers mutate `.value` imperatively and a React
     // re-render must never write it back to its initial value.
@@ -105,33 +98,31 @@ export function Terrain({
     const terrainElevation = Fn(([positionIn]) => {
       // Fn's destructured params come back as bare `ShaderNodeObject<Node>` — too loose
       // for typed TSL math (three-side gap, UPSTREAM.md B10).
-      const position = positionIn as unknown as Node<'vec2'>
+      const position = positionIn
 
       const warpedPosition = position.add(uOffset).toVar()
       warpedPosition.addAssign(
-        mx_noise_float(warpedPosition.mul(uPositionFrequencyNode).mul(uWarpFrequencyNode), 1, 0).mul(
-          uWarpStrengthNode,
+        mx_noise_float(warpedPosition.mul(uPositionFrequency).mul(uWarpFrequency), 1, 0).mul(
+          uWarpStrength,
         ),
       )
 
       const elevation = float(0).toVar()
       // Run-time loop: the octave count is a uniform, so the iteration bound must be a
       // TSL `Loop` (a JS `for` here would bake the count at graph build).
-      Loop({ type: 'float', start: float(1), end: uNoiseIterationsNode, condition: '<=' }, ({ i }) => {
-        const noiseInput = warpedPosition.mul(uPositionFrequencyNode).mul(i.mul(2)).add(i.mul(987))
+      Loop({ type: 'float', start: float(1), end: uNoiseIterations, condition: '<=' }, ({ i }) => {
+        const noiseInput = warpedPosition.mul(uPositionFrequency).mul(i.mul(2)).add(i.mul(987))
         const noise = mx_noise_float(noiseInput, 1, 0).div(i.add(1).mul(2))
         elevation.addAssign(noise)
       })
 
       const elevationSign = sign(elevation)
-      elevation.assign(elevation.abs().pow(2).mul(elevationSign).mul(uStrengthNode))
+      elevation.assign(elevation.abs().pow(2).mul(elevationSign).mul(uStrength))
 
       return elevation
     })
 
-    const material = new MeshStandardNodeMaterial({ metalness: 0, roughness: 0.5, color: '#85d534' })
-
-    material.positionNode = Fn(() => {
+    const positionNode = Fn(() => {
       // neighbours positions
       const neighbourA = positionLocal.xyz.add(vec3(NORMAL_LOOKUP_SHIFT, 0.0, 0.0)).toVar()
       const neighbourB = positionLocal.xyz.add(vec3(0.0, 0.0, -NORMAL_LOOKUP_SHIFT)).toVar()
@@ -155,48 +146,31 @@ export function Terrain({
       return position
     })()
 
-    material.normalNode = transformNormalToView(vNormal)
+    const normalNode = transformNormalToView(vNormal)
 
-    material.colorNode = Fn(() => {
-      const finalColor = vec3(uColorSandNode).toVar()
+    const colorNode = Fn(() => {
+      const finalColor = uColorSand.toVar()
 
       // grass
       const grassMix = step(-0.06, vPosition.y)
-      finalColor.assign(grassMix.mix(finalColor, uColorGrassNode))
+      finalColor.assign(grassMix.mix(finalColor, uColorGrass))
 
       // rock — steep faces above the sand line
       const rockMix = step(0.5, dot(vNormal, vec3(0, 1, 0)))
         .oneMinus()
         .mul(step(-0.06, vPosition.y))
-      finalColor.assign(rockMix.mix(finalColor, uColorRockNode))
+      finalColor.assign(rockMix.mix(finalColor, uColorRock))
 
       // snow — noisy altitude threshold
       const snowThreshold = mx_noise_float(vPosition.xz.mul(25), 1, 0).mul(0.1).add(0.45)
       const snowMix = step(snowThreshold, vPosition.y)
-      finalColor.assign(snowMix.mix(finalColor, uColorSnowNode))
+      finalColor.assign(snowMix.mix(finalColor, uColorSnow))
 
       return finalColor
     })()
 
-    // normal/uv deleted like the original: normals are rebuilt in `positionNode`, and
-    // keeping the attributes would only feed stale data into the standard material.
-    const geometry = new PlaneGeometry(10, 10, 500, 500)
-    geometry.deleteAttribute('uv')
-    geometry.deleteAttribute('normal')
-    geometry.rotateX(-Math.PI * 0.5)
-
-    return { geometry, material, uOffset }
-  }, [
-    uNoiseIterationsNode,
-    uPositionFrequencyNode,
-    uStrengthNode,
-    uWarpFrequencyNode,
-    uWarpStrengthNode,
-    uColorSandNode,
-    uColorGrassNode,
-    uColorSnowNode,
-    uColorRockNode,
-  ])
+    return { positionNode, normalNode, colorNode, uOffset }
+  })
 
   // --- drag-to-scroll -----------------------------------------------------------
   const domElement = useThree((s) => s.renderer.domElement)
@@ -216,8 +190,8 @@ export function Terrain({
 
   const onPointerMove = (e: ThreeEvent<PointerEvent>) => {
     if (!dragging.current) return
-    rig.uOffset.value.x += prevWorld.current.x - e.point.x
-    rig.uOffset.value.y += prevWorld.current.z - e.point.z
+    uOffset.value.x += prevWorld.current.x - e.point.x
+    uOffset.value.y += prevWorld.current.z - e.point.z
     prevWorld.current.copy(e.point)
   }
 
@@ -236,7 +210,17 @@ export function Terrain({
 
   return (
     <>
-      <mesh geometry={rig.geometry} material={rig.material} castShadow receiveShadow />
+      <mesh castShadow receiveShadow>
+        <TerrainGeometry />
+        <meshStandardNodeMaterial
+          metalness={0}
+          roughness={0.5}
+          color="#85d534"
+          positionNode={positionNode}
+          normalNode={normalNode}
+          colorNode={colorNode}
+        />
+      </mesh>
       {/* Invisible drag plane: material-invisible (not mesh-invisible) so it still
           raycasts; only this mesh has pointer handlers, so R3F's event raycaster never
           considers the displaced terrain — same as the original's dedicated drag.object. */}
@@ -257,4 +241,28 @@ export function Terrain({
       </mesh>
     </>
   )
+}
+
+/**
+ * A densely subdivided plane, rotated flat in GEOMETRY space so `positionNode` can
+ * displace `positionLocal.y` (rotating the mesh would turn the displacement with it).
+ * `uv`/`normal` are deleted like the original: normals are rebuilt from neighbour
+ * elevation taps in `positionNode`, and keeping the attributes would only feed stale
+ * data into the standard material.
+ */
+function TerrainGeometry() {
+  const geometryRef = useRef<PlaneGeometry>(null)
+
+  useLayoutEffect(() => {
+    const geometry = geometryRef.current
+    // Fast Refresh keeps the geometry but reruns the effect — prepare only once.
+    if (!geometry || geometry.userData.prepared) return
+
+    geometry.userData.prepared = true
+    geometry.deleteAttribute('uv')
+    geometry.deleteAttribute('normal')
+    geometry.rotateX(-Math.PI * 0.5)
+  }, [])
+
+  return <planeGeometry args={[10, 10, 500, 500]} ref={geometryRef} />
 }

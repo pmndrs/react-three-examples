@@ -47,11 +47,10 @@
  *   is about, and an infinite world-space grid at a different height would clash with it
  */
 import { Suspense, useEffect } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
 import { color, normalWorldGeometry } from 'three/tsl'
 import { ACESFilmicToneMapping } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+import { Canvas, useThree } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { PostFX } from './PostFX'
 import { ReflectiveFloor } from './ReflectiveFloor'
@@ -76,15 +75,6 @@ function SceneBackground() {
 }
 
 export default function Reflection() {
-  const { effectorSpeed, vignetteStrength } = useControls('reflection', {
-    Tree: folder({
-      effectorSpeed: { value: 1, min: 0.1, max: 3, step: 0.05 },
-    }),
-    Post: folder({
-      vignetteStrength: { value: 0.2, min: 0, max: 0.6, step: 0.01 },
-    }),
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
@@ -107,8 +97,8 @@ export default function Reflection() {
       <Suspense fallback={null}>
         <ReflectiveFloor />
       </Suspense>
-      <Tree effectorSpeed={effectorSpeed} />
-      <PostFX vignetteStrength={vignetteStrength} />
+      <Tree />
+      <PostFX />
       <DemoHelpers grid={false} target={[0, 1, 0]} minDistance={1} maxDistance={10} autoRotate autoRotateSpeed={1} />
     </Canvas>
   )

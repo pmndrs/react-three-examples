@@ -39,59 +39,57 @@
  *   coincident with (and visually clashing against) the room's bottom plane
  */
 import { Suspense, useMemo, useRef } from 'react'
+import { screenUV, texture, uv, viewportSafeUV, viewportSharedTexture } from 'three/tsl'
+import { RepeatWrapping } from 'three/webgpu'
+import type { Mesh } from 'three/webgpu'
 import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
-import { screenUV, texture, uv, viewportSafeUV, viewportSharedTexture } from 'three/tsl'
-import { MeshBasicNodeMaterial, RepeatWrapping } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const FLOOR_NORMAL_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/floors/FloorsCheckerboard_S_Normal.jpg'
 
-interface RefractorPlaneProps {
-  normalScale: number
-  uvTile: number
-}
-
 // The "window" plane: backdropNode samples the frame already being rendered (the room
 // behind it), distorted by a tiled normal map — see header DEMONSTRATES.
-function RefractorPlane({ normalScale, uvTile }: RefractorPlaneProps) {
+function RefractorPlane() {
+  const { normalScale, uvTile } = useControls('refraction', {
+    Refractor: folder({
+      normalScale: { value: 0.1, min: 0, max: 0.5, step: 0.01 },
+      uvTile: { value: 5, min: 1, max: 20, step: 1 },
+    }),
+  })
   const floorNormal = useTexture(FLOOR_NORMAL_URL)
 
-  const material = useMemo(() => {
+  const backdropNode = useMemo(() => {
     floorNormal.wrapS = RepeatWrapping
     floorNormal.wrapT = RepeatWrapping
 
     const uvOffset = texture(floorNormal, uv().mul(uvTile)).xy.mul(2).sub(1).mul(normalScale)
     const refractorUV = screenUV.add(uvOffset)
-
-    const mat = new MeshBasicNodeMaterial({
-      backdropNode: viewportSharedTexture(viewportSafeUV(refractorUV)),
-    })
-    mat.transparent = true
-    return mat
+    return viewportSharedTexture(viewportSafeUV(refractorUV))
   }, [floorNormal, normalScale, uvTile])
 
   return (
-    <mesh material={material} position={[0, 50, 0]}>
+    <mesh position={[0, 50, 0]}>
       <planeGeometry args={[100.1, 100.1]} />
+      <meshBasicNodeMaterial backdropNode={backdropNode} transparent />
     </mesh>
   )
 }
 
-interface OrbitingSphereProps {
-  orbitSpeed: number
-}
-
 // Plain THREE.Mesh orbited imperatively in useFrame — no node material required, this
 // object exists only to give the refractor plane something moving to distort.
-function OrbitingSphere({ orbitSpeed }: OrbitingSphereProps) {
-  const ref = useRef<Mesh>(null)
+function OrbitingSphere() {
+  const { orbitSpeed } = useControls('refraction', {
+    Sphere: folder({
+      orbitSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
+    }),
+  })
+  const sphereRef = useRef<Mesh>(null)
 
   useFrame((state) => {
-    const mesh = ref.current
+    const mesh = sphereRef.current
     if (!mesh) return
 
     const t = state.elapsed * orbitSpeed
@@ -101,7 +99,7 @@ function OrbitingSphere({ orbitSpeed }: OrbitingSphereProps) {
   })
 
   return (
-    <mesh ref={ref}>
+    <mesh ref={sphereRef}>
       <icosahedronGeometry args={[5, 0]} />
       <meshPhongMaterial color="#ffffff" emissive="#7b7b7b" flatShading />
     </mesh>
@@ -109,24 +107,14 @@ function OrbitingSphere({ orbitSpeed }: OrbitingSphereProps) {
 }
 
 export default function Refraction() {
-  const { normalScale, uvTile, orbitSpeed } = useControls('refraction', {
-    Refractor: folder({
-      normalScale: { value: 0.1, min: 0, max: 0.5, step: 0.01 },
-      uvTile: { value: 5, min: 1, max: 20, step: 1 },
-    }),
-    Sphere: folder({
-      orbitSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
-    }),
-  })
-
   return (
     <Canvas renderer camera={{ position: [0, 50, 160], fov: 45, near: 1, far: 500 }}>
-      <OrbitingSphere orbitSpeed={orbitSpeed} />
+      <OrbitingSphere />
       {/* Explicit boundary: suspending up to Canvas's own boundary re-runs createRoot
           on fiber alpha.3 and freezes every TSL `time` graph (see AGENTS.md; found by
           tsl-vfx-flames' pixel-diff sweep — this example shipped frozen). */}
       <Suspense fallback={null}>
-        <RefractorPlane normalScale={normalScale} uvTile={uvTile} />
+        <RefractorPlane />
       </Suspense>
 
       {/* Room: floor, ceiling, back, and two side walls (front stays open to the camera). */}

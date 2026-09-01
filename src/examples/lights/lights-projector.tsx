@@ -42,7 +42,7 @@ import {
   SpotLightHelper,
   VideoTexture,
 } from 'three/webgpu'
-import type { Node, ProjectorLight as ProjectorLightImpl, Texture } from 'three/webgpu'
+import type { ProjectorLight as ProjectorLightImpl, Texture } from 'three/webgpu'
 import { PLYLoader } from 'three/addons/loaders/PLYLoader.js'
 import { Fn, color, mx_worley_noise_float, time } from 'three/tsl'
 
@@ -122,7 +122,7 @@ function ProjectorRig() {
       Fn(([lightCoord]) => {
         // Fn's destructured param types as bare ShaderNodeObject<Node> (AGENTS.md B10
         // cast family) — the light passes its vec3 projected coordinate here.
-        const projectorUV = lightCoord as unknown as Node<'vec3'>
+        const projectorUV = lightCoord
         const waterLayer0 = mx_worley_noise_float(projectorUV.mul(10).add(time)).pow(2)
         return waterLayer0.mul(color('#5abcd8')).mul(2)
       }),

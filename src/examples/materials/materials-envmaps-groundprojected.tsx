@@ -51,7 +51,7 @@ import {
   MeshStandardNodeMaterial,
   MultiplyBlending,
 } from 'three/webgpu'
-import type { Material, Mesh, Node } from 'three/webgpu'
+import type { Material, Mesh } from 'three/webgpu'
 import { cubeTexture } from 'three/tsl'
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js'
 import { getGroundProjectedNormal } from 'three/addons/tsl/utils/GroundedSkybox.js'
@@ -113,16 +113,13 @@ function GroundedEnvironment({
     cubeRT.fromEquirectangularTexture(renderer, equirect)
   }, [cubeRT, renderer, equirect])
 
-  // Casts: fiber's UniformNode<T> pins the TSL node-type param to `unknown`, so it
-  // never structurally narrows to Node<'float'> even though it is one at runtime
-  // (documented fiber typing gap, see rtt / skinning-instancing).
   const colorNode = useMemo(
     () =>
       cubeTexture(
         cubeRT.texture,
         getGroundProjectedNormal(
-          uRadius as unknown as Node<'float'>,
-          uHeight as unknown as Node<'float'>,
+          uRadius,
+          uHeight,
         ),
       ),
     [cubeRT, uRadius, uHeight],

@@ -5,11 +5,11 @@
 // mesh so it inherits the plane's transform, exactly like the original's
 // `plane.add(reflector.target)`.
 import { useMemo } from 'react'
-import { useUniforms } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import { color, reflector, texture, uv } from 'three/tsl'
 import { RepeatWrapping, SRGBColorSpace } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
+import { useUniforms } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 
 const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples'
 const FLOOR_NORMAL_URL = `${ASSET_BASE}/textures/floors/FloorsCheckerboard_S_Normal.jpg`
@@ -18,14 +18,12 @@ const DECAL_NORMAL_URL = `${ASSET_BASE}/textures/decal/decal-normal.jpg`
 
 const PLANE_SIZE = 100.1
 
-interface RoomProps {
-  /** Ground reflector UV-perturbation strength (original hardcodes -0.08). */
-  groundDistortion: number
-  /** Back-wall reflector UV-perturbation strength (original hardcodes 0.1). */
-  wallDistortion: number
-}
+export function Room() {
+  const { groundDistortion, wallDistortion } = useControls('mirror', {
+    groundDistortion: { value: -0.08, min: -0.3, max: 0.3, step: 0.005 },
+    wallDistortion: { value: 0.1, min: 0, max: 0.3, step: 0.005 },
+  })
 
-export function Room({ groundDistortion, wallDistortion }: RoomProps) {
   // B18: creator-mode useUniforms must run BEFORE the suspending useTexture below —
   // deferred past the suspense re-render it becomes a setState-during-render warning.
   const distortion = useUniforms({ ground: groundDistortion, wall: wallDistortion }, 'mirrorRoom')
@@ -41,11 +39,8 @@ export function Room({ groundDistortion, wallDistortion }: RoomProps) {
     floorNormal.wrapT = RepeatWrapping
     decalDiffuse.colorSpace = SRGBColorSpace
 
-    // Cast: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so
-    // typed TSL math rejects it under strict tsc — documented fiber typing gap
-    // (AGENTS.md / UPSTREAM.md; these really are float uniforms at runtime).
-    const uGround = distortion.ground as unknown as Node<'float'>
-    const uWall = distortion.wall as unknown as Node<'float'>
+    const uGround = distortion.ground
+    const uWall = distortion.wall
 
     const groundReflector = reflector()
     const verticalReflector = reflector()

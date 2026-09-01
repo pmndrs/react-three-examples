@@ -29,7 +29,6 @@ import { Suspense, useEffect, useMemo } from 'react'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { color, mix, oscSine, range, time } from 'three/tsl'
 import { Color, InstancedBufferAttribute, Mesh, MeshStandardNodeMaterial, Object3D, PointLight } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
 import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -152,13 +151,7 @@ function PostFX() {
     const blurred = gaussianBlur(sceneColor)
     blurred.directionNode = depth
 
-    // Blend against the uniform node (not the `blur` prop value) — pipeline callbacks
-    // don't re-run on render, so dynamic values must live behind a uniform, and `uBlur`'s
-    // identity is stable across re-renders (create-if-not-exists), so the closure stays live.
-    // Cast: fiber's `UniformNode<T>` pins the TSL node-type parameter to `unknown` (see the
-    // type's own doc comment in @react-three/fiber/webgpu), so it never structurally narrows
-    // to `Node<"float">` for TSL math functions — even though it is one at runtime.
-    renderPipeline.outputNode = mix(sceneColor, blurred, uBlur as unknown as Node<'float'>)
+    renderPipeline.outputNode = mix(sceneColor, blurred, uBlur)
   })
 
   return null

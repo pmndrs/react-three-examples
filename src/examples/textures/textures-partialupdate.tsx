@@ -29,15 +29,20 @@
  *   ground plane to speak of); orbit controls stay on as harmless corpus baseline
  */
 import { Suspense, useMemo, useRef, useState } from 'react'
+import { Color, DataTexture, LinearFilter, MathUtils, NoToneMapping, SRGBColorSpace, Vector2 } from 'three/webgpu'
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { Color, DataTexture, LinearFilter, MathUtils, NoToneMapping, SRGBColorSpace, Vector2 } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/carbon/Carbon.png'
 
-function PartialUpdatePlane({ patchSize, updateInterval }: { patchSize: number; updateInterval: number }) {
+function PartialUpdatePlane() {
+  const { patchSize, updateInterval } = useControls('textures-partialupdate', {
+    patchSize: { value: 32, min: 8, max: 64, step: 8, label: 'patch size (px)' },
+    updateInterval: { value: 0.1, min: 0.02, max: 0.5, step: 0.02, label: 'update interval (s)' },
+  })
+
   const renderer = useThree((state) => state.renderer)
   const diffuseMap = useTexture(DIFFUSE_URL)
 
@@ -95,11 +100,6 @@ function PartialUpdatePlane({ patchSize, updateInterval }: { patchSize: number; 
 }
 
 export default function TexturesPartialUpdate() {
-  const { patchSize, updateInterval } = useControls('textures-partialupdate', {
-    patchSize: { value: 32, min: 8, max: 64, step: 8, label: 'patch size (px)' },
-    updateInterval: { value: 0.1, min: 0.02, max: 0.5, step: 0.02, label: 'update interval (s)' },
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
@@ -109,7 +109,7 @@ export default function TexturesPartialUpdate() {
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>
-        <PartialUpdatePlane patchSize={patchSize} updateInterval={updateInterval} />
+        <PartialUpdatePlane />
       </Suspense>
       <DemoHelpers grid={false} minDistance={1} maxDistance={6} />
     </Canvas>

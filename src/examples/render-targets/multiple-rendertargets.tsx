@@ -30,11 +30,11 @@
  *   fixed `screenUV.x` split
  */
 import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
-import { Canvas, useFrame, useRenderPipeline } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import { mix, mrt, normalWorld, output, screenUV, step, texture, uv, vec2 } from 'three/tsl'
 import { RepeatWrapping, SRGBColorSpace, TorusKnotGeometry } from 'three/webgpu'
 import type { Mesh } from 'three/webgpu'
+import { Canvas, useFrame, useRenderPipeline } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/hardwood2_diffuse.jpg'

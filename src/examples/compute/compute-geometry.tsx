@@ -43,7 +43,6 @@
  *   flagged for someone with WebGPU backend-source access to confirm the actual
  *   mechanism before promoting this into a general AGENTS.md rule
  *
-
  * DIVERGENCE from original
  * - The original defines its compute graph as a standalone `jelly = Fn(({ renderer,
  *   geometry, object }) => ...)`, called as `jelly()` with NO arguments — TSL defers
@@ -62,19 +61,6 @@
  *   drag guard here — the original paints on every raycast hit regardless of mouse
  *   button state, so dragging to orbit the camera also deforms the jelly, which is
  *   part of the original's interactive feel and is kept verbatim
- * - `renderer.inspector.createParameters` panel becomes leva (elasticity/damping/
- *   brush size/brush strength, same ranges and defaults)
- * - `scene.backgroundNode` cast: `@types/three`'s `Scene` doesn't declare it even
- *   though the renderer reads it directly off the live instance (B11 family, same
- *   pattern as `backdrop-area`'s `SceneBackground`) — the purple radial-vignette
- *   gradient is ported verbatim
- * - `useUniforms` is called BEFORE the suspending `useGLTF` (ordering rule, AGENTS.md
- *   B18 — `compute-cloth` precedent); the compute/material graph itself is built in a
- *   plain `useMemo`, not `useNodes` — it closes over the SUSPENDED mesh/geometry, and
- *   nothing in it needs the fiber store (same rationale as `skinning-points`)
- * - `renderer={{ toneMapping: NoToneMapping }}` explicit — the original renders with
- *   the WebGPURenderer default; fiber's ACESFilmic default would mute the flat-shaded
- *   normal-material head against the saturated gradient background
  * - Manifest `"static": true`: the jelly kernel settles to a true equilibrium
  *   (distance -> 0 -> force -> 0 -> speed decays to 0) within a couple of frames once
  *   `computeInit` seeds it and no pointer is painting — an automated headless cursor
@@ -83,8 +69,6 @@
  *   (verified: `__frameCount` advances, no dual-root warnings) — it is idle, not frozen
  */
 import { Suspense, useMemo } from 'react'
-import { useControls } from 'leva'
-import { Canvas, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
 import { Fn, If, attribute, color, instanceIndex, objectWorldMatrix, screenUV, storage, uniform } from 'three/tsl'
 import {
   MeshNormalNodeMaterial,
@@ -95,7 +79,9 @@ import {
   type Mesh,
   type Node,
 } from 'three/webgpu'
+import { Canvas, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
 import { useGLTF } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const ASSETS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples'
@@ -119,28 +105,22 @@ function SceneBackground() {
   return null
 }
 
-interface JellyHeadProps {
-  elasticity: number
-  damping: number
-  brushSize: number
-  brushStrength: number
-}
-
-function JellyHead({ elasticity, damping, brushSize, brushStrength }: JellyHeadProps) {
+function JellyHead() {
   const renderer = useThree((s) => s.renderer)
 
-  // Leva-driven uniforms — called BEFORE the suspending useGLTF below (ordering rule,
-  // AGENTS.md B18; compute-cloth precedent). WGSL-identifier rule: camelCase scope.
+  //* Controls =====================================================
+  const { elasticity, damping, brushSize, brushStrength } = useControls('compute-geometry', {
+    elasticity: { value: 0.4, min: 0, max: 0.5, step: 0.01 },
+    damping: { value: 0.94, min: 0.9, max: 0.98, step: 0.01 },
+    brushSize: { value: 0.25, min: 0.1, max: 0.5, step: 0.01, label: 'brush size' },
+    brushStrength: { value: 0.22, min: 0.1, max: 0.3, step: 0.01, label: 'brush strength' },
+  })
+  // Called BEFORE the suspending useGLTF below (ordering rule, AGENTS.md B18;
+  // compute-cloth precedent). WGSL-identifier rule: camelCase scope.
   const { uElasticity, uDamping, uBrushSize, uBrushStrength } = useUniforms(
     { uElasticity: elasticity, uDamping: damping, uBrushSize: brushSize, uBrushStrength: brushStrength },
     'computeGeometry',
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see compute-particles et al.).
-  const uElasticityNode = uElasticity as unknown as Node<'float'>
-  const uDampingNode = uDamping as unknown as Node<'float'>
-  const uBrushSizeNode = uBrushSize as unknown as Node<'float'>
-  const uBrushStrengthNode = uBrushStrength as unknown as Node<'float'>
 
   const { scene } = useGLTF(MODEL_URL)
   const mesh = useMemo(() => scene.children[0] as Mesh, [scene])
@@ -181,17 +161,17 @@ function JellyHead({ elasticity, damping, brushSize, brushStrength }: JellyHeadP
         const worldPosition = objectWorldMatrix(mesh).mul(currentPosition)
         const dist = worldPosition.distance(uPointer.xyz)
         const direction = uPointer.xyz.sub(worldPosition).normalize()
-        const power = uBrushSizeNode.sub(dist).max(0).mul(uBrushStrengthNode)
+        const power = uBrushSize.sub(dist).max(0).mul(uBrushStrength)
 
         currentPosition.addAssign(direction.mul(power))
       })
 
       // jelly: spring the current position back toward the rest shape
       const distance = basePosition.distance(currentPosition)
-      const force = uElasticityNode.mul(distance).mul(basePosition.sub(currentPosition))
+      const force = uElasticity.mul(distance).mul(basePosition.sub(currentPosition))
 
       currentSpeed.addAssign(force)
-      currentSpeed.mulAssign(uDampingNode)
+      currentSpeed.mulAssign(uDamping)
       currentPosition.addAssign(currentSpeed)
     })().compute(count)
 
@@ -209,7 +189,7 @@ function JellyHead({ elasticity, damping, brushSize, brushStrength }: JellyHeadP
     renderer.compute(computeInit)
 
     return { material, uPointer }
-  }, [mesh, renderer, uElasticityNode, uDampingNode, uBrushSizeNode, uBrushStrengthNode])
+  }, [mesh, renderer, uElasticity, uDamping, uBrushSize, uBrushStrength])
 
   const onPointerMove = (event: ThreeEvent<PointerEvent>) => {
     uPointer.value.set(event.point.x, event.point.y, event.point.z, 1)
@@ -226,17 +206,11 @@ function JellyHead({ elasticity, damping, brushSize, brushStrength }: JellyHeadP
 }
 
 export default function ComputeGeometry() {
-  const { elasticity, damping, brushSize, brushStrength } = useControls('compute-geometry', {
-    elasticity: { value: 0.4, min: 0, max: 0.5, step: 0.01 },
-    damping: { value: 0.94, min: 0.9, max: 0.98, step: 0.01 },
-    brushSize: { value: 0.25, min: 0.1, max: 0.5, step: 0.01, label: 'brush size' },
-    brushStrength: { value: 0.22, min: 0.1, max: 0.3, step: 0.01, label: 'brush strength' },
-  })
-
   return (
     <Canvas
-      // Original renders with the WebGPURenderer default (no tone mapping) — explicit
-      // here because fiber's Canvas defaults to ACESFilmic (see header DIVERGENCE).
+      // Original renders with the WebGPURenderer default (no tone mapping) — fiber's
+      // Canvas defaults to ACESFilmic, which would mute the flat-shaded normal-material
+      // head against the saturated gradient background.
       renderer={{ toneMapping: NoToneMapping }}
       camera={{ position: [0, 0, 1], fov: 50, near: 0.1, far: 10 }}
     >
@@ -244,7 +218,7 @@ export default function ComputeGeometry() {
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes every time-driven graph (AGENTS.md; corpus-wide repair). */}
       <Suspense fallback={null}>
-        <JellyHead elasticity={elasticity} damping={damping} brushSize={brushSize} brushStrength={brushStrength} />
+        <JellyHead />
       </Suspense>
       <DemoHelpers grid={false} minDistance={0.7} maxDistance={2} />
     </Canvas>

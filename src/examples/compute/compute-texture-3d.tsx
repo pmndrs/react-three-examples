@@ -34,16 +34,8 @@
  * - The sky dome (1x32 canvas-gradient `BackSide` sphere) and `NodeMaterial` box-volume
  *   shading are ported verbatim from `volume-cloud` (same technique, not re-derived) —
  *   duplicated rather than shared, per this corpus's one-file-per-example convention
- * - `renderer.inspector.createParameters` panel becomes leva (threshold/opacity/range/
- *   steps, same ranges and defaults, plus `animationSpeed`)
- * - `renderer={{ toneMapping: NoToneMapping }}` explicit — the original renders with
- *   the WebGPURenderer default; fiber's ACESFilmic default would mute the unlit
- *   additive cloud shading (same rationale as `volume-cloud`)
- * - OrbitControls (unrestricted in the original) -> DemoHelpers CameraControls, grid off
  */
 import { useMemo, useState } from 'react'
-import { useControls } from 'leva'
-import { Canvas, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import {
   Break,
   Fn,
@@ -58,36 +50,31 @@ import {
   vec4,
 } from 'three/tsl'
 import { BackSide, CanvasTexture, NoToneMapping, SRGBColorSpace, Storage3DTexture } from 'three/webgpu'
-import type { Node, StorageTexture } from 'three/webgpu'
+import type { StorageTexture } from 'three/webgpu'
 import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js'
+import { Canvas, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 // Per-axis voxel resolution — 200^3 = 8M compute invocations/frame, matching the
 // original exactly (a single cheap noise-write pass; real GPUs handle this at 60fps).
 const GRID_SIZE = 200
 
-interface CloudVolumeProps {
-  threshold: number
-  opacity: number
-  range: number
-  steps: number
-  animationSpeed: number
-}
-
-function CloudVolume({ threshold, opacity, range, steps, animationSpeed }: CloudVolumeProps) {
+function CloudVolume() {
   const renderer = useThree((s) => s.renderer)
 
+  //* Controls =====================================================
+  const { threshold, opacity, range, steps, animationSpeed } = useControls('compute-texture-3d', {
+    threshold: { value: 0.08, min: 0, max: 1, step: 0.01 },
+    opacity: { value: 0.08, min: 0, max: 1, step: 0.01 },
+    range: { value: 0.1, min: 0, max: 1, step: 0.01 },
+    steps: { value: 100, min: 0, max: 200, step: 1 },
+    animationSpeed: { value: 1, min: 0, max: 3, step: 0.05, label: 'animation speed' },
+  })
   const { uThreshold, uOpacity, uRange, uSteps, uAnimSpeed } = useUniforms(
     { uThreshold: threshold, uOpacity: opacity, uRange: range, uSteps: steps, uAnimSpeed: animationSpeed },
     'computeTexture3d', // WGSL-identifier rule: camelCase scope, never kebab-case
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see volume-cloud et al.).
-  const uThresholdNode = uThreshold as unknown as Node<'float'>
-  const uOpacityNode = uOpacity as unknown as Node<'float'>
-  const uRangeNode = uRange as unknown as Node<'float'>
-  const uStepsNode = uSteps as unknown as Node<'float'>
-  const uAnimSpeedNode = uAnimSpeed as unknown as Node<'float'>
 
   // Cast at the boundary: fiber's `StorageLike` union misses `Storage3DTexture`
   // even though the compute docs show one being stored (fiber typing gap — the
@@ -123,7 +110,7 @@ function CloudVolume({ threshold, opacity, range, steps, animationSpeed }: Cloud
       const centered = coord3d.sub(GRID_SIZE / 2).div(GRID_SIZE)
       const d = centered.length().oneMinus()
 
-      const noiseCoord = coord3d.mul(scale / 1.5).add(time.mul(uAnimSpeedNode))
+      const noiseCoord = coord3d.mul(scale / 1.5).add(time.mul(uAnimSpeed))
       const noise = mx_noise_vec3(noiseCoord).toConst('noise')
       const data = noise.mul(d).mul(d).toConst('data')
 
@@ -135,12 +122,10 @@ function CloudVolume({ threshold, opacity, range, steps, animationSpeed }: Cloud
     const raymarchCloud = Fn(() => {
       const finalColor = vec4(0).toVar()
 
-      RaymarchingBox(uStepsNode, ({ positionRay }) => {
+      RaymarchingBox(uSteps, ({ positionRay }) => {
         const mapValue = map.sample(positionRay.add(0.5)).r.toVar()
 
-        mapValue.assign(
-          smoothstep(uThresholdNode.sub(uRangeNode), uThresholdNode.add(uRangeNode), mapValue).mul(uOpacityNode),
-        )
+        mapValue.assign(smoothstep(uThreshold.sub(uRange), uThreshold.add(uRange), mapValue).mul(uOpacity))
 
         const shading = map.sample(positionRay.add(vec3(-0.01))).r.sub(map.sample(positionRay.add(vec3(0.01))).r)
         const col = shading.mul(4.0).add(positionRay.x.add(positionRay.y).mul(0.5)).add(0.3)
@@ -208,23 +193,16 @@ function Sky() {
 }
 
 export default function ComputeTexture3D() {
-  const { threshold, opacity, range, steps, animationSpeed } = useControls('compute-texture-3d', {
-    threshold: { value: 0.08, min: 0, max: 1, step: 0.01 },
-    opacity: { value: 0.08, min: 0, max: 1, step: 0.01 },
-    range: { value: 0.1, min: 0, max: 1, step: 0.01 },
-    steps: { value: 100, min: 0, max: 200, step: 1 },
-    animationSpeed: { value: 1, min: 0, max: 3, step: 0.05, label: 'animation speed' },
-  })
-
   return (
     <Canvas
-      // Original renders with the WebGPURenderer default (no tone mapping) — explicit
-      // here because fiber's Canvas defaults to ACESFilmic (see header DIVERGENCE).
+      // Original renders with the WebGPURenderer default (no tone mapping) — fiber's
+      // Canvas defaults to ACESFilmic, which would mute the unlit additive cloud
+      // shading (same rationale as volume-cloud).
       renderer={{ toneMapping: NoToneMapping }}
       camera={{ position: [0, 1, 1.5], fov: 60, near: 0.1, far: 100 }}
     >
       <Sky />
-      <CloudVolume threshold={threshold} opacity={opacity} range={range} steps={steps} animationSpeed={animationSpeed} />
+      <CloudVolume />
       <DemoHelpers grid={false} />
     </Canvas>
   )

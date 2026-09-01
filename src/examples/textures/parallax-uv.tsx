@@ -20,23 +20,17 @@
  *   original's exact tone-mapping response, set as Canvas-level renderer parameters
  *
  * DIVERGENCE from original
- * - The original's `renderer.inspector.createParameters` panel becomes leva controls
- *   (`backgroundBlurriness`, `parallaxScale`, `uvScale`) — same three parameters,
- *   same ranges and defaults
  * - DemoHelpers grid disabled (`grid={false}`) — the world-origin grid would sit
  *   directly on the ice disc at y=0 and shimmer/z-fight across the whole subject
- * - OrbitControls auto-rotate (speed -1) becomes CameraControls' `autoRotate` via
- *   DemoHelpers, with the original's 10/40 dolly limits
  * - Texture wrap/colorSpace setup happens in `useLayoutEffect` (must land before the
  *   first shader-graph build reads the textures), not awaited loader calls
  */
-import { Suspense, useLayoutEffect, useMemo } from 'react'
-import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
-import { Environment, useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { Suspense, useLayoutEffect } from 'react'
 import { blendOverlay, normalMap, parallaxUV, texture, uv } from 'three/tsl'
 import { NoColorSpace, ReinhardToneMapping, RepeatWrapping, SRGBColorSpace } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
+import { Canvas, useLocalNodes, useUniforms } from '@react-three/fiber/webgpu'
+import { Environment, useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures'
@@ -47,12 +41,13 @@ const NORMAL_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_NormalGL.jpg`
 const DISPLACE_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_Displacement.jpg`
 const BOTTOM_URL = `${TEXTURE_BASE}/ambientcg/Ice003_1K-JPG_Color.jpg`
 
-interface IceGroundProps {
-  parallaxScale: number
-  uvScale: number
-}
+function IceGround() {
+  //* Controls =====================================================
+  const { parallaxScale, uvScale } = useControls('parallax-uv', {
+    parallaxScale: { value: 0.5, min: 0.2, max: 0.5, step: 0.01 },
+    uvScale: { value: 3, min: 1, max: 5, step: 0.1 },
+  })
 
-function IceGround({ parallaxScale, uvScale }: IceGroundProps) {
   // Creator hook BEFORE the suspending hook (AGENTS.md / UPSTREAM B18): deferred to
   // the post-suspense re-render, useUniforms' store write would land after siblings
   // have subscribed and trip React's setState-during-render warning.
@@ -85,19 +80,14 @@ function IceGround({ parallaxScale, uvScale }: IceGroundProps) {
     textures.displace.colorSpace = NoColorSpace
   }, [textures])
 
-  // Casts: fiber's `UniformNode<T>` pins the TSL type param to `unknown` (documented
-  // upstream typing gap — see AGENTS.md / UPSTREAM B10 family).
-  const uParallaxScaleNode = uParallaxScale as unknown as Node<'float'>
-  const uUvScaleNode = uUvScale as unknown as Node<'float'>
-
-  // Built once per texture/uniform identity — uniform values mutate in place via
-  // `.value`, so leva edits reach the shader without a graph rebuild.
-  const nodes = useMemo(() => {
-    const scaledUV = uv().mul(uUvScaleNode)
+  // Create-once — uniform values mutate in place via `.value`, so leva edits reach
+  // the shader without a graph rebuild.
+  const nodes = useLocalNodes(() => {
+    const scaledUV = uv().mul(uUvScale)
 
     // Displacement sample drives how far the bottom layer's UVs slide along the
     // view direction — the whole "depth" of the ice is this one offset.
-    const offsetUV = texture(textures.displace, scaledUV).mul(uParallaxScaleNode)
+    const offsetUV = texture(textures.displace, scaledUV).mul(uParallaxScale)
     const parallaxUVOffset = parallaxUV(scaledUV, offsetUV)
     const parallaxResult = texture(textures.bottom, parallaxUVOffset)
 
@@ -108,7 +98,7 @@ function IceGround({ parallaxScale, uvScale }: IceGroundProps) {
       roughnessNode: texture(textures.roughness, scaledUV),
       normalNode: normalMap(texture(textures.normal, scaledUV)),
     }
-  }, [textures, uParallaxScaleNode, uUvScaleNode])
+  })
 
   return (
     <mesh rotation-x={-Math.PI / 2}>
@@ -124,10 +114,8 @@ function IceGround({ parallaxScale, uvScale }: IceGroundProps) {
 }
 
 export default function ParallaxUv() {
-  const { backgroundBlurriness, parallaxScale, uvScale } = useControls('parallax-uv', {
+  const { backgroundBlurriness } = useControls('parallax-uv', {
     backgroundBlurriness: { value: 0.4, min: 0, max: 1, step: 0.01 },
-    parallaxScale: { value: 0.5, min: 0.2, max: 0.5, step: 0.01 },
-    uvScale: { value: 3, min: 1, max: 5, step: 0.1 },
   })
 
   return (
@@ -140,7 +128,7 @@ export default function ParallaxUv() {
           creator-hook component renders before the suspending Environment sibling
           (B18 escalation, compute-particles-rain pattern). */}
       <Suspense fallback={null}>
-        <IceGround parallaxScale={parallaxScale} uvScale={uvScale} />
+        <IceGround />
         <Environment files={HDR_URL} background backgroundBlurriness={backgroundBlurriness} />
       </Suspense>
       <DemoHelpers

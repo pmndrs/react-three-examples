@@ -3,8 +3,9 @@
 // declarative; the original's imperative `rotateX(a); rotateZ(b)` chain maps to
 // `rotation={[a, 0, b]}` (Euler XYZ = intrinsic X-then-Z when Y is 0).
 import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber/webgpu'
 import type { Group, Mesh } from 'three/webgpu'
+import { useFrame } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 
 const DEG = Math.PI / 180
 
@@ -13,12 +14,10 @@ const CAP_RADIUS = 15 * Math.cos(30 * DEG)
 const CAP_Y = -15 * Math.sin(30 * DEG) - 0.05
 const HALF_SPHERE_Y = 7.5 + 15 * Math.sin(30 * DEG)
 
-interface SpheresProps {
-  /** Animation speed multiplier (1 = original's 60 fps motion). */
-  speed: number
-}
-
-export function Spheres({ speed }: SpheresProps) {
+export function Spheres() {
+  const { speed } = useControls('mirror', {
+    speed: { value: 1, min: 0, max: 3, step: 0.05 },
+  })
   const sphereGroupRef = useRef<Group>(null)
   const smallSphereRef = useRef<Mesh>(null)
   // Delta-accumulated clock so the leva speed control scales (and can pause) the

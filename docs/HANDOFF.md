@@ -1,5 +1,90 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–2)
 
+## Restyle wave 4 — COMPLETE: 131/131 restyled (2026-09-02)
+
+compute 9, tsl 7, loaders 5, textures 5, render-targets 6, reflections 6, volume 5.
+**Every example in the corpus is now restyled against AGENTS.md v1.1.**
+
+Verified: tsc 0, **lint 0 errors AND 0 warnings**, build clean, smoke 130/131 (sole
+failure `tsl-wood` = B28 at its measured rate), animates 130 passed + 1 skipped.
+
+### Both lint ratchets are now ERROR
+
+- `corpus/no-retired-patterns` — 36 sites swept, promoted 2026-09-02.
+- `corpus/import-hierarchy` — 137 sites swept, promoted 2026-09-02.
+
+Three mechanical corpus rules are now enforced rather than reviewed: header block,
+import hierarchy, retired patterns.
+
+### The `as unknown as Node<'float'>` sweep: 87 -> 23
+
+All 87 were justified by a comment claiming *"fiber's `UniformNode<T>` pins the TSL
+node-type param to `unknown`"*. **The claim was false.** Four agents disproved it
+independently — via the fiber type chain (`UniformNodeFor<V>` -> `UniformNode<'float',
+number>` -> structurally satisfies `Node<'float'>`), via the runtime source
+(`createUniform()` calls TSL's own `uniform()`), and empirically.
+
+Method: strip all 87 -> `tsc` -> 28 errors in 5 files -> restore exactly those, clean the
+orphaned imports from the rest. **Per-site, compiler-adjudicated, not pattern-matched.**
+
+The 23 survivors are a DIFFERENT family and are correct: struct `.get()` returning bare
+`Node`, custom node classes, `cubeTexture()`, one `select()` wanting `bool` — the B10/B11
+gaps. Files: `compute-water/Water.tsx`, `compute-particles-rain/Rain.tsx`,
+`skinning-points`, `geometry/instance-uniform.tsx`, `tsl-vfx-tornado/Tornado.tsx`.
+
+**A wrong comment is more contagious than wrong code.** Third instance this session, after
+"no declarative form exists for a camera-attached light" (3 files) and B16 citations
+justifying unscoped stores. Agents treat a confident comment as evidence. After the casts
+were removed, 12 files still carried the orphaned comment — those were deleted too, or the
+next agent would have re-added the casts from them.
+
+### Doc corrections this wave
+
+- **UPSTREAM.md B9/B12/B16/B17 now marked `~~FIXED in fiber alpha.4~~`** with "do NOT cite
+  in new code". They read as OPEN, which is why example comments kept citing B16 to
+  justify going unscoped.
+- **Rule 8**: order is enforced, blank line between tiers is OPTIONAL — the hand-tuned
+  corpus does both (`lights-phong` separates; `materials-basic`/`tsl-earth` don't), and two
+  agents flip-flopped on it.
+- **`useLocalNodes` is exempt from the B18 hazard** — pure `useMemo` wrapper, no
+  `store.setState`, unlike `useUniforms`/`useNodes`.
+- **`mrtNode` needs no cast** — the doc already said so; the CODE was stale. First
+  finding this session where the doc was right and the code wasn't.
+- **`docs/style-drafts/lights-phong-alt.tsx` banner-marked NOT CANONICAL.** I parked that
+  broken sketch there earlier this session and an agent modelled `useLocalNodes` on it —
+  it doesn't typecheck. My mess, now labelled.
+
+### Process finding
+
+The `compute` batch agent spawned 6 subagents and returned before they finished, so its
+report was empty and concurrency jumped to 8 against one dev server. Brief v2 now says:
+do the work yourself, no subagents, work sequentially.
+
+### Follow-ups (not done, deliberately)
+
+1. `tsl-vfx-flames/Flames.tsx` and `tsl-vfx-tornado/Tornado.tsx` still build materials via
+   `new SpriteNodeMaterial()` + post-construction `.colorNode =` in a `useMemo` — the
+   rule-3 pattern that WAS fixed in `Terrain.tsx`. Tornado has 3 materials across 2 meshes
+   sharing helper `Fn`s; left as a scoped follow-up rather than rushed.
+2. `volume-caustics` calls `useUniforms` AFTER suspending loaders (reverse of B18-safe
+   order). Works today; flagged for a dedicated B18 audit.
+3. `backdrop-area`'s 4-material runtime switcher — a third material pattern the doc
+   doesn't name. Marked `REVIEW(shared-instance)`.
+4. **prettier fails repo-wide** including on hand-tuned files; `pnpm lint` is eslint-only.
+   Adopting it is a repo-wide diff — Dennis's call.
+
+### Note on hand-tuned files
+
+To reach zero lint warnings I reordered imports in 3 hand-tuned files
+(`tsl-raging-sea/{tsl-raging-sea,seaNodes}`, `volume-fire/fluidKernels.ts`) plus
+`loader-gltf-compressed`. **Import ORDER only — no semantic change.**
+
+### Remaining work
+
+- **85 examples still to PORT** (Phase 1 webgpu). The restyle backlog is zero.
+- Stream C (sidebar grouping + working search) and Stream D (upstream fixes) still parked.
+
+
 ## Restyle wave 3 + corpus sweep — materials, scene, shadows (2026-09-02)
 
 33 more examples. **79 of 131 restyled; 52 left** (compute 11, tsl 10, loaders 7,

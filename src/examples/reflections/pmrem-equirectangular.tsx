@@ -31,13 +31,13 @@
  * - Tone mapping is NOT a divergence: the original sets ACESFilmic explicitly; set
  *   deliberately here via `renderer={{ toneMapping }}` (tone-mapping parity rule)
  */
-import { Suspense, useEffect, useLayoutEffect, useMemo } from 'react'
-import { Canvas, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Suspense, useLayoutEffect } from 'react'
 import { ACESFilmicToneMapping, EquirectangularReflectionMapping, SphereGeometry } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
-import { normalWorldGeometry, pmremTexture, uniform } from 'three/tsl'
+import { normalWorldGeometry, pmremTexture } from 'three/tsl'
 import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js'
+import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const HDR_URL =
@@ -60,12 +60,19 @@ const SPHERES = Array.from({ length: 6 }, (_, i) =>
 
 // Loads the UltraHDR equirect, wires it as a PMREM-sampled `scene.backgroundNode`,
 // and lays out the roughness/metalness sphere grid — see header DEMONSTRATES.
-function PmremScene({ backgroundRoughness }: { backgroundRoughness: number }) {
+function PmremScene() {
+  const { backgroundRoughness } = useControls('pmrem-equirectangular', {
+    backgroundRoughness: { value: 0.5, min: 0, max: 1, step: 0.01 },
+  })
   const scene = useThree((s) => s.scene)
-  const map = useLoader(UltraHDRLoader, HDR_URL)
 
-  // Live level node for the background PMREM lookup — mutated below, never rebuilt.
-  const uBackgroundRoughness = useMemo(() => uniform(0.5), [])
+  // Live level node for the background PMREM lookup — the leva value flows straight
+  // into the uniform, never rebuilding the graph. B18: this creator-mode hook must run
+  // BEFORE the suspending useLoader below, or the deferred re-render becomes a
+  // setState-during-render warning (same ordering rule as mirror's Room.tsx).
+  const { uBackgroundRoughness } = useUniforms({ uBackgroundRoughness: backgroundRoughness })
+
+  const map = useLoader(UltraHDRLoader, HDR_URL)
 
   // Layout effect: `.mapping` is read at shader-graph build time (first RAF render)
   // by both the backgroundNode and every sphere's envMap — it must land before that
@@ -81,10 +88,6 @@ function PmremScene({ backgroundRoughness }: { backgroundRoughness: number }) {
     }
   }, [scene, map, uBackgroundRoughness])
 
-  useEffect(() => {
-    uBackgroundRoughness.value = backgroundRoughness
-  }, [uBackgroundRoughness, backgroundRoughness])
-
   return (
     <>
       {SPHERES.map(({ key, position, roughness, metalness }) => (
@@ -97,10 +100,6 @@ function PmremScene({ backgroundRoughness }: { backgroundRoughness: number }) {
 }
 
 export default function PmremEquirectangular() {
-  const { backgroundRoughness } = useControls('pmrem-equirectangular', {
-    backgroundRoughness: { value: 0.5, min: 0, max: 1, step: 0.01 },
-  })
-
   return (
     <Canvas
       // Original sets ACESFilmic explicitly — mirrored deliberately (parity rule).
@@ -110,7 +109,7 @@ export default function PmremEquirectangular() {
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>
-        <PmremScene backgroundRoughness={backgroundRoughness} />
+        <PmremScene />
       </Suspense>
       <DemoHelpers grid={false} minDistance={2} maxDistance={10} />
     </Canvas>

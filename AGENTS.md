@@ -227,7 +227,10 @@ noise, not a scanning aid. A file with two short components doesn't need any.
 
 ## 8. Import hierarchy
 
-Broadest/most fundamental first, local last, blank line between tiers:
+Broadest/most fundamental first, local last. **Order is what matters and is what
+`corpus/import-hierarchy` enforces**; a blank line between tiers is optional — the
+hand-tuned corpus does both (`lights-phong` separates, `materials-basic`/`tsl-earth`
+run one block). Don't churn a file just to add or remove them.
 
 ```
 react
@@ -304,7 +307,9 @@ admits callback refs, which have no `.current` to read.
 ## TSL and the store hooks
 
 - All creator hooks are create-if-not-exists and StrictMode-safe; calling twice shares
-  the instance.
+  the instance. **`useLocalNodes` is the exception in one useful way**: it is a pure
+  `useMemo` wrapper with no `store.setState`, so unlike `useUniforms`/`useNodes` it is
+  safe to call after a suspending sibling — the B18 hazard does not apply to it.
 - **Scoped stores are safe** (alpha.4 sanitises names into valid WGSL identifiers).
   `useNodes(creator, 'scope')` to create, `useNodes('scope')` to read back elsewhere —
   that read-back is the idiomatic alternative to prop-drilling nodes. Skip the scope
@@ -344,6 +349,21 @@ admits callback refs, which have no `.current` to read.
   `uint()` where an index is needed.
 - Typed-TSL creators don't infer: `instancedBufferAttribute<T>(…)`,
   `uniformArray<'vec3'>(…)`.
+- **`useUniforms` output does NOT need `as unknown as Node<'float'>`.** fiber's
+  `MappedUniforms<T>`/`UniformNodeFor<V>` infer a concrete node type per input
+  (`number` -> `UniformNode<'float', number>`, a hex string -> `UniformNode<'color', Color>`),
+  and `UniformNode<'float', number>` structurally satisfies `Node<'float'>` — chaining
+  `.mul()`/`.mix()`/`Fn()` args works uncast. A comment claiming *"`UniformNode<T>` pins
+  its TSL type param to `unknown`"* propagated this cast to **87 sites**; it was false,
+  and 64 of them were swept 2026-09-02. **Try removing the cast first.**
+  After the sweep, the 23 surviving `as unknown as Node<…>` casts are a DIFFERENT family
+  and are correct: struct member access (`duckElement.get('position')` types as bare
+  `Node`), custom node classes (`new InstanceUniformNode()`), `cubeTexture()`, and one
+  `select()` wanting `bool` — i.e. the B10/B11 gaps, not the uniform gap. They live in
+  `compute-water/Water.tsx`, `compute-particles-rain/Rain.tsx`, `skinning-points`,
+  `geometry/instance-uniform.tsx`, `tsl-vfx-tornado/Tornado.tsx`.
+  Related: a `color`-typed uniform will not unify as a `vec3()` ARGUMENT. Dropping the
+  `vec3()` wrapper beats casting — a color node already behaves like a vec3 downstream.
 - `.assign()` is typed `Node | number` — a raw JS boolean fails; use `bool(true)`.
 - **Never type anything as `ReturnType<typeof uniform>`** — `uniform` is overloaded
   and `ReturnType` resolves only the last overload, discarding what your call

@@ -2,10 +2,10 @@
 // gaussian soft-focus, a vignette, and a separate object pass of the teapot
 // tree-topper blurred and boosted into a glow — the original's RenderPipeline
 // composition, rebuilt in fiber's useRenderPipeline.
-import { useRenderPipeline } from '@react-three/fiber/webgpu'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { pass, screenUV, vec2 } from 'three/tsl'
 import type { Mesh } from 'three/webgpu'
+import { useRenderPipeline } from '@react-three/fiber/webgpu'
 
 export interface SnowPostFXProps {
   /** The glowing teapot mesh — rendered a second time as its own pass. */
@@ -14,8 +14,6 @@ export interface SnowPostFXProps {
 
 export function SnowPostFX({ teapot }: SnowPostFXProps) {
   useRenderPipeline(({ renderPipeline, passes, camera }) => {
-    if (!renderPipeline) return
-
     const scenePassColor = passes.scenePass.getTextureNode()
     const vignette = screenUV.distance(0.5).mul(1.35).clamp().oneMinus()
 

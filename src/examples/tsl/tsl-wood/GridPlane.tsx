@@ -3,8 +3,9 @@
 // screen-space-derivative antialiasing and a radial fade to nothing.
 // Straight port of the original's `createGridPlane()` TSL graph; the Fn
 // parameters are folded into build-time constants (see header DIVERGENCE).
-import { useMemo } from 'react'
 import { abs, float, fract, fwidth, length, max, mix, positionWorld, smoothstep, vec4 } from 'three/tsl'
+
+import { useNodes } from '@react-three/fiber/webgpu'
 
 const GRID_SIZE = 1.0
 const DOT_WIDTH = 0.03
@@ -13,7 +14,7 @@ const FADE_RADIUS = 30.0
 const FADE_FALLOFF = 20.0
 
 export function GridPlane() {
-  const colorNode = useMemo(() => {
+  const { colorNode } = useNodes(() => {
     const coord = positionWorld.xz.div(GRID_SIZE)
     const grid = fract(coord)
 
@@ -38,8 +39,8 @@ export function GridPlane() {
     // (.mix is also missing from @types' fluent surface).
     const baseColor = vec4(1.0, 1.0, 1.0, 0.0)
     const gridColor = vec4(0.5, 0.5, 0.5, 1.0)
-    return mix(baseColor, gridColor, gridPattern).mul(radialGradient)
-  }, [])
+    return { colorNode: mix(baseColor, gridColor, gridPattern).mul(radialGradient) }
+  })
 
   return (
     <mesh rotation-x={-Math.PI / 2} renderOrder={-1}>

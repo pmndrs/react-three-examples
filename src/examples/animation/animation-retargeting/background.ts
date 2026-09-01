@@ -22,14 +22,13 @@ import {
   vec2,
   vec3,
 } from 'three/tsl'
-import type { Node } from 'three/webgpu'
 
 // forked from https://www.shadertoy.com/view/7ly3D1
 // Cast: the Fn's destructured param comes back as bare `ShaderNodeObject<Node>` (no
 // vec2 type parameter) — same class of gap as tsl-halftone's `halftoneLayer` params
 // (AGENTS.md Fn-param cast, B10).
 const lightSpeed = /*#__PURE__*/ Fn(([suvIn]) => {
-  const suv = vec2(suvIn as unknown as Node<'vec2'>)
+  const suv = vec2(suvIn)
   const uv = vec2(length(suv), atan(suv.y, suv.x))
   const offset = float(
     float(0.1)

@@ -34,20 +34,13 @@
  *   ACESFilmic and mute the emissive Phong palette (AGENTS.md v0.9 rule)
  */
 import { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { NoToneMapping } from 'three/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { Room } from './Room'
 import { Spheres } from './Spheres'
 
 export default function Mirror() {
-  const { groundDistortion, wallDistortion, speed } = useControls('mirror', {
-    groundDistortion: { value: -0.08, min: -0.3, max: 0.3, step: 0.005 },
-    wallDistortion: { value: 0.1, min: 0, max: 0.3, step: 0.005 },
-    speed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
-
   return (
     <Canvas
       // Original runs the WebGPURenderer default (NoToneMapping) — deliberate, see header.
@@ -64,9 +57,9 @@ export default function Mirror() {
 
       {/* B17 gate: the Room suspends on its three hotlinked textures. */}
       <Suspense fallback={null}>
-        <Room groundDistortion={groundDistortion} wallDistortion={wallDistortion} />
+        <Room />
       </Suspense>
-      <Spheres speed={speed} />
+      <Spheres />
 
       <DemoHelpers grid={false} target={[0, 40, 0]} minDistance={10} maxDistance={400} />
     </Canvas>

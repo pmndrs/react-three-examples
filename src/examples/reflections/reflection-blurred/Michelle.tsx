@@ -1,8 +1,8 @@
 // The animated dancer reflected in the floor: Michelle.glb playing its single clip.
 // See reflection-blurred.tsx header DEMONSTRATES / DIVERGENCE.
 import { useEffect } from 'react'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import type { Mesh } from 'three/webgpu'
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 
 const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
 

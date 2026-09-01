@@ -33,7 +33,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { checker, convertToTexture, uv } from 'three/tsl'
-import type { Node } from 'three/webgpu'
 
 import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
 import { button, useControls } from 'leva'
@@ -58,10 +57,7 @@ function ProceduralPlane() {
   const proceduralToTexture = useMemo(
     () =>
       convertToTexture(
-        // Cast: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so it
-        // never structurally narrows to `Node<'float'>` even though it is one at runtime
-        // (documented fiber typing gap, see rtt.tsx/shadow-contact).
-        checker(uv().mul(uvScaleNode as unknown as Node<'float'>)),
+        checker(uv().mul(uvScaleNode)),
         512,
         512,
       ),
@@ -73,7 +69,7 @@ function ProceduralPlane() {
   )
 
   const colorNode = useMemo(
-    () => gaussianBlur(proceduralToTexture, blurAmountNode as unknown as Node<'float'>, 20),
+    () => gaussianBlur(proceduralToTexture, blurAmountNode, 20),
     [proceduralToTexture, blurAmountNode],
   )
 

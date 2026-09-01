@@ -1,19 +1,9 @@
 // The water heightfield simulation: ping-pong height storage + wave-equation compute
 // kernels, the water surface whose vertex stage reads those buffers, the duck struct
-// buffer + bobbing kernel, and the pointer-driven disturbance rig. Uses fiber hooks
-// (`useUniforms`/`useBuffers`/`useNodes`/`useLoader`/`useFrame`/`useThree`), so it
-// lives inside <Canvas>, not in the page shell.
+// buffer + bobbing kernel, and the pointer-driven disturbance rig. Leva controls and
+// fiber hooks (`useUniforms`/`useBuffers`/`useNodes`/`useLoader`/`useFrame`/`useThree`)
+// live here too, so this must render inside <Canvas>, not the page shell.
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react'
-import {
-  useBuffers,
-  useFrame,
-  useLoader,
-  useNodes,
-  useThree,
-  useUniforms,
-  type ThreeEvent,
-} from '@react-three/fiber/webgpu'
-import type CameraControlsImpl from 'camera-controls'
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js'
 import { SimplexNoise } from 'three/addons/math/SimplexNoise.js'
 import {
@@ -46,6 +36,17 @@ import {
   type Node,
   type StorageBufferNode,
 } from 'three/webgpu'
+import {
+  useBuffers,
+  useFrame,
+  useLoader,
+  useNodes,
+  useThree,
+  useUniforms,
+  type ThreeEvent,
+} from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
+import type CameraControlsImpl from 'camera-controls'
 import { Ducks, NUM_DUCKS } from './Ducks'
 
 // Dimensions of the simulation grid / water size in world units (original values).
@@ -58,47 +59,42 @@ const HDR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/blouberg_sunrise_2_1k.hdr'
 
 export interface WaterProps {
-  mouseSize: number
-  mouseDeep: number
-  viscosity: number
-  /** Simulation speed 1..6 — the sim dispatches every `7 - speed` frames (original cadence). */
-  speed: number
-  ducksEnabled: boolean
-  wireframe: boolean
   /** Live camera-controls instance — orbiting is suspended while disturbing the water. */
   controlsRef: RefObject<CameraControlsImpl | null>
 }
 
-export function Water({
-  mouseSize,
-  mouseDeep,
-  viscosity,
-  speed,
-  ducksEnabled,
-  wireframe,
-  controlsRef,
-}: WaterProps) {
+export function Water({ controlsRef }: WaterProps) {
+  //* Controls =====================================================
+  const {
+    mouseSize,
+    mouseDeep,
+    viscosity,
+    speed,
+    ducks: ducksEnabled,
+    wireframe,
+  } = useControls('compute-water', {
+    mouseSize: { value: 0.12, min: 0.1, max: 0.3, step: 0.001 },
+    mouseDeep: { value: 0.5, min: 0.1, max: 1, step: 0.01 },
+    viscosity: { value: 0.96, min: 0.9, max: 0.96, step: 0.001 },
+    // The sim dispatches every `7 - speed` frames — the original's cadence.
+    speed: { value: 5, min: 1, max: 6, step: 1 },
+    ducks: true,
+    wireframe: false,
+  })
+
   const scene = useThree((state) => state.scene)
   const renderer = useThree((state) => state.renderer)
 
   // Leva knobs → live kernel uniforms. Called BEFORE the suspending useLoader below —
   // creator-mode hooks deferred past a suspension write to the store after siblings
-  // have subscribed (AGENTS.md B18 ordering rule). WGSL-identifier rule: camelCase scope.
+  // have subscribed (AGENTS.md B18 ordering rule).
   const { uMouseSize, uMouseDeep, uViscosity } = useUniforms(
     { uMouseSize: mouseSize, uMouseDeep: mouseDeep, uViscosity: viscosity },
     'computeWater',
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see compute-particles et al.).
-  const uMouseSizeNode = uMouseSize as unknown as Node<'float'>
-  const uMouseDeepNode = uMouseDeep as unknown as Node<'float'>
-  const uViscosityNode = uViscosity as unknown as Node<'float'>
 
-  // Simulation state, GPU-only after this upload. UNSCOPED on purpose: scoped
-  // useBuffers names each buffer `${scope}.${name}` and the dot lands in the WGSL
-  // struct name — runtime shader compile error (fiber bug, UPSTREAM.md B16).
-  // Prefixed root-level keys instead; the original's `.setName('HeightA')` labels
-  // are dropped — fiber re-labels stored nodes by key.
+  // Simulation state, GPU-only after this upload; the original's `.setName('HeightA')`
+  // labels are dropped — fiber labels each entry from the scope + key instead.
   const { waterHeightA, waterHeightB, waterPrevHeight, waterDuckData } = useBuffers(() => {
     // CPU-side seed: 15-octave simplex heightfield, exactly the original's noise().
     const simplex = new SimplexNoise()
@@ -147,11 +143,9 @@ export function Water({
       waterPrevHeight: instancedArray(new Float32Array(heightArray)),
       waterDuckData: instancedStructArray(duckArray, DuckStruct),
     }
-  })
+  }, 'computeWater')
 
-  // All node graphs built exactly once, closing over the TYPED hook returns above
-  // (creator-state reads widen to fiber's BufferLike — AGENTS.md). Also UNSCOPED
-  // (UPSTREAM.md B16): kernels and material nodes all reach WGSL codegen.
+  // All node graphs built exactly once, closing over the buffers above.
   const {
     computeHeightAtoB,
     computeHeightBtoA,
@@ -216,7 +210,7 @@ export function Water({
 
         const { north, south, east, west } = getNeighborValues(instanceIndex, readBuffer)
         const neighborHeight = north.add(south).add(east).add(west).mul(0.5).sub(prevHeight)
-        const newHeight = neighborHeight.mul(uViscosityNode).toVar()
+        const newHeight = neighborHeight.mul(uViscosity).toVar()
 
         // Grid coordinate of this texel in [0, 1] (the kernel dispatches 2-D).
         const x = float(globalId.x).mul(1 / WIDTH)
@@ -226,11 +220,11 @@ export function Water({
         // "indent" the water by the scaled cosine, weighted by pointer velocity.
         const centerVec = vec2(0.5)
         const mousePhase = clamp(
-          vec2(x, y).sub(centerVec).mul(BOUNDS).sub(uMousePos).length().mul(Math.PI).div(uMouseSizeNode),
+          vec2(x, y).sub(centerVec).mul(BOUNDS).sub(uMousePos).length().mul(Math.PI).div(uMouseSize),
           0.0,
           Math.PI,
         )
-        newHeight.addAssign(cos(mousePhase).add(1.0).mul(uMouseDeepNode).mul(uMouseSpeed.length()))
+        newHeight.addAssign(cos(mousePhase).add(1.0).mul(uMouseDeep).mul(uMouseSpeed.length()))
 
         waterPrevHeight.element(instanceIndex).assign(height)
         writeBuffer.element(instanceIndex).assign(newHeight)
@@ -353,7 +347,7 @@ export function Water({
       waterNormalNode,
       duckPositionNode,
     }
-  })
+  }, 'computeWater')
 
   // SUSPENDS — deliberately ordered after every creator hook above (AGENTS.md B18)
   // and before the meshes render: the water/duck materials carry custom position/
@@ -500,9 +494,8 @@ export function Water({
         <meshBasicMaterial visible={false} />
       </mesh>
 
-      {/* B17 gate: useGLTF suspends; letting it reach Canvas's boundary re-runs
-          createRoot and freezes every time-driven graph (AGENTS.md). Mounted last —
-          by the time the duck resolves, the environment above is long set. */}
+      {/* useGLTF suspends, so Ducks gets its own boundary — mounted last, so the
+          environment above is already set by the time the duck model resolves. */}
       <Suspense fallback={null}>
         <Ducks positionNode={duckPositionNode} visible={ducksEnabled} wireframe={wireframe} />
       </Suspense>

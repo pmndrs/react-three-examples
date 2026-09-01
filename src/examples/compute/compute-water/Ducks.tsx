@@ -1,11 +1,11 @@
 // The duck flock: duck.glb (Draco-compressed) loaded via drei's useGLTF — this
 // component SUSPENDS, so Water mounts it behind its own <Suspense> gate, after the
-// sim's creator hooks have already run (AGENTS.md B17/B18). One InstancedMesh whose
-// `positionNode` (built in Water's useNodes, passed down) offsets each instance by
-// the duck struct storage buffer — placement lives on the GPU only.
+// sim's creator hooks have already run (AGENTS.md B18 ordering). One InstancedMesh
+// whose `positionNode` (built in Water's useNodes, passed down) offsets each
+// instance by the duck struct storage buffer — placement lives on the GPU only.
 import { useEffect, useRef } from 'react'
-import { useGLTF } from '@react-three/drei/webgpu'
 import type { Mesh, MeshStandardMaterial, MeshStandardNodeMaterial, Node } from 'three/webgpu'
+import { useGLTF } from '@react-three/drei/webgpu'
 
 export const NUM_DUCKS = 100
 

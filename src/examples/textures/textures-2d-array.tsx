@@ -27,9 +27,9 @@
  *   `textures-partialupdate` — no ground plane in the original)
  */
 import { Suspense, useMemo } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
 import { oscTriangle, texture, time, uv } from 'three/tsl'
 import { DataArrayTexture, NoToneMapping, RedFormat } from 'three/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu'
 import { useZippedVolumeData } from '../../utils/useZippedVolumeData'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 

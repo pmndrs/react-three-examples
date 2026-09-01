@@ -36,12 +36,8 @@
  * - OrbitControls → DemoHelpers CameraControls; grid off (the original floats a cloud
  *   in a sky void); dolly-out capped at 9 so the camera stays inside the radius-10
  *   sky sphere (the original lets you dolly through it into the void)
- * - `useUniforms`' `UniformNode<T>` pins its TSL type param to `unknown` (documented
- *   fiber typing gap) — cast to `Node<'float'>`/`Node<'vec3'>` where uniforms feed math
  */
 import { useMemo, useRef } from 'react'
-import { Canvas, useFrame, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { Break, Fn, If, float, smoothstep, texture3D, vec3, vec4 } from 'three/tsl'
 import {
   BackSide,
@@ -55,24 +51,31 @@ import {
   SRGBColorSpace,
   Vector3,
 } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
 import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js'
 import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js'
+import { Canvas, useFrame, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-interface CloudProps {
-  threshold: number
-  opacity: number
-  range: number
-  steps: number
-  baseColor: string
-  rotationSpeed: number
-}
+function Cloud() {
+  const { threshold, opacity, range, steps, baseColor, rotationSpeed } = useControls('volume-cloud', {
+    threshold: { value: 0.25, min: 0, max: 1, step: 0.01 },
+    opacity: { value: 0.25, min: 0, max: 1, step: 0.01 },
+    range: { value: 0.1, min: 0, max: 1, step: 0.01 },
+    steps: { value: 100, min: 0, max: 200, step: 1 },
+    baseColor: '#798aa0',
+    rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
+  })
 
-function Cloud({ threshold, opacity, range, steps, baseColor, rotationSpeed }: CloudProps) {
   const meshRef = useRef<Mesh>(null)
 
-  const { uThreshold, uOpacity, uRange, uSteps, uBaseColor } = useUniforms(
+  const {
+    uThreshold: uThresholdNode,
+    uOpacity: uOpacityNode,
+    uRange: uRangeNode,
+    uSteps: uStepsNode,
+    uBaseColor: uBaseColorNode,
+  } = useUniforms(
     {
       uThreshold: threshold,
       uOpacity: opacity,
@@ -113,13 +116,6 @@ function Cloud({ threshold, opacity, range, steps, baseColor, rotationSpeed }: C
     texture.needsUpdate = true
     return texture
   }, [])
-
-  // Casts: `useUniforms` pins its TSL type param to `unknown` — see header DIVERGENCE.
-  const uThresholdNode = uThreshold as unknown as Node<'float'>
-  const uOpacityNode = uOpacity as unknown as Node<'float'>
-  const uRangeNode = uRange as unknown as Node<'float'>
-  const uStepsNode = uSteps as unknown as Node<'float'>
-  const uBaseColorNode = uBaseColor as unknown as Node<'vec3'>
 
   // Node graph builds once — uniform node identities are stable across re-renders
   // (leva changes mutate `.value` in place through useUniforms).
@@ -208,15 +204,6 @@ function Sky() {
 }
 
 export default function VolumeCloud() {
-  const { threshold, opacity, range, steps, baseColor, rotationSpeed } = useControls('volume-cloud', {
-    threshold: { value: 0.25, min: 0, max: 1, step: 0.01 },
-    opacity: { value: 0.25, min: 0, max: 1, step: 0.01 },
-    range: { value: 0.1, min: 0, max: 1, step: 0.01 },
-    steps: { value: 100, min: 0, max: 200, step: 1 },
-    baseColor: '#798aa0',
-    rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
-
   return (
     <Canvas
       // Original renders with the WebGPURenderer default (no tone mapping) — explicit
@@ -225,14 +212,7 @@ export default function VolumeCloud() {
       camera={{ position: [0, 0, 1.5], fov: 60, near: 0.1, far: 100 }}
     >
       <Sky />
-      <Cloud
-        threshold={threshold}
-        opacity={opacity}
-        range={range}
-        steps={steps}
-        baseColor={baseColor}
-        rotationSpeed={rotationSpeed}
-      />
+      <Cloud />
       <DemoHelpers grid={false} maxDistance={9} />
     </Canvas>
   )

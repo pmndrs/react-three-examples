@@ -33,8 +33,6 @@
  *   just calls `renderer.render()` every frame with no per-frame mutation
  */
 import { useMemo } from 'react'
-import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { Break, Fn, If, Loop, bool, select, texture3D, vec3, vec4 } from 'three/tsl'
 import {
   BackSide,
@@ -45,24 +43,26 @@ import {
   RedFormat,
   Vector3,
 } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
 import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js'
 import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js'
+import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const REFINEMENT_STEPS = 4
 
-interface PerlinBoxProps {
-  threshold: number
-  steps: number
-  refine: boolean
-}
+function PerlinBox() {
+  const { threshold, steps, refine } = useControls('volume-perlin', {
+    threshold: { value: 0.6, min: 0, max: 1, step: 0.01 },
+    steps: { value: 200, min: 0, max: 300, step: 1 },
+    refine: true,
+  })
 
-function PerlinBox({ threshold, steps, refine }: PerlinBoxProps) {
-  const { uThreshold, uSteps, uRefine } = useUniforms(
-    { uThreshold: threshold, uSteps: steps, uRefine: refine },
-    'volumePerlin',
-  )
+  const {
+    uThreshold: uThresholdNode,
+    uSteps: uStepsNode,
+    uRefine: uRefineNode,
+  } = useUniforms({ uThreshold: threshold, uSteps: steps, uRefine: refine }, 'volumePerlin')
 
   // 128^3 raw perlin field, ported verbatim from the original's init().
   const perlinTexture = useMemo(() => {
@@ -91,12 +91,6 @@ function PerlinBox({ threshold, steps, refine }: PerlinBoxProps) {
     texture.needsUpdate = true
     return texture
   }, [])
-
-  // useUniforms' UniformNode<T> pins its TSL type param to `unknown` (documented
-  // fiber typing gap, see AGENTS.md) — cast to the concrete node types math needs.
-  const uThresholdNode = uThreshold as unknown as Node<'float'>
-  const uStepsNode = uSteps as unknown as Node<'float'>
-  const uRefineNode = uRefine as unknown as Node<'bool'>
 
   const material = useMemo(() => {
     const map = texture3D(perlinTexture, null, 0)
@@ -168,12 +162,6 @@ function PerlinBox({ threshold, steps, refine }: PerlinBoxProps) {
 }
 
 export default function VolumePerlin() {
-  const { threshold, steps, refine } = useControls('volume-perlin', {
-    threshold: { value: 0.6, min: 0, max: 1, step: 0.01 },
-    steps: { value: 200, min: 0, max: 300, step: 1 },
-    refine: true,
-  })
-
   return (
     <Canvas
       // Original renders with the WebGPURenderer default (no tone mapping) — explicit
@@ -181,7 +169,7 @@ export default function VolumePerlin() {
       renderer={{ toneMapping: NoToneMapping }}
       camera={{ position: [0, 0, 2], fov: 60, near: 0.1, far: 100 }}
     >
-      <PerlinBox threshold={threshold} steps={steps} refine={refine} />
+      <PerlinBox />
       <DemoHelpers grid={false} maxDistance={9} />
     </Canvas>
   )

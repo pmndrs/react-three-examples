@@ -31,30 +31,29 @@
  *   `OrthographicCamera` (same rationale as this repo's `compute-texture`)
  * - `phase`/`lastUpdate` bookkeeping lives in plain `useRef`s instead of module-scope
  *   `let` bindings — imperative per-frame state that must never trigger a re-render
- * - `state.elapsed` (seconds, v10's clock replacement) stands in for the original's
- *   `performance.now() / 1000`
- * - `renderer.inspector` wiring dropped (no Inspector slot in this repo's shell); the
- *   example has no user-facing controls in the original either (leva panel omitted)
+ * - `elapsed` (seconds, v10's `useFrame` clock replacement) stands in for the
+ *   original's `performance.now() / 1000`
+ * - The example has no user-facing controls in the original — no leva panel here either
  */
 import { useRef } from 'react'
-import { Canvas, useFrame, useGPUStorage, useNodes, useThree } from '@react-three/fiber/webgpu'
 import {
   Fn,
   NodeAccess,
   float,
   instanceIndex,
+  int,
+  ivec2,
   select,
   storageTexture,
-  textureStore,
   texture,
+  textureStore,
   uniform,
   uvec2,
-  ivec2,
-  int,
   vec2,
-  vec4 } from 'three/tsl'
-import { HalfFloatType, StorageTexture, Vector2 } from 'three/webgpu'
-import type { Node, StorageTextureNode} from 'three/webgpu'
+  vec4,
+} from 'three/tsl'
+import { HalfFloatType, StorageTexture, Vector2, type Node, type StorageTextureNode } from 'three/webgpu'
+import { Canvas, useFrame, useGPUStorage, useNodes, useThree } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const WIDTH = 512
@@ -138,7 +137,8 @@ function PingPongPlane() {
       uSeed,
       uPhase,
       // uPhase true => computeToPong just ran (ping -> pong) => display pong.
-      colorNode: select(uPhase, texture(pongTexture), texture(pingTexture)) }
+      colorNode: select(uPhase, texture(pongTexture), texture(pingTexture)),
+    }
   })
 
   // Imperative per-frame bookkeeping — must never trigger a re-render.
@@ -146,8 +146,8 @@ function PingPongPlane() {
   const lastUpdateRef = useRef(-1)
 
   useFrame(
-    (state) => {
-      const seconds = Math.floor(state.elapsed)
+    ({ elapsed }) => {
+      const seconds = Math.floor(elapsed)
 
       // Reseed roughly once a second (only checked on the phase===true half of the
       // alternation, matching the original's `if (phase && seconds !== lastUpdate)`).

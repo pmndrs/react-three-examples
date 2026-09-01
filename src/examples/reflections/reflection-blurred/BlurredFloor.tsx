@@ -2,7 +2,7 @@
 // hash-blurred inside the floor material's `colorNode`, plus the animated ripple-ring
 // graph that both colors the floor and drives a `PointLight.colorNode` so the rings
 // cast real light. See reflection-blurred.tsx header DEMONSTRATES / DIVERGENCE.
-import { useEffect, useMemo } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import {
   Fn,
   abs,
@@ -23,8 +23,8 @@ import {
   vec4,
 } from 'three/tsl'
 import { hashBlur } from 'three/addons/tsl/display/hashBlur.js'
-import { BoxGeometry, Mesh, MeshStandardNodeMaterial, PointLight } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
+import type { Node, PointLight } from 'three/webgpu'
+import { useControls } from 'leva'
 
 // Traveling ripple rings (https://www.shadertoy.com/view/3tdSRn), ported from the
 // original's `drawCircle` TSL `Fn`. Written as a plain node-builder function: every
@@ -40,17 +40,14 @@ function drawCircle(pos: Node<'vec2'>, radius: number, width: number, power: num
   return ringColor.mul(intensity).mul(power).mul(float(0.8).sub(abs(dist2)).max(0.0))
 }
 
-export interface BlurredFloorProps {
-  /** Reflection roughness: raises blur weight and shortens the sharp contact band. */
-  roughness: number
-  /** Hash-blur radius. */
-  radius: number
-  /** Reflector render-target scale (live: the reflector resizes per frame). */
-  resolutionScale: number
-}
+export function BlurredFloor() {
+  const { roughness, radius, resolutionScale } = useControls('reflection-blurred', {
+    roughness: { value: 0.9, min: 0, max: 1, step: 0.01 },
+    radius: { value: 0.2, min: 0, max: 1, step: 0.01 },
+    resolutionScale: { value: 0.5, min: 0.25, max: 1, step: 0.05 },
+  })
 
-export function BlurredFloor({ roughness, radius, resolutionScale }: BlurredFloorProps) {
-  const { floorMesh, reflectionTarget, floorLight, reflection, uRoughness, uRadius } = useMemo(() => {
+  const { colorNode, animatedCircle, reflectionTarget, reflection, uRoughness, uRadius } = useMemo(() => {
     const uRoughness = uniform(0.9)
     const uRadius = uniform(0.2)
 
@@ -60,22 +57,13 @@ export function BlurredFloor({ roughness, radius, resolutionScale }: BlurredFloo
     const animatedColor = mix(color(0x74ccf4), color(0x7f00c5), positionWorld.xz.distance(vec2(0)).div(10).clamp())
     const animatedCircle = hue(drawCircle(positionWorld.xz.mul(0.1), 0.5, 0.8, 0.01, animatedColor).mul(circleFadeY), time)
 
-    // The rings also emit light. Cast: `colorNode` is read off the live light by
-    // `AnalyticLightNode`'s constructor (`(light && light.colorNode) || uniform(color)`,
-    // verified in three/src/nodes/lighting/AnalyticLightNode.js), but @types/three
-    // doesn't declare it on `Light` — B11-family duck-typed-property gap.
-    const floorLight = new PointLight(0xffffff)
-    ;(floorLight as unknown as { colorNode: Node }).colorNode = animatedCircle.mul(50)
-
     // reflection — half-resolution mirror render with a depth attachment; bounces off
     // since nothing else reflects
     const reflection = reflector({ resolutionScale: 0.5, depth: true, bounces: false })
     const reflectionDepth = reflection.getDepthNode()
     reflection.target.rotateX(-Math.PI / 2)
 
-    const floorMaterial = new MeshStandardNodeMaterial()
-    floorMaterial.transparent = true
-    floorMaterial.colorNode = Fn(() => {
+    const colorNode = Fn(() => {
       // ranges adjustment
       const radiusRange = mix(0.01, 0.1, uRadius) // range [ 0.01, 0.1 ]
       const roughnessRange = mix(0.3, 0.03, uRoughness) // range [ 0.03, 0.3 ]
@@ -122,10 +110,19 @@ export function BlurredFloor({ roughness, radius, resolutionScale }: BlurredFloo
       return vec4(output, opacity)
     })()
 
-    const floorMesh = new Mesh(new BoxGeometry(50, 0.001, 50), floorMaterial)
-
-    return { floorMesh, reflectionTarget: reflection.target, floorLight, reflection, uRoughness, uRadius }
+    return { colorNode, animatedCircle, reflectionTarget: reflection.target, reflection, uRoughness, uRadius }
   }, [])
+
+  // The rings also emit light. Cast: `colorNode` is read off the live light by
+  // `AnalyticLightNode`'s constructor (`(light && light.colorNode) || uniform(color)`,
+  // verified in three/src/nodes/lighting/AnalyticLightNode.js), but @types/three
+  // doesn't declare it on `Light` — B11-family duck-typed-property gap.
+  const pointLightRef = useRef<PointLight>(null)
+  useLayoutEffect(() => {
+    const light = pointLightRef.current
+    if (!light) return
+    ;(light as PointLight & { colorNode: Node }).colorNode = animatedCircle.mul(50)
+  }, [animatedCircle])
 
   useEffect(() => {
     uRoughness.value = roughness
@@ -141,9 +138,12 @@ export function BlurredFloor({ roughness, radius, resolutionScale }: BlurredFloo
 
   return (
     <>
-      <primitive object={floorMesh} />
+      <mesh>
+        <boxGeometry args={[50, 0.001, 50]} />
+        <meshStandardNodeMaterial transparent colorNode={colorNode} />
+      </mesh>
       <primitive object={reflectionTarget} />
-      <primitive object={floorLight} />
+      <pointLight ref={pointLightRef} color="#ffffff" />
     </>
   )
 }

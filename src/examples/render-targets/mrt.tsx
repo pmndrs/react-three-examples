@@ -36,8 +36,6 @@
  *   `screenUV.x` layout, not a parameter
  */
 import { Suspense, useLayoutEffect } from 'react'
-import { Canvas, useLoader, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
 import {
   diffuseColor,
   emissive,
@@ -52,6 +50,8 @@ import {
 } from 'three/tsl'
 import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js'
 import { ACESFilmicToneMapping, EquirectangularReflectionMapping, NearestFilter, UnsignedByteType } from 'three/webgpu'
+import { Canvas, useLoader, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
+import { useGLTF } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const HDR_URL =

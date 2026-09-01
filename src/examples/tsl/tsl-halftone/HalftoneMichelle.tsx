@@ -2,8 +2,8 @@
 // overridden, per mesh, in an effect (the mesh list is only known once the model loads,
 // unlike HalftonePrimitives' statically-known meshes).
 import { useEffect } from 'react'
-import { useGLTF } from '@react-three/drei/webgpu'
 import type { Material, Mesh, Node } from 'three/webgpu'
+import { useGLTF } from '@react-three/drei/webgpu'
 
 const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
 

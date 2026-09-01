@@ -2,40 +2,16 @@
 // block, TextGeometry row/column labels, and the leva-driven "custom" block.
 // Suspends on the label font — mounted inside the page's one Suspense gate.
 import { useMemo } from 'react'
-import { useLoader } from '@react-three/fiber/webgpu'
 import { Matrix4, MeshStandardNodeMaterial, type MeshPhysicalNodeMaterial } from 'three/webgpu'
 import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js'
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
 import { Finishes, WoodGenuses, WoodNodeMaterial } from 'three/addons/materials/WoodNodeMaterial.js'
 
-const FONT_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/fonts/helvetiker_regular.typeface.json'
+import { useLoader } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 
-// Live-mutable parameters of the leva "custom wood" block (all of them are
-// onObjectUpdate-backed uniforms or reference-backed physical properties on
-// the material instance — see header DEMONSTRATES).
-export interface CustomWoodParams {
-  centerSize: number
-  largeWarpScale: number
-  largeGrainStretch: number
-  smallWarpStrength: number
-  smallWarpScale: number
-  fineWarpStrength: number
-  fineWarpScale: number
-  ringThickness: number
-  ringBias: number
-  ringSizeVariance: number
-  ringVarianceScale: number
-  barkThickness: number
-  splotchScale: number
-  splotchIntensity: number
-  cellScale: number
-  cellSize: number
-  darkGrainColor: string
-  lightGrainColor: string
-  clearcoat: number
-  clearcoatRoughness: number
-}
+const FONT_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/fonts/helvetiker_regular.typeface.json'
 
 // Original's getGridPosition — coordinates are local to the rotated base group.
 function gridPosition(woodIndex: number, finishIndex: number): [number, number, number] {
@@ -84,7 +60,35 @@ function Label({
   )
 }
 
-export function WoodShowcase({ custom }: { custom: CustomWoodParams }) {
+export function WoodShowcase() {
+  //* Controls ====================================================
+  // Same 20 knobs, ranges, and defaults as the original's Inspector GUI (the
+  // "custom" block in the corner of the swatch grid). All of them are
+  // onObjectUpdate-backed uniforms or reference-backed physical properties on
+  // the material instance — see header DEMONSTRATES.
+  const custom = useControls('custom wood', {
+    centerSize: { value: 1.11, min: 0, max: 2, step: 0.01 },
+    largeWarpScale: { value: 0.32, min: 0, max: 1, step: 0.001 },
+    largeGrainStretch: { value: 0.24, min: 0, max: 1, step: 0.001 },
+    smallWarpStrength: { value: 0.059, min: 0, max: 0.2, step: 0.001 },
+    smallWarpScale: { value: 2, min: 0, max: 5, step: 0.01 },
+    fineWarpStrength: { value: 0.006, min: 0, max: 0.05, step: 0.001 },
+    fineWarpScale: { value: 32.8, min: 0, max: 50, step: 0.1 },
+    ringThickness: { value: 1 / 34, min: 0, max: 0.1, step: 0.001 },
+    ringBias: { value: 0.03, min: -0.2, max: 0.2, step: 0.001 },
+    ringSizeVariance: { value: 0.03, min: 0, max: 0.2, step: 0.001 },
+    ringVarianceScale: { value: 4.4, min: 0, max: 10, step: 0.1 },
+    barkThickness: { value: 0.3, min: 0, max: 1, step: 0.01 },
+    splotchScale: { value: 0.2, min: 0, max: 1, step: 0.01 },
+    splotchIntensity: { value: 0.541, min: 0, max: 1, step: 0.01 },
+    cellScale: { value: 910, min: 100, max: 2000, step: 1 },
+    cellSize: { value: 0.1, min: 0.01, max: 0.5, step: 0.001 },
+    darkGrainColor: '#0c0504',
+    lightGrainColor: '#926c50',
+    clearcoat: { value: 1, min: 0, max: 1, step: 0.01 },
+    clearcoatRoughness: { value: 0.2, min: 0, max: 1, step: 0.01 },
+  })
+
   const font = useLoader(FontLoader, FONT_URL)
 
   // One shared rounded slab, one shared black label material (like the original).

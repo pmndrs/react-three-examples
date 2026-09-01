@@ -5,7 +5,6 @@
 import { useMemo } from 'react'
 import { depth, float, texture, vec3 } from 'three/tsl'
 import { CameraHelper, Group, Mesh, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 
 import { useFrame, useThree, useUniforms } from '@react-three/fiber/webgpu'
@@ -43,10 +42,6 @@ export function ContactShadowCatcher() {
     uPlaneOpacity: planeOpacity,
   }))
 
-  // Cast: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so it
-  // never structurally narrows to the specific `Node<'float'|'vec3'>` types TSL math
-  // and NodeMaterial's `*Node` fields expect (documented fiber typing gap, see
-  // skinning-instancing/rtt).
   const rig = useMemo(() => {
     const renderTarget = new RenderTarget(512, 512, { depthBuffer: true })
     renderTarget.texture.generateMipmaps = false
@@ -64,7 +59,7 @@ export function ContactShadowCatcher() {
     depthMaterial.colorNode = vec3(0)
     depthMaterial.opacityNode = float(1)
       .sub(depth)
-      .mul(uDarkness as unknown as Node<'float'>)
+      .mul(uDarkness)
     depthMaterial.depthTest = false
     depthMaterial.depthWrite = false
 
@@ -74,7 +69,7 @@ export function ContactShadowCatcher() {
     shadowPlaneMaterial.transparent = true
     shadowPlaneMaterial.depthWrite = false
     shadowPlaneMaterial.colorNode = vec3(0)
-    shadowPlaneMaterial.opacityNode = blurredShadow.a.mul(uShadowOpacity as unknown as Node<'float'>)
+    shadowPlaneMaterial.opacityNode = blurredShadow.a.mul(uShadowOpacity)
 
     const shadowPlane = new Mesh(planeGeometry, shadowPlaneMaterial)
     shadowPlane.renderOrder = 1
@@ -84,8 +79,8 @@ export function ContactShadowCatcher() {
     const fillPlaneMaterial = new NodeMaterial()
     fillPlaneMaterial.transparent = true
     fillPlaneMaterial.depthWrite = false
-    fillPlaneMaterial.colorNode = uPlaneColor as unknown as Node<'vec3'>
-    fillPlaneMaterial.opacityNode = uPlaneOpacity as unknown as Node<'float'>
+    fillPlaneMaterial.colorNode = uPlaneColor
+    fillPlaneMaterial.opacityNode = uPlaneOpacity
 
     const fillPlane = new Mesh(planeGeometry, fillPlaneMaterial)
     fillPlane.rotateX(Math.PI)

@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Fn, float, instanceIndex, instancedArray, instancedBufferAttribute, mix, shapeCircle, sin, time, vec3 } from 'three/tsl'
 import { CatmullRomCurve3, Color, InstancedBufferAttribute, SRGBColorSpace, Vector3 } from 'three/webgpu'
-import type { Node, PointsNodeMaterial} from 'three/webgpu'
+import type {  PointsNodeMaterial} from 'three/webgpu'
 import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js'
 import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
@@ -64,11 +64,9 @@ export function InstancedPoints() {
     { uPulseSpeed: pulseSpeed, uMinWidth: minWidth, uMaxWidth: maxWidth },
     'instancePoints', // WGSL-identifier rule: camelCase scope, never kebab-case
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see tsl-galaxy et al.).
-  const uPulseSpeedNode = uPulseSpeed as unknown as Node<'float'>
-  const uMinWidthNode = uMinWidth as unknown as Node<'float'>
-  const uMaxWidthNode = uMaxWidth as unknown as Node<'float'>
+  const uPulseSpeedNode = uPulseSpeed
+  const uMinWidthNode = uMinWidth
+  const uMaxWidthNode = uMaxWidth
 
   const { divisions, positionAttribute, colorsAttribute, sizes } = useMemo(buildPointData, [])
 

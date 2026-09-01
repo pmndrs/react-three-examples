@@ -32,8 +32,6 @@
  *   (the original's hard-coded `speed = .4` wobble constant, now uniform-driven),
  *   `fallSpeed` (multiplier on the per-flake fall velocity, original ×1), and a
  *   "reset snow" button that re-dispatches the init kernel
- * - The Inspector addon and all `.toInspector()` tags are dropped — this repo's
- *   shell has no inspector; leva is the panel
  * - OrbitControls (target (0,10,0), dolly 25–35, maxPolarAngle π/1.7, autoRotate
  *   −0.7) becomes the DemoHelpers/camera-controls baseline with the same limits;
  *   grid disabled — the scene has its own fading snowy floor
@@ -46,15 +44,10 @@
  * - The landing-height sample takes `.x` of the RedFormat texel explicitly; the
  *   original compares `position.y` against the raw vec4 sample and lets TSL
  *   broadcasting resolve it — same value
- * - `renderer={{ toneMapping: ACESFilmicToneMapping }}` written explicitly (corpus
- *   tone-mapping rule); it matches both the original and fiber's default
- * - Split into a folder (page shell / SnowParticles compute+collision / SnowScenery /
- *   SnowPostFX) — the single file would far exceed the ~200-line threshold
  */
 import { useState } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { button, useControls } from 'leva'
 import { ACESFilmicToneMapping, Mesh, MeshBasicNodeMaterial } from 'three/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu'
 import { TeapotGeometry } from '../../../assets/TeapotGeometry'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { SnowParticles } from './SnowParticles'
@@ -72,13 +65,6 @@ export default function ComputeParticlesSnow() {
     return mesh
   })
 
-  const [resetNonce, setResetNonce] = useState(0)
-  const { driftSpeed, fallSpeed } = useControls('compute-particles-snow', {
-    driftSpeed: { value: 0.4, min: 0, max: 2, step: 0.01 },
-    fallSpeed: { value: 1, min: 0, max: 5, step: 0.05 },
-    'reset snow': button(() => setResetNonce((nonce) => nonce + 1)),
-  })
-
   return (
     <Canvas
       // The original sets ACESFilmic explicitly — same as fiber's Canvas default,
@@ -89,7 +75,7 @@ export default function ComputeParticlesSnow() {
       <fog attach="fog" args={['#0f3c37', 5, 40]} />
       <SnowScenery />
       <primitive object={teapot} />
-      <SnowParticles driftSpeed={driftSpeed} fallSpeed={fallSpeed} resetNonce={resetNonce} />
+      <SnowParticles />
       <SnowPostFX teapot={teapot} />
       <DemoHelpers
         grid={false}

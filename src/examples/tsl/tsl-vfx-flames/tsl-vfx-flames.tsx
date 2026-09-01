@@ -22,8 +22,7 @@
  * DIVERGENCE from original
  * - `timeScale` uniform added (every `time` term becomes `time.mul(uTimeScale)`) and
  *   the five gradient stops exposed as leva colors repainting the CanvasTexture live —
- *   the original hard-codes all of them and has no GUI (its Inspector addon overlay is
- *   dropped repo-wide; leva is the panel)
+ *   the original hard-codes all of them and has no GUI
  * - `sprite.center.set(0.5, 0)` omitted: `center` is only applied inside
  *   `SpriteNodeMaterial.setupPositionView`, which the `vertexNode = billboarding()`
  *   override bypasses entirely (NodeMaterial.setupVertex) — it is a no-op in the
@@ -31,46 +30,24 @@
  * - `.toVar()` added where the original assigns into bare expressions (flame 1's
  *   `cellularNoise`, flame 2's `shape`) — identical math, keeps `.assign()` targets
  *   real vars under three 0.185.1
- * - `useUniforms`' `UniformNode<T>` pins its TSL type param to `unknown` (documented
- *   fiber typing gap) — cast to `Node<'float'>` where the uniform feeds TSL math
  * - `renderer={{ toneMapping: NoToneMapping }}`: the original renders with the
  *   WebGPURenderer default; fiber's Canvas defaults to ACESFilmic, which mutes the
  *   white-hot core and the gradient's saturated magentas
- * - OrbitControls → DemoHelpers' camera-controls baseline (same 0.1/50 dolly range);
- *   grid disabled — the flames float in a dark void with no ground plane
- * - Split into a folder (this file + Flames.tsx): the single-file port runs past the
- *   ~200-line threshold — split by scene role (page shell/controls vs the flame node
- *   graphs, which need fiber hooks and so must live inside `<Canvas>`)
  * - Explicit `<Suspense fallback={null}>` around the flame subtree (the original has
  *   no async boundary at all): if useTexture's suspension bubbles up to Canvas's own
  *   boundary, fiber alpha.3 re-runs createRoot and the TSL `time` uniform stops
  *   updating — the whole scene freezes on its first frame. Bisected on this port;
  *   sprites/tsl-earth/refraction in this corpus exhibit the same latent freeze
  */
-import { Suspense, useMemo } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
+import { Suspense } from 'react'
 import { NoToneMapping } from 'three/webgpu'
+
+import { Canvas } from '@react-three/fiber/webgpu'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { Flames } from './Flames'
 
 export default function TslVfxFlames() {
-  const { timeScale, color1, color2, color3, color4, color5 } = useControls('tsl-vfx-flames', {
-    timeScale: { value: 1, min: 0, max: 3, step: 0.01 },
-    gradient: folder({
-      color1: '#090033',
-      color2: '#5f1f93',
-      color3: '#e02e96',
-      color4: '#ffbd80',
-      color5: '#fff0db',
-    }),
-  })
-
-  const gradientColors = useMemo(
-    () => [color1, color2, color3, color4, color5],
-    [color1, color2, color3, color4, color5],
-  )
-
   return (
     <Canvas
       // NoToneMapping matches the original (WebGPURenderer default) — see header.
@@ -83,7 +60,7 @@ export default function TslVfxFlames() {
           should only be called once!") and permanently freezes the TSL `time` update
           loop — the flames render one frame and never lick. See header DIVERGENCE. */}
       <Suspense fallback={null}>
-        <Flames timeScale={timeScale} gradientColors={gradientColors} />
+        <Flames />
       </Suspense>
       <DemoHelpers grid={false} minDistance={0.1} maxDistance={50} />
     </Canvas>

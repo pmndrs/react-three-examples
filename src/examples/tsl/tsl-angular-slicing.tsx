@@ -10,8 +10,9 @@
  * - `NodeMaterial.outputNode` + `frontFacing` to recolor ONLY back faces: with
  *   `side: DoubleSide` the discard exposes the hull interior, and flat-colored back
  *   faces read as a solid machined cap over the cut
- * - Live three/tsl `uniform()` nodes driven from leva — mutate `.value` per edit,
- *   the sliced wedge tracks it with zero graph rebuilds (build-time vs run-time rule)
+ * - `useUniforms` feeding leva straight into the mask/output graphs — create-or-update
+ *   semantics mutate the live GPU uniforms per edit, the sliced wedge tracks it with
+ *   zero graph rebuilds (build-time vs run-time rule)
  * - One node material shared across several glTF meshes via an imperative traverse
  *   (the showcased escape hatch, kept visible in the component that owns it);
  *   Draco decoding wired by drei's `useGLTF` second argument
@@ -20,72 +21,66 @@
  *   and `scene.environment` like the original
  *
  * DIVERGENCE from original
- * - lil-gui (via `renderer.inspector.createParameters`) → leva: sliceStart/sliceArc
- *   sliders and the slice color swatch, same ranges and defaults; the Inspector
- *   itself has no fiber equivalent — dropped
- * - DemoHelpers' camera-controls orbit replaces OrbitControls; `minDistance`/
- *   `maxDistance` (0.1/50) map directly. Grid disabled (`grid={false}`) — the
- *   original's tilted shadow-catching backdrop plane is kept instead
  * - Explicit `<Suspense>` gate wraps the lit scene (B17), which also guarantees the
  *   first shader build of the custom-node materials already sees `scene.environment`
  *   (B15) — replaces the original's build-scene-in-loader-callback flow
  * - `maskShadowNode` stays unset, matching the original's commented-out line: the
  *   shadow pass inherits the same angular discard from `maskNode`
- * - Tone mapping is NOT a divergence: the original sets ACESFilmic explicitly;
- *   mirrored deliberately via `renderer={{ toneMapping }}` (parity rule)
  */
-import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { Canvas, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
 import {
   ACESFilmicToneMapping,
-  Color,
   DoubleSide,
   EquirectangularReflectionMapping,
   MeshPhysicalNodeMaterial,
 } from 'three/webgpu'
-import type { Mesh, Node } from 'three/webgpu'
-import { Fn, If, TWO_PI, atan, frontFacing, output, positionLocal, uniform, vec4 } from 'three/tsl'
+import type { Mesh } from 'three/webgpu'
+import { Fn, If, TWO_PI, atan, frontFacing, output, positionLocal, vec4 } from 'three/tsl'
 import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js'
+
+import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { useGLTF } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/gears.glb'
 const HDR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg'
 
-interface SliceControls {
-  sliceStart: number
-  sliceArc: number
-  sliceColor: string
-}
-
 // Loads the UltraHDR environment + Draco gears model, builds the sliced/default
 // physical node materials, and assigns them across the model — see header block.
-function SlicedGears({ sliceStart, sliceArc, sliceColor }: SliceControls) {
+function SlicedGears() {
+  //* Controls ====================================================
+  const { sliceStart, sliceArc, sliceColor } = useControls('angular-slicing', {
+    sliceStart: { value: 1.75, min: -Math.PI, max: Math.PI, step: 0.001 },
+    sliceArc: { value: 1.25, min: 0, max: Math.PI * 2, step: 0.001 },
+    sliceColor: '#b62f58',
+  })
+
   const scene = useThree((s) => s.scene)
   const envMap = useLoader(UltraHDRLoader, HDR_URL)
   const gltf = useGLTF(MODEL_URL, { draco: true })
 
-  // Live uniform nodes (three-side, like the original's) — leva edits mutate `.value`
-  // below; the graphs are built once and never rebuilt.
-  const { uSliceStart, uSliceArc, uSliceColor } = useMemo(
-    () => ({
-      uSliceStart: uniform(1.75),
-      uSliceArc: uniform(1.25),
-      uSliceColor: uniform(new Color('#b62f58')),
-    }),
-    [],
-  )
+  // Live uniforms — create-or-update semantics sync leva edits into `.value` with
+  // zero graph rebuilds; the two materials below are built once.
+  const { uSliceStart, uSliceArc, uSliceColor } = useUniforms({
+    uSliceStart: sliceStart,
+    uSliceArc: sliceArc,
+    uSliceColor: sliceColor,
+  })
 
+  // REVIEW(shared-instance): one default + one sliced MeshPhysicalNodeMaterial,
+  // applied across every mesh in the gltf by the traverse below — genuinely shared,
+  // not a per-mesh material.
   const { defaultMaterial, slicedMaterial } = useMemo(() => {
     // Is the local-XY polar angle of `position` inside the [start, start+arc) wedge?
     const inAngle = Fn(([positionIn, angleStartIn, angleArcIn]) => {
       // Fn's destructured params come back as bare `ShaderNodeObject<Node>` — too
       // loose for the swizzles/comparisons below (three-side gap, UPSTREAM.md B10).
-      const position = positionIn as unknown as Node<'vec2'>
-      const angleStart = angleStartIn as unknown as Node<'float'>
-      const angleArc = angleArcIn as unknown as Node<'float'>
+      const position = positionIn
+      const angleStart = angleStartIn
+      const angleArc = angleArcIn
 
       const angle = atan(position.y, position.x).sub(angleStart).mod(TWO_PI).toVar()
       return angle.greaterThan(0).and(angle.lessThan(angleArc))
@@ -148,16 +143,6 @@ function SlicedGears({ sliceStart, sliceArc, sliceColor }: SliceControls) {
     })
   }, [gltf, defaultMaterial, slicedMaterial])
 
-  useEffect(() => {
-    uSliceStart.value = sliceStart
-  }, [uSliceStart, sliceStart])
-  useEffect(() => {
-    uSliceArc.value = sliceArc
-  }, [uSliceArc, sliceArc])
-  useEffect(() => {
-    uSliceColor.value.set(sliceColor)
-  }, [uSliceColor, sliceColor])
-
   return <primitive object={gltf.scene} />
 }
 
@@ -176,12 +161,6 @@ function Backdrop() {
 }
 
 export default function TslAngularSlicing() {
-  const controls = useControls('angular-slicing', {
-    sliceStart: { value: 1.75, min: -Math.PI, max: Math.PI, step: 0.001 },
-    sliceArc: { value: 1.25, min: 0, max: Math.PI * 2, step: 0.001 },
-    sliceColor: '#b62f58',
-  })
-
   return (
     <Canvas
       shadows
@@ -208,7 +187,7 @@ export default function TslAngularSlicing() {
           shadow-normalBias={0.05}
         />
         <Backdrop />
-        <SlicedGears {...controls} />
+        <SlicedGears />
       </Suspense>
       <DemoHelpers grid={false} minDistance={0.1} maxDistance={50} />
     </Canvas>

@@ -6,14 +6,6 @@
 // <Canvas>, not in the page shell.
 import { useMemo, useRef, useState } from 'react'
 import {
-  useBuffers,
-  useFrame,
-  useNodes,
-  useThree,
-  useUniforms,
-  type ThreeEvent,
-} from '@react-three/fiber/webgpu'
-import {
   cameraProjectionMatrix,
   cameraViewMatrix,
   Continue,
@@ -40,16 +32,9 @@ import {
   vec4,
   vertexIndex,
 } from 'three/tsl'
-import {
-  BackSide,
-  BufferAttribute,
-  BufferGeometry,
-  DoubleSide,
-  Raycaster,
-  Vector2,
-  Vector3,
-  type Node,
-} from 'three/webgpu'
+import { BackSide, BufferAttribute, BufferGeometry, DoubleSide, Raycaster, Vector2, Vector3 } from 'three/webgpu'
+import { useBuffers, useFrame, useNodes, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 
 const BIRDS = 8192
 const SPEED_LIMIT = 9.0
@@ -75,15 +60,13 @@ function createBirdGeometry(): BufferGeometry {
   return geometry
 }
 
-export interface BirdsProps {
-  separation: number
-  alignment: number
-  cohesion: number
-}
-
-export function Birds({ separation, alignment, cohesion }: BirdsProps) {
-  const renderer = useThree((state) => state.renderer)
-
+export function Birds() {
+  //* Controls =====================================================
+  const { separation, alignment, cohesion } = useControls('compute-birds', {
+    separation: { value: 15, min: 0, max: 100, step: 1 },
+    alignment: { value: 20, min: 0, max: 100, step: 0.001 },
+    cohesion: { value: 20, min: 0, max: 100, step: 0.025 },
+  })
   // Leva knobs → live kernel uniforms (create-or-update syncs new values every
   // re-render; the kernels below reference the stable node instances).
   // WGSL-identifier rule: camelCase scope, never kebab-case.
@@ -91,12 +74,10 @@ export function Birds({ separation, alignment, cohesion }: BirdsProps) {
     { uSeparation: separation, uAlignment: alignment, uCohesion: cohesion },
     'computeBirds',
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see compute-particles et al.).
-  const uSeparationNode = uSeparation as unknown as Node<'float'>
-  const uAlignmentNode = uAlignment as unknown as Node<'float'>
-  const uCohesionNode = uCohesion as unknown as Node<'float'>
 
+  const renderer = useThree((state) => state.renderer)
+
+  //* GPU State =====================================================
   // Flock state, GPU-only after this upload. UNSCOPED on purpose: scoped useBuffers
   // names each buffer `${scope}.${name}` and the dot lands in the WGSL struct name —
   // runtime shader compile error (fiber bug, UPSTREAM.md B16). Prefixed root-level
@@ -126,6 +107,7 @@ export function Birds({ separation, alignment, cohesion }: BirdsProps) {
     }
   })
 
+  //* Compute Graph =================================================
   // All node graphs built exactly once, closing over the TYPED hook returns above
   // (creator-state reads widen to fiber's BufferLike — AGENTS.md). Also UNSCOPED
   // (UPSTREAM.md B16): kernels and the vertex graph all reach WGSL codegen.
@@ -147,9 +129,9 @@ export function Birds({ separation, alignment, cohesion }: BirdsProps) {
         const PI_2 = PI.mul(2.0)
         const limit = float(SPEED_LIMIT).toVar('limit')
 
-        const zoneRadius = uSeparationNode.add(uAlignmentNode).add(uCohesionNode).toConst()
-        const separationThresh = uSeparationNode.div(zoneRadius).toConst()
-        const alignmentThresh = uSeparationNode.add(uAlignmentNode).div(zoneRadius).toConst()
+        const zoneRadius = uSeparation.add(uAlignment).add(uCohesion).toConst()
+        const separationThresh = uSeparation.div(zoneRadius).toConst()
+        const alignmentThresh = uSeparation.add(uAlignment).div(zoneRadius).toConst()
         const zoneRadiusSq = zoneRadius.mul(zoneRadius).toConst()
 
         // Cache this bird's position and velocity outside the loop.
@@ -321,6 +303,7 @@ export function Birds({ separation, alignment, cohesion }: BirdsProps) {
       return { computeVelocity, computePosition, uDeltaTime, uRayOrigin, uRayDirection, birdVertexNode }
     })
 
+  //* Scene ==========================================================
   const geometry = useMemo(createBirdGeometry, [])
 
   // Pointer state: the handler only records the latest NDC; the camera ray is
@@ -338,10 +321,10 @@ export function Birds({ separation, alignment, cohesion }: BirdsProps) {
   // compute is not a render takeover): refresh deltaTime + the camera-ray
   // uniforms, then step velocity and position.
   useFrame(
-    (state) => {
-      uDeltaTime.value = Math.min(state.delta, 1) // the original's safety cap
+    ({ camera, delta }) => {
+      uDeltaTime.value = Math.min(delta, 1) // the original's safety cap
 
-      raycaster.setFromCamera(ndcRef.current, state.camera)
+      raycaster.setFromCamera(ndcRef.current, camera)
       uRayOrigin.value.copy(raycaster.ray.origin)
       uRayDirection.value.copy(raycaster.ray.direction)
 

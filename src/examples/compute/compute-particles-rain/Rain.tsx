@@ -2,10 +2,9 @@
 // heightmap rig, plus the two particle meshes (drops and impact ripples). Uses
 // fiber hooks (`useBuffers`/`useNodes`/`useFrame`/`useThree`), so it lives inside
 // <Canvas>, not in the page shell.
-import { useEffect, useMemo } from 'react'
-import { useBuffers, useFrame, useNodes, useThree } from '@react-three/fiber/webgpu'
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+import { useEffect, useMemo, useState } from 'react'
 import {
+  billboarding,
   deltaTime,
   Fn,
   hash,
@@ -20,7 +19,7 @@ import {
   uv,
   vec2,
 } from 'three/tsl'
-import { billboarding } from 'three/tsl'
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import {
   DoubleSide,
   HalfFloatType,
@@ -31,24 +30,29 @@ import {
   RenderTarget,
   type Node,
 } from 'three/webgpu'
+import { useBuffers, useFrame, useNodes, useThree } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 
 export const MAX_PARTICLE_COUNT = 50_000
 
-export interface RainProps {
-  /** Live draw-count throttle for both particle meshes (three's `Mesh.count`). */
-  dropCount: number
-}
-
-export function Rain({ dropCount }: RainProps) {
+export function Rain() {
   const scene = useThree((state) => state.scene)
   const renderer = useThree((state) => state.renderer)
 
+  //* Controls =====================================================
+  const { dropCount } = useControls('compute-particles-rain', {
+    dropCount: { value: MAX_PARTICLE_COUNT / 2, min: 200, max: MAX_PARTICLE_COUNT, step: 1 },
+  })
+
+  //* Collision Rig + Geometry ======================================
   // The collision rig: a top-down orthographic camera that sees ONLY layer 1 (the
   // colliders opt in via `layers.enable(1)`, see Colliders.tsx) renders world
   // positions into a HalfFloat render target — a live heightmap the compute kernel
-  // samples to find the surface under each drop. Never disposed in a cleanup:
-  // StrictMode would kill the memoized instance for good (AGENTS.md).
-  const rig = useMemo(() => {
+  // samples to find the surface under each drop. Camera/RenderTarget/override
+  // material are captured by the useNodes closure below, so identity must be
+  // stable — lazy useState, not useMemo (AGENTS.md). Never disposed in a cleanup:
+  // StrictMode would kill the instance for good.
+  const [rig] = useState(() => {
     const collisionCamera = new OrthographicCamera(-50, 50, 50, -50, 0.1, 50)
     collisionCamera.position.y = 50
     collisionCamera.lookAt(0, 0, 0)
@@ -65,7 +69,7 @@ export function Rain({ dropCount }: RainProps) {
     collisionPosMaterial.colorNode = positionWorld
 
     return { collisionCamera, collisionPosRT, collisionPosMaterial }
-  }, [])
+  })
 
   // Ripple geometry: one flat quad + two crossed vertical quads merged into a single
   // instanced draw, exactly as the original builds it with BufferGeometryUtils.
@@ -81,6 +85,7 @@ export function Rain({ dropCount }: RainProps) {
     return mergeGeometries([surfaceGeometry, xGeometry, zGeometry])
   }, [])
 
+  //* GPU State =====================================================
   // Particle state, GPU-only. UNSCOPED on purpose: scoped useBuffers names each
   // buffer `${scope}.${name}` and the dot lands in the WGSL struct name — runtime
   // shader compile error (fiber bug, UPSTREAM.md B16). Prefixed root-level keys.
@@ -91,6 +96,7 @@ export function Rain({ dropCount }: RainProps) {
     rippleTimes: instancedArray(MAX_PARTICLE_COUNT, 'vec3'),
   }))
 
+  //* Compute Graph =================================================
   // All node graphs built exactly once, closing over the TYPED hook returns above
   // (creator-state reads widen to fiber's BufferLike, losing `.element()`/
   // `.toAttribute()` — AGENTS.md). Also UNSCOPED (UPSTREAM.md B16): every one of
@@ -215,6 +221,7 @@ export function Rain({ dropCount }: RainProps) {
     }
   })
 
+  //* Dispatch ======================================================
   // ONCE: seed the buffers. Sync compute() is safe in an effect — fiber awaits
   // renderer.init() before children render (AGENTS.md compute pattern).
   useEffect(() => {
@@ -240,6 +247,7 @@ export function Rain({ dropCount }: RainProps) {
     { before: 'render' },
   )
 
+  //* Scene =========================================================
   return (
     <>
       {/* Drops: one 0.1x2 plane drawn `dropCount` times; positions live only on the

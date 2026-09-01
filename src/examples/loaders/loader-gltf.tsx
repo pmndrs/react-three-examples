@@ -54,15 +54,12 @@
  *   drei's `useGLTF` suspense cache, consistent with this repo's existing simplification
  *   pattern (`instance-mesh`) — repeatedly swapping through many large models in one
  *   session grows GPU memory faster than the original; a real tradeoff, not a bug.
- * - `renderer.inspector.createParameters` dat.gui panel replaced by leva: `model`
- *   dropdown (sourced from the live-fetched index) and `blurriness` slider — the same
- *   two parameters the original exposes.
  */
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { AnimationMixer, ACESFilmicToneMapping } from 'three/webgpu'
 import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { AnimationMixer, ACESFilmicToneMapping } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MODEL_INDEX_URL =

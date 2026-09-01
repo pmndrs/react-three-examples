@@ -41,10 +41,10 @@
  *   other loader-gltf-* ports).
  */
 import { Suspense } from 'react'
+import { ReinhardToneMapping } from 'three/webgpu'
 import { Canvas } from '@react-three/fiber/webgpu'
 import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { ReinhardToneMapping } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MODEL_URL =

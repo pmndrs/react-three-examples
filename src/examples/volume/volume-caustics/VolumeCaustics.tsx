@@ -3,8 +3,6 @@
 // volumetric pass -> bloom -> compose). Uses fiber hooks throughout, so it lives
 // inside <Canvas>; the page shell owns leva and Suspense.
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useGLTF, useTexture } from '@react-three/drei/webgpu'
 import { bayer16 } from 'three/addons/tsl/math/Bayer.js'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
 import { frameId, pass, screenCoordinate, screenUV } from 'three/tsl'
@@ -18,29 +16,29 @@ import {
   SpotLight,
   VolumeNodeMaterial,
   type Mesh,
-  type Node,
 } from 'three/webgpu'
+import { useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { useGLTF, useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog'
 import { CAUSTIC_MAP_URL, DUCK_URL, LAYER_VOLUMETRIC_LIGHTING } from './constants'
 import { createDuckShading } from './duckShading'
 
-interface VolumeCausticsProps {
-  causticOcclusion: number
-  materialColor: string
-  smokeAmount: number
-  volumetricLightingIntensity: number
-  steps: number
-  resolution: number
-}
+export function VolumeCaustics() {
+  const { causticOcclusion, materialColor } = useControls('volume-caustics duck', {
+    causticOcclusion: { value: 1, min: 0, max: 20, step: 0.1 },
+    materialColor: '#ffd700',
+  })
+  const { smokeAmount, volumetricLightingIntensity, steps, resolution } = useControls(
+    'volume-caustics fog',
+    {
+      smokeAmount: { value: 3, min: 0, max: 10, step: 0.1 },
+      volumetricLightingIntensity: { value: 0.7, min: 0, max: 3, step: 0.01 },
+      steps: { value: 20, min: 4, max: 64, step: 1 },
+      resolution: { value: 0.5, min: 0.1, max: 1, step: 0.05 },
+    },
+  )
 
-export function VolumeCaustics({
-  causticOcclusion,
-  materialColor,
-  smokeAmount,
-  volumetricLightingIntensity,
-  steps,
-  resolution,
-}: VolumeCausticsProps) {
   const gltf = useGLTF(DUCK_URL, { draco: true })
   const causticMap = useTexture(CAUSTIC_MAP_URL)
 
@@ -52,7 +50,11 @@ export function VolumeCaustics({
     renderer.shadowMap.transmitted = true
   }, [renderer])
 
-  const { uCausticOcclusion, uSmokeAmount, uVolumetricIntensity } = useUniforms(
+  const {
+    uCausticOcclusion: uCausticOcclusionNode,
+    uSmokeAmount: uSmokeAmountNode,
+    uVolumetricIntensity: uVolumetricIntensityNode,
+  } = useUniforms(
     {
       uCausticOcclusion: causticOcclusion,
       uSmokeAmount: smokeAmount,
@@ -60,11 +62,6 @@ export function VolumeCaustics({
     },
     'volumeCaustics',
   )
-  // useUniforms' UniformNode<T> pins its TSL type param to `unknown` (fiber typing
-  // gap, see AGENTS.md) — cast to the concrete node type the graphs below need.
-  const uCausticOcclusionNode = uCausticOcclusion as unknown as Node<'float'>
-  const uSmokeAmountNode = uSmokeAmount as unknown as Node<'float'>
-  const uVolumetricIntensityNode = uVolumetricIntensity as unknown as Node<'float'>
 
   useLayoutEffect(() => {
     causticMap.wrapS = causticMap.wrapT = RepeatWrapping

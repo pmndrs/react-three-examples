@@ -1,8 +1,7 @@
 // The compute pipeline + sprite field for tsl-compute-attractors-particles.
 // Uses fiber hooks (`useBuffers`/`useNodes`/`useUniforms`/`useFrame`/`useThree`),
 // so it lives inside <Canvas>, not in the page shell.
-import { useEffect } from 'react'
-import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { useEffect, useState } from 'react'
 import {
   cos,
   float,
@@ -20,7 +19,11 @@ import {
   uniformArray,
   vec3,
   vec4 } from 'three/tsl'
-import { AdditiveBlending, Vector3, type Node} from 'three/webgpu'
+import { AdditiveBlending, Vector3 } from 'three/webgpu'
+
+import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { button, useControls } from 'leva'
+
 import { ATTRACTOR_COUNT, ATTRACTOR_DEFAULT_POSITIONS, ATTRACTOR_ROTATION_AXES } from './attractors'
 
 export const PARTICLE_COUNT = 2 ** 18 // 262,144 — same as the original
@@ -31,36 +34,41 @@ const GRAVITY_CONSTANT = 6.67e-11
 const seed = () => uint(Math.floor(Math.random() * 0xffffff))
 
 export interface AttractorParticlesProps {
-  /** Live attractor positions (leva), synced into the uniformArray each render. */
+  /** Live attractor positions (leva, shared with AttractorHelpers), synced into the
+   * uniformArray each render. */
   attractorPositions: readonly { x: number; y: number; z: number }[]
-  attractorMass: number
-  particleGlobalMass: number
-  timeScale: number
-  spinningStrength: number
-  maxSpeed: number
-  velocityDamping: number
-  scale: number
-  boundHalfExtent: number
-  colorA: string
-  colorB: string
-  /** Incremented by the leva Reset button — re-dispatches the init kernel. */
-  resetCount: number
 }
 
-export function AttractorParticles({
-  attractorPositions,
-  attractorMass,
-  particleGlobalMass,
-  timeScale,
-  spinningStrength,
-  maxSpeed,
-  velocityDamping,
-  scale,
-  boundHalfExtent,
-  colorA,
-  colorB,
-  resetCount }: AttractorParticlesProps) {
+export function AttractorParticles({ attractorPositions }: AttractorParticlesProps) {
   const renderer = useThree((state) => state.renderer)
+  const [resetCount, setResetCount] = useState(0)
+
+  //* Controls ====================================================
+  const {
+    attractorMassExponent,
+    particleGlobalMassExponent,
+    timeScale,
+    maxSpeed,
+    velocityDamping,
+    spinningStrength,
+    scale,
+    boundHalfExtent,
+    colorA,
+    colorB,
+  } = useControls('particles', {
+    attractorMassExponent: { value: 7, min: 1, max: 10, step: 1 },
+    particleGlobalMassExponent: { value: 4, min: 1, max: 10, step: 1 },
+    timeScale: { value: 1, min: 0, max: 2, step: 0.01 },
+    maxSpeed: { value: 8, min: 0, max: 10, step: 0.01 },
+    velocityDamping: { value: 0.1, min: 0, max: 0.1, step: 0.001 },
+    spinningStrength: { value: 2.75, min: 0, max: 10, step: 0.01 },
+    scale: { value: 0.008, min: 0, max: 0.1, step: 0.001 },
+    boundHalfExtent: { value: 8, min: 0, max: 20, step: 0.01 },
+    colorA: '#5900ff',
+    colorB: '#ffa575',
+    // Incremented by the leva Reset button — re-dispatches the init kernel below.
+    reset: button(() => setResetCount((count) => count + 1)),
+  })
 
   // Leva knobs → live uniforms: create-or-update semantics sync new values on
   // every re-render; the graphs below reference the stable node instances.
@@ -76,8 +84,8 @@ export function AttractorParticles({
     uColorA,
     uColorB } = useUniforms(
     {
-      uAttractorMass: attractorMass,
-      uParticleGlobalMass: particleGlobalMass,
+      uAttractorMass: 10 ** attractorMassExponent,
+      uParticleGlobalMass: 10 ** particleGlobalMassExponent,
       uTimeScale: timeScale,
       uSpinningStrength: spinningStrength,
       uMaxSpeed: maxSpeed,
@@ -88,19 +96,6 @@ export function AttractorParticles({
       uColorB: colorB },
     'attractorParticles', // WGSL-identifier rule: camelCase scope, never kebab-case
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see tsl-galaxy et al.).
-  const uAttractorMassNode = uAttractorMass as unknown as Node<'float'>
-  const uParticleGlobalMassNode = uParticleGlobalMass as unknown as Node<'float'>
-  const uTimeScaleNode = uTimeScale as unknown as Node<'float'>
-  const uSpinningStrengthNode = uSpinningStrength as unknown as Node<'float'>
-  const uMaxSpeedNode = uMaxSpeed as unknown as Node<'float'>
-  const uVelocityDampingNode = uVelocityDamping as unknown as Node<'float'>
-  const uScaleNode = uScale as unknown as Node<'float'>
-  const uBoundHalfExtentNode = uBoundHalfExtent as unknown as Node<'float'>
-  const uColorANode = uColorA as unknown as Node<'vec3'>
-  const uColorBNode = uColorB as unknown as Node<'vec3'>
-
   // The particle state, GPU-only. UNSCOPED on purpose: scoped useBuffers names
   // each buffer `${scope}.${name}` and the dot lands in the WGSL struct name —
   // runtime shader compile error (fiber bug, UPSTREAM.md B16). Root-level keys
@@ -134,8 +129,8 @@ export function AttractorParticles({
       const sphericalToVec3 = Fn(([phiRaw, thetaRaw]) => {
         // Cast: Fn destructured params type as bare ShaderNodeObject<Node>, so
         // typed TSL math won't resolve through them (three typing gap, UPSTREAM.md B10).
-        const phi = phiRaw as unknown as Node<'float'>
-        const theta = thetaRaw as unknown as Node<'float'>
+        const phi = phiRaw
+        const theta = thetaRaw
         const sinPhiRadius = sin(phi)
         return vec3(sinPhiRadius.mul(sin(theta)), cos(phi), sinPhiRadius.mul(cos(theta)))
       })
@@ -164,7 +159,7 @@ export function AttractorParticles({
       // Per-particle mass multiplier — shared by the update kernel (physics)
       // and the sprite scaleNode (heavier particle = bigger sprite).
       const particleMassMultiplier = hash(instanceIndex.add(seed())).remap(0.25, 1).toVar()
-      const particleMass = particleMassMultiplier.mul(uParticleGlobalMassNode).toVar()
+      const particleMass = particleMassMultiplier.mul(uParticleGlobalMass).toVar()
 
       // (2) Update kernel: Newtonian gravity toward each attractor plus a
       // rotational force around its axis, speed clamp (GPU `If()`, not JS `if`),
@@ -172,7 +167,7 @@ export function AttractorParticles({
       const computeUpdate = Fn(() => {
         // Fixed timestep (like the original) for a consistent simulation.
         const delta = float(1 / 60)
-          .mul(uTimeScaleNode)
+          .mul(uTimeScale)
           .toVar()
         const position = attractorParticlePositions.element(instanceIndex)
         const velocity = attractorParticleVelocities.element(instanceIndex)
@@ -188,45 +183,45 @@ export function AttractorParticles({
 
           // gravity
           const gravityStrength = particleMass
-            .mul(uAttractorMassNode)
+            .mul(uAttractorMass)
             .mul(GRAVITY_CONSTANT)
             .div(distance.pow(2))
             .toVar()
           force.addAssign(direction.mul(gravityStrength))
 
           // spinning
-          const spinningForce = attractorRotationAxis.mul(gravityStrength).mul(uSpinningStrengthNode)
+          const spinningForce = attractorRotationAxis.mul(gravityStrength).mul(uSpinningStrength)
           force.addAssign(spinningForce.cross(toAttractor))
         })
 
         // velocity
         velocity.addAssign(force.mul(delta))
         const speed = velocity.length()
-        If(speed.greaterThan(uMaxSpeedNode), () => {
-          velocity.assign(velocity.normalize().mul(uMaxSpeedNode))
+        If(speed.greaterThan(uMaxSpeed), () => {
+          velocity.assign(velocity.normalize().mul(uMaxSpeed))
         })
-        velocity.mulAssign(float(uVelocityDampingNode).oneMinus())
+        velocity.mulAssign(float(uVelocityDamping).oneMinus())
 
         // position
         position.addAssign(velocity.mul(delta))
 
         // box loop: wrap positions into the [-half, +half] cube
-        const halfHalfExtent = float(uBoundHalfExtentNode).div(2).toVar()
-        position.assign(mod(position.add(halfHalfExtent), uBoundHalfExtentNode).sub(halfHalfExtent))
+        const halfHalfExtent = float(uBoundHalfExtent).div(2).toVar()
+        position.assign(mod(position.add(halfHalfExtent), uBoundHalfExtent).sub(halfHalfExtent))
       })().compute(PARTICLE_COUNT)
 
       // Sprite graph: position straight from the storage buffer; color ramps
       // from colorA to colorB with speed; scale follows the particle's mass.
       const speed = attractorParticleVelocities.toAttribute().length()
-      const colorMix = speed.div(uMaxSpeedNode).smoothstep(0, 0.5)
+      const colorMix = speed.div(uMaxSpeed).smoothstep(0, 0.5)
 
       return {
         computeInit,
         computeUpdate,
         uAttractorPositions,
         spritePositionNode: attractorParticlePositions.toAttribute(),
-        spriteColorNode: vec4(mix(uColorANode, uColorBNode, colorMix), 1),
-        spriteScaleNode: particleMassMultiplier.mul(uScaleNode) }
+        spriteColorNode: vec4(mix(uColorA, uColorB, colorMix), 1),
+        spriteScaleNode: particleMassMultiplier.mul(uScale) }
     })
 
   // ONCE at mount + on every leva Reset press: (re)seed the buffers. Sync

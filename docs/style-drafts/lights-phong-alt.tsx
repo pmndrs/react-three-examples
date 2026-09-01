@@ -1,3 +1,14 @@
+/* ============================================================================
+ * NOT CANONICAL — DO NOT USE AS A REFERENCE.
+ *
+ * A scratch sketch, parked here so it stopped breaking the build. It does NOT
+ * typecheck: `useLocalNodes<T extends Record<string, unknown>>` requires its creator
+ * to return a NAMED-NODE OBJECT, and this file returns a bare node. It also carries
+ * an unresolved inline author critique.
+ *
+ * The shipped, hand-tuned reference is src/examples/lights/lights-phong.tsx.
+ * A restyle agent used this file as a model once; hence this banner.
+ * ==========================================================================*/
 /**
  * lights-phong
  * R3F port of three.js `webgpu_lights_phong`, running on WebGPU.

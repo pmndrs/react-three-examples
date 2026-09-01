@@ -3,10 +3,10 @@
 // layer 0, so both the main camera and the collision camera see it — snow lands on
 // all of it.
 import { useLayoutEffect, useMemo } from 'react'
-import { useThree } from '@react-three/fiber/webgpu'
 import { color, positionLocal, screenUV } from 'three/tsl'
 import { MeshStandardNodeMaterial } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+import { useNodes, useThree } from '@react-three/fiber/webgpu'
 
 const TREE_LEVELS = 8
 
@@ -24,18 +24,20 @@ export function SnowScenery() {
     }
   }, [scene])
 
-  // One material shared by all tree cones + the trunk (the original shares one too),
-  // and the floor's radial opacity fade. Memoized, never disposed (StrictMode rule).
-  const { treeMaterial, floorOpacityNode } = useMemo(
-    () => ({
-      treeMaterial: new MeshStandardNodeMaterial({ color: 0x0d492c, roughness: 0.6, metalness: 0 }),
-      // The original bakes rotateX(-π/2) into the floor geometry and reads
-      // `positionLocal.xz`; this port rotates the mesh instead, so the plane's local
-      // ground coordinates are xy — identical radial fade (header DIVERGENCE).
-      floorOpacityNode: positionLocal.xy.mul(0.05).distance(0).saturate().oneMinus(),
-    }),
+  // REVIEW(shared-instance): one material for all eight tree cones + the trunk (the
+  // original shares one too) — a real perf win over nine separate materials, so it
+  // stays imperative. Memoized, never disposed (StrictMode rule).
+  const treeMaterial = useMemo(
+    () => new MeshStandardNodeMaterial({ color: 0x0d492c, roughness: 0.6, metalness: 0 }),
     [],
   )
+
+  // The floor's radial opacity fade. The original bakes rotateX(-π/2) into the floor
+  // geometry and reads `positionLocal.xz`; this port rotates the mesh instead, so the
+  // plane's local ground coordinates are xy — identical radial fade.
+  const { floorOpacityNode } = useNodes(() => ({
+    floorOpacityNode: positionLocal.xy.mul(0.05).distance(0).saturate().oneMinus(),
+  }))
 
   return (
     <>

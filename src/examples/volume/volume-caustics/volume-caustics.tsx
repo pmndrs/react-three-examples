@@ -41,30 +41,14 @@
  *   becomes drei `useGLTF`'s second argument
  */
 import { Suspense, useRef } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { NoToneMapping } from 'three/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu'
 import type CameraControlsImpl from 'camera-controls'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { VolumeCaustics } from './VolumeCaustics'
 
 export default function VolumeCausticsExample() {
   const cameraControlsRef = useRef<CameraControlsImpl | null>(null)
-
-  const { causticOcclusion, materialColor } = useControls('volume-caustics duck', {
-    causticOcclusion: { value: 1, min: 0, max: 20, step: 0.1 },
-    materialColor: '#ffd700',
-  })
-
-  const { smokeAmount, volumetricLightingIntensity, steps, resolution } = useControls(
-    'volume-caustics fog',
-    {
-      smokeAmount: { value: 3, min: 0, max: 10, step: 0.1 },
-      volumetricLightingIntensity: { value: 0.7, min: 0, max: 3, step: 0.01 },
-      steps: { value: 20, min: 4, max: 64, step: 1 },
-      resolution: { value: 0.5, min: 0.1, max: 1, step: 0.05 },
-    },
-  )
 
   return (
     <Canvas
@@ -76,14 +60,7 @@ export default function VolumeCausticsExample() {
       camera={{ position: [-0.7, 0.2, 0.2], fov: 25, near: 0.025, far: 5 }}
     >
       <Suspense fallback={null}>
-        <VolumeCaustics
-          causticOcclusion={causticOcclusion}
-          materialColor={materialColor}
-          smokeAmount={smokeAmount}
-          volumetricLightingIntensity={volumetricLightingIntensity}
-          steps={steps}
-          resolution={resolution}
-        />
+        <VolumeCaustics />
       </Suspense>
       <DemoHelpers
         grid={false}

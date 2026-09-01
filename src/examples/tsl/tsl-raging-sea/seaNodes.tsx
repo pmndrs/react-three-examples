@@ -1,4 +1,3 @@
-import { folder } from 'leva';
 import { useLayoutEffect, useRef } from 'react';
 import {
   Fn,
@@ -13,6 +12,7 @@ import {
   vec3,
 } from 'three/tsl';
 import type { Node, PlaneGeometry } from 'three/webgpu';
+import { folder } from 'leva';
 
 //* Controls ======================================================
 

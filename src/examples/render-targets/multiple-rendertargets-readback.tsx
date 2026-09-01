@@ -24,8 +24,6 @@
  *   original's Inspector `selection` GUI ('mrt' / 'diffuse' / 'normal')
  *
  * DIVERGENCE from original
- * - leva `selection` dropdown replaces `renderer.inspector.createParameters(...)` —
- *   same three options, same default ('mrt')
  * - DemoHelpers baseline (camera-controls orbit, `grid={false}` — solid dark
  *   background, no ground plane in the original) replaces the bare `OrbitControls`
  * - Render-target resize is driven by `useThree`'s reactive `size` instead of a
@@ -48,9 +46,6 @@
  *   so both need matching names for either to compile
  */
 import { Suspense, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
 import { mix, mrt, normalWorld, output, screenUV, step, texture, uv, vec2 } from 'three/tsl'
 import {
   DataTexture,
@@ -66,6 +61,9 @@ import {
   UnsignedByteType,
 } from 'three/webgpu'
 import type { Mesh } from 'three/webgpu'
+import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/hardwood2_diffuse.jpg'

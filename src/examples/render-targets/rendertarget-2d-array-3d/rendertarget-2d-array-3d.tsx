@@ -53,9 +53,8 @@
  *   (`MultiViewRig.tsx`), matching the original's own per-view controls.
  */
 import { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { NoToneMapping } from 'three/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu'
 import { useZippedVolumeData } from '../../../utils/useZippedVolumeData'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { MultiViewRig } from './MultiViewRig'
@@ -63,24 +62,20 @@ import { MultiViewRig } from './MultiViewRig'
 const VOLUME_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/3d/head256x256x109.zip'
 const VOLUME_ENTRY = 'head256x256x109'
 
-function Rig({ layersPerSecond }: { layersPerSecond: number }) {
+function Rig() {
   // Suspends until the shared zip volume is loaded + unpacked (see
   // `textures-2d-array` for the sibling port using the same asset).
   const data = useZippedVolumeData(VOLUME_URL, VOLUME_ENTRY)
-  return <MultiViewRig data={data} layersPerSecond={layersPerSecond} />
+  return <MultiViewRig data={data} />
 }
 
 export default function RenderTarget2DArray3D() {
-  const { layersPerSecond } = useControls('rendertarget-2d-array-3d', {
-    layersPerSecond: { value: 20, min: 2, max: 60, step: 1, label: 'layers / second' },
-  })
-
   return (
     <Canvas renderer={{ toneMapping: NoToneMapping }} background="#000000">
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>
-        <Rig layersPerSecond={layersPerSecond} />
+        <Rig />
       </Suspense>
       <DemoHelpers grid={false} controls={false} />
     </Canvas>

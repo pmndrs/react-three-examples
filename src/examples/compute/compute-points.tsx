@@ -32,8 +32,7 @@
  *   not matching the original's exact (arguably accidental) resize behavior
  * - DemoHelpers `controls={false} grid={false}`: the original has no camera
  *   interaction at all — a fixed 2D view is the point of a shadertoy-style demo
- * - The GUI's `scaleVector.x`/`.y` sliders (0-1) become leva `boundsX`/`boundsY`;
- *   `renderer.inspector` panel dropped (no Inspector wiring in this repo's shell)
+ * - The GUI's `scaleVector.x`/`.y` sliders (0-1) become leva `boundsX`/`boundsY`
  * - Pointer tracking: an invisible full-frustum plane with an `onPointerMove` handler
  *   (`event.point.xy` is already in the same -1..1 space the kernel expects, R3F did
  *   the raycast) instead of the original's `window` `mousemove` listener + manual NDC
@@ -52,11 +51,10 @@
  *   ref instead of a JSX prop (candidate DefinitelyTyped fix, not a fiber/corpus gap)
  */
 import { useLayoutEffect, useRef } from 'react'
-import { useControls } from 'leva'
-import { Canvas, useFrame, useNodes, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
 import { Fn, color, float, instanceIndex, instancedArray, uniform, vec2 } from 'three/tsl'
-import { Vector2 } from 'three/webgpu'
-import type { Node, OrthographicCamera, Points, Renderer} from 'three/webgpu'
+import { Vector2, type OrthographicCamera, type Points, type Renderer } from 'three/webgpu'
+import { Canvas, useFrame, useNodes, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const PARTICLE_COUNT = 300_000
@@ -80,23 +78,19 @@ function OrthographicFraming() {
   return null
 }
 
-interface PointsFieldProps {
-  boundsX: number
-  boundsY: number
-}
-
-function PointsField({ boundsX, boundsY }: PointsFieldProps) {
+function PointsField() {
   const renderer = useThree((s) => s.renderer)
   const pointsRef = useRef<Points>(null)
 
+  //* Controls =====================================================
+  const { boundsX, boundsY } = useControls('compute-points', {
+    boundsX: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds x' },
+    boundsY: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds y' },
+  })
   const { uBoundsX, uBoundsY } = useUniforms(
     { uBoundsX: boundsX, uBoundsY: boundsY },
     'computePoints', // WGSL-identifier rule: camelCase scope, never kebab-case
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see compute-particles et al.).
-  const uBoundsXNode = uBoundsX as unknown as Node<'float'>
-  const uBoundsYNode = uBoundsY as unknown as Node<'float'>
 
   // All node graphs built once. ROOT-LEVEL useNodes on purpose (UPSTREAM.md B16):
   // a scoped call would name entries `${scope}.${name}`, and the sprite-material
@@ -114,7 +108,7 @@ function PointsField({ boundsX, boundsY }: PointsFieldProps) {
       const particle = particleArray.element(instanceIndex)
       const velocity = velocityArray.element(instanceIndex)
 
-      const limit = vec2(uBoundsXNode, uBoundsYNode)
+      const limit = vec2(uBoundsX, uBoundsY)
       const position = particle.add(velocity).toVar()
 
       velocity.x.assign(position.x.abs().greaterThanEqual(limit.x).select(velocity.x.negate(), velocity.x))
@@ -152,7 +146,8 @@ function PointsField({ boundsX, boundsY }: PointsFieldProps) {
       computeNode,
       uPointer,
       positionNode: particleArray.element(instanceIndex),
-      colorNode: particleArray.element(instanceIndex).add(color(0xffffff)) }
+      colorNode: particleArray.element(instanceIndex).add(color(0xffffff)),
+    }
   })
 
   // EVERY FRAME: step the simulation. Pointer updates arrive separately, via the
@@ -205,10 +200,6 @@ function PointsField({ boundsX, boundsY }: PointsFieldProps) {
 }
 
 export default function ComputePoints() {
-  const { boundsX, boundsY } = useControls('compute-points', {
-    boundsX: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds x' },
-    boundsY: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds y' } })
-
   return (
     <Canvas
       // Reading a storage buffer directly in the VERTEX stage (positionNode above)
@@ -220,7 +211,7 @@ export default function ComputePoints() {
       camera={{ position: [0, 0, 1], near: 0, far: 1 }}
     >
       <OrthographicFraming />
-      <PointsField boundsX={boundsX} boundsY={boundsY} />
+      <PointsField />
       <DemoHelpers grid={false} controls={false} />
     </Canvas>
   )

@@ -3,8 +3,6 @@
 // the full DEMONSTRATES/DIVERGENCE story). Lives in its own file because it needs
 // fiber hooks (`useUniforms`) and therefore must render inside `<Canvas>`.
 import { useEffect, useMemo } from 'react'
-import { useUniforms } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import {
   billboarding,
   Fn,
@@ -22,24 +20,35 @@ import {
   vec4,
 } from 'three/tsl'
 import { CanvasTexture, DoubleSide, SpriteNodeMaterial, SRGBColorSpace } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
+
+import { useUniforms } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
+import { folder, useControls } from 'leva'
 
 const CDN = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples'
 const CELLULAR_URL = `${CDN}/textures/noises/voronoi/grayscale-256x256.png`
 const PERLIN_URL = `${CDN}/textures/noises/perlin/rgb-256x256.png`
 
-export interface FlamesProps {
-  timeScale: number
-  gradientColors: string[]
-}
+export function Flames() {
+  //* Controls ====================================================
+  const { timeScale, color1, color2, color3, color4, color5 } = useControls('tsl-vfx-flames', {
+    timeScale: { value: 1, min: 0, max: 3, step: 0.01 },
+    gradient: folder({
+      color1: '#090033',
+      color2: '#5f1f93',
+      color3: '#e02e96',
+      color4: '#ffbd80',
+      color5: '#fff0db',
+    }),
+  })
+  const gradientColors = useMemo(
+    () => [color1, color2, color3, color4, color5],
+    [color1, color2, color3, color4, color5],
+  )
 
-export function Flames({ timeScale, gradientColors }: FlamesProps) {
   const [cellularTexture, perlinTexture] = useTexture([CELLULAR_URL, PERLIN_URL])
 
   const { uTimeScale } = useUniforms({ uTimeScale: timeScale }, 'vfxFlames')
-  // Cast: fiber's `UniformNode<T>` pins its TSL type param to `unknown` — documented
-  // upstream typing gap (see header DIVERGENCE).
-  const uTimeScaleNode = uTimeScale as unknown as Node<'float'>
 
   // 128x1 gradient LUT. The texture object is identity-stable (painted in the effect
   // below), so leva color edits never rebuild the node graph.
@@ -68,7 +77,7 @@ export function Flames({ timeScale, gradientColors }: FlamesProps) {
   const { flame1Material, flame2Material } = useMemo(() => {
     // Every `time` term in the original scales through the live uniform — slow-mo
     // with zero graph rebuilds.
-    const t = time.mul(uTimeScaleNode)
+    const t = time.mul(uTimeScale)
 
     // flame 1 — the gradient-toned core
 
@@ -152,7 +161,7 @@ export function Flames({ timeScale, gradientColors }: FlamesProps) {
     flame2Material.vertexNode = billboarding()
 
     return { flame1Material, flame2Material }
-  }, [cellularTexture, perlinTexture, gradientTexture, uTimeScaleNode])
+  }, [cellularTexture, perlinTexture, gradientTexture, uTimeScale])
 
   return (
     <>

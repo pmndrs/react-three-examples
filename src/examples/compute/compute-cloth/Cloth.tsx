@@ -2,18 +2,9 @@
 // the CPU-side system, two compute kernels (per-spring force + per-vertex
 // integration), the cloth surface whose vertex stage centres each render vertex on
 // 4 verlet vertices, the animated collision sphere, and the wireframe debug view.
-// Uses fiber hooks (`useUniforms`/`useBuffers`/`useNodes`/`useLoader`/`useFrame`/
-// `useThree`), so it lives inside <Canvas>, not in the page shell.
+// Uses fiber hooks (`useControls`/`useUniforms`/`useBuffers`/`useNodes`/`useLoader`/
+// `useFrame`/`useThree`), so it lives inside <Canvas>, not in the page shell.
 import { useLayoutEffect, useRef, useState } from 'react'
-import {
-  useBuffers,
-  useFrame,
-  useLoader,
-  useNodes,
-  useThree,
-  useUniforms,
-} from '@react-three/fiber/webgpu'
-import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js'
 import {
   attribute,
   cross,
@@ -30,13 +21,11 @@ import {
   triNoise3D,
   uniform,
 } from 'three/tsl'
-import {
-  DoubleSide,
-  EquirectangularReflectionMapping,
-  Vector3,
-  type Mesh,
-  type Node,
-} from 'three/webgpu'
+import { DoubleSide, EquirectangularReflectionMapping, Vector3, type Mesh } from 'three/webgpu'
+import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js'
+import { useBuffers, useFrame, useLoader, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
+
 import { buildVerletSystem, SPHERE_RADIUS } from './verletSystem'
 import { VerletWireframe } from './VerletWireframe'
 
@@ -50,31 +39,24 @@ const TIME_PER_STEP = 1 / STEPS_PER_SECOND
 // Don't advance the accumulator too far when the tab was out of focus.
 const MAX_DELTA = 1 / 60
 
-export interface ClothProps {
-  stiffness: number
-  wind: number
-  sphereEnabled: boolean
-  wireframe: boolean
-  color: string
-  roughness: number
-  sheen: number
-  sheenRoughness: number
-  sheenColor: string
-}
-
-export function Cloth({
-  stiffness,
-  wind,
-  sphereEnabled,
-  wireframe,
-  color,
-  roughness,
-  sheen,
-  sheenRoughness,
-  sheenColor,
-}: ClothProps) {
+export function Cloth() {
   const scene = useThree((state) => state.scene)
   const renderer = useThree((state) => state.renderer)
+
+  //* Controls ======================================================
+  const { stiffness, wind, sphere: sphereEnabled, wireframe } = useControls('compute-cloth', {
+    stiffness: { value: 0.2, min: 0.1, max: 0.5, step: 0.01 },
+    wireframe: false,
+    sphere: true,
+    wind: { value: 1, min: 0, max: 5, step: 0.1 },
+  })
+  const { color, roughness, sheen, sheenRoughness, sheenColor } = useControls('material', {
+    color: '#204080',
+    roughness: { value: 1, min: 0, max: 1, step: 0.01 },
+    sheen: { value: 1, min: 0, max: 1, step: 0.01 },
+    sheenRoughness: { value: 0.5, min: 0, max: 1, step: 0.01 },
+    sheenColor: '#ffffff',
+  })
 
   // Leva knobs → live kernel uniforms. Called BEFORE the suspending useLoader below —
   // creator-mode hooks deferred past a suspension write to the store after siblings
@@ -83,12 +65,8 @@ export function Cloth({
     { uStiffness: stiffness, uWind: wind, uSphere: sphereEnabled ? 1 : 0 },
     'computeCloth',
   )
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
-  // (documented fiber typing gap — see compute-particles et al.).
-  const uStiffnessNode = uStiffness as unknown as Node<'float'>
-  const uWindNode = uWind as unknown as Node<'float'>
-  const uSphereNode = uSphere as unknown as Node<'float'>
 
+  //* GPU State ======================================================
   // CPU-side verlet system, built once and captured by the create-once creators
   // below — lazy useState, not useMemo: a StrictMode memo re-run could hand the
   // component a different instance than the one the buffers uploaded (AGENTS.md
@@ -118,6 +96,7 @@ export function Cloth({
     clothSpringForce: instancedArray(system.springCount, 'vec3'),
   }))
 
+  //* Compute Graph ==================================================
   // All node graphs built exactly once, closing over the TYPED hook returns above
   // (creator-state reads widen to fiber's BufferLike — AGENTS.md). Also UNSCOPED
   // (UPSTREAM.md B16): kernels and material nodes all reach WGSL codegen.
@@ -147,7 +126,7 @@ export function Cloth({
 
       const delta = vertex1Position.sub(vertex0Position).toVar()
       const dist = delta.length().max(0.000001).toVar()
-      const force = dist.sub(restLength).mul(uStiffnessNode).mul(delta).mul(0.5).div(dist)
+      const force = dist.sub(restLength).mul(uStiffness).mul(delta).mul(0.5).div(dist)
       clothSpringForce.element(instanceIndex).assign(force)
     })().compute(system.springCount)
 
@@ -187,14 +166,14 @@ export function Cloth({
 
       // wind
       const noise = triNoise3D(position, 1, time).sub(0.2).mul(0.0001)
-      const windForce = noise.mul(uWindNode)
+      const windForce = noise.mul(uWind)
       force.z.subAssign(windForce)
 
       // collision with the sphere: push out along the centre delta when the
       // candidate position lands inside the radius (zeroed by the sphere toggle).
       const deltaSphere = position.add(force).sub(uSpherePosition)
       const dist = deltaSphere.length()
-      const sphereForce = float(SPHERE_RADIUS).sub(dist).max(0).mul(deltaSphere).div(dist).mul(uSphereNode)
+      const sphereForce = float(SPHERE_RADIUS).sub(dist).max(0).mul(deltaSphere).div(dist).mul(uSphere)
       force.addAssign(sphereForce)
 
       clothVertexForce.element(instanceIndex).assign(force)
@@ -258,6 +237,7 @@ export function Cloth({
     }
   })
 
+  //* Environment ====================================================
   // SUSPENDS — deliberately ordered after every creator hook above (AGENTS.md B18)
   // and before the meshes render: the cloth/sphere materials carry custom node
   // graphs in an unlit scene, so their FIRST shader build must already see
@@ -279,15 +259,16 @@ export function Cloth({
     }
   }, [scene, envMap])
 
+  //* Simulation Loop ================================================
   // EVERY FRAME, before the default render phase draws (NOT phase:'render' —
   // compute is not a render takeover): run 0..6 fixed sub-steps, each moving the
-  // sphere uniform along its figure-8 sweep and dispatching BOTH kernels (B9 cast).
+  // sphere uniform along its figure-8 sweep and dispatching BOTH kernels.
   const sphereRef = useRef<Mesh>(null)
   const stepState = useRef({ accumulator: 0, timestamp: 0 })
   useFrame(
-    (state) => {
+    ({ delta }) => {
       const sim = stepState.current
-      sim.accumulator += Math.min(state.delta, MAX_DELTA)
+      sim.accumulator += Math.min(delta, MAX_DELTA)
 
       while (sim.accumulator >= TIME_PER_STEP) {
         sim.timestamp += TIME_PER_STEP

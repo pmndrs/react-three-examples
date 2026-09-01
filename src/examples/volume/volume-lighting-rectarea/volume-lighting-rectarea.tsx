@@ -34,27 +34,14 @@
  * - `Inspector`/`.toInspector()` wiring dropped (not ported)
  */
 import { Suspense } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { NeutralToneMapping } from 'three/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { VolumeLightingRectarea } from './VolumeLightingRectarea'
 
 const KNOT_POSITION: [number, number, number] = [0, 5.5, 0]
 
 export default function VolumeLightingRectareaExample() {
-  const { fogIntensity, smokeAmount, rotationSpeed } = useControls('volume-lighting-rectarea scene', {
-    fogIntensity: { value: 1, min: 0, max: 2, step: 0.01 },
-    smokeAmount: { value: 2, min: 0, max: 3, step: 0.05 },
-    rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
-
-  const { steps, resolution, denoiseStrength } = useControls('volume-lighting-rectarea quality', {
-    steps: { value: 12, min: 2, max: 16, step: 1 },
-    resolution: { value: 0.25, min: 0.1, max: 1, step: 0.05 },
-    denoiseStrength: { value: 0.6, min: 0, max: 1, step: 0.01 },
-  })
-
   return (
     <Canvas
       // Original sets these explicitly — mirrored here (fiber's Canvas would
@@ -65,14 +52,7 @@ export default function VolumeLightingRectareaExample() {
       camera={{ position: [0, 5, -15], fov: 60, near: 0.1, far: 250 }}
     >
       <Suspense fallback={null}>
-        <VolumeLightingRectarea
-          fogIntensity={fogIntensity}
-          smokeAmount={smokeAmount}
-          rotationSpeed={rotationSpeed}
-          steps={steps}
-          resolution={resolution}
-          denoiseStrength={denoiseStrength}
-        />
+        <VolumeLightingRectarea />
       </Suspense>
       <DemoHelpers grid={false} target={KNOT_POSITION} minDistance={5} maxDistance={200} />
     </Canvas>

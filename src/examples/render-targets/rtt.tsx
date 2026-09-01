@@ -32,7 +32,7 @@
  */
 import { Suspense, useRef } from 'react'
 import { hue, saturation, texture } from 'three/tsl'
-import type { Mesh, Node } from 'three/webgpu'
+import type { Mesh } from 'three/webgpu'
 import { Canvas, useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
@@ -77,11 +77,8 @@ function PostFX() {
     if (!renderPipeline) return
 
     const sceneColor = passes.scenePass.getTextureNode()
-    // Cast: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so it
-    // never structurally narrows to `Node<'float'>` even though it is one at runtime
-    // (documented fiber typing gap, see skinning-instancing).
-    const mouseX = uMouseX as unknown as Node<'float'>
-    const mouseY = uMouseY as unknown as Node<'float'>
+    const mouseX = uMouseX
+    const mouseY = uMouseY
 
     renderPipeline.outputNode = hue(saturation(sceneColor.rgb, mouseX.oneMinus()), mouseY)
   })

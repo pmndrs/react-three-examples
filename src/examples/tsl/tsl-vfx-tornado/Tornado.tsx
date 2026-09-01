@@ -3,8 +3,6 @@
 // a MeshBasicNodeMaterial `outputNode`/`positionNode` graph over one scrolling RGB
 // perlin texture. Needs fiber hooks (`useUniforms`), so it lives inside <Canvas>.
 import { useLayoutEffect, useMemo } from 'react'
-import { useUniforms } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import {
   Fn,
   PI,
@@ -32,24 +30,26 @@ import {
 } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
 
+import { useUniforms } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
+
 const PERLIN_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/noises/perlin/rgb-256x256.png'
 
-export interface TornadoProps {
-  emissiveColor: string
-  timeScale: number
-  parabolStrength: number
-  parabolOffset: number
-  parabolAmplitude: number
-}
+export function Tornado() {
+  //* Controls ====================================================
+  const { emissiveColor, timeScale, parabolStrength, parabolOffset, parabolAmplitude } = useControls(
+    'tsl-vfx-tornado',
+    {
+      emissiveColor: '#ff8b4d',
+      timeScale: { value: 0.2, min: -1, max: 1, step: 0.01 },
+      parabolStrength: { value: 1, min: 0, max: 2, step: 0.01 },
+      parabolOffset: { value: 0.3, min: 0, max: 1, step: 0.01 },
+      parabolAmplitude: { value: 0.2, min: 0, max: 2, step: 0.01 },
+    },
+  )
 
-export function Tornado({
-  emissiveColor,
-  timeScale,
-  parabolStrength,
-  parabolOffset,
-  parabolAmplitude,
-}: TornadoProps) {
   // Run-time knobs: create-or-update semantics sync the leva values into the live GPU
   // uniforms on every re-render — the node graphs below never rebuild.
   // ORDER MATTERS: `useUniforms` must run BEFORE the suspending `useTexture` below.
@@ -69,15 +69,6 @@ export function Tornado({
       },
       'vfxTornado',
     )
-
-  // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so the
-  // uniforms won't feed typed TSL math under strict tsc (upstream fiber gap — same
-  // cast family as tsl-galaxy / tsl-raging-sea).
-  const uEmissiveColorNode = uEmissiveColor as unknown as Node<'vec3'>
-  const uTimeScaleNode = uTimeScale as unknown as Node<'float'>
-  const uParabolStrengthNode = uParabolStrength as unknown as Node<'float'>
-  const uParabolOffsetNode = uParabolOffset as unknown as Node<'float'>
-  const uParabolAmplitudeNode = uParabolAmplitude as unknown as Node<'float'>
 
   const perlinTexture = useTexture(PERLIN_URL)
 
@@ -153,7 +144,7 @@ export function Tornado({
     const floorMaterial = new MeshBasicNodeMaterial({ transparent: true })
 
     floorMaterial.outputNode = Fn(() => {
-      const scaledTime = time.mul(uTimeScaleNode)
+      const scaledTime = time.mul(uTimeScale)
 
       // noise 1
       const noise1Uv = toRadialUv(uv(), vec2(0.5, 0.5), scaledTime, scaledTime)
@@ -179,7 +170,7 @@ export function Tornado({
 
       // output: hard-thresholded emissive cells (×3 so bloom picks them up)
       return vec4(
-        vec3(uEmissiveColorNode).mul(effect.step(0.2)).mul(3),
+        uEmissiveColor.mul(effect.step(0.2)).mul(3),
         effect.smoothstep(0, 0.01),
       )
     })()
@@ -190,14 +181,14 @@ export function Tornado({
 
     emissiveMaterial.positionNode = twistedCylinder(
       positionLocal,
-      uParabolStrengthNode,
-      uParabolOffsetNode,
-      float(uParabolAmplitudeNode).sub(0.05), // slightly inside the dark shell
-      time.mul(uTimeScaleNode),
+      uParabolStrength,
+      uParabolOffset,
+      float(uParabolAmplitude).sub(0.05), // slightly inside the dark shell
+      time.mul(uTimeScale),
     )
 
     emissiveMaterial.outputNode = Fn(() => {
-      const scaledTime = time.mul(uTimeScaleNode)
+      const scaledTime = time.mul(uTimeScale)
 
       // noise 1
       const noise1Uv = uv().add(vec2(scaledTime, scaledTime.negate())).toVar()
@@ -218,10 +209,10 @@ export function Tornado({
       const effect = noise1.mul(noise2).mul(outerFade)
 
       // emissive normalized by its own luminance so any picked color glows equally
-      const emissiveColorLuminance = luminance(vec3(uEmissiveColorNode))
+      const emissiveColorLuminance = luminance(uEmissiveColor)
 
       return vec4(
-        vec3(uEmissiveColorNode).mul(1.2).div(emissiveColorLuminance),
+        uEmissiveColor.mul(1.2).div(emissiveColorLuminance),
         effect.smoothstep(0, 0.1),
       )
     })()
@@ -232,14 +223,14 @@ export function Tornado({
 
     darkMaterial.positionNode = twistedCylinder(
       positionLocal,
-      uParabolStrengthNode,
-      uParabolOffsetNode,
-      uParabolAmplitudeNode,
-      time.mul(uTimeScaleNode),
+      uParabolStrength,
+      uParabolOffset,
+      uParabolAmplitude,
+      time.mul(uTimeScale),
     )
 
     darkMaterial.outputNode = Fn(() => {
-      const scaledTime = time.mul(uTimeScaleNode).add(123.4) // decorrelate from the core
+      const scaledTime = time.mul(uTimeScale).add(123.4) // decorrelate from the core
 
       // noise 1
       const noise1Uv = uv().add(vec2(scaledTime, scaledTime.negate())).toVar()
@@ -273,11 +264,11 @@ export function Tornado({
     return { floorGeometry, cylinderGeometry, floorMaterial, emissiveMaterial, darkMaterial }
   }, [
     perlinTexture,
-    uEmissiveColorNode,
-    uTimeScaleNode,
-    uParabolStrengthNode,
-    uParabolOffsetNode,
-    uParabolAmplitudeNode,
+    uEmissiveColor,
+    uTimeScale,
+    uParabolStrength,
+    uParabolOffset,
+    uParabolAmplitude,
   ])
 
   return (
