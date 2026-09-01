@@ -8,9 +8,9 @@
  *   `exponentialHeightFogFactor(density, height)` factor — fog that pools below a
  *   world-space height instead of the uniform distance haze the auto-wrapped
  *   `Fog`/`FogExp2` objects give
- * - Live three/tsl `uniform()` nodes as the dynamism channel: the fog graph is built
- *   ONCE, leva sliders only mutate `uniform.value` — no shader rebuild while dragging
- *   (exactly how the original's Inspector GUI drives the same two uniforms)
+ * - `useUniforms` as the dynamism channel: the fog graph is built ONCE, leva sliders
+ *   only mutate `.value` — no shader rebuild while dragging (exactly how the
+ *   original's Inspector GUI drives the same three uniforms)
  * - `InstancedMesh` with a one-time imperative `setMatrixAt` layout in
  *   `useLayoutEffect` (first-render-visible mesh state, per the Layer 1 rule)
  * - Deliberate `renderer={{ toneMapping: NoToneMapping }}` for parity — the original
@@ -30,30 +30,30 @@
  * - DemoHelpers grid disabled — the original has no ground plane and a grid at y=0
  *   would slice through the fog bank the example is about
  */
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { exponentialHeightFogFactor, fog, uniform } from 'three/tsl'
-import { Color, NoToneMapping, Object3D } from 'three/webgpu'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import { exponentialHeightFogFactor, fog } from 'three/tsl'
+import { NoToneMapping, Object3D } from 'three/webgpu'
 import type { InstancedMesh, Node } from 'three/webgpu'
+
+import { Canvas, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-interface HeightFogProps {
-  density: number
-  height: number
-  fogColor: string
-}
-
-// Custom scene-level TSL fog. The graph is built once from live uniform() nodes;
-// leva changes only mutate `.value`. Cast: `@types/three`'s `Scene` doesn't declare
-// `fogNode` — see header DIVERGENCE.
-function HeightFog({ density, height, fogColor }: HeightFogProps) {
+// Custom scene-level TSL fog. The graph is built once from live useUniforms nodes;
+// leva changes only mutate `.value`, no rebuild. Cast: `@types/three`'s `Scene`
+// doesn't declare `fogNode` — see header DIVERGENCE.
+function HeightFog({ fogColor }: { fogColor: string }) {
   const scene = useThree((s) => s.scene)
 
-  // three/tsl uniforms, created once — the same objects the original feeds its GUI.
-  const uDensity = useMemo(() => uniform(0.04), [])
-  const uHeight = useMemo(() => uniform(2), [])
-  const uColor = useMemo(() => uniform(new Color('#ffdfc1')), [])
+  const { density, height } = useControls('height-fog', {
+    density: { value: 0.04, min: 0.001, max: 0.1, step: 0.0001 },
+    height: { value: 2, min: -5, max: 5 },
+  })
+
+  // The same three/tsl uniform nodes the original feeds its GUI — useUniforms keeps
+  // `.value` synced.
+  const { uDensity, uHeight, uColor } = useUniforms({ uDensity: density, uHeight: height, uColor: fogColor })
 
   useEffect(() => {
     const fogged = scene as unknown as { fogNode: Node | null }
@@ -62,18 +62,6 @@ function HeightFog({ density, height, fogColor }: HeightFogProps) {
       fogged.fogNode = null
     }
   }, [scene, uColor, uDensity, uHeight])
-
-  useEffect(() => {
-    uDensity.value = density
-  }, [uDensity, density])
-
-  useEffect(() => {
-    uHeight.value = height
-  }, [uHeight, height])
-
-  useEffect(() => {
-    uColor.value.set(fogColor)
-  }, [uColor, fogColor])
 
   return null
 }
@@ -110,9 +98,8 @@ function BoxField() {
 }
 
 export default function FogHeight() {
-  const { density, height, fogColor } = useControls('height-fog', {
-    density: { value: 0.04, min: 0.001, max: 0.1, step: 0.0001 },
-    height: { value: 2, min: -5, max: 5 },
+  // fogColor lives here, not in HeightFog — Canvas's own `background` prop needs it too.
+  const { fogColor } = useControls('height-fog', {
     fogColor: '#ffdfc1',
   })
 
@@ -124,7 +111,7 @@ export default function FogHeight() {
       background={fogColor}
       camera={{ position: [20, 10, 25], fov: 45, near: 1, far: 600 }}
     >
-      <HeightFog density={density} height={height} fogColor={fogColor} />
+      <HeightFog fogColor={fogColor} />
       <BoxField />
       <directionalLight color="#ffc0cb" intensity={2} position={[-10, 10, 10]} />
       <ambientLight color="#cccccc" />

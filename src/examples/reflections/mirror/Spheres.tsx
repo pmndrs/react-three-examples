@@ -26,7 +26,7 @@ export function Spheres({ speed }: SpheresProps) {
   // Date.now() and a per-frame rotation increment).
   const clockRef = useRef(0)
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     clockRef.current += delta * speed
     const t = clockRef.current
 

@@ -74,7 +74,7 @@ function Dish() {
     }
   }, [scene, animations])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     mixerRef.current?.update(delta)
   })
 

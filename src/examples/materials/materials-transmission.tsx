@@ -40,9 +40,6 @@
  *   the param is declared but never wired to anything upstream).
  */
 import { Suspense, useEffect } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { Environment } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
 import {
   ACESFilmicToneMapping,
   CanvasTexture,
@@ -50,6 +47,9 @@ import {
   NearestFilter,
   RepeatWrapping,
 } from 'three/webgpu'
+import { Canvas, useThree } from '@react-three/fiber/webgpu'
+import { Environment } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const HDR_URL =

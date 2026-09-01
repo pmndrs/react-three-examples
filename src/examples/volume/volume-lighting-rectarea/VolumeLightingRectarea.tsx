@@ -131,7 +131,7 @@ export function VolumeLightingRectarea({
     lights.forEach((l) => l!.layers.enable(LAYER_VOLUMETRIC_LIGHTING))
   }, [])
 
-  useFrame((_state, delta) => {
+  useFrame(({ delta }) => {
     const l1 = light1Ref.current
     const l2 = light2Ref.current
     const l3 = light3Ref.current

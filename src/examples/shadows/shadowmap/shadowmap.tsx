@@ -54,9 +54,11 @@
  *   `sky`/`postprocessing-bloom-emissive`: a WebGPURenderer property, not a TSL uniform)
  */
 import { useEffect } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { useControls, folder } from 'leva'
 import { ACESFilmicToneMapping } from 'three/webgpu'
+
+import { Canvas, useThree } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { Ground } from './Ground'
 import { Lights } from './Lights'
@@ -64,7 +66,8 @@ import { Pillars, TorusKnot } from './Shapes'
 
 // renderer.toneMappingExposure is a WebGPURenderer property, not a TSL uniform — set
 // imperatively (same pattern as sky.tsx / postprocessing-bloom-emissive.tsx).
-function ToneMappingExposure({ exposure }: { exposure: number }) {
+function ToneMappingExposure() {
+  const { exposure } = useControls('shadowmap', { exposure: { value: 1, min: 0, max: 2, step: 0.01 } })
   const renderer = useThree((s) => s.renderer)
 
   useEffect(() => {
@@ -75,14 +78,9 @@ function ToneMappingExposure({ exposure }: { exposure: number }) {
 }
 
 export default function Shadowmap() {
-  const { maskThreshold, shadowRadius, spinSpeed, exposure } = useControls('shadowmap', {
-    maskThreshold: { value: 0, min: -1, max: 1, step: 0.01 },
-    shadow: folder({
-      shadowRadius: { value: 4, min: 0, max: 10, step: 0.5 },
-    }),
-    spinSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
-    exposure: { value: 1, min: 0, max: 2, step: 0.01 },
-  })
+  // spinSpeed is shared by Lights (light orbit) and TorusKnot (spin rate) — stays here
+  // rather than duplicating the leva row in both.
+  const { spinSpeed } = useControls('shadowmap', { spinSpeed: { value: 1, min: 0, max: 3, step: 0.05 } })
 
   return (
     <Canvas
@@ -92,11 +90,11 @@ export default function Shadowmap() {
       camera={{ position: [0, 10, 20], fov: 45, near: 1, far: 1000 }}
     >
       <fog attach="fog" args={['#222244', 50, 100]} />
-      <Lights shadowRadius={shadowRadius} spinSpeed={spinSpeed} />
-      <TorusKnot maskThreshold={maskThreshold} spinSpeed={spinSpeed} />
+      <Lights spinSpeed={spinSpeed} />
+      <TorusKnot spinSpeed={spinSpeed} />
       <Pillars />
       <Ground />
-      <ToneMappingExposure exposure={exposure} />
+      <ToneMappingExposure />
       <DemoHelpers grid={false} target={[0, 2, 0]} minDistance={7} maxDistance={40} />
     </Canvas>
   )

@@ -29,9 +29,6 @@
  *   values
  */
 import { Suspense, useEffect } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { Environment, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
 import {
   ACESFilmicToneMapping,
   AgXToneMapping,
@@ -41,6 +38,11 @@ import {
   NoToneMapping,
   ReinhardToneMapping,
 } from 'three/webgpu'
+
+import { Canvas, useThree } from '@react-three/fiber/webgpu'
+import { Environment, useGLTF } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MASK_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/venice_mask.glb'
@@ -62,47 +64,46 @@ function VeniceMask() {
   return <primitive object={scene} />
 }
 
-// renderer.toneMapping / renderer.toneMappingExposure are WebGPURenderer properties,
-// not TSL uniforms or Canvas-level config — mutated imperatively so the leva dropdown
-// and exposure slider take effect without a pipeline rebuild.
-function ToneMapping({ type, exposure }: { type: keyof typeof TONE_MAPPING_OPTIONS; exposure: number }) {
-  const renderer = useThree((s) => s.renderer)
-
-  useEffect(() => {
-    renderer.toneMapping = TONE_MAPPING_OPTIONS[type]
-  }, [renderer, type])
-
-  useEffect(() => {
-    renderer.toneMappingExposure = exposure
-  }, [renderer, exposure])
-
-  return null
-}
-
-export default function Tonemapping() {
-  const { toneMapping, exposure } = useControls('tonemapping', {
-    toneMapping: { value: 'Neutral', options: Object.keys(TONE_MAPPING_OPTIONS) },
-    exposure: { value: 1, min: 0, max: 2, step: 0.01 },
-  })
-
+// Blurriness/intensity are the leva knobs for this HDR — owned here, next to the
+// Environment they drive, rather than at the page root.
+function HdrBackground() {
   const { blurriness, intensity } = useControls('background', {
     blurriness: { value: 0.3, min: 0, max: 1, step: 0.01 },
     intensity: { value: 1, min: 0, max: 1, step: 0.01 },
   })
 
+  return <Environment files={HDR_URL} background backgroundBlurriness={blurriness} backgroundIntensity={intensity} />
+}
+
+// renderer.toneMapping / renderer.toneMappingExposure are WebGPURenderer properties,
+// not TSL uniforms or Canvas-level config — mutated imperatively so the leva dropdown
+// and exposure slider take effect without a pipeline rebuild.
+function ToneMapping() {
+  const renderer = useThree((s) => s.renderer)
+  const { toneMapping, exposure } = useControls('tonemapping', {
+    toneMapping: { value: 'Neutral', options: Object.keys(TONE_MAPPING_OPTIONS) },
+    exposure: { value: 1, min: 0, max: 2, step: 0.01 },
+  })
+
+  useEffect(() => {
+    renderer.toneMapping = TONE_MAPPING_OPTIONS[toneMapping as keyof typeof TONE_MAPPING_OPTIONS]
+    renderer.toneMappingExposure = exposure
+  }, [renderer, toneMapping, exposure])
+
+  return null
+}
+
+export default function Tonemapping() {
   return (
-    <Canvas
-      renderer
-      camera={{ position: [-0.02, 0.03, 0.05], fov: 45, near: 0.01, far: 10 }}
-    >
+    <Canvas renderer camera={{ position: [-0.02, 0.03, 0.05], fov: 45, near: 0.01, far: 10 }}>
       <directionalLight color={0xfff3ee} intensity={3} position={[1, 0.05, 0.7]} />
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>
-        <Environment files={HDR_URL} background backgroundBlurriness={blurriness} backgroundIntensity={intensity} />
+        <HdrBackground />
         <VeniceMask />
       </Suspense>
-      <ToneMapping type={toneMapping as keyof typeof TONE_MAPPING_OPTIONS} exposure={exposure} />
+      <ToneMapping />
       <DemoHelpers grid={false} target={[0, 0.03, 0]} minDistance={0.03} maxDistance={0.2} pan={false} />
     </Canvas>
   )

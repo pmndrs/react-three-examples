@@ -40,9 +40,6 @@
  *   with no ground plane in the original
  */
 import { Suspense, useEffect, useMemo } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useCubeTexture, useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
 import {
   CubeReflectionMapping,
   CubeRefractionMapping,
@@ -51,6 +48,9 @@ import {
   MeshBasicNodeMaterial,
   SRGBColorSpace,
 } from 'three/webgpu'
+import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
+import { useCubeTexture, useTexture } from '@react-three/drei/webgpu'
+import { folder, useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/Bridge2/'
@@ -96,7 +96,7 @@ function EnvMapSphere({ type, refraction, rotateX, rotateY, rotateZ, syncMateria
     material.needsUpdate = true
   }, [scene, material, type, refraction, textureCube, textureEquirec])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     if (rotateX) scene.backgroundRotation.x += ROTATION_SPEED * delta
     if (rotateY) scene.backgroundRotation.y += ROTATION_SPEED * delta
     if (rotateZ) scene.backgroundRotation.z += ROTATION_SPEED * delta

@@ -42,8 +42,10 @@
  *   worth exposing (same call as `rtt`)
  */
 import { useEffect, useMemo } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
 import { SRGBColorSpace, SphereGeometry, VideoTexture } from 'three/webgpu'
+
+import { Canvas } from '@react-three/fiber/webgpu'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const VIDEO_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/pano.webm'

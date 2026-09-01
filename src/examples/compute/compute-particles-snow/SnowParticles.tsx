@@ -15,8 +15,7 @@ import {
   texture,
   time,
   uint,
-  vec3,
-} from 'three/tsl'
+  vec3 } from 'three/tsl'
 import {
   HalfFloatType,
   MeshBasicNodeMaterial,
@@ -25,9 +24,8 @@ import {
   OrthographicCamera,
   RedFormat,
   RenderTarget,
-  SphereGeometry,
-} from 'three/webgpu'
-import type { Node, WebGPURenderer } from 'three/webgpu'
+  SphereGeometry } from 'three/webgpu'
+import type { Node} from 'three/webgpu'
 
 const PARTICLE_COUNT = 100_000
 // Flake radius — also the per-flake surface clearance in the landing test.
@@ -51,11 +49,7 @@ export interface SnowParticlesProps {
 export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticlesProps) {
   const scene = useThree((state) => state.scene)
   const camera = useThree((state) => state.camera)
-  const rawRenderer = useThree((state) => state.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` and the RenderTarget
-  // overload of `.setRenderTarget()` exist only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((state) => state.renderer)
 
   // The main camera must also see layer 2, where the falling flakes live.
   useLayoutEffect(() => {
@@ -109,8 +103,7 @@ export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticl
     snowScales: instancedArray(PARTICLE_COUNT, 'vec3'),
     snowStaticPositions: instancedArray(PARTICLE_COUNT, 'vec3'),
     // x/z: spawn column, y: fall velocity, w: per-flake random seed
-    snowData: instancedArray(PARTICLE_COUNT, 'vec4'),
-  }))
+    snowData: instancedArray(PARTICLE_COUNT, 'vec4') }))
 
   // Kernels + render position nodes, built once. Closing over the TYPED hook returns
   // above (creator-state reads widen to fiber's BufferLike, losing `.element()` /
@@ -183,8 +176,7 @@ export function SnowParticles({ driftSpeed, fallSpeed, resetNonce }: SnowParticl
         snowDynamicPositionNode: positionLocal.mul(snowScales.toAttribute()).add(snowPositions.toAttribute()),
         snowStaticPositionNode: positionLocal
           .mul(snowScales.toAttribute())
-          .add(snowStaticPositions.toAttribute()),
-      }
+          .add(snowStaticPositions.toAttribute()) }
     })
 
   // ONCE at mount + ON DEMAND from the leva reset button (nonce-keyed): seed the

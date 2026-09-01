@@ -23,7 +23,6 @@
  */
 import { useEffect } from 'react'
 import { NoToneMapping, PMREMGenerator } from 'three/webgpu'
-import type { WebGPURenderer } from 'three/webgpu'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { Canvas, useThree } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
@@ -37,11 +36,10 @@ import { Shapes } from './Shapes'
 // RoomEnvironment PMREM lighting — same imperative escape-hatch pattern as
 // postprocessing-ao's RoomEnv and postprocessing-sobel's RoomEnv.
 function RoomEnv() {
-  const rawRenderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer)
   const scene = useThree((s) => s.scene)
 
   useEffect(() => {
-    const renderer = rawRenderer as WebGPURenderer // UPSTREAM B9
     const environment = new RoomEnvironment()
     const pmremGenerator = new PMREMGenerator(renderer)
     const envRT = pmremGenerator.fromScene(environment, 0.04)
@@ -52,7 +50,7 @@ function RoomEnv() {
       scene.environment = null
       envRT.dispose()
     }
-  }, [rawRenderer, scene])
+  }, [renderer, scene])
 
   return null
 }

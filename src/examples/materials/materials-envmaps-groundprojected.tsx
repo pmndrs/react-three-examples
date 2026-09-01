@@ -11,7 +11,7 @@
  *   half into a walkable ground plane under the car
  * - Equirect HDR -> cube map conversion with `CubeRenderTarget.fromEquirectangularTexture`
  *   (the original's "avoid pole artifacts" step), run once in a layout effect against
- *   the live renderer (B9 union cast)
+ *   the live renderer
  * - Projection `height`/`radius` as live `useUniforms` values: the webgpu original
  *   bakes them into the graph as const `float()`s — behind uniforms they become leva
  *   sliders that never trigger a shader-graph rebuild
@@ -42,9 +42,6 @@
  *   original constructs; the node classes are the same materials, named honestly).
  */
 import { Suspense, useEffect, useLayoutEffect, useMemo, useState } from 'react'
-import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useGLTF, useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
 import {
   ACESFilmicToneMapping,
   CubeRenderTarget,
@@ -54,10 +51,13 @@ import {
   MeshStandardNodeMaterial,
   MultiplyBlending,
 } from 'three/webgpu'
-import type { Material, Mesh, Node, WebGPURenderer } from 'three/webgpu'
+import type { Material, Mesh, Node } from 'three/webgpu'
 import { cubeTexture } from 'three/tsl'
 import { HDRLoader } from 'three/addons/loaders/HDRLoader.js'
 import { getGroundProjectedNormal } from 'three/addons/tsl/utils/GroundedSkybox.js'
+import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { useGLTF, useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/'
@@ -83,9 +83,7 @@ function GroundedEnvironment({
 
   const envMap = useLoader(HDRLoader, HDR_URL)
   const scene = useThree((s) => s.scene)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the /webgpu
-  // entry; fromEquirectangularTexture needs the common Renderer base (B9).
-  const renderer = useThree((s) => s.renderer) as WebGPURenderer
+  const renderer = useThree((s) => s.renderer)
 
   // HDRLoader leaves mapping at UVMapping; reflection mapping must be in place
   // before the first shader build reads scene.environment.

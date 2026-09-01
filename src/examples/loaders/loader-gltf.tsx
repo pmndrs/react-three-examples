@@ -104,7 +104,7 @@ function Model({ url }: { url: string }) {
     }
   }, [scene, animations])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     mixerRef.current?.update(delta)
   })
 

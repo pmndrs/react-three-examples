@@ -151,7 +151,7 @@ function Spheres({ controlsRef }: { controlsRef: React.RefObject<CameraControlsI
     }
   }, [controlsRef])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     if (rotating.current && groupRef.current) groupRef.current.rotation.y += delta * 0.5
   })
 

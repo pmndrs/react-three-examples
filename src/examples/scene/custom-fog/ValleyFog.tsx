@@ -4,56 +4,34 @@
 // (around mid-height), so the peaks rise clear above it. The band sits at a fixed
 // altitude whatever the distance, and the noise wobbles its top edge and drifts it
 // through world space, so it reads as slow-moving cloud. (The peaks reach ~130.)
-import { useEffect, useLayoutEffect, useMemo } from 'react'
-import { useThree } from '@react-three/fiber/webgpu'
-import {
-  color,
-  densityFogFactor,
-  fog,
-  normalWorld,
-  positionWorld,
-  time,
-  triNoise3D,
-  uniform,
-} from 'three/tsl'
+import { useLayoutEffect } from 'react'
+import { color, densityFogFactor, fog, normalWorld, positionWorld, time, triNoise3D } from 'three/tsl'
 import type { Node } from 'three/webgpu'
+
+import { useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
 
 const SKY_COLOR = 0xf0f5f5
 const GROUND_COLOR = 0xd0dee7
 
-export interface ValleyFogProps {
-  /** World-y the fog is solid below (the valley floor). */
-  base: number
-  /** World-y the fog fades out by (mid-mountain). */
-  top: number
-  /** Distance haze density, so the far peaks dissolve into the same grey. */
-  haze: number
-}
-
-export function ValleyFog({ base, top, haze }: ValleyFogProps) {
+export function ValleyFog() {
   const scene = useThree((s) => s.scene)
 
-  // Live-tunable knobs of the fog graph — leva changes mutate `.value`, no rebuild.
-  const uniforms = useMemo(
-    () => ({
-      fogBase: uniform(-20),
-      fogTop: uniform(55),
-      fogHaze: uniform(0.0012),
+  const { base, top, haze } = useControls('custom-fog', {
+    fog: folder({
+      base: { value: -20, min: -40, max: 20, step: 1 }, // world-y the fog is solid below (valley floor)
+      top: { value: 55, min: 0, max: 130, step: 1 }, // world-y the fog fades out by (mid-mountain)
+      haze: { value: 0.0012, min: 0, max: 0.005, step: 0.0001 }, // distance haze density
     }),
-    [],
-  )
+  })
 
-  useEffect(() => {
-    uniforms.fogBase.value = base
-    uniforms.fogTop.value = top
-    uniforms.fogHaze.value = haze
-  }, [uniforms, base, top, haze])
+  // Live-tunable knobs of the fog graph — useUniforms keeps `.value` synced, no
+  // manual effect.
+  const { fogBase, fogTop, fogHaze } = useUniforms({ fogBase: base, fogTop: top, fogHaze: haze })
 
   // Build the graph once and hand it to the scene. Layout effect, not passive: the
   // first shader build (first RAF after commit) must already see the fog node.
   useLayoutEffect(() => {
-    const { fogBase, fogTop, fogHaze } = uniforms
-
     const groundColor = color(GROUND_COLOR)
     const skyColor = color(SKY_COLOR)
 
@@ -84,7 +62,7 @@ export function ValleyFog({ base, top, haze }: ValleyFogProps) {
       fogged.fogNode = null
       fogged.backgroundNode = null
     }
-  }, [scene, uniforms])
+  }, [scene, fogBase, fogTop, fogHaze])
 
   return null
 }

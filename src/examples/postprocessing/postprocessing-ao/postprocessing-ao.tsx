@@ -21,7 +21,6 @@
  */
 import { Suspense, useEffect } from 'react'
 import { NeutralToneMapping, PMREMGenerator } from 'three/webgpu'
-import type { WebGPURenderer } from 'three/webgpu'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { Canvas, useThree } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
@@ -37,13 +36,10 @@ import { TennysonBust } from './TennysonBust'
 // RoomEnvironment → PMREM → scene.environment, dimmed to let the spotlights carry
 // the scene (matches the original: intensity 0.3 over a #666666 background).
 function RoomEnv() {
-  const rawRenderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer)
   const scene = useThree((s) => s.scene)
 
   useEffect(() => {
-    // PMREMGenerator wants the WebGPU renderer; useThree types the union even on
-    // the /webgpu entry (upstream fiber gap, UPSTREAM.md B9).
-    const renderer = rawRenderer as WebGPURenderer
     const environment = new RoomEnvironment()
     const pmremGenerator = new PMREMGenerator(renderer)
     const envRT = pmremGenerator.fromScene(environment, 0.04)
@@ -55,7 +51,7 @@ function RoomEnv() {
       scene.environment = null
       envRT.dispose()
     }
-  }, [rawRenderer, scene])
+  }, [renderer, scene])
 
   return null
 }

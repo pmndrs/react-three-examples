@@ -4,12 +4,14 @@
 // once after the glTF loads (AGENTS.md guarded-setup pattern, same shape as
 // shadowmap-opacity's dragon scene).
 import { useLayoutEffect, useRef, useState } from 'react'
+import { Group, MeshPhongMaterial } from 'three/webgpu'
+import type { DirectionalLight, Mesh, Object3D } from 'three/webgpu'
+import { ProgressiveLightMap } from 'three/addons/misc/ProgressiveLightMapGPU.js'
+
 import { useFrame, useThree } from '@react-three/fiber/webgpu'
 import { TransformControls, useGLTF } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import type CameraControlsImpl from 'camera-controls'
-import { Group, MeshPhongMaterial } from 'three/webgpu'
-import type { DirectionalLight, Mesh, Object3D, WebGPURenderer } from 'three/webgpu'
-import { ProgressiveLightMap } from 'three/addons/misc/ProgressiveLightMapGPU.js'
 
 const MODEL_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/ShadowmappableMesh.glb'
@@ -18,28 +20,24 @@ const SHADOW_MAP_RES = 1024
 const LIGHT_MAP_RES = 1024
 
 export interface LightmapSceneProps {
-  enabled: boolean
-  blurEdges: boolean
-  blendWindow: number
-  lightRadius: number
-  ambientWeight: number
-  debugLightmap: boolean
   controlsRef: React.RefObject<CameraControlsImpl | null>
 }
 
-export function LightmapScene({
-  enabled,
-  blurEdges,
-  blendWindow,
-  lightRadius,
-  ambientWeight,
-  debugLightmap,
-  controlsRef,
-}: LightmapSceneProps) {
-  // useThree types renderer as the WebGL/WebGPU union even on the `/webgpu` entry
-  // (fiber typing gap, UPSTREAM.md B9) — ProgressiveLightMapGPU is WebGPURenderer-only.
-  const rawRenderer = useThree((s) => s.renderer)
-  const renderer = rawRenderer as WebGPURenderer
+export function LightmapScene({ controlsRef }: LightmapSceneProps) {
+  const { enabled, blurEdges, blendWindow, lightRadius, ambientWeight, debugLightmap } = useControls(
+    'shadowmap-progressive',
+    {
+      enabled: { value: true, label: 'Enable' },
+      blurEdges: { value: true, label: 'Blur Edges' },
+      blendWindow: { value: 200, min: 1, max: 500, step: 1, label: 'Blend Window' },
+      lightRadius: { value: 50, min: 0, max: 200, step: 10, label: 'Light Radius' },
+      ambientWeight: { value: 0.5, min: 0, max: 1, step: 0.1, label: 'Ambient Weight' },
+      debugLightmap: { value: false, label: 'Debug Lightmap' },
+    },
+  )
+  // On the `/webgpu` entry, `state.renderer` is already typed WebGPURenderer (B9 fixed
+  // in fiber alpha.4) — no cast needed. ProgressiveLightMapGPU is WebGPURenderer-only.
+  const renderer = useThree((s) => s.renderer)
   const camera = useThree((s) => s.camera)
   const { scene: gltfScene } = useGLTF(MODEL_URL)
 

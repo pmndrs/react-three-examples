@@ -28,12 +28,15 @@
  * - DemoHelpers grid disabled (`grid={false}`) — the sky dome fills the frame edge to
  *   edge; a ground grid would cut across open sky where the original has none
  */
-import { useEffect, useMemo } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
+import type { SkyMesh } from 'three/addons/objects/SkyMesh.js'
+import { ACESFilmicToneMapping, MathUtils, Vector3 } from 'three/webgpu'
+
 import { Canvas, useThree } from '@react-three/fiber/webgpu'
 import { CubeCamera } from '@react-three/drei/webgpu'
 import { folder, useControls } from 'leva'
-import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
-import { ACESFilmicToneMapping, MathUtils, Vector3 } from 'three/webgpu'
+
+import '../../assets/SkyMesh'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 // Initial camera distance from the origin — reused to lock CameraControls' dolly range
@@ -41,40 +44,41 @@ import { DemoHelpers } from '../../utils/DemoHelpers'
 const CAMERA_POSITION: [number, number, number] = [0, 100, 2000]
 const CAMERA_DISTANCE = Math.hypot(...CAMERA_POSITION)
 
-interface SkyProps {
-  turbidity: number
-  rayleigh: number
-  mieCoefficient: number
-  mieDirectionalG: number
-  elevation: number
-  azimuth: number
-  showSunDisc: boolean
-  cloudCoverage: number
-  cloudDensity: number
-  cloudElevation: number
-}
-
 // SkyMesh's parameters are all `uniform()`-backed fields on the instance (three.js TSL),
 // mutated directly here — no fiber uniform/rebuild machinery needed.
-function Sky({
-  turbidity,
-  rayleigh,
-  mieCoefficient,
-  mieDirectionalG,
-  elevation,
-  azimuth,
-  showSunDisc,
-  cloudCoverage,
-  cloudDensity,
-  cloudElevation,
-}: SkyProps) {
-  const sky = useMemo(() => {
-    const mesh = new SkyMesh()
-    mesh.scale.setScalar(450000)
-    return mesh
-  }, [])
+function Sky() {
+  const skyRef = useRef<SkyMesh>(null)
 
-  useEffect(() => {
+  const {
+    turbidity,
+    rayleigh,
+    mieCoefficient,
+    mieDirectionalG,
+    elevation,
+    azimuth,
+    showSunDisc,
+    cloudCoverage,
+    cloudDensity,
+    cloudElevation,
+  } = useControls('webgpu-sky', {
+    turbidity: { value: 10, min: 0, max: 20, step: 0.1 },
+    rayleigh: { value: 3, min: 0, max: 4, step: 0.001 },
+    mieCoefficient: { value: 0.005, min: 0, max: 0.1, step: 0.001 },
+    mieDirectionalG: { value: 0.7, min: 0, max: 1, step: 0.001 },
+    elevation: { value: 65, min: 0, max: 90, step: 0.1 },
+    azimuth: { value: 0, min: -180, max: 180, step: 0.1 },
+    showSunDisc: true,
+    clouds: folder({
+      cloudCoverage: { value: 0.4, min: 0, max: 1, step: 0.01 },
+      cloudDensity: { value: 0.4, min: 0, max: 1, step: 0.01 },
+      cloudElevation: { value: 0.5, min: 0, max: 1, step: 0.01 },
+    }),
+  })
+
+  useLayoutEffect(() => {
+    const sky = skyRef.current
+    if (!sky) return
+
     sky.turbidity.value = turbidity
     sky.rayleigh.value = rayleigh
     sky.mieCoefficient.value = mieCoefficient
@@ -88,7 +92,6 @@ function Sky({
     const theta = MathUtils.degToRad(azimuth)
     sky.sunPosition.value.copy(new Vector3().setFromSphericalCoords(1, phi, theta))
   }, [
-    sky,
     turbidity,
     rayleigh,
     mieCoefficient,
@@ -101,7 +104,7 @@ function Sky({
     cloudElevation,
   ])
 
-  return <primitive object={sky} />
+  return <skyMesh ref={skyRef} scale={450000} />
 }
 
 // Reflective sphere: drei's <CubeCamera> hides its children, captures the surrounding
@@ -124,8 +127,11 @@ function ReflectiveSphere() {
 // renderer.toneMappingExposure is a WebGPURenderer property, not a TSL uniform — has no
 // place in a node graph, so it's set imperatively (same pattern as
 // postprocessing-bloom-emissive's ToneMappingExposure).
-function ToneMappingExposure({ exposure }: { exposure: number }) {
+function ToneMappingExposure() {
   const renderer = useThree((s) => s.renderer)
+  const { exposure } = useControls('webgpu-sky', {
+    exposure: { value: 0.05, min: 0, max: 1, step: 0.0001 },
+  })
 
   useEffect(() => {
     renderer.toneMappingExposure = exposure
@@ -135,53 +141,14 @@ function ToneMappingExposure({ exposure }: { exposure: number }) {
 }
 
 export default function WebgpuSky() {
-  const {
-    turbidity,
-    rayleigh,
-    mieCoefficient,
-    mieDirectionalG,
-    elevation,
-    azimuth,
-    exposure,
-    showSunDisc,
-    cloudCoverage,
-    cloudDensity,
-    cloudElevation,
-  } = useControls('webgpu-sky', {
-    turbidity: { value: 10, min: 0, max: 20, step: 0.1 },
-    rayleigh: { value: 3, min: 0, max: 4, step: 0.001 },
-    mieCoefficient: { value: 0.005, min: 0, max: 0.1, step: 0.001 },
-    mieDirectionalG: { value: 0.7, min: 0, max: 1, step: 0.001 },
-    elevation: { value: 65, min: 0, max: 90, step: 0.1 },
-    azimuth: { value: 0, min: -180, max: 180, step: 0.1 },
-    exposure: { value: 0.05, min: 0, max: 1, step: 0.0001 },
-    showSunDisc: true,
-    clouds: folder({
-      cloudCoverage: { value: 0.4, min: 0, max: 1, step: 0.01 },
-      cloudDensity: { value: 0.4, min: 0, max: 1, step: 0.01 },
-      cloudElevation: { value: 0.5, min: 0, max: 1, step: 0.01 },
-    }),
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       camera={{ position: CAMERA_POSITION, fov: 60, near: 100, far: 2000000 }}
     >
-      <Sky
-        turbidity={turbidity}
-        rayleigh={rayleigh}
-        mieCoefficient={mieCoefficient}
-        mieDirectionalG={mieDirectionalG}
-        elevation={elevation}
-        azimuth={azimuth}
-        showSunDisc={showSunDisc}
-        cloudCoverage={cloudCoverage}
-        cloudDensity={cloudDensity}
-        cloudElevation={cloudElevation}
-      />
+      <Sky />
       <ReflectiveSphere />
-      <ToneMappingExposure exposure={exposure} />
+      <ToneMappingExposure />
       <DemoHelpers grid={false} minDistance={CAMERA_DISTANCE} maxDistance={CAMERA_DISTANCE} pan={false} />
     </Canvas>
   )

@@ -35,9 +35,9 @@
  *   sway) runs unconditionally with no exposed parameters
  */
 import { Suspense, useMemo, useRef } from 'react'
+import { BoxGeometry, Color, type Mesh } from 'three/webgpu'
 import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { useVideoTexture } from '@react-three/drei/webgpu'
-import { BoxGeometry, Color, type Mesh } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const VIDEO_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sintel.mp4'

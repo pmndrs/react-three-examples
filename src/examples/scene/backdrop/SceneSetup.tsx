@@ -2,10 +2,11 @@
 // background and a spotlight rigidly attached to the camera. See backdrop.tsx header
 // DEMONSTRATES for both.
 import { useEffect, useMemo } from 'react'
-import { useThree } from '@react-three/fiber/webgpu'
 import { color, screenUV } from 'three/tsl'
 import { SpotLight } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+
+import { useThree } from '@react-three/fiber/webgpu'
 
 // Scene-level TSL sky gradient. Cast: `@types/three`'s `Scene` doesn't declare
 // `backgroundNode` even though the webgpu renderer reads it directly off the live scene
@@ -24,8 +25,11 @@ export function SceneBackground() {
   return null
 }
 
-// SpotLight rigidly attached to the camera. No declarative "light as camera child"
-// pattern exists in R3F — same escape hatch as skinning-instancing's `CameraLight`.
+// SpotLight rigidly attached to the camera (a declarative equivalent exists —
+// `<PerspectiveCamera makeDefault><spotLight/></PerspectiveCamera>`, used by
+// postprocessing-bloom — but this attaches to whatever camera Canvas's `camera` prop
+// made default, so it's kept imperative on purpose, same as skinning-instancing's
+// `CameraLight`).
 export function CameraLight() {
   const camera = useThree((s) => s.camera)
   const light = useMemo(() => {

@@ -1,5 +1,75 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–2)
 
+## Restyle wave 3 + corpus sweep — materials, scene, shadows (2026-09-02)
+
+33 more examples. **79 of 131 restyled; 52 left** (compute 11, tsl 10, loaders 7,
+render-targets 7, reflections 6, volume 6, textures 5).
+
+### The corpus sweep — retired patterns are GONE and now an error
+
+24 `as WebGPURenderer` (retired B9) + 12 `useFrame((_, delta) =>` (rule 10) = **36 sites,
+now 0.** `corpus/no-retired-patterns` promoted from `warn` to **`error`**.
+
+I under-reported this twice: first "3 files" (my grep only matched
+`s.renderer) as WebGPURenderer`; the bulk bind through `rawRenderer`), then the materials
+agent found 2 more. **A narrow grep is not a survey — write the AST rule instead.** Some
+of these survived in categories that had ALREADY been restyled, because each agent only
+fixed the instances its brief named.
+
+Codemod handled 13 files and REFUSED 7 with different binding shapes rather than guessing;
+those were done by hand. Import cleanup needed three passes (multi-line members, inline
+members, type-only imports).
+
+Lint warnings 129 -> 75, now exclusively import-hierarchy in the 4 remaining categories.
+
+### AGENTS.md: pattern (b) had a silent precondition
+
+The (b)/(c) selection rule I wrote in wave 1 was incomplete. What matters is not "does the
+node expose a writable uniform field" but **WHEN it reads that field**:
+
+- `BloomNode` reads `this.threshold` in `setup()` (at compile) -> field swap works, (b).
+- `SkyMesh` assigns `material.colorNode` inside its CONSTRUCTOR, capturing
+  `this.turbidity` on the spot (`objects/SkyMesh.js:371`) -> the field swap does nothing
+  and the control silently freezes. `WaterMesh` is the same. Those need `.value` mutation,
+  pattern (c).
+
+Failure mode is invisible: renders perfectly, knob just doesn't work. Documented.
+
+### UPSTREAM B31 filed — camera typing, NOT B9
+
+`RootState.camera` is typed base `Camera` (`fiber/dist/webgpu/index.d.ts:170`), so reading
+`.near`/`.fov` needs a cast. Several in-repo comments called this "the same shape as B9" —
+but B9 is FIXED, so those comments taught that a still-necessary cast was obsolete. Filed
+separately; comment repointed.
+
+### Agent self-verification is not reliable
+
+The shadows agent reported "0 tsc errors" with **two in its own file**: moving the CSM
+`mode` control into `CsmLight` made leva's `select` return `string` where
+`CSMShadowNodeMode` was required. Fixed by constraining the control
+(`satisfies CSMShadowNodeMode[]`), not by casting at each use site. Second agent this
+session whose self-report was wrong — verify every batch independently.
+
+### Worth featuring
+
+`ocean` 200 -> 86, `custom-fog` 220 -> 83, `sky` gained a real `<skyMesh>` intrinsic
+(new `src/assets/SkyMesh.ts`) replacing `new SkyMesh()` + `<primitive>`, and
+`shadowmap-csm`'s `CsmLight` went from **14 props to 1**.
+
+### Verified
+
+tsc 0, lint 0 errors, build clean, **smoke 130/131** — sole failure `tsl-wood`, the
+measured B28 flake (1-in-5), in 3.5m normal timing.
+
+### Open for Dennis
+
+- **prettier fails repo-wide**, including on the hand-tuned `lights-phong.tsx`.
+  `pnpm lint` is eslint-only, so formatting has never been enforced. Deciding whether to
+  adopt it is a repo-wide diff — not taken unilaterally.
+- `backdrop-area`'s 4-material runtime switcher is a THIRD material pattern that neither
+  "declarative JSX" nor "shared instance" describes. Marked `REVIEW(shared-instance)`.
+
+
 ## Restyle wave 2 — lights, animation, camera, geometry (2026-09-01)
 
 25 more examples restyled against AGENTS.md v1.1 (brief v2). **44 of 131 done**

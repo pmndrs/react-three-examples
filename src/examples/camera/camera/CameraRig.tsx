@@ -18,7 +18,6 @@ import {
   PerspectiveCamera,
   SphereGeometry,
 } from 'three/webgpu'
-import type { WebGPURenderer } from 'three/webgpu'
 import { useFrame, useThree } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
 
@@ -35,12 +34,7 @@ export function CameraRig() {
     },
   })
 
-  const { scene, renderer: rawRenderer } = useThree()
-  // Cast: see rtt.tsx / ContactShadowCatcher.tsx — fiber's `useThree()` types `renderer`
-  // as the package-wide `WebGLRenderer | WebGPURenderer` union even on the `/webgpu`
-  // entry (documented fiber typing gap, UPSTREAM.md B9). This canvas only ever runs a
-  // WebGPURenderer (the `/webgpu` entry creates one unconditionally).
-  const renderer = rawRenderer as WebGPURenderer
+  const { scene, renderer } = useThree()
   const size = useThree((state) => state.size)
 
   const rig = useMemo(() => {

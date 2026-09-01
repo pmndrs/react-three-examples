@@ -1,9 +1,11 @@
 // The rotating torus knot (its own maskNode-punched shadow caster, see the file header
 // DEMONSTRATES) plus the four static pillars around it.
-import { useMemo, useRef } from 'react'
-import { useFrame, useUniforms } from '@react-three/fiber/webgpu'
+import { useRef } from 'react'
 import { mx_fractal_noise_float, positionLocal } from 'three/tsl'
 import type { Mesh, Node } from 'three/webgpu'
+
+import { useFrame, useNodes, useUniforms } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 
 const BASE_COLOR = '#999999'
 const PILLAR_POSITIONS: [number, number, number][] = [
@@ -14,25 +16,24 @@ const PILLAR_POSITIONS: [number, number, number][] = [
 ]
 
 export interface TorusKnotProps {
-  maskThreshold: number
   spinSpeed: number
 }
 
 // The torus knot's material doubles as its own shadow-caster material: `maskNode`
 // discards fragments below the noise threshold, and that discard applies to the shadow
 // depth pass too, punching matching holes in the shadow (header DEMONSTRATES).
-export function TorusKnot({ maskThreshold, spinSpeed }: TorusKnotProps) {
+export function TorusKnot({ spinSpeed }: TorusKnotProps) {
+  const { maskThreshold } = useControls('shadowmap', { maskThreshold: { value: 0, min: -1, max: 1, step: 0.01 } })
   const meshRef = useRef<Mesh>(null)
   const { threshold } = useUniforms({ threshold: maskThreshold }, 'shadowmapMask')
 
   // Cast: fiber's `UniformNode<T>` pins the value type to `unknown` (documented fiber
   // typing gap, see tsl-halftone/skinning-instancing) — this uniform really is a float.
-  const maskNode = useMemo(
-    () => mx_fractal_noise_float(positionLocal.mul(0.1)).x.greaterThan(threshold as unknown as Node<'float'>),
-    [threshold],
-  )
+  const { maskNode } = useNodes(() => ({
+    maskNode: mx_fractal_noise_float(positionLocal.mul(0.1)).x.greaterThan(threshold as unknown as Node<'float'>),
+  }))
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const mesh = meshRef.current
     if (!mesh) return
     mesh.rotation.x += 0.25 * spinSpeed * delta

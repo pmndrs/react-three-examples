@@ -48,40 +48,17 @@
  *   world-space grid at a different height would clash with the shadow catcher plane
  *   that IS the subject of this example
  */
-import { folder, useControls } from 'leva'
 import { Canvas } from '@react-three/fiber/webgpu'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { ContactShadowCatcher } from './ContactShadowCatcher'
 import { Shapes } from './Shapes'
 
 export default function ShadowContact() {
-  const { shadowBlur, shadowDarkness, shadowOpacity, planeColor, planeOpacity, showWireframe } = useControls(
-    'shadow-contact',
-    {
-      Shadow: folder({
-        shadowBlur: { value: 3.5, min: 0, max: 15, step: 0.1 },
-        shadowDarkness: { value: 1, min: 0.1, max: 5, step: 0.1 },
-        shadowOpacity: { value: 1, min: 0, max: 1, step: 0.01 },
-      }),
-      Plane: folder({
-        planeColor: '#ffffff',
-        planeOpacity: { value: 1, min: 0, max: 1, step: 0.01 },
-      }),
-      showWireframe: false,
-    },
-  )
-
   return (
     <Canvas renderer background="#ffffff" camera={{ position: [0.5, 1, 2], fov: 50, near: 0.1, far: 100 }}>
       <Shapes />
-      <ContactShadowCatcher
-        blur={shadowBlur}
-        darkness={shadowDarkness}
-        shadowOpacity={shadowOpacity}
-        planeColor={planeColor}
-        planeOpacity={planeOpacity}
-        showWireframe={showWireframe}
-      />
+      <ContactShadowCatcher />
       <DemoHelpers grid={false} />
     </Canvas>
   )

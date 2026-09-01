@@ -21,7 +21,7 @@ export function CollisionBox({ z, scaleX }: CollisionBoxProps) {
     ref.current?.layers.enable(1)
   }, [])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const box = ref.current
     if (!box) return
     // The original negates the slider so dragging right moves the box toward the
@@ -52,7 +52,7 @@ export function Monkey() {
     ref.current?.layers.enable(1)
   }, [])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const monkey = ref.current
     if (!monkey) return
     monkey.rotation.y += delta

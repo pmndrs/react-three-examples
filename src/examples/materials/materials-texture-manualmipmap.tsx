@@ -32,8 +32,6 @@
  *   exists to teach, not a knob worth exposing
  */
 import { Suspense, useEffect, useMemo } from 'react'
-import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import {
   CanvasTexture,
   LinearFilter,
@@ -45,7 +43,9 @@ import {
   Scene,
   SRGBColorSpace,
 } from 'three/webgpu'
-import type { Texture, WebGPURenderer } from 'three/webgpu'
+import type { Texture } from 'three/webgpu'
+import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const PAINTING_URL =
@@ -143,11 +143,7 @@ function MipmapPane({ floorTexture, paintingTexture }: { floorTexture: Texture; 
 }
 
 function ManualMipmapSplit() {
-  const rawRenderer = useThree((state) => state.renderer)
-  // Cast: fiber's `useThree` types `renderer` as the `WebGLRenderer | WebGPURenderer`
-  // union even on the `/webgpu` entry (documented fiber typing gap, UPSTREAM.md B9);
-  // this canvas only ever runs a WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((state) => state.renderer)
 
   const paintingSource = useTexture(PAINTING_URL)
   const paintingLinear = useMemo(() => {

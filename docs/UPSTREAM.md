@@ -616,6 +616,22 @@ do not count those as fixed.
   between two graphs has no uniform field to assign onto, so the read-back is the ONLY
   available pattern (AGENTS.md § Post-processing (d)).
 
+### B31 · fiber: `RootState.camera` is the base `Camera`, so every lens read needs a cast
+
+- **What**: `state.camera` is typed `Camera` (`@react-three/fiber/dist/webgpu/index.d.ts:170`),
+  which has no `.near` / `.far` / `.fov` / `.aspect`. Any example reading a lens property
+  off the active camera must cast: `(camera as PerspectiveCamera).near`.
+- **Distinct from B9, which is FIXED.** B9 was the `renderer` union on the `/webgpu`
+  entry and fiber alpha.4 resolved it. Several in-repo comments described this camera
+  cast as "the same shape as B9", which now reads as though it were also retired — it is
+  not. Filed separately so the two cannot be confused again.
+- **Where it bites**: `scene/backdrop-water/RenderPipelineFX.tsx` (reads `.near`/`.far`
+  to reconstruct view depth). Any post-processing pass needing camera depth params hits it.
+- **Fix**: `<Canvas camera>` already knows which camera class it constructed; RootState
+  could carry that through a generic, or default to `PerspectiveCamera` (what fiber
+  actually creates unless told otherwise), with `OrthographicCamera` narrowing when
+  `orthographic` is set.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

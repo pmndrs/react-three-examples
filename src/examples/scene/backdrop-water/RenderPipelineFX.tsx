@@ -4,18 +4,19 @@
 // water plane, read from `objectPosition(camera).y` vs. a `screenUV`-derived horizon).
 // Below the waterline the blurred result is additionally tinted and vignetted. See
 // backdrop-water.tsx header DEMONSTRATES.
-import { useRenderPipeline } from '@react-three/fiber/webgpu'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { color, objectPosition, screenUV } from 'three/tsl'
 import type { PerspectiveCamera } from 'three/webgpu'
+
+import { useRenderPipeline } from '@react-three/fiber/webgpu'
 
 export function RenderPipelineFX() {
   useRenderPipeline(({ renderPipeline, passes, camera }) => {
     if (!renderPipeline) return
 
     // Cast: RootState's `camera` is typed as the base `Camera` (no `.near`) even though
-    // this example's `<Canvas camera>` is a PerspectiveCamera — same union-typing shape
-    // as UPSTREAM.md B9's `renderer` gap, applied to `camera` instead.
+    // this example's `<Canvas camera>` is a PerspectiveCamera — UPSTREAM B31. (NOT the
+    // renderer gap B9, which alpha.4 fixed; this one is still open.)
     const near = (camera as PerspectiveCamera).near
 
     const scenePassColor = passes.scenePass.getTextureNode()

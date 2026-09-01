@@ -3,50 +3,58 @@
 // control (maxFar, mode, margin, shadow near/far, camera swap, helper visibility) as a
 // live mutation + `updateFrustums()`/`updateVisibility()` — exactly what the original's
 // GUI `onChange` handlers do, just as React effects instead of dat.gui callbacks.
-import { useEffect, useLayoutEffect, useRef } from 'react'
-import { useFrame, useThree } from '@react-three/fiber/webgpu'
-import { CSMShadowNode } from 'three/addons/csm/CSMShadowNode.js'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { CSMShadowNode, type CSMShadowNodeMode } from 'three/addons/csm/CSMShadowNode.js'
 import { CSMHelper } from 'three/addons/csm/CSMHelper.js'
 import type { DirectionalLight } from 'three/webgpu'
 
+import { useFrame, useThree } from '@react-three/fiber/webgpu'
+import { button, folder, useControls } from 'leva'
+
 export interface CsmLightProps {
-  cascades: number
-  maxFar: number
-  mode: 'practical' | 'uniform' | 'logarithmic'
   lightDirection: [number, number, number]
-  margin: number
-  shadowsEnabled: boolean
-  shadowNear: number
-  shadowFar: number
-  helperVisible: boolean
-  displayFrustum: boolean
-  displayPlanes: boolean
-  displayShadowBounds: boolean
-  autoUpdateHelper: boolean
-  /** Bumped by the "update helper" leva button for a manual refresh when auto-update is off. */
-  manualUpdateNonce: number
 }
 
 function applyLightDirection(light: DirectionalLight, [x, y, z]: [number, number, number]) {
   light.position.set(x, y, z).normalize().multiplyScalar(-200)
 }
 
-export function CsmLight({
-  cascades,
-  maxFar,
-  mode,
-  lightDirection,
-  margin,
-  shadowsEnabled,
-  shadowNear,
-  shadowFar,
-  helperVisible,
-  displayFrustum,
-  displayPlanes,
-  displayShadowBounds,
-  autoUpdateHelper,
-  manualUpdateNonce,
-}: CsmLightProps) {
+export function CsmLight({ lightDirection }: CsmLightProps) {
+  const [manualUpdateNonce, setManualUpdateNonce] = useState(0)
+  const {
+    shadowsEnabled,
+    cascades,
+    maxFar,
+    mode,
+    margin,
+    shadowNear,
+    shadowFar,
+    helperVisible,
+    displayFrustum,
+    displayPlanes,
+    displayShadowBounds,
+    autoUpdateHelper,
+  } = useControls('shadowmap-csm', {
+    shadowsEnabled: { value: true, label: 'shadows' },
+    cascades: { value: 4, min: 1, max: 4, step: 1 },
+    maxFar: { value: 1000, min: 1, max: 5000, step: 1, label: 'max shadow far' },
+    mode: {
+      value: 'practical' as CSMShadowNodeMode,
+      options: ['uniform', 'logarithmic', 'practical'] satisfies CSMShadowNodeMode[],
+      label: 'split mode',
+    },
+    margin: { value: 100, min: 0, max: 200, label: 'light margin' },
+    shadowNear: { value: 1, min: 1, max: 10000, label: 'shadow near' },
+    shadowFar: { value: 2000, min: 1, max: 10000, label: 'shadow far' },
+    helper: folder({
+      helperVisible: { value: false, label: 'visible' },
+      displayFrustum: { value: true, label: 'frustum' },
+      displayPlanes: { value: true, label: 'planes' },
+      displayShadowBounds: { value: true, label: 'shadow bounds' },
+      autoUpdateHelper: { value: true, label: 'auto update' },
+      'update now': button(() => setManualUpdateNonce((n) => n + 1)),
+    }),
+  })
   const lightRef = useRef<DirectionalLight>(null)
   const csmRef = useRef<CSMShadowNode | null>(null)
   const helperRef = useRef<CSMHelper | null>(null)

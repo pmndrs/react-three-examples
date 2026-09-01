@@ -95,7 +95,7 @@ export function CameraControls({
     controls.touches.three = pan ? ACTION.TOUCH_TRUCK : ACTION.NONE
   }, [controls, pan])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     // OrbitControls parity: autoRotateSpeed 2.0 ≈ 30s per orbit.
     if (autoRotate) controls.azimuthAngle += autoRotateSpeed * ((2 * Math.PI) / 60) * delta
     controls.update(delta)

@@ -2,8 +2,6 @@
 // together. Both addon meshes carry their parameters as `uniform()`-backed instance
 // fields (three.js TSL) — leva changes mutate `.value` directly, nothing rebuilds.
 import { useEffect, useLayoutEffect, useMemo } from 'react'
-import { useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
 import { WaterMesh } from 'three/addons/objects/WaterMesh.js'
 import {
@@ -14,35 +12,37 @@ import {
   RepeatWrapping,
   Scene,
   Vector3,
-  type WebGPURenderer,
 } from 'three/webgpu'
+
+import { useThree } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
+import { folder, useControls } from 'leva'
 
 const WATER_NORMALS_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/waternormals.jpg'
 
-export interface OceanSkyProps {
-  elevation: number
-  azimuth: number
-  distortionScale: number
-  size: number
-  cloudCoverage: number
-  cloudDensity: number
-  cloudElevation: number
-}
-
-export function OceanSky({
-  elevation,
-  azimuth,
-  distortionScale,
-  size,
-  cloudCoverage,
-  cloudDensity,
-  cloudElevation,
-}: OceanSkyProps) {
+export function OceanSky() {
   const scene = useThree((s) => s.scene)
-  // PMREMGenerator (three/webgpu) wants the common Renderer; useThree types the union
-  // even on the /webgpu entry — cast once (upstream fiber gap, UPSTREAM.md B9).
-  const renderer = useThree((s) => s.renderer) as WebGPURenderer
+  const renderer = useThree((s) => s.renderer)
+
+  const { elevation, azimuth, distortionScale, size, cloudCoverage, cloudDensity, cloudElevation } = useControls(
+    'ocean',
+    {
+      sky: folder({
+        elevation: { value: 2, min: 0, max: 90, step: 0.1 },
+        azimuth: { value: 180, min: -180, max: 180, step: 0.1 },
+      }),
+      water: folder({
+        distortionScale: { value: 3.7, min: 0, max: 8, step: 0.1 },
+        size: { value: 1, min: 0.1, max: 10, step: 0.1 },
+      }),
+      clouds: folder({
+        cloudCoverage: { value: 0.4, min: 0, max: 1, step: 0.01 },
+        cloudDensity: { value: 0.5, min: 0, max: 1, step: 0.01 },
+        cloudElevation: { value: 0.5, min: 0, max: 1, step: 0.01 },
+      }),
+    },
+  )
 
   const waterNormals = useTexture(WATER_NORMALS_URL)
 

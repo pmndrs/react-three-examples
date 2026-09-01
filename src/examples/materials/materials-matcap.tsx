@@ -35,12 +35,12 @@
  *   backdrop, and a ground grid at y=0 would slice through the ~7-unit-tall scan
  */
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { Canvas, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
 import { ACESFilmicToneMapping, SRGBColorSpace, TextureLoader } from 'three/webgpu'
 import type { Mesh, MeshMatcapNodeMaterial, Texture } from 'three/webgpu'
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js'
+import { Canvas, useLoader, useThree } from '@react-three/fiber/webgpu'
+import { useGLTF } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const ASSETS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples'

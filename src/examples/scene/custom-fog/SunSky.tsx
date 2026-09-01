@@ -3,34 +3,29 @@
 // a bare env scene and is baked into `scene.environment` via PMREMGenerator on every
 // sun move, the original's updateSun() dance.
 import { useLayoutEffect, useMemo } from 'react'
-import { useThree } from '@react-three/fiber/webgpu'
-import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
-import {
-  Color,
-  MathUtils,
-  PMREMGenerator,
-  Scene,
-  Vector3,
-  type DirectionalLight,
-  type RenderTarget,
-  type WebGPURenderer,
-} from 'three/webgpu'
 import type { RefObject } from 'react'
+import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
+import { Color, MathUtils, PMREMGenerator, Scene, Vector3 } from 'three/webgpu'
+import type { DirectionalLight, RenderTarget } from 'three/webgpu'
+
+import { useThree } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
 
 export interface SunSkyProps {
-  /** Sun height above the horizon, in degrees (low = golden hour). */
-  elevation: number
-  /** Sun compass direction, in degrees. */
-  azimuth: number
   /** Shared handle to the key light, so the terrain rebuild can refresh its shadow map. */
   sunRef: RefObject<DirectionalLight | null>
 }
 
-export function SunSky({ elevation, azimuth, sunRef }: SunSkyProps) {
+export function SunSky({ sunRef }: SunSkyProps) {
   const scene = useThree((s) => s.scene)
-  // PMREMGenerator (three/webgpu) wants the common Renderer; useThree types the union
-  // even on the /webgpu entry — cast once (upstream fiber gap, UPSTREAM.md B9).
-  const renderer = useThree((s) => s.renderer) as WebGPURenderer
+  const renderer = useThree((s) => s.renderer)
+
+  const { elevation, azimuth } = useControls('custom-fog', {
+    sun: folder({
+      elevation: { value: 11, min: 1, max: 40, step: 0.5 }, // low = golden hour
+      azimuth: { value: 150, min: 0, max: 360, step: 1 },
+    }),
+  })
 
   const sky = useMemo(() => {
     const mesh = new SkyMesh()

@@ -56,7 +56,7 @@ import { useControls } from 'leva'
 import { Canvas, useFrame, useNodes, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
 import { Fn, color, float, instanceIndex, instancedArray, uniform, vec2 } from 'three/tsl'
 import { Vector2 } from 'three/webgpu'
-import type { Node, OrthographicCamera, Points, Renderer, WebGPURenderer } from 'three/webgpu'
+import type { Node, OrthographicCamera, Points, Renderer} from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const PARTICLE_COUNT = 300_000
@@ -86,10 +86,7 @@ interface PointsFieldProps {
 }
 
 function PointsField({ boundsX, boundsY }: PointsFieldProps) {
-  const rawRenderer = useThree((s) => s.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` exists only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((s) => s.renderer)
   const pointsRef = useRef<Points>(null)
 
   const { uBoundsX, uBoundsY } = useUniforms(
@@ -155,8 +152,7 @@ function PointsField({ boundsX, boundsY }: PointsFieldProps) {
       computeNode,
       uPointer,
       positionNode: particleArray.element(instanceIndex),
-      colorNode: particleArray.element(instanceIndex).add(color(0xffffff)),
-    }
+      colorNode: particleArray.element(instanceIndex).add(color(0xffffff)) }
   })
 
   // EVERY FRAME: step the simulation. Pointer updates arrive separately, via the
@@ -211,8 +207,7 @@ function PointsField({ boundsX, boundsY }: PointsFieldProps) {
 export default function ComputePoints() {
   const { boundsX, boundsY } = useControls('compute-points', {
     boundsX: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds x' },
-    boundsY: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds y' },
-  })
+    boundsY: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds y' } })
 
   return (
     <Canvas

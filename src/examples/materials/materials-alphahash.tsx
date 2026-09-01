@@ -37,10 +37,6 @@
  *   ACESFilmic and mute the random instance palette
  */
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { Canvas, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
-import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js'
 import {
   Color,
   IcosahedronGeometry,
@@ -49,19 +45,20 @@ import {
   NoToneMapping,
   PMREMGenerator,
 } from 'three/webgpu'
-import type { InstancedMesh, WebGPURenderer } from 'three/webgpu'
+import type { InstancedMesh } from 'three/webgpu'
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
+import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js'
+import { Canvas, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 // RoomEnvironment → PMREM → scene.environment: the scene's only light source
 // (matches the original — no analytical lights, full intensity).
 function RoomEnv() {
-  const rawRenderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer)
   const scene = useThree((s) => s.scene)
 
   useEffect(() => {
-    // PMREMGenerator wants the WebGPU renderer; useThree types the union even on
-    // the /webgpu entry (upstream fiber gap, UPSTREAM.md B9).
-    const renderer = rawRenderer as WebGPURenderer
     const environment = new RoomEnvironment()
     const pmremGenerator = new PMREMGenerator(renderer)
     const envRT = pmremGenerator.fromScene(environment, 0.04)
@@ -72,7 +69,7 @@ function RoomEnv() {
       scene.environment = null
       envRT.dispose()
     }
-  }, [rawRenderer, scene])
+  }, [renderer, scene])
 
   return null
 }

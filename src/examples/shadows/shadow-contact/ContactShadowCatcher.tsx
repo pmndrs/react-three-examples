@@ -3,44 +3,37 @@
 // of that render target drives a ground-plane material's opacity. Built imperatively —
 // see the shadow-contact.tsx header's DIVERGENCE section for why.
 import { useMemo } from 'react'
-import { useFrame, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { depth, float, texture, vec3 } from 'three/tsl'
 import { CameraHelper, Group, Mesh, NodeMaterial, OrthographicCamera, PlaneGeometry, RenderTarget } from 'three/webgpu'
-import type { Node, WebGPURenderer } from 'three/webgpu'
+import type { Node } from 'three/webgpu'
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
+
+import { useFrame, useThree, useUniforms } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
 
 const PLANE_WIDTH = 2.5
 const PLANE_HEIGHT = 2.5
 const CAMERA_HEIGHT = 0.3
 const PLANE_Y = -0.3
 
-export interface ContactShadowCatcherProps {
-  blur: number
-  darkness: number
-  shadowOpacity: number
-  planeColor: string
-  planeOpacity: number
-  showWireframe: boolean
-}
+export function ContactShadowCatcher() {
+  const { shadowBlur: blur, shadowDarkness: darkness, shadowOpacity, planeColor, planeOpacity, showWireframe } =
+    useControls('shadow-contact', {
+      Shadow: folder({
+        shadowBlur: { value: 3.5, min: 0, max: 15, step: 0.1 },
+        shadowDarkness: { value: 1, min: 0.1, max: 5, step: 0.1 },
+        shadowOpacity: { value: 1, min: 0, max: 1, step: 0.01 },
+      }),
+      Plane: folder({
+        planeColor: '#ffffff',
+        planeOpacity: { value: 1, min: 0, max: 1, step: 0.01 },
+      }),
+      showWireframe: false,
+    })
 
-export function ContactShadowCatcher({
-  blur,
-  darkness,
-  shadowOpacity,
-  planeColor,
-  planeOpacity,
-  showWireframe,
-}: ContactShadowCatcherProps) {
-  const { scene, renderer: rawRenderer } = useThree()
-  // Cast: even from the `/webgpu` entry, fiber's `useThree()` types `renderer` as the
-  // package-wide `WebGLRenderer | WebGPURenderer` union (a fiber typing gap — the
-  // narrowed `WebGPURootState` the docs describe isn't actually what `useThree`'s
-  // declaration resolves to). `setRenderTarget`/`getClearAlpha`/etc. exist on both, but
-  // union method calls require an argument assignable to every member's signature,
-  // which a plain `RenderTarget` isn't for `WebGLRenderer`'s `WebGLRenderTarget`-typed
-  // overload. This canvas only ever runs WebGPURenderer (the `/webgpu` entry creates
-  // one unconditionally), so the cast is safe at runtime.
-  const renderer = rawRenderer as WebGPURenderer
+  // On the `/webgpu` entry, `state.renderer` is already typed WebGPURenderer (B9 fixed
+  // in fiber alpha.4) — no cast needed.
+  const { scene, renderer } = useThree()
 
   const { uBlur, uDarkness, uShadowOpacity, uPlaneColor, uPlaneOpacity } = useUniforms(() => ({
     uBlur: blur,

@@ -52,10 +52,9 @@ import {
   ivec2,
   int,
   vec2,
-  vec4,
-} from 'three/tsl'
+  vec4 } from 'three/tsl'
 import { HalfFloatType, StorageTexture, Vector2 } from 'three/webgpu'
-import type { Node, StorageTextureNode, WebGPURenderer } from 'three/webgpu'
+import type { Node, StorageTextureNode} from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const WIDTH = 512
@@ -75,10 +74,7 @@ function blur5(readTex: StorageTextureNode, uv: Node<'ivec2'>) {
 }
 
 function PingPongPlane() {
-  const rawRenderer = useThree((s) => s.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` exists only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((s) => s.renderer)
 
   // Two HDR storage textures, create-once (StrictMode-safe).
   const { pingTexture, pongTexture } = useGPUStorage(() => {
@@ -142,8 +138,7 @@ function PingPongPlane() {
       uSeed,
       uPhase,
       // uPhase true => computeToPong just ran (ping -> pong) => display pong.
-      colorNode: select(uPhase, texture(pongTexture), texture(pingTexture)),
-    }
+      colorNode: select(uPhase, texture(pongTexture), texture(pingTexture)) }
   })
 
   // Imperative per-frame bookkeeping — must never trigger a re-render.

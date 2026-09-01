@@ -116,8 +116,7 @@ function OrbitingObjects({ envMapIntensity }: { envMapIntensity: number }) {
   const cubeRef = useRef<Mesh>(null)
   const torusRef = useRef<Mesh>(null)
 
-  useFrame((state, delta) => {
-    const time = state.elapsed
+  useFrame(({ elapsed: time, delta }) => {
     const cube = cubeRef.current
     const torus = torusRef.current
     if (!cube || !torus) return

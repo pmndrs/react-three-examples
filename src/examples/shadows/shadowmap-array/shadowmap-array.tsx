@@ -18,7 +18,7 @@
  *   colors) alongside plain `InstancedMesh` for columns/cubes/spheres/toruses — the
  *   scene mixes both instancing strategies on purpose, matching the original
  * - A procedural ground `colorNode` (`mx_fractal_noise_vec3` blending green/brown by
- *   world position) on `<meshPhongNodeMaterial>`, built once via `useMemo`
+ *   world position) on `<meshPhongNodeMaterial>`, built once via `useNodes`
  *
  * DIVERGENCE from original
  * - `tilesX`/`tilesY` are LIVE leva controls (1–4, original hard-codes 2×2) — changing
@@ -41,21 +41,20 @@
  * - `renderer.inspector = new Inspector()` + its GUI dropped for leva, same gap noted
  *   across this corpus's other ports.
  */
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { Fn, mx_fractal_noise_vec3, positionWorld, color as tslColor } from 'three/tsl'
-import { ACESFilmicToneMapping, MeshPhongNodeMaterial } from 'three/webgpu'
+import { ACESFilmicToneMapping } from 'three/webgpu'
 import type { DirectionalLight } from 'three/webgpu'
 import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js'
 import { TileShadowNodeHelper } from 'three/addons/tsl/shadows/TileShadowNodeHelper.js'
+
+import { Canvas, useFrame, useNodes, useThree } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { Scenery, TorusKnotCentral } from './Scenery'
 
 interface TiledSunProps {
-  tilesX: number
-  tilesY: number
-  helperVisible: boolean
   speed: number
 }
 
@@ -63,7 +62,12 @@ interface TiledSunProps {
 // split into a tilesX*tilesY grid via TileShadowNode. Rebuilding the node/helper pair
 // is cheap (a handful of render targets + cameras, not a multi-second bake) so it's
 // safe to redo on every tilesX/tilesY change, not gated behind a commit button.
-function TiledSun({ tilesX, tilesY, helperVisible, speed }: TiledSunProps) {
+function TiledSun({ speed }: TiledSunProps) {
+  const { tilesX, tilesY, helperVisible } = useControls('shadowmap-array', {
+    tilesX: { value: 2, min: 1, max: 4, step: 1 },
+    tilesY: { value: 2, min: 1, max: 4, step: 1 },
+    helperVisible: { value: true, label: 'show tile helper' },
+  })
   const lightRef = useRef<DirectionalLight>(null)
   const helperRef = useRef<TileShadowNodeHelper | null>(null)
   const { scene } = useThree()
@@ -100,7 +104,7 @@ function TiledSun({ tilesX, tilesY, helperVisible, speed }: TiledSunProps) {
     if (helperRef.current) helperRef.current.visible = helperVisible
   }, [helperVisible])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const light = lightRef.current
     if (!light) return
     clockRef.current += delta * speed // original rate: sin(time_ms * 0.0001) = 0.1 rad/s
@@ -138,32 +142,26 @@ function TiledSun({ tilesX, tilesY, helperVisible, speed }: TiledSunProps) {
 // Procedural green/brown ground, ported from the original's colorNode Fn — noise.x
 // picks the mix factor via the fluent `.mix` (calling node = factor, AGENTS.md).
 function Ground() {
-  const material = useMemo(() => {
-    const m = new MeshPhongNodeMaterial({ color: '#88aa44', shininess: 5, specular: '#222222' })
-    m.colorNode = Fn(() => {
+  const { colorNode } = useNodes(() => ({
+    colorNode: Fn(() => {
       const noise = mx_fractal_noise_vec3(positionWorld.mul(0.05)).saturate()
       const green = tslColor(0.4, 0.7, 0.3)
       const brown = tslColor(0.6, 0.5, 0.3)
       return noise.x.mix(green, brown)
-    })()
-    return m
-  }, [])
+    })(),
+  }))
 
   return (
     <mesh rotation-x={-Math.PI / 2} receiveShadow>
       <planeGeometry args={[1500, 1500, 2, 2]} />
-      <primitive object={material} attach="material" />
+      <meshPhongNodeMaterial color="#88aa44" shininess={5} specular="#222222" colorNode={colorNode} />
     </mesh>
   )
 }
 
 export default function ShadowmapArray() {
-  const { tilesX, tilesY, helperVisible, speed } = useControls('shadowmap-array', {
-    tilesX: { value: 2, min: 1, max: 4, step: 1 },
-    tilesY: { value: 2, min: 1, max: 4, step: 1 },
-    helperVisible: { value: true, label: 'show tile helper' },
-    speed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
+  // speed is shared by TiledSun (light orbit) and TorusKnotCentral (spin rate).
+  const { speed } = useControls('shadowmap-array', { speed: { value: 1, min: 0, max: 3, step: 0.05 } })
 
   return (
     <Canvas
@@ -174,7 +172,7 @@ export default function ShadowmapArray() {
     >
       <fog attach="fog" args={['#ccccff', 700, 1000]} />
       <ambientLight color="#ccccff" intensity={3} />
-      <TiledSun tilesX={tilesX} tilesY={tilesY} helperVisible={helperVisible} speed={speed} />
+      <TiledSun speed={speed} />
       <Ground />
       <Scenery />
       <TorusKnotCentral speed={speed} />

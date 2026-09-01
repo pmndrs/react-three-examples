@@ -47,28 +47,25 @@
  *   Inspector RootState slot, same gap noted across the corpus's other ports).
  */
 import { Suspense, useLayoutEffect } from 'react'
+import { color, Fn, mix } from 'three/tsl'
+import { AgXToneMapping, Color } from 'three/webgpu'
+import type { Mesh, MeshPhysicalNodeMaterial, Node } from 'three/webgpu'
+
 import { Canvas, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { color, Fn, mix } from 'three/tsl'
-import { AgXToneMapping, Color } from 'three/webgpu'
-import type { Mesh, MeshPhysicalNodeMaterial, Node, WebGPURenderer } from 'three/webgpu'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MODEL_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DragonAttenuation.glb'
 
-interface RendererSetupProps {
-  exposure: number
-}
-
 // toneMappingExposure + shadowMap.transmitted are WebGPURenderer properties with no
 // Canvas prop — set imperatively (pattern: materials-transmission, volume-fire).
-// useThree's renderer union needs the B9 cast for the WebGPU-only `shadowMap.transmitted`
-// flag; useLayoutEffect because it must land before the first shadow render.
-function RendererSetup({ exposure }: RendererSetupProps) {
-  const rawRenderer = useThree((s) => s.renderer)
-  const renderer = rawRenderer as WebGPURenderer
+// useLayoutEffect because it must land before the first shadow render.
+function RendererSetup() {
+  const { exposure } = useControls('shadowmap-opacity', { exposure: { value: 1.5, min: 0.1, max: 3, step: 0.05 } })
+  const renderer = useThree((s) => s.renderer)
 
   useLayoutEffect(() => {
     renderer.shadowMap.transmitted = true
@@ -86,7 +83,10 @@ function RendererSetup({ exposure }: RendererSetupProps) {
 // driven by the live `shadowOpacity` uniform. Guarded by scene.userData so StrictMode's
 // double-invoked effect (and any remount sharing drei's cached scene) never re-adds
 // dragon2 or double-applies the +=4 floor scale.
-function DragonScene({ shadowOpacity }: { shadowOpacity: number }) {
+function DragonScene() {
+  const { shadowOpacity } = useControls('shadowmap-opacity', {
+    shadowOpacity: { value: 1, min: 0, max: 1, step: 0.01, label: 'shadow opacity' },
+  })
   const { scene } = useGLTF(MODEL_URL)
   const { uOpacity } = useUniforms(() => ({ uOpacity: 1 }))
 
@@ -140,9 +140,8 @@ function DragonScene({ shadowOpacity }: { shadowOpacity: number }) {
 }
 
 export default function ShadowmapOpacity() {
-  const { shadowOpacity, exposure, shadowRadius } = useControls('shadowmap-opacity', {
-    shadowOpacity: { value: 1, min: 0, max: 1, step: 0.01, label: 'shadow opacity' },
-    exposure: { value: 1.5, min: 0.1, max: 3, step: 0.05 },
+  // Consumed directly below, by the directionalLight in this same component.
+  const { shadowRadius } = useControls('shadowmap-opacity', {
     shadowRadius: { value: 4, min: 0, max: 12, step: 0.5, label: 'shadow radius' },
   })
 
@@ -153,7 +152,7 @@ export default function ShadowmapOpacity() {
       background="#9e9eff"
       camera={{ position: [-4, 2, 6], fov: 45, near: 0.1, far: 40 }}
     >
-      <RendererSetup exposure={exposure} />
+      <RendererSetup />
       <ambientLight intensity={0.5} />
       <directionalLight
         color="#6666ff"
@@ -173,7 +172,7 @@ export default function ShadowmapOpacity() {
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>
-        <DragonScene shadowOpacity={shadowOpacity} />
+        <DragonScene />
       </Suspense>
       <DemoHelpers grid={false} target={[0, 0, 0]} minDistance={0.1} maxDistance={10} />
     </Canvas>

@@ -54,13 +54,15 @@
  *   post-processing / inlined addon math), same rationale as `backdrop`'s split
  */
 import { Suspense } from 'react'
+
 import { Canvas } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
+
+import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { SceneBackground } from './SceneSetup'
 import { Michelle } from './Michelle'
 import { WaterScene } from './WaterScene'
 import { RenderPipelineFX } from './RenderPipelineFX'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
 
 export default function BackdropWater() {
   const { floorY } = useControls('backdrop-water', {

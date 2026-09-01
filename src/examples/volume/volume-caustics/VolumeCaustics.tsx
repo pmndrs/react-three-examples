@@ -19,7 +19,6 @@ import {
   VolumeNodeMaterial,
   type Mesh,
   type Node,
-  type WebGPURenderer,
 } from 'three/webgpu'
 import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog'
 import { CAUSTIC_MAP_URL, DUCK_URL, LAYER_VOLUMETRIC_LIGHTING } from './constants'
@@ -48,8 +47,7 @@ export function VolumeCaustics({
   // WebGPU-only renderer flag (no Canvas prop) required for the duck's transmitted
   // castShadowNode caustics — cast for the B9 union gap, layout effect so it's set
   // before the first shadow render (AGENTS.md imperative-setup rule).
-  const rawRenderer = useThree((state) => state.renderer)
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((state) => state.renderer)
   useLayoutEffect(() => {
     renderer.shadowMap.transmitted = true
   }, [renderer])

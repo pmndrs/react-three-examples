@@ -40,27 +40,16 @@
  *   lightmap receiver in frame, and TransformControls gizmos already crowd the view.
  */
 import { Suspense, useRef } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import type CameraControlsImpl from 'camera-controls'
 import { NoToneMapping } from 'three/webgpu'
+
+import { Canvas } from '@react-three/fiber/webgpu'
+import type CameraControlsImpl from 'camera-controls'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { LightmapScene } from './LightmapScene'
 
 export default function ShadowmapProgressive() {
   const controlsRef = useRef<CameraControlsImpl>(null)
-
-  const { enabled, blurEdges, blendWindow, lightRadius, ambientWeight, debugLightmap } = useControls(
-    'shadowmap-progressive',
-    {
-      enabled: { value: true, label: 'Enable' },
-      blurEdges: { value: true, label: 'Blur Edges' },
-      blendWindow: { value: 200, min: 1, max: 500, step: 1, label: 'Blend Window' },
-      lightRadius: { value: 50, min: 0, max: 200, step: 10, label: 'Light Radius' },
-      ambientWeight: { value: 0.5, min: 0, max: 1, step: 0.1, label: 'Ambient Weight' },
-      debugLightmap: { value: false, label: 'Debug Lightmap' },
-    },
-  )
 
   return (
     <Canvas
@@ -74,15 +63,7 @@ export default function ShadowmapProgressive() {
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>
-        <LightmapScene
-          enabled={enabled}
-          blurEdges={blurEdges}
-          blendWindow={blendWindow}
-          lightRadius={lightRadius}
-          ambientWeight={ambientWeight}
-          debugLightmap={debugLightmap}
-          controlsRef={controlsRef}
-        />
+        <LightmapScene controlsRef={controlsRef} />
       </Suspense>
       <DemoHelpers
         grid={false}

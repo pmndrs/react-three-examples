@@ -42,7 +42,7 @@ import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber/web
 import { useTexture } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { MathUtils, RepeatWrapping, Scene, SRGBColorSpace } from 'three/webgpu'
-import type { Texture, WebGPURenderer } from 'three/webgpu'
+import type { Texture} from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const CRATE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/crate.gif'
@@ -85,11 +85,7 @@ function CrateGround({ texture }: { texture: Texture }) {
 }
 
 function AnisotropySplit({ leftAnisotropy, rightAnisotropy }: { leftAnisotropy: number; rightAnisotropy: number }) {
-  const rawRenderer = useThree((state) => state.renderer)
-  // Cast: fiber's `useThree` types `renderer` as the `WebGLRenderer | WebGPURenderer`
-  // union even on the `/webgpu` entry (documented fiber typing gap, UPSTREAM.md B9);
-  // this canvas only ever runs a WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((state) => state.renderer)
 
   // Original: texture1.anisotropy = renderer.getMaxAnisotropy() — the WebGPU backend
   // reports a constant 16 (spec ceiling), so the leva default of 16 IS max; the clamp
@@ -149,8 +145,7 @@ function AnisotropySplit({ leftAnisotropy, rightAnisotropy }: { leftAnisotropy: 
 export default function TexturesAnisotropyExample() {
   const { left, right } = useControls('anisotropy', {
     left: { label: 'left pane', value: 16, options: ANISOTROPY_LEVELS },
-    right: { label: 'right pane', value: 1, options: ANISOTROPY_LEVELS },
-  })
+    right: { label: 'right pane', value: 1, options: ANISOTROPY_LEVELS } })
 
   return (
     <Canvas renderer camera={{ fov: 35, near: 1, far: 25000, position: [0, 200, 1500] }}>

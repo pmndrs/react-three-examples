@@ -41,8 +41,6 @@
  *   infinite grid would float 5 units above it, mid-room
  */
 import { useMemo, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
 import {
   BackSide,
   CanvasTexture,
@@ -54,6 +52,10 @@ import {
   SphereGeometry,
 } from 'three/webgpu'
 import type { PointLight } from 'three/webgpu'
+
+import { Canvas, useFrame } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 // Constant shared assets (not mutable state — same module-scope rationale as
@@ -100,7 +102,7 @@ function ShadowLight({ color, intensity, speed, bias, radius, offset = 0 }: Shad
   // past 1.0 so it reads as the glowing bulb under NoToneMapping.
   const bulbColor = useMemo(() => new Color(color).multiplyScalar(intensity), [color, intensity])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const light = lightRef.current
     if (!light) return
     clockRef.current += delta * speed

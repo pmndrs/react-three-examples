@@ -3,7 +3,6 @@
 // colors) — ported near-verbatim from the original's createScenery(). Random per
 // mount, matching the original's per-load layout (no seed).
 import { useRef, useState } from 'react'
-import { useFrame } from '@react-three/fiber/webgpu'
 import {
   BatchedMesh,
   BoxGeometry,
@@ -17,6 +16,8 @@ import {
   TorusGeometry,
 } from 'three/webgpu'
 import type { Mesh } from 'three/webgpu'
+
+import { useFrame } from '@react-three/fiber/webgpu'
 
 function buildScenery() {
   const matrix = new Matrix4()
@@ -158,7 +159,7 @@ export function Scenery() {
 export function TorusKnotCentral({ speed }: { speed: number }) {
   const meshRef = useRef<Mesh>(null)
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const mesh = meshRef.current
     if (!mesh) return
     mesh.rotation.x += 0.25 * speed * delta

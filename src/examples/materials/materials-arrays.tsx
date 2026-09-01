@@ -25,8 +25,8 @@
  *   pattern, avoiding a second geometry construction path
  */
 import { useLayoutEffect, useMemo, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { DoubleSide, type BufferGeometry, type Mesh } from 'three/webgpu'
+import { Canvas, useFrame } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const COLORS = ['#ff1493', '#0000ff', '#00ff00'] as const
@@ -77,7 +77,7 @@ function MaterialArraysScene() {
     if (boxWireframeRef.current) groupBox(boxWireframeRef.current.geometry)
   }, [])
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const spin = delta * 1 // ~0.005/frame at 60fps, matching the original's per-frame increment
     if (boxRef.current) {
       boxRef.current.rotation.y += spin

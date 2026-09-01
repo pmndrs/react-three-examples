@@ -4,29 +4,32 @@
 // No `useRenderPipeline`/render-target plumbing needed: the node graph owns the
 // sub-render, resolved automatically wherever this material gets drawn.
 import { useMemo } from 'react'
-import { useThree } from '@react-three/fiber/webgpu'
 import { pass, screenUV, uv } from 'three/tsl'
-import { DoubleSide, MeshBasicNodeMaterial } from 'three/webgpu'
+import { DoubleSide } from 'three/webgpu'
 import type { Scene } from 'three/webgpu'
+
+import { useThree } from '@react-three/fiber/webgpu'
 
 export function PortalWindow({ portalScene }: { portalScene: Scene }) {
   const camera = useThree((s) => s.camera)
 
-  const material = useMemo(() => {
-    const mat = new MeshBasicNodeMaterial()
-    mat.colorNode = pass(portalScene, camera).context({ getUV: () => screenUV })
-    // Feathers the rectangular plane into an ellipse: distance-from-center remapped to
-    // an opacity falloff, matching the original's `uv().distance(.5).remapClamp(.3,
-    // .5).oneMinus()`.
-    mat.opacityNode = uv().distance(0.5).remapClamp(0.3, 0.5).oneMinus()
-    mat.side = DoubleSide
-    mat.transparent = true
-    return mat
-  }, [portalScene, camera])
+  // useMemo, not useNodes: this graph depends on runtime instances (the camera can
+  // change identity) that a create-once hook can't express — same carve-out as
+  // lights-phong's `lights([instance])`.
+  const colorNode = useMemo(() => pass(portalScene, camera).context({ getUV: () => screenUV }), [portalScene, camera])
 
   return (
-    <mesh position={[0, 1, 0.8]} material={material}>
+    <mesh position={[0, 1, 0.8]}>
       <planeGeometry args={[1.7, 2]} />
+      <meshBasicNodeMaterial
+        colorNode={colorNode}
+        // Feathers the rectangular plane into an ellipse: distance-from-center remapped
+        // to an opacity falloff, matching the original's
+        // `uv().distance(.5).remapClamp(.3, .5).oneMinus()`.
+        opacityNode={uv().distance(0.5).remapClamp(0.3, 0.5).oneMinus()}
+        side={DoubleSide}
+        transparent
+      />
     </mesh>
   )
 }

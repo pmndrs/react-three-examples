@@ -1,9 +1,10 @@
 // Loaded character: plays its one clip, and overrides every mesh's `outputNode` with an
 // oscillating posterize pulse. See backdrop.tsx header DEMONSTRATES / DIVERGENCE.
 import { useEffect } from 'react'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import { output, oscSine, posterize, time } from 'three/tsl'
 import type { Material, Mesh } from 'three/webgpu'
+
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 
 const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
 
@@ -12,11 +13,11 @@ export function Michelle() {
   const { actions } = useAnimations(animations, scene)
 
   useEffect(() => {
-    // Michelle.glb ships a single clip — same "first action" idiom as
-    // skinning-instancing (no named-clip ambiguity to worry about here).
-    const first = Object.values(actions)[0]
-    first?.play()
-  }, [actions])
+    // Play by name, never Object.values(actions) — Michelle.glb ships one clip, but a
+    // GLTF can carry rest/utility clips that would otherwise pollute the blend.
+    const name = animations[0]?.name
+    if (name) actions[name]?.play()
+  }, [actions, animations])
 
   useEffect(() => {
     const pulse = oscSine(time.mul(0.1)).mix(output, posterize(output.add(0.1), 4).mul(2))

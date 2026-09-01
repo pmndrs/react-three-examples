@@ -2,10 +2,7 @@
 // field + caustic-lit floor), and a `MeshBasicNodeMaterial` water plane whose
 // `colorNode`/`backdropNode`/`backdropAlphaNode` combine animated voronoi noise with
 // depth-tested screen-space refraction. See backdrop-water.tsx header DEMONSTRATES.
-import { useFrame } from '@react-three/fiber/webgpu'
 import { useMemo, useRef } from 'react'
-import type { Group } from 'three/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
 import {
   color,
   linearDepth,
@@ -20,7 +17,12 @@ import {
   viewportLinearDepth,
   viewportSharedTexture,
 } from 'three/tsl'
-import { IcosahedronGeometry, MeshStandardNodeMaterial, RepeatWrapping, NoColorSpace } from 'three/webgpu'
+import { IcosahedronGeometry, MeshStandardNodeMaterial, NoColorSpace, RepeatWrapping } from 'three/webgpu'
+import type { Group } from 'three/webgpu'
+
+import { useFrame } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
+
 import { voronoi2d, voronoi3d } from './voronoiNoise'
 
 const ICE_TEXTURE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/water.jpg'
@@ -46,6 +48,10 @@ export function WaterScene({ floorY }: WaterSceneProps) {
     return triplanarTexture(texture(iceDiffuse)).add(color(0x0066ff)).mul(0.8)
   }, [iceDiffuse])
 
+  // REVIEW(shared-instance): one geometry + one material shared by all 100 icosahedron
+  // meshes below, instead of a JSX material/geometry per mesh — the field is static
+  // (only position/rotation vary per instance in the frame loop), so a reviewer should
+  // weigh whether InstancedMesh would be worth the added complexity over this.
   const iceGeometry = useMemo(() => new IcosahedronGeometry(1, 3), [])
   const iceMaterial = useMemo(() => new MeshStandardNodeMaterial({ colorNode: iceColorNode }), [iceColorNode])
 
@@ -69,14 +75,14 @@ export function WaterScene({ floorY }: WaterSceneProps) {
   ]
 
   const objectsRef = useRef<Group>(null)
-  useFrame((state, delta) => {
+  useFrame(({ elapsed, delta }) => {
     const group = objectsRef.current
     if (!group) return
     group.children.forEach((object, i) => {
       // Phase offset uses the array index instead of the original's `object.id`
       // (three.js's internal auto-increment counter — an implementation detail with
       // no semantic meaning, not something a port should try to reproduce).
-      object.position.y = Math.sin(state.elapsed + i) * 0.3
+      object.position.y = Math.sin(elapsed + i) * 0.3
       object.rotation.y += delta * 0.3
     })
   })

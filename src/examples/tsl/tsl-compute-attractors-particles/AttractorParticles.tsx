@@ -19,9 +19,8 @@ import {
   uint,
   uniformArray,
   vec3,
-  vec4,
-} from 'three/tsl'
-import { AdditiveBlending, Vector3, type Node, type WebGPURenderer } from 'three/webgpu'
+  vec4 } from 'three/tsl'
+import { AdditiveBlending, Vector3, type Node} from 'three/webgpu'
 import { ATTRACTOR_COUNT, ATTRACTOR_DEFAULT_POSITIONS, ATTRACTOR_ROTATION_AXES } from './attractors'
 
 export const PARTICLE_COUNT = 2 ** 18 // 262,144 — same as the original
@@ -60,12 +59,8 @@ export function AttractorParticles({
   boundHalfExtent,
   colorA,
   colorB,
-  resetCount,
-}: AttractorParticlesProps) {
-  const rawRenderer = useThree((state) => state.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` exists only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  resetCount }: AttractorParticlesProps) {
+  const renderer = useThree((state) => state.renderer)
 
   // Leva knobs → live uniforms: create-or-update semantics sync new values on
   // every re-render; the graphs below reference the stable node instances.
@@ -79,8 +74,7 @@ export function AttractorParticles({
     uScale,
     uBoundHalfExtent,
     uColorA,
-    uColorB,
-  } = useUniforms(
+    uColorB } = useUniforms(
     {
       uAttractorMass: attractorMass,
       uParticleGlobalMass: particleGlobalMass,
@@ -91,8 +85,7 @@ export function AttractorParticles({
       uScale: scale,
       uBoundHalfExtent: boundHalfExtent,
       uColorA: colorA,
-      uColorB: colorB,
-    },
+      uColorB: colorB },
     'attractorParticles', // WGSL-identifier rule: camelCase scope, never kebab-case
   )
   // Casts: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`
@@ -114,8 +107,7 @@ export function AttractorParticles({
   // are bare identifiers, so they stay WGSL-legal; prefix them instead.
   const { attractorParticlePositions, attractorParticleVelocities } = useBuffers(() => ({
     attractorParticlePositions: instancedArray(PARTICLE_COUNT, 'vec3'),
-    attractorParticleVelocities: instancedArray(PARTICLE_COUNT, 'vec3'),
-  }))
+    attractorParticleVelocities: instancedArray(PARTICLE_COUNT, 'vec3') }))
 
   // All node graphs built exactly once; we close over the TYPED useBuffers
   // returns instead of reading back through the creator-state ScopedStore
@@ -234,8 +226,7 @@ export function AttractorParticles({
         uAttractorPositions,
         spritePositionNode: attractorParticlePositions.toAttribute(),
         spriteColorNode: vec4(mix(uColorANode, uColorBNode, colorMix), 1),
-        spriteScaleNode: particleMassMultiplier.mul(uScaleNode),
-      }
+        spriteScaleNode: particleMassMultiplier.mul(uScaleNode) }
     })
 
   // ONCE at mount + on every leva Reset press: (re)seed the buffers. Sync

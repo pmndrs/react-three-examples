@@ -58,7 +58,7 @@ import {
   vec4,
 } from 'three/tsl'
 import { BackSide, CanvasTexture, NoToneMapping, SRGBColorSpace, Storage3DTexture } from 'three/webgpu'
-import type { Node, StorageTexture, WebGPURenderer } from 'three/webgpu'
+import type { Node, StorageTexture } from 'three/webgpu'
 import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
@@ -75,10 +75,7 @@ interface CloudVolumeProps {
 }
 
 function CloudVolume({ threshold, opacity, range, steps, animationSpeed }: CloudVolumeProps) {
-  const rawRenderer = useThree((s) => s.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` exists only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((s) => s.renderer)
 
   const { uThreshold, uOpacity, uRange, uSteps, uAnimSpeed } = useUniforms(
     { uThreshold: threshold, uOpacity: opacity, uRange: range, uSteps: steps, uAnimSpeed: animationSpeed },

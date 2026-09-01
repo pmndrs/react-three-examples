@@ -34,9 +34,6 @@
  *   Inspector RootState slot yet (same gap noted in `lights-phong` / `reflection`)
  */
 import { Suspense, useLayoutEffect, useRef } from 'react'
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
 import {
   ACESFilmicToneMapping,
   CanvasTexture,
@@ -47,6 +44,9 @@ import {
 import type { Group, Mesh } from 'three/webgpu'
 import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js'
 import { FlakesTexture } from 'three/addons/textures/FlakesTexture.js'
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu'
+import { useTexture } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
@@ -110,8 +110,8 @@ function ClearcoatSpheres({ clearcoat }: { clearcoat: number }) {
     }
   }, [carbonDiffuse, carbonNormal])
 
-  useFrame((state, delta) => {
-    const timer = state.elapsed * 0.25
+  useFrame(({ elapsed, delta }) => {
+    const timer = elapsed * 0.25
     lightRef.current?.position.set(
       Math.sin(timer * 7) * 3,
       Math.cos(timer * 5) * 4,

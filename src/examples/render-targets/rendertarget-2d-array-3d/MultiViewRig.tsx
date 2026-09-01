@@ -171,11 +171,8 @@ function buildRig(renderer: WebGPURenderer, data: Uint8Array, aspect: number) {
 type Rig = ReturnType<typeof buildRig>
 
 export function MultiViewRig({ data, layersPerSecond }: { data: Uint8Array; layersPerSecond: number }) {
-  const rawRenderer = useThree((state) => state.renderer)
+  const renderer = useThree((state) => state.renderer)
   const size = useThree((state) => state.size)
-  // WebGPU-only calls below (layered setRenderTarget, RenderTarget3D) fail strict
-  // tsc on fiber's WebGL|WebGPU renderer union (AGENTS.md B9).
-  const renderer = rawRenderer as WebGPURenderer
 
   // Non-node instances (scenes, cameras, controls, render targets) captured by the
   // create-once frame-loop closure below — lazy useState keeps identity stable

@@ -3,9 +3,10 @@
 // DEMONSTRATES/DIVERGENCE for why a plain `.clone()` + traversal replaces the
 // original's two hardcoded child-index lookups.
 import { useEffect, useLayoutEffect, useMemo } from 'react'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import { mx_fractal_noise_vec3, time, uv } from 'three/tsl'
 import type { Mesh, MeshStandardMaterial, Node } from 'three/webgpu'
+
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 
 const XBOT_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Xbot.glb'
 

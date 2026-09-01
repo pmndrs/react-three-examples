@@ -37,11 +37,13 @@
  *   (`children[0].children[0]`/`[1]`) — see `PortalModels.tsx` header
  */
 import { Suspense, useEffect, useMemo } from 'react'
-import { Canvas, createPortal, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { color, mx_worley_noise_float, normalWorld, time, vec2 } from 'three/tsl'
 import { LinearToneMapping, Scene } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+
+import { Canvas, createPortal, useThree } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { PortalGhost, XbotModel } from './PortalModels'
 import { PortalWindow } from './PortalWindow'
@@ -69,8 +71,11 @@ function SceneBackground() {
 
 // WebGPURenderer property, not a TSL uniform — same escape hatch as
 // sky.tsx/tonemapping.tsx's exposure controls.
-function ToneMappingExposure({ exposure }: { exposure: number }) {
+function ToneMappingExposure() {
   const renderer = useThree((s) => s.renderer)
+  const { exposure } = useControls('portal', {
+    exposure: { value: 0.15, min: 0, max: 1, step: 0.01 },
+  })
 
   useEffect(() => {
     renderer.toneMappingExposure = exposure
@@ -80,10 +85,6 @@ function ToneMappingExposure({ exposure }: { exposure: number }) {
 }
 
 export default function Portal() {
-  const { exposure } = useControls('portal', {
-    exposure: { value: 0.15, min: 0, max: 1, step: 0.01 },
-  })
-
   // The portal's destination scene: a plain THREE.Scene that never joins the Canvas's
   // own scene graph. `createPortal` below feeds its lights/model in declaratively; the
   // TSL `pass()` node in PortalWindow is what actually renders it (see header
@@ -104,7 +105,7 @@ export default function Portal() {
       camera={{ position: CAMERA_POSITION, fov: 50, near: 0.01, far: 30 }}
     >
       <SceneBackground />
-      <ToneMappingExposure exposure={exposure} />
+      <ToneMappingExposure />
       <hemisphereLight args={['#ff0066', '#0066ff', 7]} />
       <pointLight position={[0, 1, 5]} power={17000} />
       <Suspense fallback={null}>

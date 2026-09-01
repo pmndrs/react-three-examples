@@ -65,7 +65,7 @@ import {
   TorusKnotGeometry,
   UnsignedByteType,
 } from 'three/webgpu'
-import type { Mesh, WebGPURenderer } from 'three/webgpu'
+import type { Mesh } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/hardwood2_diffuse.jpg'
@@ -102,7 +102,7 @@ function TorusKnot() {
 // target or the low-res readback target, an optional GPU→CPU pixel readback, and a
 // raw QuadMesh composite as the final frame — see header DEMONSTRATES.
 function ReadbackPipeline({ selection }: { selection: Selection }) {
-  const rawRenderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer)
   const scene = useThree((s) => s.scene)
   const camera = useThree((s) => s.camera)
   const size = useThree((s) => s.size)
@@ -151,12 +151,9 @@ function ReadbackPipeline({ selection }: { selection: Selection }) {
   }, [renderTarget, readbackTarget, displayMaterial])
 
   useLayoutEffect(() => {
-    // WebGPU-only renderer calls fail strict tsc on fiber's WebGL|WebGPU union
-    // (AGENTS.md B9).
-    const renderer = rawRenderer as WebGPURenderer
     const dpr = renderer.getPixelRatio()
     renderTarget.setSize(Math.floor(size.width * dpr), Math.floor(size.height * dpr))
-  }, [rawRenderer, renderTarget, size])
+  }, [renderer, renderTarget, size])
 
   // Tracks whether a readback is currently in flight, so at most one is ever
   // outstanding at a time.
@@ -164,9 +161,6 @@ function ReadbackPipeline({ selection }: { selection: Selection }) {
 
   useFrame(
     () => {
-      // WebGPU-only calls (setMRT/setRenderTarget with a WebGPU target) fail strict
-      // tsc on fiber's WebGL|WebGPU renderer union (AGENTS.md B9).
-      const renderer = rawRenderer as WebGPURenderer
       const isReadback = selection !== 'mrt'
 
       renderer.setMRT(sceneMRT)

@@ -44,12 +44,14 @@
  *   `(-100, 10, 0)` target and `maxPolarAngle` clamp as the original; grid disabled
  *   (`grid={false}`) — the original's own 10000×10000 floor plane is the receiver.
  */
-import { useMemo, useRef, useState } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { OrthographicCamera, PerspectiveCamera } from '@react-three/drei/webgpu'
-import { button, folder, useControls } from 'leva'
+import { useMemo, useRef } from 'react'
 import { NoToneMapping } from 'three/webgpu'
 import type { Mesh } from 'three/webgpu'
+
+import { Canvas, useThree } from '@react-three/fiber/webgpu'
+import { OrthographicCamera, PerspectiveCamera } from '@react-three/drei/webgpu'
+import { folder, useControls } from 'leva'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { CsmLight } from './CsmLight'
 
@@ -109,7 +111,8 @@ function FillLight({ direction }: { direction: [number, number, number] }) {
   return <directionalLight color="#000020" intensity={1.5} position={position} />
 }
 
-function Cameras({ orthographic }: { orthographic: boolean }) {
+function Cameras() {
+  const { orthographic } = useControls('shadowmap-csm', { orthographic: false })
   const aspect = useThree((s) => s.size.width / s.size.height)
   const halfHeight = ORTHO_DISTANCE / 2
   const halfWidth = halfHeight * aspect
@@ -133,46 +136,13 @@ function Cameras({ orthographic }: { orthographic: boolean }) {
 }
 
 export default function ShadowmapCsm() {
-  const [manualUpdateNonce, setManualUpdateNonce] = useState(0)
-
-  const {
-    orthographic,
-    shadowsEnabled,
-    cascades,
-    maxFar,
-    mode,
-    lightX,
-    lightY,
-    lightZ,
-    margin,
-    shadowNear,
-    shadowFar,
-    helperVisible,
-    displayFrustum,
-    displayPlanes,
-    displayShadowBounds,
-    autoUpdateHelper,
-  } = useControls('shadowmap-csm', {
-    orthographic: false,
-    shadowsEnabled: { value: true, label: 'shadows' },
-    cascades: { value: 4, min: 1, max: 4, step: 1 },
-    maxFar: { value: 1000, min: 1, max: 5000, step: 1, label: 'max shadow far' },
-    mode: { value: 'practical', options: ['uniform', 'logarithmic', 'practical'], label: 'split mode' },
+  // Shared by FillLight (counter-light) and CsmLight (the CSM sun itself) — stays here
+  // rather than duplicating the leva row in both siblings.
+  const { lightX, lightY, lightZ } = useControls('shadowmap-csm', {
     'light direction': folder({
       lightX: { value: -1, min: -1, max: 1, label: 'x' },
       lightY: { value: -1, min: -1, max: 1, label: 'y' },
       lightZ: { value: -1, min: -1, max: 1, label: 'z' },
-    }),
-    margin: { value: 100, min: 0, max: 200, label: 'light margin' },
-    shadowNear: { value: 1, min: 1, max: 10000, label: 'shadow near' },
-    shadowFar: { value: 2000, min: 1, max: 10000, label: 'shadow far' },
-    helper: folder({
-      helperVisible: { value: false, label: 'visible' },
-      displayFrustum: { value: true, label: 'frustum' },
-      displayPlanes: { value: true, label: 'planes' },
-      displayShadowBounds: { value: true, label: 'shadow bounds' },
-      autoUpdateHelper: { value: true, label: 'auto update' },
-      'update now': button(() => setManualUpdateNonce((n) => n + 1)),
     }),
   })
 
@@ -188,25 +158,10 @@ export default function ShadowmapCsm() {
       // camera prop omitted: Cameras below owns both PerspectiveCamera/OrthographicCamera
       // via makeDefault, matching the original's perspective/ortho toggle.
     >
-      <Cameras orthographic={orthographic} />
+      <Cameras />
       <ambientLight intensity={1.5} />
       <FillLight direction={[lightX, lightY, lightZ]} />
-      <CsmLight
-        cascades={cascades}
-        maxFar={maxFar}
-        mode={mode as 'practical' | 'uniform' | 'logarithmic'}
-        lightDirection={[lightX, lightY, lightZ]}
-        margin={margin}
-        shadowsEnabled={shadowsEnabled}
-        shadowNear={shadowNear}
-        shadowFar={shadowFar}
-        helperVisible={helperVisible}
-        displayFrustum={displayFrustum}
-        displayPlanes={displayPlanes}
-        displayShadowBounds={displayShadowBounds}
-        autoUpdateHelper={autoUpdateHelper}
-        manualUpdateNonce={manualUpdateNonce}
-      />
+      <CsmLight lightDirection={[lightX, lightY, lightZ]} />
       <Floor />
       <BoxRows />
       <DemoHelpers

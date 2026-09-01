@@ -1,7 +1,8 @@
 // Three normal-shaded shapes arranged on a circle, matching the original's fixed trio.
 import { useRef } from 'react'
-import { useFrame } from '@react-three/fiber/webgpu'
 import type { Mesh } from 'three/webgpu'
+
+import { useFrame } from '@react-three/fiber/webgpu'
 
 export function Shapes() {
   const meshRefs = useRef<(Mesh | null)[]>([])

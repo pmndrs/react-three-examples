@@ -43,10 +43,12 @@
  * - `renderer.setPixelRatio(devicePixelRatio)` dropped (fiber manages dpr);
  *   `renderer.inspector` integration dropped (repo doesn't wire it)
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { ACESFilmicToneMapping } from 'three/webgpu'
+import type { DirectionalLight } from 'three/webgpu'
+
 import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
-import { ACESFilmicToneMapping, type DirectionalLight } from 'three/webgpu'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { SunSky } from './SunSky'
 import { TerrainForest } from './TerrainForest'
@@ -65,65 +67,15 @@ function ToneMappingExposure({ exposure }: { exposure: number }) {
 export default function CustomFog() {
   const sunRef = useRef<DirectionalLight>(null)
 
-  // Terrain parameters the expensive bake is keyed on — committed on slider release
-  // (leva onEditEnd below), never per drag tick.
-  const [baked, setBaked] = useState({ seed: 1, erosion: 0.7, valleyBias: 1.2 })
-
-  const { elevation, azimuth, base, top, haze, cullFrom, cullTo } = useControls('custom-fog', {
-    sun: folder({
-      elevation: { value: 11, min: 1, max: 40, step: 0.5 }, // low = golden hour
-      azimuth: { value: 150, min: 0, max: 360, step: 1 },
-    }),
-    fog: folder({
-      base: { value: -20, min: -40, max: 20, step: 1 },
-      top: { value: 55, min: 0, max: 130, step: 1 },
-      haze: { value: 0.0012, min: 0, max: 0.005, step: 0.0001 },
-    }),
-    forest: folder({
-      cullFrom: { value: 300, min: 50, max: 1000, step: 10 },
-      cullTo: { value: 620, min: 100, max: 1400, step: 10 },
-    }),
-    terrain: folder({
-      seed: {
-        value: 1,
-        min: 1,
-        max: 50,
-        step: 1,
-        onEditEnd: (v: number) => setBaked((s) => ({ ...s, seed: v })),
-      },
-      erosion: {
-        value: 0.7,
-        min: 0,
-        max: 1.5,
-        step: 0.05,
-        onEditEnd: (v: number) => setBaked((s) => ({ ...s, erosion: v })),
-      },
-      valleyBias: {
-        value: 1.2,
-        min: 1,
-        max: 3,
-        step: 0.1,
-        onEditEnd: (v: number) => setBaked((s) => ({ ...s, valleyBias: v })),
-      },
-    }),
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       shadows
       camera={{ position: [-50, 88, 230], fov: 45, near: 1, far: 20000 }}
     >
-      <ValleyFog base={base} top={top} haze={haze} />
-      <SunSky elevation={elevation} azimuth={azimuth} sunRef={sunRef} />
-      <TerrainForest
-        seed={baked.seed}
-        erosion={baked.erosion}
-        valleyBias={baked.valleyBias}
-        cullFrom={cullFrom}
-        cullTo={cullTo}
-        sunRef={sunRef}
-      />
+      <ValleyFog />
+      <SunSky sunRef={sunRef} />
+      <TerrainForest sunRef={sunRef} />
       <ToneMappingExposure exposure={0.62} />
       <DemoHelpers grid={false} target={[0, 5, -120]} minDistance={5} maxDistance={2000} />
     </Canvas>

@@ -94,7 +94,6 @@ import {
   type BufferAttribute,
   type Mesh,
   type Node,
-  type WebGPURenderer,
 } from 'three/webgpu'
 import { useGLTF } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
@@ -128,10 +127,7 @@ interface JellyHeadProps {
 }
 
 function JellyHead({ elasticity, damping, brushSize, brushStrength }: JellyHeadProps) {
-  const rawRenderer = useThree((s) => s.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` exists only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((s) => s.renderer)
 
   // Leva-driven uniforms — called BEFORE the suspending useGLTF below (ordering rule,
   // AGENTS.md B18; compute-cloth precedent). WGSL-identifier rule: camelCase scope.

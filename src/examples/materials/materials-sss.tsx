@@ -36,12 +36,12 @@
  *   and at this scene scale (~500-unit model) the 0.5-unit grid would be moiré noise
  */
 import { Suspense, useEffect, useMemo } from 'react'
+import { NoToneMapping, TextureLoader } from 'three/webgpu'
+import type { Mesh } from 'three/webgpu'
+import { texture, uniform, vec3 } from 'three/tsl'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu'
 import { useFBX } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
-import { texture, uniform, vec3 } from 'three/tsl'
-import { NoToneMapping, TextureLoader } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const ASSETS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples'

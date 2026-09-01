@@ -165,7 +165,7 @@ function Cloud({ threshold, opacity, range, steps, baseColor, rotationSpeed }: C
 
   // Original: `mesh.rotation.y = -performance.now() / 7500` — accumulated here so the
   // added rotationSpeed knob rescales without a phase jump.
-  useFrame((_state, delta) => {
+  useFrame(({ delta }) => {
     if (meshRef.current) meshRef.current.rotation.y -= (delta / 7.5) * rotationSpeed
   })
 

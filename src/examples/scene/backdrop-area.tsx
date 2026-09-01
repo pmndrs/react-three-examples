@@ -31,9 +31,6 @@
  * - `renderer.inspector` dropped entirely (same gap as above)
  */
 import { Suspense, useEffect, useMemo } from 'react'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
 import { hashBlur } from 'three/addons/tsl/display/hashBlur.js'
 import {
   checker,
@@ -50,6 +47,11 @@ import {
 } from 'three/tsl'
 import { DoubleSide, MeshBasicNodeMaterial, NeutralToneMapping } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
+
+import { Canvas, useThree } from '@react-three/fiber/webgpu'
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
+import { useControls } from 'leva'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
@@ -76,11 +78,11 @@ function Michelle() {
   const { actions } = useAnimations(animations, scene)
 
   useEffect(() => {
-    // Michelle.glb ships a single clip — same "first action" idiom as backdrop/
-    // backdrop-water (no named-clip ambiguity to worry about here).
-    const first = Object.values(actions)[0]
-    first?.play()
-  }, [actions])
+    // Play by name, never Object.values(actions) — Michelle.glb ships one clip, but a
+    // GLTF can carry rest/utility clips that would otherwise pollute the blend.
+    const name = animations[0]?.name
+    if (name) actions[name]?.play()
+  }, [actions, animations])
 
   return <primitive object={scene} />
 }
@@ -89,6 +91,10 @@ function Michelle() {
 // DEMONSTRATES. Built once: none of these graphs depend on React state (the checker
 // material's tiling reads the box's live scale through `modelScale`, not a uniform we
 // manage).
+// REVIEW(shared-instance): all four materials are built once and picked by prop rather
+// than rendered as four JSX elements — the box scale sliders share this same `Scene`
+// re-render, and re-declaring TSL graphs on every scale-slider tick would rebuild all
+// four shaders on every drag frame instead of the one pick.
 function useAreaMaterials() {
   return useMemo(() => {
     const depthDistance = viewportLinearDepth.distance(linearDepth())

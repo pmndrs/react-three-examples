@@ -18,7 +18,7 @@ import { DemoHelpers } from '../../utils/DemoHelpers'
 function TorusKnot() {
   const meshRef = useRef<Mesh>(null)
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     if (!meshRef.current) return
     meshRef.current.rotation.x += delta * 0.3
     meshRef.current.rotation.y += delta * 0.4

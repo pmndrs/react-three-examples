@@ -13,8 +13,9 @@
  *   into `scene.environment` — the original's `updateSun()` dance, run in a
  *   `useLayoutEffect` so the FIRST shader build of the floating box already sees the
  *   environment (passive effects can lose that race — AGENTS.md B15/useLayoutEffect)
- * - Bloom post-processing via `useRenderPipeline` return-to-register: `bloom()`'s own
- *   `.strength`/`.radius` uniforms mutated in an effect, no rebuild, no fiber cast
+ * - Bloom post-processing via `useRenderPipeline`: leva-backed `useUniforms` nodes
+ *   swapped onto `bloom()`'s own `.strength`/`.radius` fields before the shader
+ *   compiles, no rebuild
  * - `renderer.toneMappingExposure` driven live from leva (renderer property, not a
  *   TSL uniform — same escape hatch as `sky`/`postprocessing-bloom-emissive`)
  *
@@ -32,9 +33,10 @@
  * - `renderer.inspector` / `Inspector` integration dropped (repo doesn't wire it)
  */
 import { Suspense, useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
 import { ACESFilmicToneMapping, type Mesh } from 'three/webgpu'
+
+import { Canvas, useFrame } from '@react-three/fiber/webgpu'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { OceanSky } from './OceanSky'
 import { PostFX, ToneMappingExposure } from './PostFX'
@@ -60,58 +62,18 @@ function BobbingBox() {
 }
 
 export default function Ocean() {
-  const {
-    elevation,
-    azimuth,
-    exposure,
-    distortionScale,
-    size,
-    bloomStrength,
-    bloomRadius,
-    cloudCoverage,
-    cloudDensity,
-    cloudElevation,
-  } = useControls('ocean', {
-    sky: folder({
-      elevation: { value: 2, min: 0, max: 90, step: 0.1 },
-      azimuth: { value: 180, min: -180, max: 180, step: 0.1 },
-      exposure: { value: 0.1, min: 0, max: 1, step: 0.0001 },
-    }),
-    water: folder({
-      distortionScale: { value: 3.7, min: 0, max: 8, step: 0.1 },
-      size: { value: 1, min: 0.1, max: 10, step: 0.1 },
-    }),
-    bloom: folder({
-      bloomStrength: { value: 0.1, min: 0, max: 3, step: 0.01 },
-      bloomRadius: { value: 0, min: 0, max: 1, step: 0.01 },
-    }),
-    clouds: folder({
-      cloudCoverage: { value: 0.4, min: 0, max: 1, step: 0.01 },
-      cloudDensity: { value: 0.5, min: 0, max: 1, step: 0.01 },
-      cloudElevation: { value: 0.5, min: 0, max: 1, step: 0.01 },
-    }),
-  })
-
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       camera={{ position: [30, 30, 100], fov: 55, near: 1, far: 20000 }}
     >
       <Suspense fallback={null}>
-        <OceanSky
-          elevation={elevation}
-          azimuth={azimuth}
-          distortionScale={distortionScale}
-          size={size}
-          cloudCoverage={cloudCoverage}
-          cloudDensity={cloudDensity}
-          cloudElevation={cloudElevation}
-        />
+        <OceanSky />
         {/* Inside the same gate: first commit must coincide with the env bake (B15). */}
         <BobbingBox />
       </Suspense>
-      <PostFX strength={bloomStrength} radius={bloomRadius} />
-      <ToneMappingExposure exposure={exposure} />
+      <PostFX />
+      <ToneMappingExposure />
       <DemoHelpers
         grid={false}
         target={[0, 10, 0]}

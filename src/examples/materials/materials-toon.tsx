@@ -37,11 +37,6 @@
  *   three.js Inspector (same as `postprocessing` / `postprocessing-dof`)
  */
 import { Suspense, useEffect, useMemo, useRef } from 'react'
-import { Canvas, useFrame, useLoader, useRenderPipeline } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { FontLoader } from 'three/addons/loaders/FontLoader.js'
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
-import { uniform } from 'three/tsl'
 import {
   Color,
   DataTexture,
@@ -52,6 +47,11 @@ import {
   ToonOutlinePassNode,
 } from 'three/webgpu'
 import type { Mesh, UniformNode } from 'three/webgpu'
+import { uniform } from 'three/tsl'
+import { FontLoader } from 'three/addons/loaders/FontLoader.js'
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
+import { Canvas, useFrame, useLoader, useRenderPipeline } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const FONT_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/fonts/gentilis_regular.typeface.json'

@@ -16,9 +16,9 @@
  * - `material.outputNode` overriding a loaded GLTF's PBR shading with an
  *   `oscSine`/`posterize` pulse (same full-scene-effect-with-no-pipeline-pass pattern as
  *   `tsl-halftone`'s `HalftoneMichelle.tsx`, a much smaller graph) (Michelle.tsx)
- * - Escape hatch: a `SpotLight` attached to the camera via `camera.add()` (no
- *   declarative "light as camera child" in R3F — same pattern as
- *   `skinning-instancing`'s `CameraLight`, swapped to a spotlight) (SceneSetup.tsx)
+ * - Escape hatch: a `SpotLight` attached to the camera via `camera.add()`, kept
+ *   imperative on purpose so it follows whatever camera Canvas's `camera` prop made
+ *   default — same pattern as `skinning-instancing`'s `CameraLight` (SceneSetup.tsx)
  * - Escape hatch: the portal ring's auto-rotation pausing while the user drags the
  *   camera, wired through the `controlsRef` escape hatch and camera-controls' own
  *   `controlstart`/`controlend` events (the library's OrbitControls-compatible
@@ -47,20 +47,17 @@
  *   rationale as `tsl-halftone`'s split
  */
 import { Suspense, useCallback, useRef } from 'react'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import type CameraControlsImpl from 'camera-controls'
 import { NeutralToneMapping } from 'three/webgpu'
+
+import { Canvas } from '@react-three/fiber/webgpu'
+import type CameraControlsImpl from 'camera-controls'
+
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { CameraLight, SceneBackground } from './SceneSetup'
 import { Michelle } from './Michelle'
 import { Portals } from './Portals'
 
 export default function Backdrop() {
-  const { rotateSpeed } = useControls('backdrop', {
-    rotateSpeed: { value: 0.5, min: 0, max: 2, step: 0.05 },
-  })
-
   // Pausing the portal ring's auto-rotation while the user drags the camera — the
   // callback ref fires once camera-controls' instance is available (React 19 callback
   // refs support a cleanup return, so both subscribe and unsubscribe live here).
@@ -91,7 +88,7 @@ export default function Backdrop() {
       <Suspense fallback={null}>
         <Michelle />
       </Suspense>
-      <Portals rotateSpeed={rotateSpeed} rotatingRef={rotatingRef} />
+      <Portals rotatingRef={rotatingRef} />
       <DemoHelpers target={[0, 1, 0]} controlsRef={setControls} />
     </Canvas>
   )

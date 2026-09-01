@@ -42,16 +42,18 @@
  *   ACESFilmic and mute the warm/cool light split; AGENTS.md v0.9 rule)
  */
 import { useRef } from 'react'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
 import { NoToneMapping } from 'three/webgpu'
 import type { DirectionalLight, Group, Mesh } from 'three/webgpu'
+
+import { Canvas, useFrame } from '@react-three/fiber/webgpu'
+import { folder, useControls } from 'leva'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 function TorusKnot({ speed }: { speed: number }) {
   const meshRef = useRef<Mesh>(null)
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const mesh = meshRef.current
     if (!mesh) return
     mesh.rotation.x += 0.25 * speed * delta
@@ -95,22 +97,28 @@ function Ground() {
 }
 
 interface LightsProps {
-  spotRadius: number
-  spotSamples: number
-  dirRadius: number
-  dirSamples: number
   speed: number
 }
 
 // Warm spot + cool directional, both VSM casters with the original's deliberately tiny
 // map sizes (256 / 512). The directional light orbits inside a group and bobs along z;
 // the bob phase is accumulated from delta so the speed slider never teleports it.
-function Lights({ spotRadius, spotSamples, dirRadius, dirSamples, speed }: LightsProps) {
+function Lights({ speed }: LightsProps) {
+  const { spotRadius, spotSamples, dirRadius, dirSamples } = useControls('shadowmap-vsm', {
+    spotlight: folder({
+      spotRadius: { value: 4, min: 0, max: 25, step: 0.1, label: 'radius' },
+      spotSamples: { value: 8, min: 1, max: 25, step: 1, label: 'samples' },
+    }),
+    'directional light': folder({
+      dirRadius: { value: 4, min: 0, max: 25, step: 0.1, label: 'radius' },
+      dirSamples: { value: 8, min: 1, max: 25, step: 1, label: 'samples' },
+    }),
+  })
   const dirGroupRef = useRef<Group>(null)
   const dirLightRef = useRef<DirectionalLight>(null)
   const bobPhaseRef = useRef(0)
 
-  useFrame((_, delta) => {
+  useFrame(({ delta }) => {
     const group = dirGroupRef.current
     const light = dirLightRef.current
     if (!group || !light) return
@@ -162,17 +170,8 @@ function Lights({ spotRadius, spotSamples, dirRadius, dirSamples, speed }: Light
 }
 
 export default function ShadowmapVsm() {
-  const { spotRadius, spotSamples, dirRadius, dirSamples, speed } = useControls('shadowmap-vsm', {
-    spotlight: folder({
-      spotRadius: { value: 4, min: 0, max: 25, step: 0.1, label: 'radius' },
-      spotSamples: { value: 8, min: 1, max: 25, step: 1, label: 'samples' },
-    }),
-    'directional light': folder({
-      dirRadius: { value: 4, min: 0, max: 25, step: 0.1, label: 'radius' },
-      dirSamples: { value: 8, min: 1, max: 25, step: 1, label: 'samples' },
-    }),
-    speed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
+  // speed is shared by Lights (directional bob/orbit) and TorusKnot (spin rate).
+  const { speed } = useControls('shadowmap-vsm', { speed: { value: 1, min: 0, max: 3, step: 0.05 } })
 
   return (
     <Canvas
@@ -182,13 +181,7 @@ export default function ShadowmapVsm() {
       camera={{ position: [0, 10, 30], fov: 45, near: 1, far: 1000 }}
     >
       <fog attach="fog" args={['#222244', 50, 100]} />
-      <Lights
-        spotRadius={spotRadius}
-        spotSamples={spotSamples}
-        dirRadius={dirRadius}
-        dirSamples={dirSamples}
-        speed={speed}
-      />
+      <Lights speed={speed} />
       <TorusKnot speed={speed} />
       <Pillars />
       <Ground />

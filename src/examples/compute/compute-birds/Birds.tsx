@@ -49,7 +49,6 @@ import {
   Vector2,
   Vector3,
   type Node,
-  type WebGPURenderer,
 } from 'three/webgpu'
 
 const BIRDS = 8192
@@ -83,10 +82,7 @@ export interface BirdsProps {
 }
 
 export function Birds({ separation, alignment, cohesion }: BirdsProps) {
-  const rawRenderer = useThree((state) => state.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` exists only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((state) => state.renderer)
 
   // Leva knobs → live kernel uniforms (create-or-update syncs new values every
   // re-render; the kernels below reference the stable node instances).

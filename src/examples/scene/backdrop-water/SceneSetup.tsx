@@ -2,9 +2,10 @@
 // backdrop-water.tsx header DEMONSTRATES. Same escape hatch as `backdrop`/
 // `reflection`'s `SceneBackground`.
 import { useEffect } from 'react'
-import { useThree } from '@react-three/fiber/webgpu'
 import { color, normalWorld } from 'three/tsl'
 import type { Node } from 'three/webgpu'
+
+import { useThree } from '@react-three/fiber/webgpu'
 
 // Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
 // webgpu renderer reads it directly off the live scene instance (duck-typed gap,

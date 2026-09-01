@@ -45,7 +45,6 @@ import {
   type MeshStandardNodeMaterial,
   type Node,
   type StorageBufferNode,
-  type WebGPURenderer,
 } from 'three/webgpu'
 import { Ducks, NUM_DUCKS } from './Ducks'
 
@@ -80,10 +79,7 @@ export function Water({
   controlsRef,
 }: WaterProps) {
   const scene = useThree((state) => state.scene)
-  const rawRenderer = useThree((state) => state.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` exists only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((state) => state.renderer)
 
   // Leva knobs → live kernel uniforms. Called BEFORE the suspending useLoader below —
   // creator-mode hooks deferred past a suspension write to the store after siblings

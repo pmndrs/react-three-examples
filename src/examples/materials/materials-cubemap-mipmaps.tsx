@@ -32,9 +32,9 @@
  *   manual-vs-auto comparison the example exists to teach
  */
 import { Suspense, useMemo } from 'react'
-import { Canvas, useLoader } from '@react-three/fiber/webgpu'
 import { CubeTextureLoader, LinearFilter, LinearMipmapLinearFilter, SRGBColorSpace } from 'three/webgpu'
 import type { CubeTexture } from 'three/webgpu'
+import { Canvas, useLoader } from '@react-three/fiber/webgpu'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/angus/'

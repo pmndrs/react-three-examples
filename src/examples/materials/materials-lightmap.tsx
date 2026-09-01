@@ -31,11 +31,11 @@
  *   ~800-unit world scale; the 0.5-unit demo grid would be sub-pixel noise inside it
  */
 import { Suspense, useEffect, useMemo } from 'react'
-import { Canvas, useLoader } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
 import { BackSide, Color, NoToneMapping, ObjectLoader } from 'three/webgpu'
 import type { Mesh, MeshPhongMaterial } from 'three/webgpu'
 import { color, mix, positionLocal, vec4 } from 'three/tsl'
+import { Canvas, useLoader } from '@react-three/fiber/webgpu'
+import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 // ObjectLoader resolves the JSON's relative image URLs (lightmap-ao-shadow.png,

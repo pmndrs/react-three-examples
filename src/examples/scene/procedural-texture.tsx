@@ -31,22 +31,26 @@
  *   actually demonstrated, not just narrated in a comment
  */
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { button, useControls } from 'leva'
-import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { checker, convertToTexture, uv } from 'three/tsl'
 import type { Node } from 'three/webgpu'
+
+import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
+import { button, useControls } from 'leva'
+
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-interface ProceduralPlaneProps {
-  uvScale: number
-  blurAmount: number
-  autoUpdate: boolean
-  updateTick: number
-}
+function ProceduralPlane() {
+  const [updateTick, setUpdateTick] = useState(0)
 
-function ProceduralPlane({ uvScale: uvScaleValue, blurAmount: blurAmountValue, autoUpdate, updateTick }: ProceduralPlaneProps) {
-  const { uvScale, blurAmount } = useUniforms(() => ({ uvScale: uvScaleValue, blurAmount: blurAmountValue }))
+  const { uvScale, blurAmount, autoUpdate } = useControls('procedural-texture', {
+    uvScale: { value: 4, min: 1, max: 10, step: 0.1, label: 'uv scale (before rtt)' },
+    blurAmount: { value: 0.5, min: 0, max: 2, step: 0.01, label: 'blur amount (after rtt)' },
+    autoUpdate: { value: true, label: 'auto update' },
+    'update once': button(() => setUpdateTick((n) => n + 1)),
+  })
+
+  const { uvScale: uvScaleNode, blurAmount: blurAmountNode } = useUniforms({ uvScale, blurAmount })
 
   // Procedural checker pattern, baked to a 512x512 texture. `convertToTexture` returns
   // an `RTTNode` (typed as such by @types/three) — no cast needed to reach `.autoUpdate`/
@@ -57,7 +61,7 @@ function ProceduralPlane({ uvScale: uvScaleValue, blurAmount: blurAmountValue, a
         // Cast: fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so it
         // never structurally narrows to `Node<'float'>` even though it is one at runtime
         // (documented fiber typing gap, see rtt.tsx/shadow-contact).
-        checker(uv().mul(uvScale as unknown as Node<'float'>)),
+        checker(uv().mul(uvScaleNode as unknown as Node<'float'>)),
         512,
         512,
       ),
@@ -65,12 +69,12 @@ function ProceduralPlane({ uvScale: uvScaleValue, blurAmount: blurAmountValue, a
     // mutated in place via `.value`), so this dep never actually changes identity — listed
     // for the lint rule, not for churn. It guards against re-baking a brand new RTTNode
     // (render target + quad mesh) on every leva tick.
-    [uvScale],
+    [uvScaleNode],
   )
 
   const colorNode = useMemo(
-    () => gaussianBlur(proceduralToTexture, blurAmount as unknown as Node<'float'>, 20),
-    [proceduralToTexture, blurAmount],
+    () => gaussianBlur(proceduralToTexture, blurAmountNode as unknown as Node<'float'>, 20),
+    [proceduralToTexture, blurAmountNode],
   )
 
   useEffect(() => {
@@ -97,18 +101,9 @@ function ProceduralPlane({ uvScale: uvScaleValue, blurAmount: blurAmountValue, a
 }
 
 export default function ProceduralTexture() {
-  const [updateTick, setUpdateTick] = useState(0)
-
-  const { uvScale, blurAmount, autoUpdate } = useControls('procedural-texture', {
-    uvScale: { value: 4, min: 1, max: 10, step: 0.1, label: 'uv scale (before rtt)' },
-    blurAmount: { value: 0.5, min: 0, max: 2, step: 0.01, label: 'blur amount (after rtt)' },
-    autoUpdate: { value: true, label: 'auto update' },
-    'update once': button(() => setUpdateTick((n) => n + 1)),
-  })
-
   return (
     <Canvas renderer background="#111111" camera={{ position: [0, 0, 3], fov: 50 }}>
-      <ProceduralPlane uvScale={uvScale} blurAmount={blurAmount} autoUpdate={autoUpdate} updateTick={updateTick} />
+      <ProceduralPlane />
       <DemoHelpers />
     </Canvas>
   )

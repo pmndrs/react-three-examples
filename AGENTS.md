@@ -385,10 +385,20 @@ in `node_modules/three/examples/jsm/tsl/display/` and pick by what it actually d
   preserve), but `dotScreen()`/`rgbShift()` call `uniform(angle)` unconditionally, which
   rewraps your node into a NEW uniform and silently drops every later write (B29).
   Construct with defaults, then assign onto the field — correct for all of them.
-- **(c)** *fallback, two cases only.* Either there is no instance to assign onto — an
+  **Precondition — WHEN the node reads the field.** (b) only works if the node reads
+  `this.<field>` in `setup()` (at shader compile), like `BloomNode` does. A class that
+  builds its graph in its CONSTRUCTOR has already captured the original uniform node by
+  reference, and replacing the field afterwards changes nothing — `SkyMesh` assigns
+  `material.colorNode` inside `constructor()`, closing over `this.turbidity`/`this.rayleigh`
+  on the spot (`objects/SkyMesh.js`), and `WaterMesh` is the same shape. For those,
+  **mutate `.value` in place** — the field swap fails silently, which is the worst
+  failure mode there is. Check where the graph is built before choosing.
+
+- **(c)** *fallback, three cases.* There is no instance to assign onto — an
   `Fn()`-style helper taking an options object (`depthAwareBlend`) — or the field is
   **int/uint** (`godrays().raymarchSteps` is `uniform(uint(60))`) and `useUniforms` can
-  only produce `UniformNode<'float'>` for a JS number. → create three/tsl `uniform()`
+  only produce `UniformNode<'float'>` for a JS number; or the graph was built in the
+  constructor (above). → create three/tsl `uniform()`
   nodes inside the mainCB, pass them in, register via return-to-register, mutate
   `.value` in an effect.
 - **(d)** *structural toggle.* A boolean that swaps the whole `outputNode` between two

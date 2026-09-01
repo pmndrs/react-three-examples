@@ -30,7 +30,6 @@ import {
   PlaneGeometry,
   RenderTarget,
   type Node,
-  type WebGPURenderer,
 } from 'three/webgpu'
 
 export const MAX_PARTICLE_COUNT = 50_000
@@ -42,11 +41,7 @@ export interface RainProps {
 
 export function Rain({ dropCount }: RainProps) {
   const scene = useThree((state) => state.scene)
-  const rawRenderer = useThree((state) => state.renderer)
-  // Cast: useThree types renderer as the WebGL/WebGPU union even on the `/webgpu`
-  // entry (fiber typing gap, UPSTREAM.md B9) — `.compute()` and RenderTarget-typed
-  // `.setRenderTarget()` exist only on WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const renderer = useThree((state) => state.renderer)
 
   // The collision rig: a top-down orthographic camera that sees ONLY layer 1 (the
   // colliders opt in via `layers.enable(1)`, see Colliders.tsx) renders world

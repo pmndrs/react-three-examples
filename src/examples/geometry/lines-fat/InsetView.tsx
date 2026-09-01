@@ -8,17 +8,13 @@
 import { useMemo } from 'react'
 import { color } from 'three/tsl'
 import { PerspectiveCamera } from 'three/webgpu'
-import type { Node, WebGPURenderer } from 'three/webgpu'
+import type { Node } from 'three/webgpu'
 import { useFrame, useThree } from '@react-three/fiber/webgpu'
 
 const INSET_MARGIN = 20 // px from the top-left corner, as in the original
 
 export function InsetView() {
-  const { scene, renderer: rawRenderer } = useThree()
-  // Cast: fiber's `useThree()` types `renderer` as the package-wide
-  // `WebGLRenderer | WebGPURenderer` union even on the `/webgpu` entry (documented
-  // fiber typing gap, UPSTREAM.md B9). This canvas only ever runs a WebGPURenderer.
-  const renderer = rawRenderer as WebGPURenderer
+  const { scene, renderer } = useThree()
   const size = useThree((state) => state.size)
 
   // Square inset camera (aspect 1, fixed) — pose is copied from the live orbit camera
