@@ -12,7 +12,8 @@
     "lint": "eslint .",
     "test:smoke": "playwright test tests/smoke.spec.ts",
     "test:animates": "playwright test tests/animates.spec.ts",
-    "contact-sheet": "node scripts/contact-sheet.mjs"
+    "contact-sheet": "node scripts/contact-sheet.mjs",
+    "generate:manifest": "node scripts/generate-manifest.mjs"
   },
   "dependencies": {
     "@react-three/drei": "^11.0.0-alpha.5",

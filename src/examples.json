@@ -2,26 +2,54 @@
   {
     "slug": "animation-skinning-blending",
     "title": "Animation / Skinning / Blending",
-    "tags": ["animation", "skinning", "gltf", "shadows", "leva"],
+    "category": "animation",
+    "tags": [
+      "animation",
+      "gltf",
+      "leva",
+      "shadows",
+      "skinning"
+    ],
     "original": "https://threejs.org/examples/#webgl_animation_skinning_blending",
     "credits": "Soldier model from the three.js examples"
   },
   {
     "slug": "hello-webgpu",
     "title": "Hello WebGPU",
-    "tags": ["placeholder", "webgpu"]
+    "category": "scene",
+    "tags": [
+      "placeholder"
+    ]
   },
   {
     "slug": "skinning-instancing",
     "title": "Skinning / Instancing",
-    "tags": ["animation", "skinning", "instancing", "gltf", "tsl", "post-processing", "leva"],
+    "category": "animation",
+    "tags": [
+      "animation",
+      "gltf",
+      "instancing",
+      "leva",
+      "postprocessing",
+      "skinning",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_skinning_instancing",
     "credits": "Michelle model from the three.js examples"
   },
   {
     "slug": "postprocessing-bloom-emissive",
     "title": "Postprocessing / Bloom Emissive",
-    "tags": ["postprocessing", "bloom", "mrt", "tsl", "gltf", "environment", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "bloom",
+      "environment",
+      "gltf",
+      "leva",
+      "mrt",
+      "postprocessing",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_bloom_emissive",
     "credits": "DamagedHelmet model and moonless_golf_1k HDR from the three.js examples (glTF-Sample-Models / Poly Haven)",
     "static": true
@@ -29,68 +57,135 @@
   {
     "slug": "sky",
     "title": "Sky",
-    "tags": ["tsl", "sky", "environment", "cubecamera", "leva"],
+    "category": "scene",
+    "tags": [
+      "cube-camera",
+      "environment",
+      "leva",
+      "sky",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_sky",
     "credits": "SkyMesh (Preetham analytic sky model) from the three.js examples"
   },
   {
     "slug": "rtt",
     "title": "Render to Texture",
-    "tags": ["tsl", "render-to-texture", "post-processing", "pointer"],
+    "category": "render-targets",
+    "tags": [
+      "pointer",
+      "postprocessing",
+      "render-target",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_rtt",
     "credits": "uv_grid_opengl texture from the three.js examples"
   },
   {
     "slug": "shadow-contact",
     "title": "Shadow / Contact",
-    "tags": ["tsl", "shadow", "render-to-texture", "gaussian-blur", "leva"],
+    "category": "shadows",
+    "tags": [
+      "gaussian-blur",
+      "leva",
+      "render-target",
+      "shadows",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_shadow_contact"
   },
   {
     "slug": "tsl-halftone",
     "title": "TSL / Halftone",
-    "tags": ["tsl", "node-material", "gltf", "leva"],
+    "category": "tsl",
+    "tags": [
+      "gltf",
+      "leva",
+      "node-material",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_halftone",
     "credits": "Michelle model from the three.js examples"
   },
   {
     "slug": "sprites",
     "title": "Sprites",
-    "tags": ["tsl", "node-material", "sprites", "fog", "leva"],
+    "category": "geometry",
+    "tags": [
+      "fog",
+      "leva",
+      "node-material",
+      "sprites",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_sprites",
     "credits": "sprite1.png texture from the three.js examples"
   },
   {
     "slug": "tsl-earth",
     "title": "TSL / Earth",
-    "tags": ["tsl", "node-material", "planet", "leva"],
+    "category": "tsl",
+    "tags": [
+      "leva",
+      "node-material",
+      "planet",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_earth",
     "credits": "Earth textures from Solar System Scope (resized and merged), via the three.js examples"
   },
   {
     "slug": "shadowmap",
     "title": "Shadow Map",
-    "tags": ["tsl", "shadow", "node-material", "leva"],
+    "category": "shadows",
+    "tags": [
+      "leva",
+      "node-material",
+      "shadows",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_shadowmap"
   },
   {
     "slug": "procedural-texture",
     "title": "Procedural Texture",
-    "tags": ["tsl", "render-to-texture", "gaussian-blur", "leva"],
+    "category": "textures",
+    "tags": [
+      "gaussian-blur",
+      "leva",
+      "render-target",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_procedural_texture",
     "static": true
   },
   {
     "slug": "reflection",
     "title": "Reflection + Recursive Tree Cubes",
-    "tags": ["tsl", "reflection", "instancing", "post-processing", "shadows", "fog", "leva"],
+    "category": "reflections",
+    "tags": [
+      "fog",
+      "instancing",
+      "leva",
+      "postprocessing",
+      "reflection",
+      "shadows",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_reflection",
     "credits": "Recursive Tree Cubes concept by oosmoxiecode; floor checkerboard textures from the three.js examples"
   },
   {
     "slug": "tonemapping",
     "title": "Tone Mapping",
-    "tags": ["tonemapping", "environment", "gltf", "hdr", "leva"],
+    "category": "scene",
+    "tags": [
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "tonemapping"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tonemapping",
     "credits": "Venice Mask by DailyArt (CC BY-NC 4.0, Sketchfab); Venice Sunset HDR from HDRI Haven, via the three.js examples",
     "static": true
@@ -98,48 +193,92 @@
   {
     "slug": "refraction",
     "title": "Refraction",
-    "tags": ["tsl", "node-material", "refraction", "leva"],
+    "category": "materials",
+    "tags": [
+      "leva",
+      "node-material",
+      "refraction",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_refraction",
     "credits": "FloorsCheckerboard_S_Normal texture from the three.js examples"
   },
   {
     "slug": "video-panorama",
     "title": "Video Panorama",
-    "tags": ["video", "texture", "panorama", "equirectangular"],
+    "category": "textures",
+    "tags": [
+      "equirectangular",
+      "panorama",
+      "textures",
+      "video"
+    ],
     "original": "https://threejs.org/examples/#webgpu_video_panorama",
     "credits": "pano.webm video from the three.js examples"
   },
   {
     "slug": "lights-rectarealight",
     "title": "Lights / RectAreaLight",
-    "tags": ["lights", "rectarealight", "tsl", "node-material", "leva"],
+    "category": "lights",
+    "tags": [
+      "leva",
+      "lights",
+      "node-material",
+      "rectarea-light",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lights_rectarealight",
     "credits": "RectAreaLight LTC BRDF approximation by Eric Heitz et al.; RectAreaLightHelper by abelnation, from the three.js examples"
   },
   {
     "slug": "instance-mesh",
     "title": "Instance Mesh",
-    "tags": ["instancing", "tsl", "node-material", "leva"],
+    "category": "geometry",
+    "tags": [
+      "instancing",
+      "leva",
+      "node-material",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_instance_mesh",
     "credits": "Suzanne geometry from the three.js examples"
   },
   {
     "slug": "morphtargets",
     "title": "Morph Targets",
-    "tags": ["morphtargets", "geometry", "leva"],
+    "category": "animation",
+    "tags": [
+      "geometry",
+      "leva",
+      "morphtargets"
+    ],
     "original": "https://threejs.org/examples/#webgpu_morphtargets",
     "static": true
   },
   {
     "slug": "clipping",
     "title": "Clipping Planes",
-    "tags": ["clipping", "shadows", "node-material", "leva"],
+    "category": "materials",
+    "tags": [
+      "clipping",
+      "leva",
+      "node-material",
+      "shadows"
+    ],
     "original": "https://threejs.org/examples/#webgpu_clipping"
   },
   {
     "slug": "loader-gltf",
     "title": "Loader / glTF",
-    "tags": ["gltf", "loader", "environment", "hdr", "animation", "leva"],
+    "category": "loaders",
+    "tags": [
+      "animation",
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "loader"
+    ],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf",
     "credits": "glTF sample models from the Khronos Group glTF-Sample-Assets repository; quarry_01 HDR from the three.js examples (Poly Haven)",
     "static": true
@@ -147,14 +286,30 @@
   {
     "slug": "lights-spotlight",
     "title": "Lights / Spotlight",
-    "tags": ["lights", "spotlight", "shadows", "ply", "leva"],
+    "category": "lights",
+    "tags": [
+      "leva",
+      "lights",
+      "ply",
+      "shadows",
+      "spot-light"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lights_spotlight",
     "credits": "Lucy statue (Stanford 3D Scanning Repository) and disturb/colors/uv_grid_opengl textures from the three.js examples"
   },
   {
     "slug": "materials-envmaps",
     "title": "Materials / Environment Maps",
-    "tags": ["materials", "environment", "cubemap", "equirectangular", "reflection", "refraction", "leva"],
+    "category": "materials",
+    "tags": [
+      "cubemap",
+      "environment",
+      "equirectangular",
+      "leva",
+      "materials",
+      "reflection",
+      "refraction"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_envmaps",
     "credits": "Bridge2 cube map and equirectangular map (by Jón Ragnarsson) from the three.js examples",
     "static": true
@@ -162,55 +317,118 @@
   {
     "slug": "loader-gltf-transmission",
     "title": "Loader / glTF Transmission",
-    "tags": ["gltf", "loader", "transmission", "environment", "hdr", "animation", "leva"],
+    "category": "loaders",
+    "tags": [
+      "animation",
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "loader",
+      "transmission"
+    ],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_transmission",
     "credits": "Iridescent Dish With Olives by Eric Chadwick (KHR_materials_transmission sample); San Giuseppe Bridge HDR from the three.js examples (Poly Haven)"
   },
   {
     "slug": "depth-texture",
     "title": "Depth Texture",
-    "tags": ["tsl", "render-to-texture", "depth", "leva"],
+    "category": "render-targets",
+    "tags": [
+      "depth",
+      "leva",
+      "render-target",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_depth_texture",
     "static": true
   },
   {
     "slug": "backdrop",
     "title": "Backdrop",
-    "tags": ["tsl", "node-material", "backdrop", "gltf", "leva"],
+    "category": "scene",
+    "tags": [
+      "backdrop",
+      "gltf",
+      "leva",
+      "node-material",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_backdrop",
     "credits": "Michelle model from the three.js examples"
   },
   {
     "slug": "camera",
     "title": "Camera",
-    "tags": ["camera", "cameraHelper", "render-takeover", "scissor", "leva"],
+    "category": "camera",
+    "tags": [
+      "camera",
+      "camera-helper",
+      "leva",
+      "render-takeover",
+      "scissor"
+    ],
     "original": "https://threejs.org/examples/#webgpu_camera"
   },
   {
     "slug": "lights-pointlights",
     "title": "Lights / Point Lights",
-    "tags": ["lights", "pointlight", "tsl", "node-material", "obj", "leva"],
+    "category": "lights",
+    "tags": [
+      "leva",
+      "lights",
+      "node-material",
+      "obj",
+      "point-light",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lights_pointlights",
     "credits": "Walt Disney head by David OReilly; displacement effect by oosmoxiecode, from the three.js examples"
   },
   {
     "slug": "portal",
     "title": "Portal",
-    "tags": ["tsl", "node-material", "render-to-texture", "gltf", "animation", "leva"],
+    "category": "render-targets",
+    "tags": [
+      "animation",
+      "gltf",
+      "leva",
+      "node-material",
+      "render-target",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_portal",
     "credits": "Xbot model from the three.js examples"
   },
   {
     "slug": "materials-displacementmap",
     "title": "Materials / Displacement Map",
-    "tags": ["materials", "node-material", "displacement", "obj", "environment", "cubemap", "orthographic", "leva"],
+    "category": "materials",
+    "tags": [
+      "cubemap",
+      "displacement",
+      "environment",
+      "leva",
+      "materials",
+      "node-material",
+      "obj",
+      "orthographic"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_displacementmap",
     "credits": "Ninja head model (normal/ao/displacement maps) from AMD GPU MeshMapper, via the three.js examples; SwedishRoyalCastle cube map from the three.js examples"
   },
   {
     "slug": "geometry-loft",
     "title": "Geometry / Loft",
-    "tags": ["geometry", "tsl", "node-material", "shadows", "environment", "leva"],
+    "category": "geometry",
+    "tags": [
+      "environment",
+      "geometry",
+      "leva",
+      "node-material",
+      "shadows",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_geometry_loft",
     "credits": "LoftGeometry addon from the three.js examples",
     "ciSkip": "17-exhibit shader-graph compile + B17 open anomaly (createRoot warning with no suspending hook) exceeds readiness on SwiftShader; passes on Metal",
@@ -220,55 +438,123 @@
   {
     "slug": "animation-retargeting",
     "title": "Animation / Retargeting",
-    "tags": ["animation", "skinning", "gltf", "retargeting", "tsl", "reflection", "leva"],
+    "category": "animation",
+    "tags": [
+      "animation",
+      "gltf",
+      "leva",
+      "reflection",
+      "retargeting",
+      "skinning",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_animation_retargeting",
     "credits": "Michelle and Soldier models from the three.js examples"
   },
   {
     "slug": "backdrop-water",
     "title": "Backdrop Water",
-    "tags": ["tsl", "node-material", "backdrop", "water", "gltf", "post-processing", "shadows", "fog", "leva"],
+    "category": "scene",
+    "tags": [
+      "backdrop",
+      "fog",
+      "gltf",
+      "leva",
+      "node-material",
+      "postprocessing",
+      "shadows",
+      "tsl",
+      "water"
+    ],
     "original": "https://threejs.org/examples/#webgpu_backdrop_water",
     "credits": "Michelle model and water.jpg texture from the three.js examples"
   },
   {
     "slug": "materials-basic",
     "title": "Materials / Basic",
-    "tags": ["materials", "node-material", "instancing", "cubemap", "reflection", "refraction", "leva"],
+    "category": "materials",
+    "tags": [
+      "cubemap",
+      "instancing",
+      "leva",
+      "materials",
+      "node-material",
+      "reflection",
+      "refraction"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_basic",
     "credits": "pisa cube map from the three.js examples"
   },
   {
     "slug": "lights-phong",
     "title": "Lights / Phong",
-    "tags": ["lights", "phong", "tsl", "node-material", "fog", "leva"],
+    "category": "lights",
+    "tags": [
+      "fog",
+      "leva",
+      "lights",
+      "node-material",
+      "phong",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lights_phong",
     "credits": "roughness_map and Water_1_M_Normal textures from the three.js examples"
   },
   {
     "slug": "backdrop-area",
     "title": "Backdrop Area",
-    "tags": ["tsl", "node-material", "backdrop", "depth", "gltf", "leva"],
+    "category": "scene",
+    "tags": [
+      "backdrop",
+      "depth",
+      "gltf",
+      "leva",
+      "node-material",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_backdrop_area",
     "credits": "Michelle model from the three.js examples"
   },
   {
     "slug": "camera-array",
     "title": "Camera Array",
-    "tags": ["camera", "arraycamera", "shadows", "node-material", "leva"],
+    "category": "camera",
+    "tags": [
+      "array-camera",
+      "camera",
+      "leva",
+      "node-material",
+      "shadows"
+    ],
     "original": "https://threejs.org/examples/#webgpu_camera_array"
   },
   {
     "slug": "loader-gltf-iridescence",
     "title": "Loader / glTF Iridescence",
-    "tags": ["gltf", "loader", "iridescence", "environment", "hdr", "leva"],
+    "category": "loaders",
+    "tags": [
+      "environment",
+      "gltf",
+      "hdr",
+      "iridescence",
+      "leva",
+      "loader"
+    ],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_iridescence",
     "credits": "Iridescence Lamp (KHR_materials_iridescence sample) from glTF-Sample-Models; Venice Sunset HDR from HDRI Haven, via the three.js examples"
   },
   {
     "slug": "loader-gltf-sheen",
     "title": "Loader / glTF Sheen",
-    "tags": ["gltf", "loader", "sheen", "environment", "hdr", "leva"],
+    "category": "loaders",
+    "tags": [
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "loader",
+      "sheen"
+    ],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_sheen",
     "credits": "Sheen Chair (KHR_materials_sheen sample) from glTF-Sample-Models",
     "static": true
@@ -276,14 +562,31 @@
   {
     "slug": "loader-gltf-anisotropy",
     "title": "Loader / glTF Anisotropy",
-    "tags": ["gltf", "loader", "anisotropy", "environment", "hdr", "leva"],
+    "category": "loaders",
+    "tags": [
+      "anisotropy",
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "loader"
+    ],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_anisotropy",
     "credits": "Anisotropy Barn Lamp (KHR_materials_anisotropy sample) from glTF-Sample-Models; Pedestrian Overpass HDR from the three.js examples (Poly Haven)"
   },
   {
     "slug": "textures-anisotropy",
     "title": "Textures / Anisotropy",
-    "tags": ["textures", "anisotropy", "filtering", "scissor", "render-takeover", "fog", "leva"],
+    "category": "textures",
+    "tags": [
+      "anisotropy",
+      "filtering",
+      "fog",
+      "leva",
+      "render-takeover",
+      "scissor",
+      "textures"
+    ],
     "original": "https://threejs.org/examples/#webgpu_textures_anisotropy",
     "credits": "crate.gif texture from the three.js examples",
     "static": true
@@ -291,14 +594,31 @@
   {
     "slug": "loader-gltf-dispersion",
     "title": "Loader / glTF Dispersion",
-    "tags": ["gltf", "loader", "dispersion", "transmission", "environment", "hdr", "leva"],
+    "category": "loaders",
+    "tags": [
+      "dispersion",
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "loader",
+      "transmission"
+    ],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_dispersion",
     "credits": "DispersionTest model (KHR_materials_dispersion sample) from glTF-Sample-Assets; Pedestrian Overpass HDR from the three.js examples (Poly Haven)"
   },
   {
     "slug": "loader-gltf-compressed",
     "title": "Loader / glTF Compressed",
-    "tags": ["gltf", "loader", "ktx2", "meshopt", "compression", "leva"],
+    "category": "loaders",
+    "tags": [
+      "compression",
+      "gltf",
+      "ktx2",
+      "leva",
+      "loader",
+      "meshopt"
+    ],
     "original": "https://threejs.org/examples/#webgpu_loader_gltf_compressed",
     "credits": "Coffeemat by Roman Red (Sketchfab), compressed with gltfpack, from the three.js examples",
     "static": true
@@ -306,14 +626,33 @@
   {
     "slug": "tsl-galaxy",
     "title": "TSL / Galaxy",
-    "tags": ["tsl", "node-material", "particles", "instancing", "sprites", "leva"],
+    "category": "tsl",
+    "tags": [
+      "instancing",
+      "leva",
+      "node-material",
+      "particles",
+      "sprites",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_galaxy",
     "credits": "Galaxy generator based on Bruno Simon's Three.js Journey lessons"
   },
   {
     "slug": "tsl-procedural-terrain",
     "title": "TSL / Procedural Terrain",
-    "tags": ["tsl", "node-material", "terrain", "noise", "shadows", "environment", "hdr", "pointer", "leva"],
+    "category": "tsl",
+    "tags": [
+      "environment",
+      "hdr",
+      "leva",
+      "node-material",
+      "noise",
+      "pointer",
+      "shadows",
+      "terrain",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_procedural_terrain",
     "credits": "Terrain shader based on Bruno Simon's Three.js Journey lessons; Pedestrian Overpass HDR from the three.js examples (Poly Haven)",
     "static": true
@@ -321,7 +660,13 @@
   {
     "slug": "compute-texture",
     "title": "Compute / Texture",
-    "tags": ["compute", "tsl", "storage-texture", "leva"],
+    "category": "compute",
+    "tags": [
+      "compute",
+      "leva",
+      "storage-texture",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_texture",
     "credits": "Sine interference pattern from Shadertoy (Xst3zN), via the three.js examples",
     "static": true
@@ -329,62 +674,137 @@
   {
     "slug": "compute-particles",
     "title": "Compute / Particles",
-    "tags": ["compute", "tsl", "particles", "sprites", "pointer", "leva"],
+    "category": "compute",
+    "tags": [
+      "compute",
+      "leva",
+      "particles",
+      "pointer",
+      "sprites",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_particles",
     "static": true
   },
   {
     "slug": "tsl-raging-sea",
     "title": "TSL / Raging Sea",
-    "tags": ["tsl", "node-material", "water", "noise", "leva"],
+    "category": "tsl",
+    "tags": [
+      "leva",
+      "node-material",
+      "noise",
+      "tsl",
+      "water"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_raging_sea",
     "credits": "Raging sea shader based on Bruno Simon's Three.js Journey lessons"
   },
   {
     "slug": "tsl-compute-attractors-particles",
     "title": "TSL / Compute Attractors Particles",
-    "tags": ["compute", "tsl", "particles", "sprites", "attractors", "leva"],
+    "category": "tsl",
+    "tags": [
+      "attractors",
+      "compute",
+      "leva",
+      "particles",
+      "sprites",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_compute_attractors_particles",
     "credits": "Particle attractor simulation by Bruno Simon, from the three.js examples"
   },
   {
     "slug": "postprocessing",
     "title": "Postprocessing",
-    "tags": ["postprocessing", "tsl", "dot-screen", "rgb-shift", "fog", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "dot-screen",
+      "fog",
+      "leva",
+      "postprocessing",
+      "rgb-shift",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing"
   },
   {
     "slug": "postprocessing-dof",
     "title": "Postprocessing / Depth of Field",
-    "tags": ["postprocessing", "depth-of-field", "tsl", "instancing", "cubemap", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "cubemap",
+      "depth-of-field",
+      "instancing",
+      "leva",
+      "postprocessing",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_dof",
     "credits": "SwedishRoyalCastle cube map from the three.js examples"
   },
   {
     "slug": "postprocessing-pixel",
     "title": "Postprocessing / Pixelation",
-    "tags": ["postprocessing", "pixelation", "tsl", "orthographic", "shadows", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "leva",
+      "orthographic",
+      "pixelation",
+      "postprocessing",
+      "shadows",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_pixel",
     "credits": "Pixelation pass with single-pixel outlines by Kody King; checker texture from the three.js examples"
   },
   {
     "slug": "postprocessing-ao",
     "title": "Postprocessing / Ambient Occlusion",
-    "tags": ["postprocessing", "ao", "gtao", "traa", "mrt", "tsl", "gltf", "environment", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "ao",
+      "environment",
+      "gltf",
+      "gtao",
+      "leva",
+      "mrt",
+      "postprocessing",
+      "traa",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_ao",
     "credits": "Tennyson bust from Three D Scans, via the three.js examples"
   },
   {
     "slug": "postprocessing-afterimage",
     "title": "Postprocessing / Afterimage",
-    "tags": ["postprocessing", "afterimage", "tsl", "sprites", "particles", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "afterimage",
+      "leva",
+      "particles",
+      "postprocessing",
+      "sprites",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_afterimage",
     "credits": "Based on Particle Spiral by oosmoxiecode; circle.png sprite from the three.js examples"
   },
   {
     "slug": "postprocessing-outline",
     "title": "Postprocessing / Outline",
-    "tags": ["postprocessing", "outline", "tsl", "obj", "pointer", "shadows", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "leva",
+      "obj",
+      "outline",
+      "pointer",
+      "postprocessing",
+      "shadows",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_outline",
     "credits": "Outline Pass by Prashant Sharma and Ben Houston; tree model from the three.js examples",
     "static": true
@@ -392,21 +812,47 @@
   {
     "slug": "tsl-vfx-tornado",
     "title": "TSL / VFX Tornado",
-    "tags": ["tsl", "node-material", "vfx", "noise", "postprocessing", "bloom", "leva"],
+    "category": "tsl",
+    "tags": [
+      "bloom",
+      "leva",
+      "node-material",
+      "noise",
+      "postprocessing",
+      "tsl",
+      "vfx"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_vfx_tornado",
     "credits": "Tornado VFX by Bruno Simon, based on Three.js Journey lessons; perlin noise texture from the three.js examples"
   },
   {
     "slug": "tsl-vfx-flames",
     "title": "TSL / VFX Flames",
-    "tags": ["tsl", "node-material", "sprites", "vfx", "noise", "leva"],
+    "category": "tsl",
+    "tags": [
+      "leva",
+      "node-material",
+      "noise",
+      "sprites",
+      "tsl",
+      "vfx"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_vfx_flames",
     "credits": "Flame VFX by Bruno Simon, inspired by @cmzw_; voronoi/perlin noise textures from the three.js examples"
   },
   {
     "slug": "materials-matcap",
     "title": "Materials / Matcap",
-    "tags": ["materials", "node-material", "matcap", "gltf", "exr", "tonemapping", "leva"],
+    "category": "materials",
+    "tags": [
+      "exr",
+      "gltf",
+      "leva",
+      "matcap",
+      "materials",
+      "node-material",
+      "tonemapping"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_matcap",
     "credits": "Lee Perry-Smith head scan by Infinite Realities (CC BY 3.0); 040full.exr matcap by cyaoeu; porcelain white matcap by Milos Paripovic, from the three.js examples",
     "static": true
@@ -414,21 +860,45 @@
   {
     "slug": "materials-toon",
     "title": "Materials / Toon",
-    "tags": ["materials", "toon", "node-material", "postprocessing", "outline", "leva"],
+    "category": "materials",
+    "tags": [
+      "leva",
+      "materials",
+      "node-material",
+      "outline",
+      "postprocessing",
+      "toon"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_toon",
     "credits": "gentilis typeface font from the three.js examples"
   },
   {
     "slug": "lines-fat",
     "title": "Lines / Fat",
-    "tags": ["lines", "line2", "node-material", "scissor", "viewport", "leva"],
+    "category": "geometry",
+    "tags": [
+      "leva",
+      "line2",
+      "lines",
+      "node-material",
+      "scissor",
+      "viewport"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lines_fat",
     "static": true
   },
   {
     "slug": "lensflares",
     "title": "Lens Flares",
-    "tags": ["lensflare", "lights", "pointlight", "fog", "node-material", "leva"],
+    "category": "lights",
+    "tags": [
+      "fog",
+      "lensflare",
+      "leva",
+      "lights",
+      "node-material",
+      "point-light"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lensflares",
     "credits": "LensflareMesh addon by Mugen87 and mrdoob; lens flare textures from ro.me, via the three.js examples",
     "static": true
@@ -436,14 +906,32 @@
   {
     "slug": "volume-cloud",
     "title": "Volume / Cloud",
-    "tags": ["tsl", "node-material", "volume", "raymarching", "3d-texture", "noise", "leva"],
+    "category": "volume",
+    "tags": [
+      "3d-texture",
+      "leva",
+      "node-material",
+      "noise",
+      "raymarching",
+      "tsl",
+      "volume"
+    ],
     "original": "https://threejs.org/examples/#webgpu_volume_cloud",
     "credits": "RaymarchingBox TSL utility and ImprovedNoise from the three.js examples"
   },
   {
     "slug": "volume-perlin",
     "title": "Volume / Perlin",
-    "tags": ["tsl", "node-material", "volume", "raymarching", "3d-texture", "noise", "leva"],
+    "category": "volume",
+    "tags": [
+      "3d-texture",
+      "leva",
+      "node-material",
+      "noise",
+      "raymarching",
+      "tsl",
+      "volume"
+    ],
     "original": "https://threejs.org/examples/#webgpu_volume_perlin",
     "credits": "RaymarchingBox TSL utility and ImprovedNoise from the three.js examples",
     "static": true
@@ -451,18 +939,19 @@
   {
     "slug": "volume-caustics",
     "title": "Volume / Caustics",
+    "category": "volume",
     "tags": [
-      "tsl",
-      "node-material",
-      "volume",
-      "raymarching",
       "3d-texture",
-      "noise",
-      "post-processing",
       "bloom",
+      "gltf",
+      "leva",
+      "node-material",
+      "noise",
+      "postprocessing",
+      "raymarching",
       "shadows",
-      "glTF",
-      "leva"
+      "tsl",
+      "volume"
     ],
     "original": "https://threejs.org/examples/#webgpu_volume_caustics",
     "credits": "Duck model from the Khronos glTF sample assets, via the three.js examples; Caustic_Free.jpg from opengameart.org, via the three.js examples"
@@ -470,20 +959,21 @@
   {
     "slug": "volume-lighting",
     "title": "Volume / Lighting",
+    "category": "volume",
     "tags": [
-      "tsl",
-      "node-material",
-      "volume",
-      "raymarching",
       "3d-texture",
-      "noise",
-      "post-processing",
       "gaussian-blur",
-      "shadows",
+      "leva",
       "lights",
-      "spotlight",
-      "pointlight",
-      "leva"
+      "node-material",
+      "noise",
+      "point-light",
+      "postprocessing",
+      "raymarching",
+      "shadows",
+      "spot-light",
+      "tsl",
+      "volume"
     ],
     "original": "https://threejs.org/examples/#webgpu_volume_lighting",
     "credits": "TeapotGeometry and colors.png light-cookie texture from the three.js examples"
@@ -491,18 +981,19 @@
   {
     "slug": "volume-lighting-rectarea",
     "title": "Volume / Lighting RectArea",
+    "category": "volume",
     "tags": [
-      "tsl",
-      "node-material",
-      "volume",
-      "raymarching",
       "3d-texture",
-      "noise",
-      "post-processing",
       "gaussian-blur",
+      "leva",
       "lights",
-      "rectarealight",
-      "leva"
+      "node-material",
+      "noise",
+      "postprocessing",
+      "raymarching",
+      "rectarea-light",
+      "tsl",
+      "volume"
     ],
     "original": "https://threejs.org/examples/#webgpu_volume_lighting_rectarea",
     "credits": "RectAreaLight LTC BRDF approximation by Eric Heitz et al., from the three.js examples"
@@ -510,18 +1001,19 @@
   {
     "slug": "volume-fire",
     "title": "Volume / Fire",
+    "category": "volume",
     "tags": [
-      "tsl",
+      "3d-texture",
+      "bloom",
       "compute",
       "fluid-simulation",
-      "volume",
-      "raymarching",
-      "3d-texture",
+      "leva",
       "node-material",
-      "post-processing",
-      "bloom",
+      "postprocessing",
+      "raymarching",
       "shadows",
-      "leva"
+      "tsl",
+      "volume"
     ],
     "original": "https://threejs.org/examples/#webgpu_volume_fire",
     "credits": "Volumetric fire simulation by the three.js authors; TeapotGeometry and the curl-noise TSL addon from the three.js examples",
@@ -530,55 +1022,124 @@
   {
     "slug": "shadowmap-pointlight",
     "title": "Shadow Map / Point Light",
-    "tags": ["shadows", "pointlight", "cube-shadow-map", "canvas-texture", "node-material", "leva"],
+    "category": "shadows",
+    "tags": [
+      "canvas-texture",
+      "cube-shadow-map",
+      "leva",
+      "node-material",
+      "point-light",
+      "shadows"
+    ],
     "original": "https://threejs.org/examples/#webgpu_shadowmap_pointlight"
   },
   {
     "slug": "shadowmap-vsm",
     "title": "Shadow Map / VSM",
-    "tags": ["shadows", "vsm", "spotlight", "directional-light", "fog", "leva"],
+    "category": "shadows",
+    "tags": [
+      "directional-light",
+      "fog",
+      "leva",
+      "shadows",
+      "spot-light",
+      "vsm"
+    ],
     "original": "https://threejs.org/examples/#webgpu_shadowmap_vsm",
     "credits": "VSM Shadows example by Paul Brunt"
   },
   {
     "slug": "ocean",
     "title": "Ocean",
-    "tags": ["water", "sky", "environment", "pmrem", "bloom", "postprocessing", "tsl", "leva"],
+    "category": "tsl",
+    "tags": [
+      "bloom",
+      "environment",
+      "leva",
+      "pmrem",
+      "postprocessing",
+      "sky",
+      "tsl",
+      "water"
+    ],
     "original": "https://threejs.org/examples/#webgpu_ocean",
     "credits": "WaterMesh flat-mirror water after Slayvin, Stemkoski and 29a.ch; SkyMesh sky model by the three.js authors; waternormals texture from the three.js examples"
   },
   {
     "slug": "clearcoat",
     "title": "Clearcoat",
-    "tags": ["materials", "clearcoat", "physical", "environment", "hdr", "canvas-texture", "lights", "leva"],
+    "category": "materials",
+    "tags": [
+      "canvas-texture",
+      "clearcoat",
+      "environment",
+      "hdr",
+      "leva",
+      "lights",
+      "materials",
+      "physical"
+    ],
     "original": "https://threejs.org/examples/#webgpu_clearcoat",
     "credits": "Carbon fibre, golf ball, and scratched gold textures, FlakesTexture addon, and Pisa HDR cube map from the three.js examples"
   },
   {
     "slug": "mirror",
     "title": "Mirror",
-    "tags": ["tsl", "reflection", "reflector", "node-material", "lights", "leva"],
+    "category": "reflections",
+    "tags": [
+      "leva",
+      "lights",
+      "node-material",
+      "reflection",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_mirror",
     "credits": "Checkerboard floor and decal textures from the three.js examples"
   },
   {
     "slug": "materials-sss",
     "title": "Materials / Subsurface Scattering",
-    "tags": ["materials", "sss", "node-material", "fbx", "lights", "leva"],
+    "category": "materials",
+    "tags": [
+      "fbx",
+      "leva",
+      "lights",
+      "materials",
+      "node-material",
+      "sss"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_sss",
     "credits": "Stanford bunny model and thickness map by Shaochun Lin, from the three.js examples"
   },
   {
     "slug": "fog-height",
     "title": "Fog / Height",
-    "tags": ["tsl", "fog", "instancing", "node-material", "leva"],
+    "category": "scene",
+    "tags": [
+      "fog",
+      "instancing",
+      "leva",
+      "node-material",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_fog_height",
     "static": true
   },
   {
     "slug": "custom-fog",
     "title": "Custom Fog",
-    "tags": ["tsl", "fog", "noise", "terrain", "instancing", "sky", "environment", "shadows", "leva"],
+    "category": "scene",
+    "tags": [
+      "environment",
+      "fog",
+      "instancing",
+      "leva",
+      "noise",
+      "shadows",
+      "sky",
+      "terrain",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_custom_fog",
     "credits": "TerrainGenerator, ForestGenerator and SkyMesh addons from the three.js examples",
     "ciSkip": "500k instanced trees + 512^2 terrain + 4096^2 shadow map loses the WebGPU device on SwiftShader (Device Lost, both attempts, run 30263967034); passes on Metal"
@@ -586,34 +1147,80 @@
   {
     "slug": "instance-uniform",
     "title": "Instance Uniform",
-    "tags": ["tsl", "node-material", "custom-node", "uniforms", "cubemap", "leva"],
+    "category": "geometry",
+    "tags": [
+      "cubemap",
+      "custom-node",
+      "leva",
+      "node-material",
+      "tsl",
+      "uniforms"
+    ],
     "original": "https://threejs.org/examples/#webgpu_instance_uniform",
     "credits": "TeapotGeometry and SwedishRoyalCastle cube map from the three.js examples"
   },
   {
     "slug": "instance-points",
     "title": "Instance Points",
-    "tags": ["points", "instancing", "compute", "tsl", "node-material", "scissor", "viewport", "leva"],
+    "category": "geometry",
+    "tags": [
+      "compute",
+      "instancing",
+      "leva",
+      "node-material",
+      "points",
+      "scissor",
+      "tsl",
+      "viewport"
+    ],
     "original": "https://threejs.org/examples/#webgpu_instance_points"
   },
   {
     "slug": "compute-particles-rain",
     "title": "Compute / Particles Rain",
-    "tags": ["compute", "tsl", "particles", "collision", "render-target", "layers", "leva"],
+    "category": "compute",
+    "tags": [
+      "collision",
+      "compute",
+      "layers",
+      "leva",
+      "particles",
+      "render-target",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_particles_rain",
     "credits": "Suzanne model by the Blender Foundation, from the three.js examples"
   },
   {
     "slug": "compute-particles-snow",
     "title": "Compute / Particles Snow",
-    "tags": ["compute", "tsl", "particles", "collision", "render-target", "layers", "postprocessing", "leva"],
+    "category": "compute",
+    "tags": [
+      "collision",
+      "compute",
+      "layers",
+      "leva",
+      "particles",
+      "postprocessing",
+      "render-target",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_particles_snow",
     "credits": "TeapotGeometry and GaussianBlurNode addons from the three.js examples"
   },
   {
     "slug": "materials-transmission",
     "title": "Materials / Transmission",
-    "tags": ["materials", "transmission", "physical", "environment", "hdr", "canvas-texture", "leva"],
+    "category": "materials",
+    "tags": [
+      "canvas-texture",
+      "environment",
+      "hdr",
+      "leva",
+      "materials",
+      "physical",
+      "transmission"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_transmission",
     "credits": "San Giuseppe Bridge HDR from the three.js examples (Poly Haven)",
     "static": true
@@ -621,21 +1228,48 @@
   {
     "slug": "materials-alphahash",
     "title": "Materials / Alpha Hash",
-    "tags": ["materials", "instancing", "postprocessing", "pmrem", "environment", "leva"],
+    "category": "materials",
+    "tags": [
+      "environment",
+      "instancing",
+      "leva",
+      "materials",
+      "pmrem",
+      "postprocessing"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_alphahash",
     "static": true
   },
   {
     "slug": "cubemap-dynamic",
     "title": "Cubemap / Dynamic",
-    "tags": ["cubecamera", "cubemap", "reflection", "environment", "hdr", "leva"],
+    "category": "reflections",
+    "tags": [
+      "cube-camera",
+      "cubemap",
+      "environment",
+      "hdr",
+      "leva",
+      "reflection"
+    ],
     "original": "https://threejs.org/examples/#webgpu_cubemap_dynamic",
     "credits": "Pisa HDR cube map and uv_grid_opengl texture from the three.js examples"
   },
   {
     "slug": "materials-envmaps-groundprojected",
     "title": "Materials / Envmaps Ground Projected",
-    "tags": ["materials", "environment", "hdr", "cubemap", "tsl", "node-material", "gltf", "physical", "leva"],
+    "category": "materials",
+    "tags": [
+      "cubemap",
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "materials",
+      "node-material",
+      "physical",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_envmaps_groundprojected",
     "credits": "Ferrari 458 Italia model by vicent091036 (Sketchfab); Blouberg Sunrise 2 HDR by Greg Zaal (Poly Haven), via the three.js examples",
     "static": true
@@ -643,7 +1277,15 @@
   {
     "slug": "materials-lightmap",
     "title": "Materials / Lightmap",
-    "tags": ["materials", "lightmap", "objectloader", "tsl", "node-material", "leva"],
+    "category": "materials",
+    "tags": [
+      "leva",
+      "lightmap",
+      "materials",
+      "node-material",
+      "object-loader",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_lightmap",
     "credits": "Baked lightmap castle scene from the three.js examples",
     "static": true
@@ -651,21 +1293,52 @@
   {
     "slug": "parallax-uv",
     "title": "Parallax UV",
-    "tags": ["tsl", "parallax", "textures", "materials", "environment", "hdr", "leva"],
+    "category": "materials",
+    "tags": [
+      "environment",
+      "hdr",
+      "leva",
+      "materials",
+      "parallax",
+      "textures",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_parallax_uv",
     "credits": "Ice textures by ambientCG; HDR by hdri-skies.com, via the three.js examples"
   },
   {
     "slug": "postprocessing-motion-blur",
     "title": "Postprocessing / Motion Blur",
-    "tags": ["postprocessing", "motion-blur", "velocity", "mrt", "tsl", "gltf", "animation", "skinning", "shadows", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "animation",
+      "gltf",
+      "leva",
+      "motion-blur",
+      "mrt",
+      "postprocessing",
+      "shadows",
+      "skinning",
+      "tsl",
+      "velocity"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_motion_blur",
     "credits": "Xbot model, checkerboard floor and uv_grid textures from the three.js examples"
   },
   {
     "slug": "postprocessing-godrays",
     "title": "Postprocessing / Godrays",
-    "tags": ["postprocessing", "godrays", "volumetric", "shadows", "pointlight", "tsl", "gltf", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "gltf",
+      "godrays",
+      "leva",
+      "point-light",
+      "postprocessing",
+      "shadows",
+      "tsl",
+      "volumetric"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_godrays",
     "credits": "Godrays technique from three-good-godrays by Casey Primozic (Ameobea); godrays demo model from the three.js examples",
     "static": true
@@ -673,35 +1346,76 @@
   {
     "slug": "mesh-batch",
     "title": "Mesh / Batch",
-    "tags": ["batchedmesh", "instancing", "tsl", "node-material", "performance", "leva"],
+    "category": "geometry",
+    "tags": [
+      "batched-mesh",
+      "instancing",
+      "leva",
+      "node-material",
+      "performance",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_mesh_batch",
     "credits": "Hybrid radix sort (SortUtils) from the three.js examples"
   },
   {
     "slug": "skinning-points",
     "title": "Skinning / Points",
-    "tags": ["animation", "skinning", "points", "compute", "tsl", "node-material", "gltf", "leva"],
+    "category": "animation",
+    "tags": [
+      "animation",
+      "compute",
+      "gltf",
+      "leva",
+      "node-material",
+      "points",
+      "skinning",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_skinning_points",
     "credits": "Michelle model from the three.js examples"
   },
   {
     "slug": "occlusion",
     "title": "Occlusion",
-    "tags": ["occlusion-query", "custom-node", "tsl", "node-material", "leva"],
+    "category": "scene",
+    "tags": [
+      "custom-node",
+      "leva",
+      "node-material",
+      "occlusion-query",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_occlusion",
     "static": true
   },
   {
     "slug": "layers",
     "title": "Layers",
-    "tags": ["layers", "instancing", "tsl", "node-material", "sprites", "leva"],
+    "category": "scene",
+    "tags": [
+      "instancing",
+      "layers",
+      "leva",
+      "node-material",
+      "sprites",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_layers",
     "credits": "blossom.png sprite from the three.js examples"
   },
   {
     "slug": "pmrem-equirectangular",
     "title": "PMREM / Equirectangular",
-    "tags": ["pmrem", "environment", "envmap", "tsl", "node-material", "ultrahdr", "leva"],
+    "category": "reflections",
+    "tags": [
+      "environment",
+      "leva",
+      "node-material",
+      "pmrem",
+      "tsl",
+      "ultrahdr"
+    ],
     "original": "https://threejs.org/examples/#webgpu_pmrem_equirectangular",
     "credits": "Royal Esplanade UltraHDR environment from the three.js examples (Poly Haven)",
     "static": true
@@ -709,14 +1423,34 @@
   {
     "slug": "reflection-blurred",
     "title": "Reflection / Blurred",
-    "tags": ["tsl", "reflection", "reflector", "hash-blur", "depth", "node-material", "gltf", "animation", "leva"],
+    "category": "reflections",
+    "tags": [
+      "animation",
+      "depth",
+      "gltf",
+      "hash-blur",
+      "leva",
+      "node-material",
+      "reflection",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_reflection_blurred",
     "credits": "Michelle model and uv_grid texture from the three.js examples; hash blur after shadertoy 4lXXWn; circle effect after shadertoy 3tdSRn"
   },
   {
     "slug": "tsl-angular-slicing",
     "title": "TSL / Angular Slicing",
-    "tags": ["tsl", "node-material", "masknode", "gltf", "environment", "ultrahdr", "shadows", "leva"],
+    "category": "tsl",
+    "tags": [
+      "environment",
+      "gltf",
+      "leva",
+      "mask-node",
+      "node-material",
+      "shadows",
+      "tsl",
+      "ultrahdr"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_angular_slicing",
     "credits": "Based on the Three.js Journey sliced-model lesson (Bruno Simon); gears model and Royal Esplanade UltraHDR environment from the three.js examples",
     "static": true
@@ -724,7 +1458,17 @@
   {
     "slug": "tsl-wood",
     "title": "TSL / Wood",
-    "tags": ["tsl", "node-material", "procedural", "wood", "clearcoat", "environment", "text", "leva"],
+    "category": "tsl",
+    "tags": [
+      "clearcoat",
+      "environment",
+      "leva",
+      "node-material",
+      "procedural",
+      "text",
+      "tsl",
+      "wood"
+    ],
     "original": "https://threejs.org/examples/#webgpu_tsl_wood",
     "credits": "WoodNodeMaterial by Logan Seeley, based on Lance Phan's Blender tutorial; San Giuseppe Bridge HDR and helvetiker font from the three.js examples",
     "static": true
@@ -732,41 +1476,101 @@
   {
     "slug": "instance-sprites",
     "title": "Instance Sprites",
-    "tags": ["sprites", "instancing", "tsl", "node-material", "fog", "leva"],
+    "category": "geometry",
+    "tags": [
+      "fog",
+      "instancing",
+      "leva",
+      "node-material",
+      "sprites",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_instance_sprites",
     "credits": "Snowflake sprite texture from the three.js examples"
   },
   {
     "slug": "compute-water",
     "title": "Compute / Water",
-    "tags": ["compute", "tsl", "water", "struct", "instancing", "pointer", "gltf", "environment", "hdr", "leva"],
+    "category": "compute",
+    "tags": [
+      "compute",
+      "environment",
+      "gltf",
+      "hdr",
+      "instancing",
+      "leva",
+      "pointer",
+      "struct",
+      "tsl",
+      "water"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_water",
     "credits": "Duck model from the three.js examples; Blouberg Sunrise 2 HDR by Greg Zaal (Poly Haven), via the three.js examples"
   },
   {
     "slug": "compute-birds",
     "title": "Compute / Birds",
-    "tags": ["compute", "boids", "tsl", "instancing", "vertex-node", "pointer", "fog", "leva"],
+    "category": "compute",
+    "tags": [
+      "boids",
+      "compute",
+      "fog",
+      "instancing",
+      "leva",
+      "pointer",
+      "tsl",
+      "vertex-node"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_birds",
     "ciSkip": "O(N^2) boids kernel (8192^2 pair tests per frame, ~67M loop iterations) cannot reach readiness on SwiftShader software raster"
   },
   {
     "slug": "compute-cloth",
     "title": "Compute / Cloth",
-    "tags": ["compute", "tsl", "cloth", "verlet", "physics", "vertex-node", "environment", "hdr", "leva"],
+    "category": "compute",
+    "tags": [
+      "cloth",
+      "compute",
+      "environment",
+      "hdr",
+      "leva",
+      "physics",
+      "tsl",
+      "verlet",
+      "vertex-node"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_cloth",
     "credits": "Royal Esplanade UltraHDR environment from the three.js examples (Poly Haven)"
   },
   {
     "slug": "lights-selective",
     "title": "Lights / Selective",
-    "tags": ["lights", "pointlight", "tsl", "node-material", "lightsNode", "fog", "leva"],
+    "category": "lights",
+    "tags": [
+      "fog",
+      "leva",
+      "lights",
+      "lights-node",
+      "node-material",
+      "point-light",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lights_selective"
   },
   {
     "slug": "postprocessing-sobel",
     "title": "Postprocessing / Sobel",
-    "tags": ["postprocessing", "tsl", "render-pipeline", "sobel", "edge-detection", "gltf", "environment", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "edge-detection",
+      "environment",
+      "gltf",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "sobel",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_sobel",
     "credits": "DragonAttenuation model from the three.js examples",
     "static": true
@@ -774,66 +1578,157 @@
   {
     "slug": "postprocessing-fxaa",
     "title": "Postprocessing / FXAA",
-    "tags": ["postprocessing", "tsl", "render-pipeline", "fxaa", "antialiasing", "instancing", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "antialiasing",
+      "fxaa",
+      "instancing",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_fxaa",
     "static": true
   },
   {
     "slug": "postprocessing-smaa",
     "title": "Postprocessing / SMAA",
-    "tags": ["postprocessing", "tsl", "render-pipeline", "smaa", "antialiasing", "textures", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "antialiasing",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "smaa",
+      "textures",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_smaa"
   },
   {
     "slug": "postprocessing-ca",
     "title": "Postprocessing / Chromatic Aberration",
-    "tags": ["postprocessing", "tsl", "render-pipeline", "chromatic-aberration", "environment", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "chromatic-aberration",
+      "environment",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_ca"
   },
   {
     "slug": "lights-ies-spotlight",
     "title": "Lights / IES Spotlight",
-    "tags": ["lights", "spotlight", "ies", "shadows", "leva"],
+    "category": "lights",
+    "tags": [
+      "ies",
+      "leva",
+      "lights",
+      "shadows",
+      "spot-light"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lights_ies_spotlight"
   },
   {
     "slug": "lights-projector",
     "title": "Lights / Projector",
-    "tags": ["lights", "spotlight", "tsl", "node-material", "video", "shadows", "ply", "leva"],
+    "category": "lights",
+    "tags": [
+      "leva",
+      "lights",
+      "node-material",
+      "ply",
+      "shadows",
+      "spot-light",
+      "tsl",
+      "video"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lights_projector",
     "credits": "Lucy statue (Stanford 3D Scanning Repository), colors.png texture, and sintel.mp4 video from the three.js examples"
   },
   {
     "slug": "lights-physical",
     "title": "Lights / Physical",
-    "tags": ["lights", "pointlight", "hemispherelight", "photometric", "shadows", "tonemapping", "bumpmap", "leva"],
+    "category": "lights",
+    "tags": [
+      "bumpmap",
+      "hemisphere-light",
+      "leva",
+      "lights",
+      "photometric",
+      "point-light",
+      "shadows",
+      "tonemapping"
+    ],
     "original": "https://threejs.org/examples/#webgpu_lights_physical",
     "credits": "Physically accurate incandescent bulb concept by Ben Houston; hardwood2/brick/earth textures from the three.js examples"
   },
   {
     "slug": "postprocessing-bloom",
     "title": "Postprocessing / Bloom",
-    "tags": ["postprocessing", "tsl", "render-pipeline", "bloom", "gltf", "animation", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "animation",
+      "bloom",
+      "gltf",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_bloom",
     "credits": "Primary Ion Drive model by Mike Murdock (CC BY 4.0)"
   },
   {
     "slug": "postprocessing-bloom-selective",
     "title": "Postprocessing / Selective Bloom",
-    "tags": ["postprocessing", "tsl", "render-pipeline", "bloom", "mrt", "interaction", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "bloom",
+      "interaction",
+      "leva",
+      "mrt",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_bloom_selective",
     "static": true
   },
   {
     "slug": "postprocessing-anamorphic",
     "title": "Postprocessing / Anamorphic",
-    "tags": ["postprocessing", "tsl", "render-pipeline", "bloom", "instancing", "custom-node", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "bloom",
+      "custom-node",
+      "instancing",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_anamorphic"
   },
   {
     "slug": "postprocessing-lensflare",
     "title": "Postprocessing / Lensflare",
-    "tags": ["postprocessing", "tsl", "render-pipeline", "bloom", "lensflare", "mrt", "environment", "gltf", "leva"],
+    "category": "postprocessing",
+    "tags": [
+      "bloom",
+      "environment",
+      "gltf",
+      "lensflare",
+      "leva",
+      "mrt",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_lensflare",
     "credits": "Space Ship Hallway by yeeyeeman (CC BY 4.0, via Sketchfab); Ice Planet Close HDR from Space Spheremaps",
     "static": true
@@ -841,20 +1736,42 @@
   {
     "slug": "materials-arrays",
     "title": "Materials / Arrays",
-    "tags": ["materials", "geometry-groups", "material-array", "wireframe", "basics"],
+    "category": "materials",
+    "tags": [
+      "basics",
+      "geometry-groups",
+      "material-array",
+      "materials",
+      "wireframe"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_arrays"
   },
   {
     "slug": "materials-video",
     "title": "Materials / Video",
-    "tags": ["materials", "video", "texture", "drei", "phong"],
+    "category": "materials",
+    "tags": [
+      "drei",
+      "materials",
+      "phong",
+      "textures",
+      "video"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_video",
     "credits": "sintel.mp4 (Sintel trailer, Blender Foundation) from the three.js examples"
   },
   {
     "slug": "materials-texture-manualmipmap",
     "title": "Materials / Texture Manual Mipmap",
-    "tags": ["materials", "texture", "mipmap", "filtering", "render-takeover", "scissor"],
+    "category": "materials",
+    "tags": [
+      "filtering",
+      "materials",
+      "mipmap",
+      "render-takeover",
+      "scissor",
+      "textures"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_texture_manualmipmap",
     "credits": "Basket of Fruit painting by Caravaggio, from the three.js examples",
     "static": true
@@ -862,7 +1779,14 @@
   {
     "slug": "materials-cubemap-mipmaps",
     "title": "Materials / Cubemap Mipmaps",
-    "tags": ["materials", "cubemap", "mipmap", "envmap", "reflection"],
+    "category": "materials",
+    "tags": [
+      "cubemap",
+      "environment",
+      "materials",
+      "mipmap",
+      "reflection"
+    ],
     "original": "https://threejs.org/examples/#webgpu_materials_cubemap_mipmaps",
     "credits": "angus cube mipmap photo set from the three.js examples",
     "static": true
@@ -870,7 +1794,14 @@
   {
     "slug": "shadowmap-opacity",
     "title": "Shadow Map / Opacity",
-    "tags": ["shadows", "castShadowNode", "transmission", "gltf", "leva"],
+    "category": "shadows",
+    "tags": [
+      "cast-shadow-node",
+      "gltf",
+      "leva",
+      "shadows",
+      "transmission"
+    ],
     "original": "https://threejs.org/examples/#webgpu_shadowmap_opacity",
     "credits": "DragonAttenuation.glb from the three.js examples",
     "static": true
@@ -878,19 +1809,44 @@
   {
     "slug": "shadowmap-array",
     "title": "Shadow Map / Array",
-    "tags": ["shadows", "tileshadownode", "batchedmesh", "instancing", "tsl", "leva"],
+    "category": "shadows",
+    "tags": [
+      "batched-mesh",
+      "instancing",
+      "leva",
+      "shadows",
+      "tile-shadow-node",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_shadowmap_array"
   },
   {
     "slug": "compute-points",
     "title": "Compute / Points",
-    "tags": ["compute", "tsl", "points", "instancedarray", "pointer", "leva"],
+    "category": "compute",
+    "tags": [
+      "compute",
+      "instanced-array",
+      "leva",
+      "pointer",
+      "points",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_points"
   },
   {
     "slug": "compute-geometry",
     "title": "Compute / Geometry",
-    "tags": ["compute", "tsl", "geometrynode", "storage", "pointer", "leva", "gltf"],
+    "category": "compute",
+    "tags": [
+      "compute",
+      "geometry-node",
+      "gltf",
+      "leva",
+      "pointer",
+      "storage",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_geometry",
     "credits": "LeePerrySmith model from the three.js examples",
     "static": true
@@ -898,13 +1854,27 @@
   {
     "slug": "compute-texture-pingpong",
     "title": "Compute / Texture Ping-Pong",
-    "tags": ["compute", "tsl", "storage-texture", "pingpong"],
+    "category": "compute",
+    "tags": [
+      "compute",
+      "pingpong",
+      "storage-texture",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_texture_pingpong"
   },
   {
     "slug": "shadowmap-csm",
     "title": "Shadow Map / CSM",
-    "tags": ["shadows", "csm", "cascaded-shadow-maps", "directional-light", "orthographic", "leva"],
+    "category": "shadows",
+    "tags": [
+      "cascaded-shadow-maps",
+      "csm",
+      "directional-light",
+      "leva",
+      "orthographic",
+      "shadows"
+    ],
     "original": "https://threejs.org/examples/#webgpu_shadowmap_csm",
     "credits": "Cascaded Shadow Maps technique by StrandedKitty (three-csm)",
     "static": true
@@ -912,20 +1882,42 @@
   {
     "slug": "compute-texture-3d",
     "title": "Compute / Texture 3D",
-    "tags": ["compute", "tsl", "storage-texture", "raymarching", "volume"],
+    "category": "compute",
+    "tags": [
+      "compute",
+      "raymarching",
+      "storage-texture",
+      "tsl",
+      "volume"
+    ],
     "original": "https://threejs.org/examples/#webgpu_compute_texture_3d"
   },
   {
     "slug": "shadowmap-progressive",
     "title": "Shadow Map / Progressive",
-    "tags": ["shadows", "lightmap", "gltf", "transformcontrols", "leva"],
+    "category": "shadows",
+    "tags": [
+      "gltf",
+      "leva",
+      "lightmap",
+      "shadows",
+      "transform-controls"
+    ],
     "original": "https://threejs.org/examples/#webgpu_shadowmap_progressive",
     "credits": "Progressive Lightmap Accumulator by zalo; ShadowmappableMesh.glb from the three.js examples"
   },
   {
     "slug": "mrt",
     "title": "MRT",
-    "tags": ["mrt", "tsl", "post-processing", "gltf", "hdr", "g-buffer"],
+    "category": "render-targets",
+    "tags": [
+      "g-buffer",
+      "gltf",
+      "hdr",
+      "mrt",
+      "postprocessing",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_mrt",
     "credits": "DamagedHelmet model and royal_esplanade HDR from the three.js examples",
     "static": true
@@ -933,49 +1925,103 @@
   {
     "slug": "mrt-mask",
     "title": "MRT Mask",
-    "tags": ["mrt", "tsl", "post-processing", "gltf", "animation", "gaussian-blur", "glow"],
+    "category": "render-targets",
+    "tags": [
+      "animation",
+      "gaussian-blur",
+      "glow",
+      "gltf",
+      "mrt",
+      "postprocessing",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_mrt_mask",
     "credits": "Michelle model from the three.js examples"
   },
   {
     "slug": "multiple-rendertargets",
     "title": "Multiple Render Targets",
-    "tags": ["mrt", "tsl", "g-buffer", "normals", "textures"],
+    "category": "render-targets",
+    "tags": [
+      "g-buffer",
+      "mrt",
+      "normals",
+      "textures",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_multiple_rendertargets",
     "credits": "hardwood2_diffuse texture from the three.js examples"
   },
   {
     "slug": "multiple-rendertargets-readback",
     "title": "Multiple Render Targets / Readback",
-    "tags": ["mrt", "tsl", "g-buffer", "readback", "gpu-cpu", "leva"],
+    "category": "render-targets",
+    "tags": [
+      "g-buffer",
+      "gpu-cpu",
+      "leva",
+      "mrt",
+      "readback",
+      "tsl"
+    ],
     "original": "https://threejs.org/examples/#webgpu_multiple_rendertargets_readback",
     "credits": "hardwood2_diffuse texture from the three.js examples"
   },
   {
     "slug": "textures-partialupdate",
     "title": "Textures / Partial Update",
-    "tags": ["textures", "data-texture", "webgpu-only", "leva"],
+    "category": "textures",
+    "tags": [
+      "data-texture",
+      "leva",
+      "textures",
+      "webgpu-only"
+    ],
     "original": "https://threejs.org/examples/#webgpu_textures_partialupdate",
     "credits": "Carbon.png texture from the three.js examples"
   },
   {
     "slug": "textures-2d-array",
     "title": "Textures / 2D Array",
-    "tags": ["textures", "data-array-texture", "tsl", "volume", "webgpu-only"],
+    "category": "textures",
+    "tags": [
+      "data-array-texture",
+      "textures",
+      "tsl",
+      "volume",
+      "webgpu-only"
+    ],
     "original": "https://threejs.org/examples/#webgpu_textures_2d-array",
     "credits": "Scanned head data by Divine Augustine (CPOL), from the three.js examples"
   },
   {
     "slug": "textures-2d-array-compressed",
     "title": "Textures / 2D Array Compressed",
-    "tags": ["textures", "ktx2", "compressed-textures", "tsl", "webgpu-only", "leva"],
+    "category": "textures",
+    "tags": [
+      "compression",
+      "ktx2",
+      "leva",
+      "textures",
+      "tsl",
+      "webgpu-only"
+    ],
     "original": "https://threejs.org/examples/#webgpu_textures_2d-array_compressed",
     "credits": "Spirited Away clip (Studio Ghibli), from the three.js examples"
   },
   {
     "slug": "rendertarget-2d-array-3d",
     "title": "Render Target / 2D Array & 3D",
-    "tags": ["render-target", "data-array-texture", "data-3d-texture", "multi-view", "tsl", "webgpu-only", "leva"],
+    "category": "render-targets",
+    "tags": [
+      "3d-texture",
+      "data-array-texture",
+      "leva",
+      "multi-view",
+      "render-target",
+      "tsl",
+      "webgpu-only"
+    ],
     "original": "https://threejs.org/examples/#webgpu_rendertarget_2d-array_3d",
     "credits": "Scanned head data by Divine Augustine (CPOL), from the three.js examples"
   }

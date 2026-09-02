@@ -1,18 +1,17 @@
 import { Suspense } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
+import { BrowserRouter, Route, Routes } from 'react-router'
 import { Layout } from './Layout'
 import { exampleRoutes } from './routes'
-import { exampleMeta, metaBySlug } from './manifest'
+import { metaBySlug } from './manifest'
 import { Titleblock } from './Titleblock'
-
-const firstSlug = exampleMeta[0]?.slug
+import { Home } from './Home'
 
 export function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          {firstSlug && <Route index element={<Navigate to={`/examples/${firstSlug}`} replace />} />}
+          <Route index element={<Home />} />
           {exampleRoutes.map(({ slug, Component }) => {
             const meta = metaBySlug.get(slug)
             return (
