@@ -70,6 +70,35 @@ It is newer than the original's 1.8.1.
   emitter (thread count baked at build, ring index uses the live value), and the cursor
   plane normal compounds every frame so the emitter drifts off the cursor as you orbit.
 
+### The wave sweep earned its keep: `lights-clustered` was silently broken
+
+Not a wave-3 example — a wave-2 one that regressed when the environment was reset
+(`pnpm add` + a fresh Vite pre-bundle changed the init ordering it had been getting away
+with). `Lighting.getNode(scene)` caches into a **module-level** WeakMap, so the first
+manager to touch a scene owns its lights node permanently; the renderer's default
+`Lighting` was winning, and `renderer.lighting = new ClusteredLighting()` from a Canvas
+child changed the field but not the node anyone read back (UPSTREAM B41).
+
+**It took three attempts, and the first two were reasonable and wrong**, which is the part
+worth remembering:
+
+1. Moved the install to `onCreated` — this made it strictly LATER. The identical error
+   message hid that the change had any effect at all.
+2. Probed the actual ordering: **a Canvas child's `useLayoutEffect` runs BEFORE
+   `onCreated`.** That inverts the obvious guess, and nothing in the docs said so.
+3. Installed it in the renderer FACTORY (`renderer={(props) => …}`) — construction time,
+   which is where the vanilla original does it. Green on both tiers, and the screenshot
+   confirms ~800 orbs each casting coloured light, so clustered shading genuinely engaged.
+
+**The crash was lucky.** It only threw because the overlay calls a clustered-only method
+(`setSize`). An example that merely read the node would have rendered with DEFAULT
+lighting — looking plausible, passing smoke, passing animates, passing a screenshot
+review. Worth assuming other silent-substitution bugs of this shape exist.
+
+Lesson now in AGENTS.md: not every construction-time concern can move into a React effect,
+and when a fix keeps failing with the identical error, probe the ordering rather than
+moving the call again.
+
 ### Infrastructure note
 
 Three agents were killed mid-flight when the machine slept. Two had written nothing; two
