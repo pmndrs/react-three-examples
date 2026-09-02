@@ -4,21 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-patchedDependencies:
-  '@react-three/drei@11.0.0-alpha.5':
-    hash: 6b239dac8c76f0748966fe31f768068ac7fd4a3501ecc66217e0691105427192
-    path: patches/@react-three__drei@11.0.0-alpha.5.patch
-
 importers:
 
   .:
     dependencies:
       '@react-three/drei':
-        specifier: ^11.0.0-alpha.5
-        version: 11.0.0-alpha.5(patch_hash=6b239dac8c76f0748966fe31f768068ac7fd4a3501ecc66217e0691105427192)(@react-three/fiber@file:reference/react-three-fiber-10.0.0-alpha.3.tgz(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1))(@types/react@19.2.17)(@types/three@0.185.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)
+        specifier: 11.0.0-alpha.6
+        version: 11.0.0-alpha.6(@react-three/fiber@10.0.0-alpha.4(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1))(@types/react@19.2.17)(@types/three@0.185.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)
       '@react-three/fiber':
-        specifier: file:reference/react-three-fiber-10.0.0-alpha.3.tgz
-        version: file:reference/react-three-fiber-10.0.0-alpha.3.tgz(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)
+        specifier: 10.0.0-alpha.4
+        version: 10.0.0-alpha.4(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)
       camera-controls:
         specifier: ^3.1.2
         version: 3.1.2(three@0.185.1)
@@ -68,12 +63,18 @@ importers:
       eslint:
         specifier: ^10.8.0
         version: 10.8.0(jiti@2.7.0)
+      eslint-config-prettier:
+        specifier: ^10.1.8
+        version: 10.1.8(eslint@10.8.0(jiti@2.7.0))
       eslint-plugin-react-hooks:
         specifier: ^7.1.1
         version: 7.1.1(eslint@10.8.0(jiti@2.7.0))
       pngjs:
         specifier: ^7.0.0
         version: 7.0.0
+      prettier:
+        specifier: ^3.9.6
+        version: 3.9.6
       tailwindcss:
         specifier: ^4.3.3
         version: 4.3.3
@@ -304,8 +305,8 @@ packages:
     engines: {node: '>=20'}
     hasBin: true
 
-  '@pmndrs/scheduler@0.1.0':
-    resolution: {integrity: sha512-LjWt2FVi7RDOpgBdSBDxToQwnMWP1wkZwVeAkr8ARvVBtvlfyMqCCvr1y9YcLm9RTUhSebN5Bx4bJTntdSd22Q==}
+  '@pmndrs/scheduler@0.2.0':
+    resolution: {integrity: sha512-Lv+4ZQjxw2BMcPDWHgcP2tULiEKZL+x5+mFW2YXWZUrDhT4h5PKpRv/U5ApweL+R319sdY63C688zd4QVamHvA==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -515,14 +516,13 @@ packages:
   '@radix-ui/rect@1.1.3':
     resolution: {integrity: sha512-JtyZR+mqgBibTo8xea3B6ZRmzZiM/YeVBtUkas6zMuXjAlfIFIW2FgqeM9eLyvEaYX66vr6DJMK+4U6LV0KhNw==}
 
-  '@react-three/drei@11.0.0-alpha.5':
-    resolution: {integrity: sha512-qtMVviEV+OxzgAR/w58hv88N5EjdRdci0y38Im+G5BiJW1+E8+BGVSvfbTvqExgik+rQwcHFDsI4B0mb+wmv5A==}
-    version: 11.0.0-alpha.5
+  '@react-three/drei@11.0.0-alpha.6':
+    resolution: {integrity: sha512-zqFQba/Uhn0kNOJc2N0XMCG2lun9BhljI/LPVv9jDIbK+VNg7y0FIb62/wLefW7aYRSltpPDoNLGzD2GntFtsA==}
     peerDependencies:
       '@react-three/fiber': '>=10.0.0-0'
-      react: ^19
-      react-dom: ^19
-      three: '>=0.182'
+      react: '>=19.0 <19.3'
+      react-dom: '>=19.0 <19.3'
+      three: '>=0.185'
     peerDependenciesMeta:
       react-dom:
         optional: true
@@ -530,9 +530,8 @@ packages:
   '@react-three/eslint-plugin@1.0.0-alpha.2':
     resolution: {integrity: sha512-F1uf8Q1KYNivBXWDywfx6k3WuyCFcqqxx0CsL6WH8+FsScQKXHUq27Wm+LuzzHtYhkArfqrwOM+Z751l7twljw==}
 
-  '@react-three/fiber@file:reference/react-three-fiber-10.0.0-alpha.3.tgz':
-    resolution: {integrity: sha512-3vuQ/VU8iUZgIdTBvQ25KvIt6XgA+yFojeaJ/SPWWcRsLgmmNvOgCK6ic80rW5xB4LyzeDbcbr0J1Q5kc7Jwog==, tarball: file:reference/react-three-fiber-10.0.0-alpha.3.tgz}
-    version: 10.0.0-alpha.3
+  '@react-three/fiber@10.0.0-alpha.4':
+    resolution: {integrity: sha512-r24sltRu+b7T5b9gyd+Z/dAv9zId0j4sBRjOg4mPvsvRPxfPM2KArOxq2peLqf51U2HFAl1zboB2FcLYwR0v/g==}
     peerDependencies:
       react: '>=19.0 <19.3'
       react-dom: '>=19.0 <19.3'
@@ -1013,6 +1012,12 @@ packages:
   escape-string-regexp@4.0.0:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
+
+  eslint-config-prettier@10.1.8:
+    resolution: {integrity: sha512-82GZUjRS0p/jganf6q1rEO25VSoHH0hKPCTrgillPjdI/3bgBhAE1QzHrHTizjpRvy6pGAvKjDJtk2pF9NDq8w==}
+    hasBin: true
+    peerDependencies:
+      eslint: '>=7.0.0'
 
   eslint-plugin-react-hooks@7.1.1:
     resolution: {integrity: sha512-f2I7Gw6JbvCexzIInuSbZpfdQ44D7iqdWX01FKLvrPgqxoE7oMj8clOfto8U6vYiz4yd5oKu39rRSVOe1zRu0g==}
@@ -1573,6 +1578,11 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
+  prettier@3.9.6:
+    resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   promise-worker-transferable@1.0.4:
     resolution: {integrity: sha512-bN+0ehEnrXfxV2ZQvU2PetO0n4gqBD4ulq3MI1WOPLgr7/Mg9yRQkX5+0v1vagr74ZTsl7XtzlaYDo2EuCeYJw==}
 
@@ -1689,11 +1699,13 @@ packages:
     resolution: {integrity: sha512-NzNVhJDYpwceVVii8/Hu6DKfD2G+NrQHlS/V/qgv763EYudVwEcMQNxd2lh+0VrUByXN/oJkl5grOhYWvQUYiw==}
     engines: {node: '>=0.10.0'}
 
-  stats-gl@2.4.2:
-    resolution: {integrity: sha512-g5O9B0hm9CvnM36+v7SFl39T7hmAlv541tU81ME8YeSb3i1CIP5/QdDeSB3A0la0bKNHpxpwxOVRo2wFTYEosQ==}
+  stats-gl@4.2.3:
+    resolution: {integrity: sha512-XxDFKl4kpB9siOTQ5szzT095uvJjj6Q3KLd7AbaceH8lJzRTnFARhBt4AnqKOpdY37iJGK+2H8W9bntMIUghYw==}
     peerDependencies:
-      '@types/three': '*'
       three: '*'
+    peerDependenciesMeta:
+      three:
+        optional: true
 
   stats.js@0.17.0:
     resolution: {integrity: sha512-hNKz8phvYLPEcRkeG1rsGmV5ChMjKDAWU7/OJJdDErPBNChQXxCo3WZurGpnWc6gZhAzEPFad1aVgyOANH1sMw==}
@@ -1725,8 +1737,8 @@ packages:
   text-table@0.2.0:
     resolution: {integrity: sha512-N+8UisAXDGk8PFXP4HAzVR9nbfmVJ3zYLAWiTIoqC5v5isinhr+r5uaO8+7r3BMfuNIufIsA7RdpVgacC2cSpw==}
 
-  three-mesh-bvh@0.8.3:
-    resolution: {integrity: sha512-4G5lBaF+g2auKX3P0yqx+MJC6oVt6sB5k+CchS6Ob0qvH0YIhuUk1eYr7ktsIpY+albCqE80/FVQGV190PmiAg==}
+  three-mesh-bvh@0.9.14:
+    resolution: {integrity: sha512-xJzfUXnLYjgw5tRKGxjfJW3Pcx0IbwNskvpdwRryhK07SYrKrYB4W8zAaPxu784gK7G4lCBgG+vfG3YeYn95kg==}
     peerDependencies:
       three: '>= 0.159.0'
 
@@ -2192,7 +2204,7 @@ snapshots:
     dependencies:
       playwright: 1.62.0
 
-  '@pmndrs/scheduler@0.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@pmndrs/scheduler@0.2.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     optionalDependencies:
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
@@ -2367,12 +2379,12 @@ snapshots:
 
   '@radix-ui/rect@1.1.3': {}
 
-  '@react-three/drei@11.0.0-alpha.5(patch_hash=6b239dac8c76f0748966fe31f768068ac7fd4a3501ecc66217e0691105427192)(@react-three/fiber@file:reference/react-three-fiber-10.0.0-alpha.3.tgz(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1))(@types/react@19.2.17)(@types/three@0.185.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)':
+  '@react-three/drei@11.0.0-alpha.6(@react-three/fiber@10.0.0-alpha.4(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1))(@types/react@19.2.17)(@types/three@0.185.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@mediapipe/tasks-vision': 0.10.17
       '@monogrid/gainmap-js': 3.4.0(three@0.185.1)
-      '@react-three/fiber': file:reference/react-three-fiber-10.0.0-alpha.3.tgz(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)
+      '@react-three/fiber': 10.0.0-alpha.4(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)
       '@use-gesture/react': 10.3.1(react@19.2.8)
       camera-controls: 3.1.2(three@0.185.1)
       cross-env: 7.0.3
@@ -2381,11 +2393,11 @@ snapshots:
       hls.js: 1.6.16
       maath: 0.10.8(@types/three@0.185.1)(three@0.185.1)
       react: 19.2.8
-      stats-gl: 2.4.2(@types/three@0.185.1)(three@0.185.1)
+      stats-gl: 4.2.3(three@0.185.1)
       stats.js: 0.17.0
       suspend-react: 0.1.3(react@19.2.8)
       three: 0.185.1
-      three-mesh-bvh: 0.8.3(three@0.185.1)
+      three-mesh-bvh: 0.9.14(three@0.185.1)
       troika-three-text: 0.52.5(three@0.185.1)
       tunnel-rat: 0.1.2(@types/react@19.2.17)(react@19.2.8)
       use-sync-external-store: 1.6.0(react@19.2.8)
@@ -2405,11 +2417,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@react-three/fiber@file:reference/react-three-fiber-10.0.0-alpha.3.tgz(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)':
+  '@react-three/fiber@10.0.0-alpha.4(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@monogrid/gainmap-js': 3.4.0(three@0.185.1)
-      '@pmndrs/scheduler': 0.1.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@pmndrs/scheduler': 0.2.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       dequal: 2.0.3
       its-fine: 2.0.0(@types/react@19.2.17)(react@19.2.8)
       react: 19.2.8
@@ -2818,6 +2830,10 @@ snapshots:
   escalade@3.2.0: {}
 
   escape-string-regexp@4.0.0: {}
+
+  eslint-config-prettier@10.1.8(eslint@10.8.0(jiti@2.7.0)):
+    dependencies:
+      eslint: 10.8.0(jiti@2.7.0)
 
   eslint-plugin-react-hooks@7.1.1(eslint@10.8.0(jiti@2.7.0)):
     dependencies:
@@ -3359,6 +3375,8 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
+  prettier@3.9.6: {}
+
   promise-worker-transferable@1.0.4:
     dependencies:
       is-promise: 2.2.2
@@ -3471,9 +3489,8 @@ snapshots:
     dependencies:
       extend-shallow: 3.0.2
 
-  stats-gl@2.4.2(@types/three@0.185.1)(three@0.185.1):
-    dependencies:
-      '@types/three': 0.185.1
+  stats-gl@4.2.3(three@0.185.1):
+    optionalDependencies:
       three: 0.185.1
 
   stats.js@0.17.0: {}
@@ -3498,7 +3515,7 @@ snapshots:
 
   text-table@0.2.0: {}
 
-  three-mesh-bvh@0.8.3(three@0.185.1):
+  three-mesh-bvh@0.9.14(three@0.185.1):
     dependencies:
       three: 0.185.1
 

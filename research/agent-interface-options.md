@@ -6,10 +6,10 @@ docs.pmnd.rs, without validating against alternatives. This doc does that valida
 
 Three distinct consumers, kept separate throughout because the right mechanism differs per case:
 
-- **(a) Web visitor** — an agent (or a human pasting a URL into one) browsing the *live site*,
+- **(a) Web visitor** — an agent (or a human pasting a URL into one) browsing the _live site_,
   no repo access.
 - **(b) Repo-cloned agent** — Claude Code / Cursor / Codex working locally inside a checkout.
-- **(c) Transplant agent** — an agent in the *user's own, unrelated* project that wants to pull
+- **(c) Transplant agent** — an agent in the _user's own, unrelated_ project that wants to pull
   one example in.
 
 ---
@@ -37,16 +37,16 @@ broad web trend.
   server logs show none of the major AI services even check for it.
 - A machine-learning study on AI-citation frequency found that **removing llms.txt as a
   feature improved the model's prediction accuracy** — i.e., the file's presence correlates
-  with *less* signal, not more.
+  with _less_ signal, not more.
 - OpenAI/Anthropic/Perplexity all publish crawler guidance (robots.txt, user-agent behavior)
   but none say llms.txt is used to decide citations or answers.
 
 **Verdict: mostly hype for the "passive crawler picks it up" use case.** It is not disproven as
-a *fetchable artifact for an agent that is told to fetch it* — that's a different mechanism
+a _fetchable artifact for an agent that is told to fetch it_ — that's a different mechanism
 (explicit tool call, not passive crawl) and there's no data either way on that narrower case.
 docs.pmnd.rs (the precedent SPEC.md cites) does publish `llms.txt`/`llms-full.txt` per library
 — confirmed live at `https://docs.pmnd.rs`, e.g. `https://pmndrs.github.io/react-three-fiber/llms.txt`
-— but pmndrs *also* ships an MCP server as the primary agent interface (see §3); llms.txt there
+— but pmndrs _also_ ships an MCP server as the primary agent interface (see §3); llms.txt there
 reads as a low-cost fallback/export format, not the main bet.
 
 **Recommendation:** generate it (cheap, mechanical, several Vite/static-site plugins do it for
@@ -97,7 +97,7 @@ Sources: [AGENTS.md Complete Guide 2026](https://codersera.com/blog/agents-md-co
 
 Plus, independently, "Each lib also exposes its `llms.txt` / `llms-full.txt`" (e.g.
 `https://pmndrs.github.io/react-three-fiber/llms.txt`). So pmndrs runs **both** — MCP as the
-primary agent-native interface, llms.txt as a static fallback/export. This is a *hub* server:
+primary agent-native interface, llms.txt as a static fallback/export. This is a _hub_ server:
 one MCP endpoint fronting docs for the whole Poimandres ecosystem (r3f, zustand, jotai, drei,
 etc.), not one server per library repo.
 
@@ -116,7 +116,7 @@ SDK / `workers-mcp`, plus a documented "Build a Remote MCP server" guide), or Ne
 (also has a documented MCP-on-Netlify guide, e.g. `static-mcpify` wires a Netlify Function at
 `/mcp` in front of structured content). There is no such thing as "MCP over static files" — an
 MCP server, even a trivial read-only one, is a compute endpoint by definition (JSON-RPC over
-HTTP/SSE); the *content* it serves can be static JSON, but the endpoint itself is not.
+HTTP/SSE); the _content_ it serves can be static JSON, but the endpoint itself is not.
 
 **Do end users actually install per-project docs MCP servers? Evidence says: rarely, by
 choice.** MCP's raw numbers are large (22k+ listed servers, 67M local-server downloads/month,
@@ -152,7 +152,7 @@ low-cost, high-confidence practices repeated across Claude Code / agent best-pra
   `research/data/{files.json,tags.json}` — the natural next step is a public `examples.json` (or
   similar) the site itself is built from, which doubles as the agent-facing index.
 - Keep `CLAUDE.md`/`AGENTS.md` short (~200 lines is the commonly cited ceiling) and push deep
-  reference material into `docs/` that the root file *points to* rather than inlines — mirrors
+  reference material into `docs/` that the root file _points to_ rather than inlines — mirrors
   the "progressive disclosure" principle Skills use (§5) and keeps context cost low for agents
   that don't need the deep material every session.
 - Scoped instructions via `.claude/rules/*.md` (or Cursor's `.cursor/rules/*.mdc`) with path
@@ -161,7 +161,7 @@ low-cost, high-confidence practices repeated across Claude Code / agent best-pra
 
 There's a separate, unrelated concept worth naming so it isn't confused with the above:
 `agent.json`/`ai-plugin.json`-style **service manifests** (declaring API capabilities,
-auth, payment terms for agents that call a *live service*) — not applicable here since this
+auth, payment terms for agents that call a _live service_) — not applicable here since this
 repo isn't exposing a callable service, just static content and code.
 
 **Verdict: proven, not hype, and the cheapest lever available.** This is unglamorous but it's
@@ -186,13 +186,13 @@ not reach Cursor/Codex/Copilot users.
   independently of any one checkout) — for a single example-gallery repo, in-repo `.claude/skills/`
   is the fitting mode, not a marketplace plugin.
 - Claude Code's own deep-link docs explicitly suggest this combination: store a runbook/how-to
-  as a Skill in the repo so a deep link's prompt only needs to *name* the skill rather than
+  as a Skill in the repo so a deep link's prompt only needs to _name_ the skill rather than
   spell out the whole task inline (see §6).
 
 **Verdict: promising, cheap, additive — but not a substitute for AGENTS.md.** A single
 `.claude/skills/lift-example/SKILL.md` that teaches "how to pull one example from this gallery
-into your own project" is a good, low-cost bet for consumer (c) specifically, *for the subset of
-that audience using Claude Code*. It should sit alongside AGENTS.md, not instead of it.
+into your own project" is a good, low-cost bet for consumer (c) specifically, _for the subset of
+that audience using Claude Code_. It should sit alongside AGENTS.md, not instead of it.
 
 Sources: [Claude Code — Extend with skills](https://code.claude.com/docs/en/skills) · [Claude Code Skills on GitHub](https://allthings.how/claude-code-skills-on-github-how-to-find-install-and-build-them/)
 
@@ -206,14 +206,14 @@ Confirmed directly from Claude Code's docs (`code.claude.com/docs/en/deep-links`
   instead of `repo`). Clicking it opens a local terminal, starts Claude Code, and pre-fills — but
   does **not** auto-send — the prompt.
 - **Important limitation for a gallery site's "open in Claude Code" button**: `repo=` only
-  resolves to a local path if Claude Code has *already been run at least once* inside a clone of
+  resolves to a local path if Claude Code has _already been run at least once_ inside a clone of
   that repo on that machine — i.e., it only works for users who've already cloned the project.
   A first-time visitor with no local clone falls back to their home directory, which defeats the
   point. `cwd=` requires a fixed absolute path, which isn't portable across users either. So this
-  mechanism serves *returning* contributors well (a→b handoff after they've already cloned once)
+  mechanism serves _returning_ contributors well (a→b handoff after they've already cloned once)
   but is not a cold-start onboarding tool for a random web visitor.
 - GitHub-rendered Markdown strips the `claude-cli://` scheme (only `http(s)` allowed), so this
-  only works as a real clickable link on the *site itself* (or Slack, wikis, etc.), not in the
+  only works as a real clickable link on the _site itself_ (or Slack, wikis, etc.), not in the
   repo's README on GitHub — reinforce this on the gallery site's per-example page, not in-repo.
 - Cursor has an equivalent (`cursor://anysphere.cursor-deeplink/...`) but with a documented
   active exploit class in 2026 (nicknamed "CursorJack"/"DeepJack" — a crafted deep link can
@@ -229,8 +229,9 @@ Sources: [Claude Code — Launch sessions from links](https://code.claude.com/do
 ## 7. Recommended layered strategy, by consumer
 
 **(a) Web visitor (agent or human browsing the live site, no repo):**
+
 - `llms.txt` + `llms-full.txt` — keep it, generate it mechanically, but treat it as a
-  fetch-on-request index for an agent explicitly pointed at the URL, *not* an SEO/discovery play
+  fetch-on-request index for an agent explicitly pointed at the URL, _not_ an SEO/discovery play
   (proven not to work passively).
 - `claude-cli://open?repo=...` buttons on example pages, framed honestly as "already cloned?
   jump in" rather than universal onboarding, given the local-clone-required limitation.
@@ -239,6 +240,7 @@ Sources: [Claude Code — Launch sessions from links](https://code.claude.com/do
   need emerges once the corpus is large.
 
 **(b) Repo-cloned agent (Claude Code / Cursor / Codex working locally):**
+
 - `AGENTS.md` at root as the source of truth (this is the proven, cross-tool-adopted mechanism).
 - `CLAUDE.md` as a thin shim: `@AGENTS.md` import on line one, Claude-Code-specific additions
   below (Skills pointers, any permission notes).
@@ -249,10 +251,11 @@ Sources: [Claude Code — Launch sessions from links](https://code.claude.com/do
   audience.
 
 **(c) Transplant agent (user's own separate project pulling in one example):**
+
 - Self-contained per-example files (already a stated project goal) + stable raw-GitHub URLs are
   the real mechanism here — an agent with a web-fetch tool can pull one file directly; this
   doesn't require llms.txt, MCP, or AGENTS.md at all.
-- `llms-full.txt` is genuinely useful for *this* case specifically (not for passive crawling): a
+- `llms-full.txt` is genuinely useful for _this_ case specifically (not for passive crawling): a
   user says "here's the corpus index, find me the boids example," and the agent fetches the
   known URL — an explicit-fetch, not a passive-crawl, use of the same file from §1.
 - The in-repo Skill (§5) also helps here if the user's own project happens to be run with Claude
@@ -260,14 +263,14 @@ Sources: [Claude Code — Launch sessions from links](https://code.claude.com/do
 
 ## Compact verdict
 
-| Mechanism | Verdict | Why |
-|---|---|---|
-| llms.txt / llms-full.txt | **Hype** (as passive AI-crawler discovery) / mildly useful (as explicit-fetch index) | 97% of files get zero requests (Ahrefs, 137k sites); Google on record as not supporting it; major crawlers skip it |
-| AGENTS.md (+ CLAUDE.md import) | **Proven** | 60k+ repos, Linux Foundation-stewarded, native in 20+ tools; one-line Claude Code compatibility gap |
-| MCP server (bespoke, per-repo) | **Promising, not launch-priority** | Real precedent (docs.pmnd.rs, Context7) but those are shared hubs, not per-repo servers; GitHub Pages can't host one anyway; users install few, proven servers |
-| In-repo structure + manifest (examples.json) | **Proven** | Cheapest, highest-leverage, no new standard needed, already half-built in this repo |
-| Claude Code Skills (in-repo) | **Promising** | Real, documented pattern, but Claude-Code-only — additive, not sufficient alone |
-| "Open in Claude Code" deep links | **Proven mechanism, narrower use than assumed** | Real and documented, but `repo=` needs a prior local clone — serves returning contributors, not cold-start visitors |
+| Mechanism                                    | Verdict                                                                              | Why                                                                                                                                                            |
+| -------------------------------------------- | ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| llms.txt / llms-full.txt                     | **Hype** (as passive AI-crawler discovery) / mildly useful (as explicit-fetch index) | 97% of files get zero requests (Ahrefs, 137k sites); Google on record as not supporting it; major crawlers skip it                                             |
+| AGENTS.md (+ CLAUDE.md import)               | **Proven**                                                                           | 60k+ repos, Linux Foundation-stewarded, native in 20+ tools; one-line Claude Code compatibility gap                                                            |
+| MCP server (bespoke, per-repo)               | **Promising, not launch-priority**                                                   | Real precedent (docs.pmnd.rs, Context7) but those are shared hubs, not per-repo servers; GitHub Pages can't host one anyway; users install few, proven servers |
+| In-repo structure + manifest (examples.json) | **Proven**                                                                           | Cheapest, highest-leverage, no new standard needed, already half-built in this repo                                                                            |
+| Claude Code Skills (in-repo)                 | **Promising**                                                                        | Real, documented pattern, but Claude-Code-only — additive, not sufficient alone                                                                                |
+| "Open in Claude Code" deep links             | **Proven mechanism, narrower use than assumed**                                      | Real and documented, but `repo=` needs a prior local clone — serves returning contributors, not cold-start visitors                                            |
 
 **Recommended combo:** AGENTS.md (root, source of truth) + CLAUDE.md importing it + a public
 `examples.json` manifest, as the backbone for (b) and (c). Keep llms.txt/llms-full.txt as a cheap

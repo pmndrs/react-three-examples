@@ -1,722 +1,642 @@
 # AGENTS.md — r3f-examples conventions
 
-R3F v10 ports of the official three.js examples — WebGPU-first, agent-friendly.
-Contract: [docs/SPEC.md](docs/SPEC.md). Milestones: [docs/ROADMAP.md](docs/ROADMAP.md).
-Session state: [docs/HANDOFF.md](docs/HANDOFF.md).
+R3F v10 ports of the official three.js examples, WebGPU-first.
 
-This doc has two layers. **Layer 1 transfers to any R3F v10 app.** **Layer 2 is this
-repo's format.** When a port forces a divergence from either layer, the divergence must
-end up as an example fix OR an amendment here (with a changelog entry) — never silent.
+**The point of this repo**: show that the same demo is _clearer_ in React than in
+vanilla three.js. A port that is longer, more indirect, or more imperative than the
+original has failed even if it renders perfectly. Read [House style](#house-style)
+before writing a line.
+
+Contract: [docs/SPEC.md](docs/SPEC.md) · Milestones: [docs/ROADMAP.md](docs/ROADMAP.md)
+· Session state: [docs/HANDOFF.md](docs/HANDOFF.md) · Patch/upstream ledger:
+[docs/UPSTREAM.md](docs/UPSTREAM.md).
+
+When a port forces a divergence from this doc, that divergence must end up as an
+example fix OR an amendment here (with a changelog entry) — never silent.
 
 ## Commands
 
-- Package manager: **pnpm only** (patched dependencies in pnpm-workspace.yaml)
+- Package manager: **pnpm only**
 - `pnpm dev` — Vite dev server, port 5173
-- `pnpm build` / `npx tsc --noEmit` / `pnpm lint` — build / typecheck / lint
-- Definition of done per example: typechecks, lints, builds, renders on WebGPU
-  (real `webgpu` canvas context, console clean), registered in manifest, header block
-  present.
+- `npx tsc --noEmit` / `pnpm lint` / `pnpm build` — typecheck / lint / build
+  (`pnpm lint` runs eslint **and** `prettier --check`)
+- `pnpm format` — prettier `--write`. Formatting is not a review topic; run it.
+- `pnpm test:changed <slug>` — smoke + animates for one example
+- `pnpm shot <slug>` — screenshot to `screenshots/`
 
-## Stack pins (July 2026 — alpha-era, versions matter)
+**Formatting is prettier's job, and the config is deliberate.** `.prettierrc` is r3f's
+own, with one intentional divergence: **`semi: true`** — Dennis writes semicolons and
+`semi: false` was silently deleting them. **Write semicolons.** Everything else
+(single quotes, 120 cols, trailing commas, `bracketSameLine`) matches r3f upstream.
+Never hand-format to match; `pnpm format` is the source of truth.
 
-- `@react-three/fiber` **10.0.0-alpha.3, built from the local v10 branch clone**,
-  installed from `reference/react-three-fiber-10.0.0-alpha.3.tgz` (npm alpha/canary
-  lag or are broken). Rebuild: in `reference/react-three-fiber`,
-  `pnpm install --no-frozen-lockfile && pnpm --filter @react-three/fiber build`, then
-  `npm pack` in `packages/fiber` and `pnpm install` here (package.json points at the
-  tarball).
-- `three` 0.185.1, `@react-three/drei` 11.0.0-alpha.5 (patched — see gotchas), `leva`,
-  `camera-controls` v3, react-router **7** (pinned `version-7` dist-tag; npm latest is
-  v8 — do not bump). TypeScript strict, Tailwind v4, single flat tsconfig.
+Definition of done: typechecks, lints, builds, renders on WebGPU (real `webgpu`
+canvas context, console clean), registered in the manifest, header block present.
+
+## Stack pins (Sept 2026 — alpha era, versions matter)
+
+- `@react-three/fiber` **10.0.0-alpha.4** (npm) · `@react-three/drei`
+  **11.0.0-alpha.6** (npm) · `three` **0.185.1** · React 19.2 (fiber peer is
+  `>=19.0 <19.3`)
+- `leva`, `camera-controls` v3, react-router **7** (pinned `version-7` dist-tag; npm
+  latest is v8 — do not bump), TypeScript strict, Tailwind v4, single flat tsconfig
 - `typescript` pinned **^6** (not 7): typescript-eslint has no TS7 support yet
-  (typescript-eslint#10940) — do not bump until it lands.
-- Reference clones (gitignored, `reference/`): three.js sparse (src + example sources
-  + files.json/tags.json, no heavy assets), react-three-fiber v10 branch (+ unpublished
-  docs), drei master (stale ≈ alpha.5).
+  (typescript-eslint#10940)
+- **No dependency patches.** `patches/` and the vendored fiber tarball are both gone
+  (UPSTREAM A1 + A2 unwound). The one local shim left is
+  `scripts/patch-fiber-types.mjs` (postinstall, types-only — UPSTREAM B1/A9).
+- Reference clones (gitignored, `reference/`): `react-three-fiber` v10 branch — its
+  `example/src/demos/webgpu/` is the **house-style reference**, and `docs/webgpu/*.mdx`
+  is the only v10 API documentation that exists (the public site 404s on v10).
 
-## Layer 1 — R3F v10 core idioms (valid in any app)
+---
 
-### Entry points and renderer
+# House style
 
-- Import `Canvas` and all hooks from **`@react-three/fiber/webgpu`** (the TSL-hooks
-  build). Never mix entry points in one app.
-- `<Canvas renderer>` enables WebGPU with defaults (antialias/MSAA 4x is on by default);
-  `renderer={{ ... }}` passes WebGPURenderer parameters. No manual renderer init.
-  The `/webgpu` entry creates a WebGPURenderer even without the prop — write `renderer`
-  anyway (corpus rule: explicit beats implicit; the prop is where parameters will land).
-- RootState exposes **`renderer`** — `gl` is a deprecated alias, do not write it.
-  Typing gap: `useThree` types it as the `WebGLRenderer | WebGPURenderer` union even on
-  the `/webgpu` entry, so WebGPU-only calls (`setRenderTarget` with a WebGPU target,
-  `compute`, …) fail strict tsc — cast once, `const renderer = rawRenderer as
-  WebGPURenderer`, with a comment (upstream fiber gap, UPSTREAM.md B9).
-- Canvas-level options replace v9 patterns: `background` prop (color / hex / HDR URL /
-  environment preset / expanded object) replaces `<color attach="background">`;
-  `shadows` accepts variant strings. `flat`/`linear`/`colorSpace`/`toneMapping` props
-  are gone — configure via `renderer={{ toneMapping, outputColorSpace }}`.
-- **Tone-mapping parity trap**: fiber's Canvas defaults to ACESFilmic; three.js
-  originals render with the WebGPURenderer default (NoToneMapping) unless they set
-  one. An unexamined default visibly mutes emissive/unlit palettes — decide
-  `renderer={{ toneMapping }}` deliberately on EVERY port, and compare against the
-  LIVE original at a matched canvas size, not the threejs.org gallery thumbnail
-  (those are stale, wider-crop captures). Caught on `tsl-raging-sea`.
+These are the rules that decide whether a port is good. They came from reviewing the
+corpus; violations of them are what "needs restyling" means.
 
-### Frame loop
+## 1. Controls live next to what they control
 
-- `useFrame((state, delta) => …)`; `state.clock` is gone — use `state.time` (ms,
-  RAF-derived), `state.delta` (s), `state.elapsed` (s).
-- The scheduler is phase-based: `{ phase: 'input' | 'physics' | 'update' | 'render' }`,
-  plus `before`/`after` constraints and `{ fps: n }` throttling. Numeric priorities are
-  a v9-ism — don't use them.
-- **Registering any callback with `phase: 'render'` takes over rendering** — only do
-  that when the example is about custom rendering, and never also call
-  `renderer.render()` alongside the default loop.
-- WebGPURenderer's `setViewport`/`setScissor` y-origin is TOP-left, unlike WebGL's
-  bottom-left (verified in `WebGPUBackend.js` — no flip). Originals doing
-  bottom-origin inset math carry this silently — their inset lands in the wrong
-  corner on WebGPU. Recompute rects top-origin (pattern: `lines-fat/InsetView.tsx`).
-- `useFrame` returns pause/resume controls; prefer them over ad-hoc booleans for
-  pause UX (mixer-level `timeScale` is fine when showcasing the three.js API itself).
-- **Never `await` inside a `phase: 'render'` callback.** The scheduler does not await
-  the callback's return value, so an `async` render-takeover lets frame N+1 start
-  before frame N finishes and both race on the renderer's global
-  `setRenderTarget`/`setMRT` state. Keep the callback synchronous and kick async GPU
-  work (e.g. `readRenderTargetPixelsAsync`) off as a decoupled, in-flight-throttled
-  promise that touches only its own data, never renderer state (pattern:
-  `multiple-rendertargets-readback`).
-- **`state.pointer` is (0,0) until the first pointer event** — unconditionally copying
-  it into a uniform every frame means "no signal yet" reads as "at the origin". For
-  repel/attract fields that must be OFF-scene when idle, track the pointer from events
-  instead (invisible plane + `onPointerMove`). Cost: 300k particles collapsing into a
-  single point within 2s, caught by the animates tier's 0px-diff check and invisible to
-  smoke (pattern: `compute-points`, matching `compute-particles`).
+**Never drill leva values through props.** leva's `useControls` works anywhere, and
+multiple `useControls` calls merge into one panel — that is the whole point of it.
+Put the controls in the component that consumes them and feed `useUniforms` directly.
 
-### TSL / WebGPU hooks
+```tsx
+// GOOD — one component owns the knobs, the uniforms and the mesh
+function SeaSurface() {
+  const { color, roughness, ...waveValues } = useControls('Raging Sea', seaControls);
+  const uniforms = useUniforms(waveValues);
+  const matNodes = useNodes(() => makeSeaNodes(uniforms));
+  return (
+    <mesh>
+      <TerrainGeometry />
+      <meshStandardNodeMaterial color={color} {...matNodes} />
+    </mesh>
+  );
+}
 
-- Hooks: `useUniforms`, `useNodes`, `useLocalNodes`, `useRenderPipeline`, `useBuffers`,
-  `useGPUStorage` — `/webgpu` entry only. All creator hooks are create-if-not-exists
-  and StrictMode-safe; calling twice shares the instance.
-- ALL fiber hooks (including the above and `useFrame`/`useThree`) only work INSIDE
-  `<Canvas>` children — leva's `useControls` works anywhere, don't let that mislead:
-  keep hook-using logic in a child component, controls in the page component.
-- **`useUniforms` scope and uniform names must be valid WGSL identifiers — no
-  hyphens.** The debug name (`${scope}_${name}`) feeds WGSL struct members; kebab-case
-  scopes compile-error the shader at runtime (tsc/build won't catch it; the smoke
-  suite's console assertion will). camelCase scopes, kebab-case is fine for leva groups.
-- **Build-time vs run-time**: JS `if/for` in node builders runs ONCE when the graph is
-  built; use TSL `If()/Loop()/select()` for anything that must react to uniforms.
+// BAD — controls at the page root, values drilled down as props
+```
+
+The only hard constraint: **fiber hooks (`useUniforms`, `useNodes`, `useFrame`,
+`useThree`, …) must be inside `<Canvas>`.** Outside it you get
+`R3F: Hooks can only be used within the Canvas component!` at runtime. So the
+consuming component is a Canvas child — that is where the controls go too.
+
+Corollary: several `useEffect`s pointed at the same object is a smell. It usually
+means state was lifted too far and is being reassembled.
+
+**When TWO siblings consume the same value**, it stays at their shared parent — one hop
+up, passed down. Do not duplicate the `useControls` call: the same leva key registered
+twice renders two sliders. "Next to its consumer" means _as close as it can go_, not
+"always in a leaf".
+
+**Repeated instances take DATA, not controls.** A component rendered N times
+(`<OrbitLight>` x4) does not get N leva folders — that would need a dynamic key
+(`useControls('light' + id)`), a pattern that appears nowhere in this corpus and should
+not be introduced. Pass the varying values as plain props from a small legible array;
+`lights-phong` is the reference:
+
+```tsx
+<OrbitLight color="#0040ff" orbit={[{ s: 0.7 }, { c: 0.5 }, { c: 0.3 }]} />
+<OrbitLight color="#ffaa00" orbit={[{ s: 0.3 }, { c: 0.7 }, { s: 0.5 }]} />
+```
+
+If the original had GUI for the whole set, that is ONE `useControls` at the shared
+parent. Props carrying per-instance data are not prop drilling — the rule is about leva
+values threaded through components that don't consume them.
+
+**Hazard when you colocate**: moving controls into a component usually makes it a
+creator-hook component (it now calls `useUniforms`/`useNodes`). A creator-hook component
+mounted AFTER a Suspense-gated suspending sibling is the B18 trigger that escalates into
+a B17 pixel freeze. If you colocate into a component that renders after a `<Suspense>`,
+move it before the boundary (pattern: `postprocessing-sobel`, `postprocessing-ao`).
+
+## 2. Use the v10 hooks, not `useMemo` + `useEffect`
+
+`useNodes`, `useUniforms`, `useTexture`, `useBuffers`, `useGPUStorage` exist precisely
+to replace hand-rolled memoization. `useNodes`' creator receives `{ uniforms, nodes,
+buffers, gpuStorage, scene, … }`, so it can reach the store itself instead of closing
+over drilled props.
+
+```tsx
+// GOOD
+const { checkerSpecular, waterNormalNode } = useNodes(() => ({
+  checkerSpecular: mix(color('#00f'), color('#f00'), checker(uv().mul(5))),
+  waterNormalNode: normalMap(texture(waterNormal)),
+}));
+
+// BAD — three separate useMemos doing the same thing
+```
+
+`useMemo` is still correct for values that must be rebuilt when a runtime _instance_
+changes (e.g. `lights([instance])`) — `useNodes` is create-once and can't express that.
+
+## 3. Declarative first
+
+Build the scene in JSX. Imperative three.js is an intentional, _showcased_ escape
+hatch — keep it visible in the component that owns it, never hidden in a helper.
+
+- No `useMemo(() => new SomeMaterial())` + `material={…}`. Write
+  `<meshPhongNodeMaterial …/>` as a child.
+- No `<primitive object={new X()}>` when an intrinsic element exists.
+- Loops are fine — prefer mapping over a small data array to four near-identical JSX
+  blocks — but keep the data legible.
+- If React genuinely cannot express it, use vanilla and say why in a comment.
+
+**Exception — one instance genuinely shared by many meshes.** A JSX material child
+creates one material per mesh. When a scene points dozens of meshes at the same
+material, `useMemo(() => new SomeMaterial())` + `material={…}` is the correct call:
+**performance wins over declarative when the sharing is real.** Same for a shared
+geometry.
+
+But take it as a smell, not a free pass — wide sharing often means the scene wants an
+`<Instances>`/`InstancedMesh`, or a component boundary in the wrong place. So do it the
+performant way AND flag it for a human:
+
+```tsx
+// REVIEW(shared-instance): one MeshStandardMaterial across ~20 meshes; a JSX child
+// would create 20. Worth checking whether this wants <Instances> instead.
+const woodMaterial = useMemo(() => new MeshStandardMaterial({ color: '#8b5a2b' }), []);
+```
+
+`REVIEW(<topic>):` is the repo's flag-for-human marker (cf. `TODO(drei-gap):` in
+`src/utils/CameraControls.tsx`) — greppable, and it must say what the reviewer should
+weigh. Never add one silently to dodge a rule.
+
+**The win is lopsided by category, and that is expected.** Scene-graph-heavy demos
+(hierarchies, lights, events, animation wiring) collapse hard in JSX — vanilla spends
+its lines on `add()`/`position.set()`/listener plumbing. Pipeline- and TSL-heavy demos
+(post-processing, compute, shader graphs) do NOT: the graph is irreducible work we need
+too, so a good port lands near parity with the original. **That is a success, not a
+regression.** Never simplify a TSL graph, drop a pass, or cut comments to chase a line
+count — the demo has to still be the demo.
+
+## 4. Don't add features the original doesn't have
+
+We are comparing _this demo_ to _that demo_. A leva selector that triples the code is
+a net loss even if it's fun. Add controls only where the original had GUI, or where
+one slider makes a hidden constant explorable. If a control forces state lifting,
+registries, or instance plumbing, it is not worth it — drop it.
+
+## 5. Types come from the elements, never hand-written
+
+If you are writing `Node<'vec3'>` by hand you are about to fight the compiler. Derive
+prop types from the JSX element that will receive them:
+
+```tsx
+type TeapotProps = ThreeElements['mesh'] &
+  Pick<ThreeElements['meshPhongNodeMaterial'], 'shininess' | 'specularNode' | 'normalNode'>;
+```
+
+Real node classes (`LightsNode`, `TextureNode`, `NormalMapNode`) do **not** satisfy a
+guessed `Node<'vec3'>`; guessing is what forces casts into examples.
+
+**Casts are a bug report.** If an example needs `as unknown as`, that is an upstream
+gap — file it in [docs/UPSTREAM.md](docs/UPSTREAM.md) with the evidence rather than
+sprinkling casts. Same for importing `Mesh`/`Material` classes just to type a ref: if
+the JSX types don't cover it, something is wrong.
+
+## 6. Comments: shorter, friendlier, once
+
+- The header block is an orientation for an intermediate R3F user, not a spec. Lead
+  with plain language; put detail inline where it applies.
+- **Say it once.** If an inline comment explains the trick, the header shouldn't
+  repeat it.
+- No boilerplate DIVERGENCE bullets. Tone mapping, CameraControls, camera near/far,
+  file splitting and "leva replaces the Inspector" are repo-wide conventions covered
+  in the README — not per-example divergences. Only list a difference a reader would
+  otherwise be confused by. **DIVERGENCE is optional**; a faithful port says nothing.
+
+Header block:
+
+```
+/**
+ * <slug>
+ * <one or two plain sentences: what you are looking at>
+ * Original: <threejs.org URL>
+ *
+ * DEMONSTRATES
+ * - <what this teaches, R3F angle first — aim for 3-6 bullets>
+ *
+ * DIVERGENCE from original   (omit entirely if there is nothing real to say)
+ * - <differences a reader would trip over>
+ */
+```
+
+## 7. Section breaks inside files
+
+Big undifferentiated blocks are hard to scan. Use a consistent marker:
+
+```tsx
+//* Controls ======================================================
+//* Shader graph ==================================================
+//* Scene =========================================================
+```
+
+**File level only** — between top-level declarations. A marker inside a function body is
+noise, not a scanning aid. A file with two short components doesn't need any.
+
+## 8. Import hierarchy
+
+Broadest/most fundamental first, local last. **Order is what matters and is what
+`corpus/import-hierarchy` enforces**; a blank line between tiers is optional — the
+hand-tuned corpus does both (`lights-phong` separates, `materials-basic`/`tsl-earth`
+run one block). Don't churn a file just to add or remove them.
+
+```
+react
+three (three, three/tsl, three/webgpu, three/addons)
+@react-three/fiber
+@react-three/drei, other third-party r3f (leva, camera-controls)
+global utils (src/utils, src/assets, src/types)
+parent-relative, then sibling-relative
+```
+
+## 9. Name refs for what they hold
+
+`const meshRef = useRef<Mesh>(null)`, not `const ref = …`. Console errors and
+`ref.current` reads are unreadable otherwise. A component that _exposes_ a ref should
+still have a local one to work with:
+
+```tsx
+// Hooks can't be conditional — always make the local ref, then pick.
+const localRef = useRef<PointLight>(null);
+const lightRef = ref ?? localRef;
+```
+
+Type the exposed prop `React.RefObject<T | null>`, not `React.Ref<T>` — `React.Ref`
+admits callback refs, which have no `.current` to read.
+
+## 10. `useFrame` destructuring
+
+`useFrame(({ elapsed, delta }) => …)`. Don't write `(_, delta)` to skip state —
+`state.elapsed` (s), `state.delta` (s) and `state.time` (ms) all live on state.
+`state.clock` is gone.
+
+---
+
+# R3F v10 idioms
+
+> Written against fiber **alpha.4**. Anything here contradicting the reference demos
+> in `reference/react-three-fiber/example/src/demos/webgpu/` — trust the demos.
+
+## Entry point and renderer
+
+- Import `Canvas` and all hooks from **`@react-three/fiber/webgpu`**. Never mix entry
+  points in one app.
+- Write `renderer` on the Canvas even though `/webgpu` implies it — that prop is where
+  parameters land. `renderer={{ … }}` passes WebGPURenderer parameters.
+- `state.renderer` is typed `WebGPURenderer` on the `/webgpu` entry (alpha.4). **No
+  cast.** `gl` is a deprecated alias — don't write it.
+- `background` prop (color / hex / HDR URL / environment preset) replaces
+  `<color attach="background">`. `shadows` takes variant strings.
+  `flat`/`linear`/`colorSpace`/`toneMapping` Canvas props are gone — use
+  `renderer={{ toneMapping, outputColorSpace }}`.
+- **Tone-mapping parity trap**: fiber defaults to ACESFilmic; three.js originals use
+  the WebGPURenderer default (NoToneMapping) unless they set one. An unexamined
+  default visibly mutes emissive palettes. Decide deliberately on every port and
+  compare against the LIVE original, not the (stale) gallery thumbnail.
+
+## Frame loop
+
+- Phase-based scheduler: `{ phase: 'input' | 'physics' | 'update' | 'render' }`, plus
+  `before`/`after` and `{ fps: n }`. Numeric priorities are a v9-ism.
+- **`phase: 'render'` takes over rendering** — only for examples about custom
+  rendering, and never alongside `renderer.render()`.
+- **Never `await` inside a `phase: 'render'` callback.** The scheduler doesn't await
+  it, so frame N+1 races frame N on renderer global state. Keep it synchronous and
+  kick async GPU work off as a throttled promise that touches only its own data
+  (pattern: `multiple-rendertargets-readback`).
+- `setViewport`/`setScissor` y-origin is **TOP-left** on WebGPU, unlike WebGL.
+  Originals doing bottom-origin inset math land in the wrong corner — recompute
+  (pattern: `lines-fat/InsetView.tsx`).
+- **`state.pointer` is (0,0) until the first pointer event.** For fields that must be
+  off-scene when idle, track the pointer from events instead (invisible plane +
+  `onPointerMove`) — otherwise "no signal yet" reads as "at the origin".
+- `useFrame` returns pause/resume controls; prefer them to ad-hoc booleans.
+
+## TSL and the store hooks
+
+- All creator hooks are create-if-not-exists and StrictMode-safe; calling twice shares
+  the instance. **`useLocalNodes` is the exception in one useful way**: it is a pure
+  `useMemo` wrapper with no `store.setState`, so unlike `useUniforms`/`useNodes` it is
+  safe to call after a suspending sibling — the B18 hazard does not apply to it.
+- **Scoped stores are safe** (alpha.4 sanitises names into valid WGSL identifiers).
+  `useNodes(creator, 'scope')` to create, `useNodes('scope')` to read back elsewhere —
+  that read-back is the idiomatic alternative to prop-drilling nodes. Skip the scope
+  when one component both creates and consumes.
+- **Build-time vs run-time**: JS `if`/`for` in a node builder runs ONCE at graph build.
+  Use TSL `If()`/`Loop()`/`select()` for anything that must react to a uniform.
 - TSL helpers that internally `.toVar()`/`.assign()` (`RaymarchingBox` et al.) need an
-  active TSL stack — call them inside an `Fn()`; the originals' `Fn` wrappers are
-  load-bearing, not cosmetic. Fails only at RUNTIME (`No stack defined for assign
-  operation`); tsc/build won't catch it (pattern: `volume-cloud`).
-- `useNodes`' returned wrapper object has a fresh identity every render (member nodes
-  are store-stable, the `{...nodes, utils}` spread is not) — key downstream `useMemo`s
-  on the individual nodes, never the wrapper (pattern: `tsl-raging-sea`,
-  `volume-fire`).
-- Prefer TSL built-ins (`time`, `cameraPosition`, …) over hand-driven uniforms;
-  uniforms from RootState only for values with no built-in (viewport/size).
+  active stack — call them inside `Fn()`. The originals' `Fn` wrappers are
+  load-bearing. Fails only at runtime (`No stack defined for assign operation`).
+- `useNodes`' returned wrapper has a fresh identity every render (members are
+  store-stable, the spread isn't) — key downstream `useMemo`s on individual nodes.
+- Prefer TSL built-ins (`time`, `cameraPosition`) over hand-driven uniforms.
 - `uniform(someObject.vector3)` wraps the LIVE object — mutate it in `useFrame` and
-  the shader sees it, zero sync code (pattern: `lights-pointlights`, wrapping
-  `light.position`).
-- A mesh whose `positionNode` fully relocates its geometry (GPU-placed particles,
-  `range()`-driven instancing) needs `frustumCulled = false` — three builds the
-  culling sphere from the CPU-side geometry (e.g. a unit plane at origin), so the
-  whole object pops out of view the moment that point leaves the frustum (pattern:
-  `tsl-galaxy`; several upstream originals carry this latent bug and just never pan).
-- Custom-node materials (`positionNode`/`normalNode`/`colorNode`) + an async
-  `Environment`: Suspense-gate the lit scene on the HDR fetch so the FIRST shader
-  build already sees `scene.environment` — if the graph compiles before the HDR
-  lands, three 0.185.1 intermittently never folds IBL in on the env change
-  (shadowed areas render pitch black; UPSTREAM B15). Pattern:
-  `tsl-procedural-terrain` (one `<Suspense>` wrapping Environment + lights + meshes).
-- Second scene rendered inside a node graph: build a plain `THREE.Scene`, mount its
-  contents declaratively with fiber's `createPortal(children, scene)`, and feed
-  `pass(scene, camera)` into a material's `colorNode` (pattern: `portal/`). No
-  `useRenderPipeline` needed — that's for post-processing the MAIN pass.
-- `Fn(([a, b]) => …)` destructured params type as bare `ShaderNodeObject<Node>` —
-  typed TSL math (`rotate` etc.) may not resolve through them; cast to
-  `Node<'float'|'vec3'|…>` with a comment (three-side typing gap, UPSTREAM.md B10 —
-  same cast family as the fiber UniformNode gap).
-- Duck-typed `*Node` properties beyond a subclass's declared types are a PATTERN, not
-  one-offs: `scene.backgroundNode`, `scene.fogNode`, `material.emissiveNode` on
-  non-Standard node materials — the runtime reads them generically
-  (`NodeMaterial.setupOutgoingLight`, `NodeManager`) but `@types/three` declares them
-  narrowly. Cast with a comment; verify against the runtime source in
-  `reference/three.js/src/renderers/common/` first (UPSTREAM.md B11). Not every
-  `*Node` field needs it — e.g. `backdropNode`/`backdropAlphaNode` ARE typed on the
-  NodeMaterial base — so check `@types/three` before reaching for the cast.
-  Confirmed ALREADY TYPED on `NodeMaterial` (no cast; usable as plain JSX props):
-  `backdropNode`/`backdropAlphaNode`, `mrtNode`, `castShadowNode`, `depthNode`,
-  `emissiveNode`, plus `Texture3DNode.sample()/.normal()`. Still duck-typed (cast
-  needed): `scene.fogNode`/`scene.backgroundNode`, and `light.colorNode` —
-  `SpotLightNode.setupDirect` calls `light.colorNode(lightCoord)` generically, but
-  `@types` declares no such field on `Light` (pattern: `lights-projector`). Nuance
-  for `castShadowNode`: the field is typed, but a material arriving from a LOADER is
-  typed `MeshStandardMaterial`, not `NodeMaterial` — cast the MATERIAL to a
-  `*NodeMaterial` type, not the property (pattern: `shadowmap-opacity`).
-- Struct storage (`instancedArray(data, Struct)`) has no typed overload
-  (ArrayFunction stops at vec4) and struct member `.get('name')` returns bare
-  `Node` — documented casts, B10 family (first port: `compute-water`). Same
-  family: `select()`'s cond param is typed `Node<'bool'>` but the runtime
-  converts numeric uniforms.
-- Typed TSL has NO integer `min`/`max`/`mod` (functional or fluent) — originals
-  doing int neighbour math can't port verbatim under strict tsc; do the math in
-  float (exact below 2^24) and convert with `uint()` where an index is needed
-  (pattern: `compute-water`).
-- Chained `.mix` is `mixElement` — the CALLING node is the interpolation FACTOR
-  (`speed.mix(a, b)` ≡ `mix(a, b, speed)`). An arg-order landmine when translating
-  originals' chained calls to functional form; `.mix` is also missing from @types'
-  fluent surface (caught by screenshot review in `skinning-points` — wrong order
-  renders plausibly wrong colors, nothing errors).
-- Typed-TSL creators need explicit type arguments under strict tsc — they don't
-  infer from their value/literal args: `instancedBufferAttribute<T>(array, itemSize)`
-  (infers `unknown`), `uniformArray<'vec3'>(values, 'vec3')` (infers bare `string`,
-  losing `.element()`'s fluent surface). Same "typed TSL surface doesn't infer"
-  family as the Fn-param cast. (`UniformArrayNode.array` also types as `unknown[]` —
-  cast to the concrete element type with a comment when mutating live values.)
-- Two more typed-TSL surface traps (B10 family):
-  - `.assign()` is typed `Node | number`, so a raw JS boolean fails strict tsc even
-    though the originals write it untyped — use `bool(true)` (pattern:
-    `volume-perlin`).
-  - **Never type a variable/prop as `ReturnType<typeof uniform>`.** `uniform` is an
-    overloaded callable and `ReturnType<T>` resolves only the LAST overload
-    (`UniformNode<unknown, unknown>`), silently discarding the type your call actually
-    inferred. Write the concrete type (`UniformNode<'float', number>`, `Node<'float'>`)
-    instead (cost real debugging time across `postprocessing-bloom`'s quartet).
-- B21 has a second manifestation, on PROPERTY ASSIGNMENT: assigning a custom `Fn(...)`
-  to an addon's function-typed field (`bloomPass.highPassFn`) fails contravariance
-  against fiber's module-augmented `Fn` overload if the callback declares a
-  hand-written named param interface. Type the param `Record<string, unknown>` and cast
-  fields individually inside (pattern: `postprocessing-anamorphic`).
-- **A shared `mrt()` config used across MORE THAN ONE render target requires matching
-  `texture.name`s on EVERY target.** `MRTNode.setup()` resolves each named output
-  against the currently-bound target's own textures and silently `continue`s past any
-  it can't match — an empty output struct, surfacing only as a WGSL "structures must
-  have at least one member" compile error. The three.js original of
-  `multiple-rendertargets-readback` carries this bug (names only the full-res target's
-  textures); our port names both (UPSTREAM.md B22).
-- Fog, two paths (verified against `NodeManager.updateFog()`): plain `Fog`/`FogExp2`
-  set declaratively (`<fog attach="fog" args={…} />`) IS auto-wrapped into a fog node
-  by the WebGPU renderer — prefer it. Only a CUSTOM TSL fog graph needs
-  `scene.fogNode = fog(color, rangeFogFactor(near, far))`, which needs a documented
-  cast — `@types/three` doesn't declare `fogNode` (UPSTREAM.md B11; pattern in
-  src/examples/sprites.tsx).
-- Node materials are auto-extended by the `/webgpu` entry: `<meshStandardNodeMaterial>`
-  etc. just work in JSX.
-- **Compute pattern** (established by `compute-texture`/`compute-particles`): kernels
-  are `Fn(() => …)().compute(count)` built once in `useNodes`; storage in `useBuffers`
-  (`instancedArray`) / `useGPUStorage` (`StorageTexture`). fiber has no dispatch hook —
-  dispatch imperatively via `renderer.compute()` (B9 cast) at three cadences: ONCE in
-  a `useEffect` (sync `compute()` is safe there — fiber awaits `renderer.init()`
-  before children render; StrictMode double-runs the effect, so the kernel must be
-  idempotent), PER-FRAME in `useFrame({ phase: 'update' })` (compute is not a render
-  takeover — never `phase: 'render'`), ON DEMAND from event handlers (pointer →
-  `uniform(Vector3)` → dispatch).
-- **Scoped store hooks are WGSL-unsafe (UPSTREAM B16)**: scoped
-  `useNodes`/`useBuffers`/`useGPUStorage` name entries `${scope}.${name}` and the dot
-  reaches WGSL identifiers — always a runtime shader-compile error for storage
-  buffers, and for any node reaching codegen (texture bindings). Use ROOT-LEVEL
-  (unscoped) calls with prefixed keys until the fiber fix lands. `useUniforms`
-  scoping is fine (underscore separator — but see the B12 no-hyphens rule).
-- Creator-state ScopedStore reads widen to `BufferLike`/`StorageLike` (losing
-  `.element()`/`.toAttribute()` and concrete classes) — close over the TYPED returns
-  of the hooks instead of reading back through creator state. Don't `setName()`
-  inside creators; fiber overwrites it with the store key (name by key).
-- Post-processing: v10's `useRenderPipeline` (wraps THREE.PostProcessing). NOT
-  `@react-three/postprocessing` (stalled, WebGL-only). Pipeline callbacks don't re-run
-  on HMR — full-reload after editing them. Known sharp edges (verified porting
-  `skinning-instancing`):
-  - The callback's `renderPipeline` param is typed nullable — guard with
-    `if (!renderPipeline) return` (the mdx examples omit this; strict mode won't).
-  - Pipeline callbacks don't re-run on React re-render either: any dynamic value
-    (leva control etc.) must flow through a uniform, never a closed-over prop.
-  - fiber's `UniformNode<T>` pins the TSL node-type param to `unknown`, so passing a
-    uniform to TSL math expecting `Node<'float'>` fails strict tsc — cast
-    `uFoo as unknown as Node<'float'>` with a comment (upstream fiber typing gap).
-  - THREE dynamism patterns — pick by where the uniform lives: (a) values YOU
-    introduce into the graph → fiber `useUniforms` + the cast above; (b) knobs a
-    three.js pass already exposes as `uniform()`-backed fields
-    (`bloom().strength/.radius` etc.) → return the pass from the mainCB to register
-    it on `passes`, then mutate `pass.foo.value` in an effect — no cast, prefer it
-    when the field exists; (c) pass factories that wrap numeric args in CONST nodes
-    (`dof()` — check the factory source before assuming bloom-style fields) → create
-    three/tsl `uniform()` nodes inside the mainCB, pass them to the factory, register
-    THEM via return-to-register, mutate `.value` in an effect (what the originals
-    themselves do; no cast — they're three-side uniforms, not fiber hook uniforms).
-    Pattern examples: (b) `postprocessing`, (c) `postprocessing-dof`.
-  - `useRenderPipeline(mainCB, setupCB)`: setupCB is where MRT config goes
-    (`scenePass.setMRT(...)`) — full details in
-    `reference/react-three-fiber/docs/webgpu/render-pipeline.mdx`.
-  - fiber's Canvas defaults to MSAA 4x and every `pass()` target inherits
-    `renderer.samples` — TRAA, `ssaaPass`, and any pass that copies depth
-    textures require single-sampled targets: `passes.scenePass.options.samples
-    = 0`, `pass(scene, camera, { samples: 0 })`, or `ssaa.options.samples = 0`,
-    or WebGPU rejects the copy with a sample-count validation error at runtime
-    (caught by the smoke console assertion; patterns: `postprocessing-ao`,
-    `materials-alphahash`). Don't reason from `updateBefore` overrides — the
-    inheritance happens elsewhere; if the pass copies depth, set samples 0.
-    (`PassNode.options` is undeclared in @types/three — B11-family structural
-    cast on raw addon passes; fiber's own `scenePass` type carries it.)
+  the shader sees it, zero sync code (pattern: `lights-pointlights`).
+- A mesh whose `positionNode` relocates its geometry needs **`frustumCulled = false`**
+  — three builds the culling sphere from CPU-side geometry, so the object pops out of
+  view (pattern: `tsl-galaxy`; several upstream originals carry this latent bug).
+- Chained `.mix` is `mixElement` — **the calling node is the FACTOR**
+  (`speed.mix(a, b)` ≡ `mix(a, b, speed)`). Wrong order renders plausibly wrong
+  colors and errors nothing.
+- Fog: plain `<fog attach="fog" args={…} />` IS auto-wrapped into a fog node by the
+  WebGPU renderer — **prefer it**. Only a custom TSL fog graph needs `scene.fogNode`
+  (which needs a documented cast — `@types/three` doesn't declare it).
+- Node materials are auto-extended: `<meshStandardNodeMaterial>` just works.
 
-### Ecosystem + React
+### Known typed-TSL gaps (cast, with a comment, and check UPSTREAM first)
 
-- drei v11 is renderer-split: import **`@react-three/drei/webgpu`** (or `/core` for
-  renderer-agnostic); NEVER the root or `/legacy` in WebGPU code — the root build is
-  legacy-flavored and will drag in a second runtime.
+- `Fn(([a, b]) => …)` params type as bare `ShaderNodeObject<Node>` — typed math may
+  not resolve through them (B10).
+- Duck-typed `*Node` fields: `scene.fogNode`, `scene.backgroundNode`,
+  `light.colorNode` need casts. **Already typed (no cast)**: `backdropNode`,
+  `backdropAlphaNode`, `mrtNode`, `castShadowNode`, `depthNode`, `emissiveNode`,
+  `Texture3DNode.sample()/.normal()`. Check `@types/three` before reaching (B11).
+- Struct storage (`instancedArray(data, Struct)`) has no typed overload; `.get(name)`
+  returns bare `Node`.
+- No integer `min`/`max`/`mod` in typed TSL — do it in float (exact below 2^24) and
+  `uint()` where an index is needed.
+- Typed-TSL creators don't infer: `instancedBufferAttribute<T>(…)`,
+  `uniformArray<'vec3'>(…)`.
+- **`useUniforms` output does NOT need `as unknown as Node<'float'>`.** fiber's
+  `MappedUniforms<T>`/`UniformNodeFor<V>` infer a concrete node type per input
+  (`number` -> `UniformNode<'float', number>`, a hex string -> `UniformNode<'color', Color>`),
+  and `UniformNode<'float', number>` structurally satisfies `Node<'float'>` — chaining
+  `.mul()`/`.mix()`/`Fn()` args works uncast. A comment claiming _"`UniformNode<T>` pins
+  its TSL type param to `unknown`"_ propagated this cast to **87 sites**; it was false,
+  and 64 of them were swept 2026-09-02. **Try removing the cast first.**
+  After the sweep, the 23 surviving `as unknown as Node<…>` casts are a DIFFERENT family
+  and are correct: struct member access (`duckElement.get('position')` types as bare
+  `Node`), custom node classes (`new InstanceUniformNode()`), `cubeTexture()`, and one
+  `select()` wanting `bool` — i.e. the B10/B11 gaps, not the uniform gap. They live in
+  `compute-water/Water.tsx`, `compute-particles-rain/Rain.tsx`, `skinning-points`,
+  `geometry/instance-uniform.tsx`, `tsl-vfx-tornado/Tornado.tsx`.
+  Related: a `color`-typed uniform will not unify as a `vec3()` ARGUMENT. Dropping the
+  `vec3()` wrapper beats casting — a color node already behaves like a vec3 downstream.
+- `.assign()` is typed `Node | number` — a raw JS boolean fails; use `bool(true)`.
+- **Never type anything as `ReturnType<typeof uniform>`** — `uniform` is overloaded
+  and `ReturnType` resolves only the last overload, discarding what your call
+  inferred. Write the concrete type.
+- A shared `mrt()` across MORE THAN ONE target needs matching `texture.name`s on
+  **every** target, or outputs are silently dropped into an empty struct (B22).
+
+## Compute
+
+Kernels are `Fn(() => …)().compute(count)` built once in `useNodes`; storage lives in
+`useBuffers` (`instancedArray`) / `useGPUStorage` (`StorageTexture`). fiber has no
+dispatch hook — dispatch via `renderer.compute()` at three cadences:
+
+- **once** in a `useEffect` (safe: fiber awaits `renderer.init()` before children
+  render; StrictMode double-runs it, so the kernel must be idempotent)
+- **per frame** in `useFrame({ phase: 'update' })` — compute is not a render takeover,
+  never `phase: 'render'`
+- **on demand** from event handlers (pointer → `uniform(Vector3)` → dispatch)
+
+## Post-processing
+
+v10's `useRenderPipeline` (wraps `THREE.RenderPipeline`). NOT
+`@react-three/postprocessing` (WebGL-only). Pipeline callbacks don't re-run on HMR or
+on React re-render — **any dynamic value must flow through a uniform, never a
+closed-over prop.** `renderPipeline` is non-null as of alpha.4 (no guard needed).
+
+Four dynamism patterns. **The selection rule is what matters** — read the factory source
+in `node_modules/three/examples/jsm/tsl/display/` and pick by what it actually does:
+
+- **(a)** values you introduce → fiber `useUniforms`, no cast.
+- **(b)** _default for node-class passes._ The pass keeps its knob in a public writable
+  field holding a `uniform()` node (`bloom().strength`, `dotScreen().scale`,
+  `dof().bokehScaleNode`) AND the field is float-typed → construct with defaults, then
+  assign your `useUniforms` node onto the field inside the mainCB **before** shader
+  compilation. Every node-class factory this corpus imports works this way.
+  **Never pass your uniform as a factory _argument_.** Whether identity survives is
+  inconsistent per factory and invisible at the call site: `bloom()` guards with
+  `strength.isNode ? strength : uniform(strength)` and `dof()` uses `nodeObject()` (both
+  preserve), but `dotScreen()`/`rgbShift()` call `uniform(angle)` unconditionally, which
+  rewraps your node into a NEW uniform and silently drops every later write (B29).
+  Construct with defaults, then assign onto the field — correct for all of them.
+  **Precondition — WHEN the node reads the field.** (b) only works if the node reads
+  `this.<field>` in `setup()` (at shader compile), like `BloomNode` does. A class that
+  builds its graph in its CONSTRUCTOR has already captured the original uniform node by
+  reference, and replacing the field afterwards changes nothing — `SkyMesh` assigns
+  `material.colorNode` inside `constructor()`, closing over `this.turbidity`/`this.rayleigh`
+  on the spot (`objects/SkyMesh.js`), and `WaterMesh` is the same shape. For those,
+  **mutate `.value` in place** — the field swap fails silently, which is the worst
+  failure mode there is. Check where the graph is built before choosing.
+
+- **(c)** _fallback, three cases._ There is no instance to assign onto — an
+  `Fn()`-style helper taking an options object (`depthAwareBlend`) — or the field is
+  **int/uint** (`godrays().raymarchSteps` is `uniform(uint(60))`) and `useUniforms` can
+  only produce `UniformNode<'float'>` for a JS number; or the graph was built in the
+  constructor (above). → create three/tsl `uniform()`
+  nodes inside the mainCB, pass them in, register via return-to-register, mutate
+  `.value` in an effect.
+- **(d)** _structural toggle._ A boolean that swaps the whole `outputNode` between two
+  different node graphs (`enabled ? sobelPass : outputPass`) has no field to assign onto
+  → register both from the mainCB, read them back off `passes` in an effect, set
+  `outputNode` and `renderPipeline.needsUpdate = true`. That read-back needs
+  `passes.xPass as ReturnType<typeof x> | undefined`. **Keep that cast** — it is exempt
+  from House style rule 5: `useRenderPipeline` is non-generic and `PassRecord =
+Record<string, any>`, so the cast ADDS type information to an `any` rather than hiding
+  an error. There is no way to write it without one (UPSTREAM B30).
+
+Verified against r185; re-verify the field types on a three bump.
+
+`useRenderPipeline(mainCB, setupCB)` — setupCB is where MRT config goes
+(`scenePass.setMRT(…)`). See `reference/react-three-fiber/docs/webgpu/render-pipeline.mdx`.
+
+**MSAA**: fiber defaults to 4x and every `pass()` inherits `renderer.samples`. TRAA,
+`ssaaPass`, and anything copying depth need single-sampled targets
+(`passes.scenePass.options.samples = 0`, `pass(scene, camera, { samples: 0 })`) or
+WebGPU throws a sample-count validation error. If the pass copies or samples depth,
+set samples 0.
+
+## React and the ecosystem
+
+- drei is renderer-split: import **`@react-three/drei/webgpu`** (or `/core`); never the
+  root or `/legacy` in WebGPU code.
+- **Suspense**: alpha.4 no longer tears down the renderer root when a child suspends,
+  so the old "every suspending subtree needs its own boundary, no exceptions" rule is
+  **retired**. Gate where it buys something: an async `Environment` in front of
+  custom-node materials still needs the lit scene gated on the HDR, or three 0.185.1
+  intermittently never folds IBL in (B15; pattern `tsl-procedural-terrain`). Do NOT
+  reflexively split boundaries — two independently-suspending resources in ONE boundary
+  can be _protective_, because the boundary delays first render until both resolve
+  (B28).
 - StrictMode double-invokes effects: never `dispose()` a `useMemo`'d instance in an
-  effect cleanup (kills the memoized instance for good). Use symmetric connect/
-  disconnect effects — see [src/utils/CameraControls.tsx](src/utils/CameraControls.tsx).
-- **Every suspending subtree inside `<Canvas>` gets its own explicit
-  `<Suspense fallback={null}>` — no exceptions.** Letting suspension reach Canvas's
-  own boundary re-runs createRoot on fiber alpha.3 (`R3F.createRoot should only be
-  called once!` console warning) and permanently freezes every TSL `time`-driven
-  graph at frame one (UPSTREAM B17). The freeze is invisible to the smoke tier
-  (non-black ≠ animating) — three shipped examples were latently frozen until a
-  pixel-diff sweep caught them. This supersedes "useGLTF suspends and Canvas
-  handles it": it doesn't, gate explicitly. (The B15 IBL gate and the dispersion
-  PMREM-race gate are special cases of this rule.) **Scope check**: the rule keys on
-  SUSPENDING HOOKS, not on "anything that loads or sets something up" — a subtree with
-  no `useGLTF`/`useTexture`/`useLoader` anywhere needs no gate, and adding one is
-  noise. `RoomEnvironment` + `PMREMGenerator.fromScene` is synchronous and does NOT
-  suspend (over-applied, then correctly reverted, in `postprocessing-ca`).
-- In a component that both suspends (useTexture/useGLTF/useLoader) and calls
-  `useUniforms`: call `useUniforms` BEFORE the suspending hook. Creator-mode
-  `useUniforms` writes to the fiber store during render; deferred to the
-  post-suspense re-render, that write lands after siblings have subscribed
-  (`useRenderPipeline` calls bare `useThree()`) → React's setState-during-render
-  warning (UPSTREAM B18; pattern: `tsl-vfx-tornado`). **The same ordering applies
-  at the SIBLING level, and the failure escalates**: a creator-hook component
-  (`useNodes`/`useBuffers`/`useUniforms`) rendered AFTER a suspending sibling —
-  even a properly Suspense-gated one — can trigger the setState-in-render, then
-  the createRoot re-run and the full B17 pixel freeze. Render creator-hook
-  components BEFORE suspending siblings in tree order (`compute-particles-rain`:
-  `<Rain>` before `<Monkey>`). The smoke console assertion does NOT catch this
-  state — only a pixel-diff does.
-- Non-node instances captured by create-once hook closures (RenderTargets,
-  cameras, override materials in a `useNodes`/`useBuffers` creator) must be
-  identity-stable across StrictMode re-renders — hold them in lazy
-  `useState(() => …)`, not `useMemo` (a StrictMode memo re-run can hand the
-  component a DIFFERENT instance than the one the create-once kernel captured;
-  pattern: `compute-particles-snow`).
-- `scene.overrideMaterial` pre-passes (collision/height maps): the WebGPU
-  renderer transfers each object material's `positionNode` onto the override
-  material (`Renderer.js:3739`) — this is what makes GPU-instanced/displaced
-  geometry participate correctly in top-down height renders (patterns:
-  `compute-particles-snow`, `compute-particles-rain`).
-- **Imperative mesh setup that must precede the first render goes in
-  `useLayoutEffect`, not `useEffect`.** The WebGPU shader-graph build reads mesh state
-  ONCE on the first RAF render and caches it (e.g. `morphReference()` caches
-  `morphTargetInfluences` in a WeakMap — `null` forever if unset at that instant);
-  passive effects can lose that race. Verified in `morphtargets` (`updateMorphTargets()`
-  after attaching a `geometry` prop). Same rule for renderer-level flags the first
-  render reads: `renderer.shadowMap.transmitted = true` for `castShadowNode` volumes
-  loses the race in a passive effect (`volume-fire`).
-- Declarative-first: the scene graph is JSX; imperative three.js calls are an
-  intentional, showcased escape hatch (R3F is an AND with three.js, not an OR) — keep
-  them visible in the component that owns them, not hidden in helpers.
-- No module-scope mutable state. Controls at the edge; props where they clarify.
-  (One-time idempotent library registration at module scope IS fine — e.g.
-  `RectAreaLightNode.setLTC(...)`, `CameraControlsImpl.install(...)` — the rule is
-  about state, not setup.)
-- `useAnimations`: play clips BY NAME, never `Object.values(actions)` — GLTFs ship
-  rest/utility clips (e.g. Soldier.glb's `TPose`) that pollute the blend at default
-  weight 1.
-- Compressed glTF (KTX2/BasisU textures): drei's `useGLTF` wires Draco (arg 2) and
-  Meshopt (arg 3) itself; KTX2 needs the `extendLoader` callback —
-  `loader.setKTX2Loader(new KTX2Loader().setTranscoderPath(<r185 basis/ CDN>)
-  .detectSupport(renderer))` with the live renderer from `useThree`. Safe in render:
-  fiber awaits `renderer.init()` before children mount (`hasFeature()` throws
-  pre-init). The explicit `setTranscoderPath` is load-bearing, not cosmetic —
-  KTX2Loader's default path resolves via `import.meta.url` against the three package,
-  unreliable under Vite pre-bundling (pattern: `loader-gltf-compressed`).
-- `useLoader(Loader, [urls])` generalizes to N resources in ONE call, not just the
-  1-resource `[files]` wrapper the HDR-cubemap workaround shows: pass a genuinely
-  multi-element outer array (each element whatever shape that loader's `.load()`
-  expects) and get back an array of N results — e.g. nine 6-face `CubeTexture` mip
-  levels in one call (pattern: `materials-cubemap-mipmaps`).
-- Derived textures (clone/mutate of a `useLoader` result) must be `useMemo`'d off the
-  loader's stable return — deriving inline during render mints a fresh texture and GPU
-  sampler on every re-render. Same family as the `useNodes` wrapper-identity rule.
-- **Acronym class names lowercase only their FIRST character in JSX.** fiber's
-  `toPascalCase`/`Uncapitalize` mapping means `IESSpotLight` is `<iESSpotLight>`, NOT
-  the more readable `<iesSpotLight>` — the latter resolves to no catalogue entry and
-  throws "not part of the THREE namespace". Verified at both the runtime
-  (`reconciler.tsx`) and type (`types/three.d.ts`) level (pattern:
-  `lights-ies-spotlight`).
-- A light rigidly attached to the camera IS declarative:
-  `<PerspectiveCamera makeDefault><pointLight …/></PerspectiveCamera>` (drei
-  `/webgpu`). No `camera.add(light)` effect needed (patterns: `postprocessing-bloom`,
-  `mrt-mask`). This supersedes `skinning-instancing`'s header claim that no
-  declarative equivalent exists — that port predates the finding.
-- **A callback ref (`ref={node => …}`) never triggers a re-render**, so a component
-  that must hand the mounted object to something else (drei `TransformControls
-  object={…}`, any `useEffect` dependency) has to mirror it into `useState` from the
-  callback ref — reading `someRef.current` in JSX renders one commit too early
-  (pattern: `shadowmap-progressive`).
-- Imperative `object.layers.enable()/.disableAll()` via a ref + `useLayoutEffect` is
-  the standing pattern for layer routing — JSX has no `layers` prop (4th occurrence:
-  `volume-fire`, `volume-caustics`, `volume-lighting`, `volume-lighting-rectarea`).
-- Addons shipped as `.js` with no `.d.ts` ANYWHERE (`three/addons/csm/*`,
-  `three/addons/tsl/shadows/*`, `misc/ProgressiveLightMapGPU.js`) still typecheck
-  cleanly — TS infers from their JSDoc. A missing `.d.ts` is not a reason to reach for
-  `any` or to inline the addon (pattern: `shadowmap-csm`, `shadowmap-array`).
-- Addon nodes that take config at CONSTRUCTION (`TileShadowNode` tilesX/tilesY,
-  `CSMShadowNode` cascades) need a full node+helper rebuild in an effect when those
-  change; everything else (`maxFar`, `mode`, `lightMargin`, shadow near/far) is a plain
-  mutation + the node's own `updateFrustums()`. Two gotchas: their debug helpers need
-  the FIRST `.update()` skipped one frame after (re)build (calling it before the light's
-  first shadow pass trips an internal not-ready guard), and `updateFrustums()`
-  dereferences state allocated by the node's lazy `_init()` — an effect that fires at
-  MOUNT (not just on user interaction, unlike the originals' GUI-only callbacks) must
-  guard on that internal state existing or it throws.
+  effect cleanup. Use symmetric connect/disconnect (see `src/utils/CameraControls.tsx`).
+- Non-node instances captured by create-once hook closures (RenderTargets, cameras,
+  override materials) must be identity-stable — hold them in lazy `useState(() => …)`,
+  not `useMemo`.
+- **Imperative setup that must precede the first render goes in `useLayoutEffect`.**
+  The WebGPU shader-graph build reads mesh state ONCE on the first RAF render and
+  caches it (`morphReference()` caches `morphTargetInfluences` — `null` forever if
+  unset then). Same for renderer flags the first render reads
+  (`renderer.shadowMap.transmitted`).
+- **A callback ref never triggers a re-render.** A component that must hand its mounted
+  object to something else mirrors it into `useState` — or, simpler, pass the
+  `useState` setter _as_ the ref: `<pointLight ref={setLight} />`.
+- `useAnimations`: play clips **by name**, never `Object.values(actions)` — GLTFs ship
+  rest/utility clips that pollute the blend at weight 1.
+- `useGLTF` takes an **options object**: `useGLTF(url, { draco: true, meshopt: true,
+ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
+  `setTranscoderPath` from the string, automatic `detectSupport`). Positional booleans
+  are deprecated. Pass the explicit transcoder path — the default resolves via
+  `import.meta.url` and is unreliable under Vite.
+- `useLoader(Loader, [urls])` takes N resources in one call and returns N results.
+- Derived textures (clone/mutate of a loader result) must be `useMemo`'d off the
+  loader's stable return.
+- **Acronym class names lowercase only the FIRST character**: `IESSpotLight` is
+  `<iESSpotLight>`, not `<iesSpotLight>`.
+- A light attached to the camera IS declarative:
+  `<PerspectiveCamera makeDefault><pointLight …/></PerspectiveCamera>`.
+- `object.layers` has no JSX prop — ref + `useLayoutEffect` is the standing pattern.
+- Addons shipped as `.js` with no `.d.ts` still typecheck (TS infers from JSDoc). A
+  missing `.d.ts` is not a reason to reach for `any`.
+- Addon nodes configured at CONSTRUCTION (`TileShadowNode` tiles, `CSMShadowNode`
+  cascades) need a node+helper rebuild when those change; everything else is a
+  mutation + `updateFrustums()`. Their helpers need the first `.update()` skipped a
+  frame, and `updateFrustums()` dereferences lazily-`_init()`ed state — guard it.
+- `scene.overrideMaterial` pre-passes: the renderer transfers each object material's
+  `positionNode` onto the override material, which is what makes GPU-displaced
+  geometry participate in top-down height renders.
+- No module-scope mutable state. One-time idempotent registration at module scope IS
+  fine (`RectAreaLightNode.setLTC`, `extend({ SomeAddon })`).
 
-## Layer 2 — corpus conventions (this repo's format)
+---
 
-### Files, routes, manifest
+# Repo format
 
-- One file per example: `src/examples/<slug>.tsx`, default-exporting the page
-  component. Route is `/examples/<slug>` (globbed — no route wiring needed).
-- If the index file would exceed **~200 lines**, switch to the folder pattern:
-  `src/examples/<slug>/<slug>.tsx` entry (folder name must match) + sibling
-  subcomponents. The split itself is a taught pattern — split by scene role, not by
-  arbitrary size.
-- Slug = original three.js example name, kebab-case, with the leading renderer prefix
-  (`webgpu_` / `webgl_`) ALWAYS dropped — every port here is WebGPU, the prefix carries
-  no information. `webgpu_skinning_instancing` → `skinning-instancing`; `webgpu_sky` →
-  `sky`. (When both a webgl and webgpu original exist, the one port covers both.)
+## Files, routes, manifest
+
+- Examples live in **category folders**: `src/examples/<category>/<slug>.tsx`, or
+  `src/examples/<category>/<slug>/<slug>.tsx` when the example needs several files
+  (entry filename must match the folder). Routes stay `/examples/<slug>` — the slug is
+  globally unique and the category never appears in the URL.
+- Categories (15): `animation` `camera` `compute` `geometry` `lights` `loaders`
+  `materials` `postprocessing` `reflections` `render-targets` `scene` `shadows`
+  `textures` `tsl` `volume`. Add one only if 3+ examples justify it.
+- A slug may equal its category (`camera`, `postprocessing`). Those live at
+  `src/examples/camera/camera/camera.tsx` and
+  `src/examples/postprocessing/postprocessing.tsx` — the route is still
+  `/examples/camera`.
+- Split a file when it passes **~200 lines**, and split by scene role — the split
+  itself is a taught pattern, not a size workaround.
+- Slug = the original three.js name, kebab-case, with the `webgpu_`/`webgl_` prefix
+  **always dropped**. `webgpu_skinning_instancing` → `skinning-instancing`.
 - Register in [src/examples.json](src/examples.json):
-  `{ slug, title, tags, original?, credits? }`. `original` = threejs.org example URL;
-  `credits` = asset/author attribution. The shell renders the Titleblock from this —
-  **never build title/credits UI inside an example**.
+  `{ slug, title, tags, original?, credits? }`. The shell renders the titleblock from
+  this — **never build title/credits UI inside an example**.
+- Shared JSX type augmentation for extended addons goes in
+  [src/types/r3f.d.ts](src/types/r3f.d.ts); the `extend()` call goes in
+  `src/assets/<Addon>.ts` and examples `import '../assets/<Addon>'`. Do NOT write a
+  per-example `declare module` block.
+- Reusable pieces drei lacks go in `src/utils/` with a doc comment naming the gap they
+  fill (each is a candidate upstream brief).
 
-### Example shape
+## Example shape
 
-- **The example owns its `<Canvas>`**; the scene lives self-contained inside — no
-  extracted `<Scene>` component, no shared canvas.
-- Header comment block (top of the index file), exactly these sections:
-  ```
-  /**
-   * <slug>
-   * R3F port of three.js `<original_name>`, running on WebGPU.
-   * Original: <threejs.org URL> (~<n> lines of JS)
-   *
-   * DEMONSTRATES
-   * - <the techniques/APIs this example teaches, R3F-angle first>
-   *
-   * DIVERGENCE from original
-   * - <every intentional difference: UI, assets, enhancements, simplifications>
-   */
-  ```
-- `<DemoHelpers>` ([src/utils/DemoHelpers.tsx](src/utils/DemoHelpers.tsx)) goes in every
-  example: grid + CameraControls baseline, toggleable via props (`grid={false}` etc.
-  when the original look demands it). It also carries the render-readiness signal —
-  include it even with everything visual turned off. For imperative camera moves
-  (`fitToBox`, `setLookAt` — e.g. Box3 auto-framing of loaded models) use the
-  `controlsRef` escape hatch; writing `camera.position` directly is futile,
-  camera-controls' `update()` overwrites it every frame.
-- Controls via leva `useControls('<group>', { … })`. Direct value controls beat
-  buttons that hide state (e.g. weight sliders instead of crossfade buttons).
-- Assets: hotlink jsdelivr pinned to the three.js release —
+- **The example owns its `<Canvas>`**; the scene is self-contained inside.
+- `<DemoHelpers>` goes in every example (grid + CameraControls baseline, toggleable).
+  It also carries the render-readiness signal, so include it even with everything
+  visual off. Use its `controlsRef` escape hatch for imperative camera moves
+  (`fitToBox`) — writing `camera.position` is futile, camera-controls overwrites it.
+- Assets: hotlink jsdelivr pinned to the release —
   `https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/<path>`. No vendored
-  binaries in the repo. **curl-check the URL before assuming a path pattern from
-  another port transfers** — the mirror does not carry every asset variant (e.g.
-  DamagedHelmet ships only as multi-file `.gltf`; the `glTF-Binary/.glb` sibling 404s,
-  unlike the KhronosGroup sample-assets repo `loader-gltf.tsx` uses).
-- Divergence from the original is expected and fine (idiomatic-primary, no pixel
-  parity) — but every divergence gets a DIVERGENCE bullet.
+  binaries. **curl-check the URL** — the mirror doesn't carry every asset variant.
 - **Verify dead or no-op code before porting it faithfully.** three.js examples are
-  demo-quality JS: `volume-caustics`' original loads a hardwood floor texture it never
-  assigns; `volume-lighting`'s calls `spotLight.lookAt()` every frame, which does
-  nothing (direction comes from `.target`, per `LightShadow.updateMatrices()`);
-  `postprocessing-ca`'s animation branch is unreachable. Drop it and say so in a
-  DIVERGENCE bullet rather than reproducing it.
-- Reusable pieces that drei lacks go in `src/utils/` with a doc comment stating the
-  drei gap they fill (each is a candidate upstream brief).
+  demo-quality: `volume_caustics` loads a texture it never assigns; `volume_lighting`
+  calls `spotLight.lookAt()` every frame, which does nothing. Drop it and say so.
 
-### Verification (do this before calling a port done)
+## Verification
 
-1. `npx tsc --noEmit` && `pnpm lint` && `pnpm build`
-0. Animated example? It must pass `pnpm test:animates` (tier 1.5: two-frame
-   pixel diff + dual-root-warning capture — catches the B17/B18 freeze family
-   that smoke's console assertion misses). Static-by-design examples declare
-   `"static": true` in their manifest entry (the test then asserts live loop +
-   clean console); stop-go easings longer than ~2s declare `"animationWindowMs"`.
-   Run it for YOUR example: `npx playwright test tests/animates.spec.ts -g "<slug>"`.
-2. Dev server: route renders, console clean, canvas context is `webgpu`.
-   Playwright `-g` matches the full `file › title` chain — quoted/anchored slug
-   patterns silently match nothing; verify with `--list` when a grep finds 0 tests.
-3. `pnpm test:smoke` (Playwright: readiness signal fires, canvas non-black). Expected
-   transient: the FIRST-ever run of an example with multi-MB hotlinked assets and/or a
-   fresh shader-graph build can blow the readiness timeout once (cold CDN fetch +
-   compile), then pass in ~1s thereafter — one slow first run is not a broken example;
-   two is. Second cold-start signature: a one-time console assertion failure
-   `Destroyed texture [PMREM.cubeUv] used in a submit` (drei Environment PMREM disposed
-   mid-flight during a slow cold HDR fetch, StrictMode remount race) — same rule, gone
-   permanently on run 2; only recurring console errors are real. Third signature: a
-   ONE-TIME `R3F.createRoot should only be called once!` on the first-ever run of a
-   heavy example (cold CDN fetch + fresh MRT shader build) even with every subtree
-   correctly Suspense-gated — RECURRING dual-root warnings are the B17 bug; a single
-   cold-start occurrence that never repeats is this transient
-   (postprocessing-motion-blur, verified 5/5 clean in both tree orderings after). CI runs the same suite on SwiftShader — but **NOT on every push**:
-   at corpus scale that job is ~30 min of software raster, so it runs on PRs,
-   nightly, and on demand (`gh workflow run ci.yml`) only (porting-phase policy,
-   2026-07-28). Local Metal is the oracle — land nothing not green here first.
-   An example that verifiably cannot reach readiness on SwiftShader declares
-   `"ciSkip": "<reason>"` in its manifest entry (exception list, SPEC §10) — used
-   sparingly, never to paper over a local failure.
-4. Screenshot for review — collapse the leva panel first (it overlays center-frame
-   subjects at small viewports). Ad-hoc Playwright screenshot scripts must launch with
-   `channel: 'chromium'` + `--enable-unsafe-webgpu` (same as playwright.config.ts) —
-   plain `chromium.launch()` is headless-shell with no WebGPU on macOS and silently
-   never reaches readiness. Keep such scripts under the repo root, not the scratchpad
-   (`@playwright/test` won't resolve from outside the workspace).
-   **leva persists control values in localStorage across separate browser launches** —
-   a script that assumes coded defaults can silently capture a PREVIOUS run's slider
-   drags (`lights-physical` shot exposure 0.26 instead of its coded 0.68).
-   `localStorage.clear()` + reload before capturing. Give every such script a hard
-   timeout and an always-run `browser.close()`: an open-ended wait on `__exampleReady`
-   is the one step that has hung porting agents for 10 minutes at a stretch. Delete the
-   script and its PNGs when done.
-5. Test SCOPED, one example at a time (`-g "<slug>"`). Batching many heavy WebGPU
-   examples into a single Playwright process — even at `--workers=1` — intermittently
-   produces `Cannot update a component` warnings from shared GPU-device pressure, on a
-   different example each run, including examples that are 8/8 clean in isolation.
-   That is environmental, not a per-example defect; the full-suite sweep at wave end is
-   the authoritative run.
+Run for YOUR example only — `pnpm test:changed <slug>` (smoke + animates).
 
-### Environment gotchas (do not rediscover)
+1. `npx tsc --noEmit && pnpm lint && pnpm build`
+2. **animates tier** — two-frame pixel diff + dual-root capture, catches freezes the
+   smoke console assertion can't see. Static-by-design examples declare
+   `"static": true` in the manifest; long stop-go easings declare `"animationWindowMs"`.
+3. **smoke tier** — readiness signal fires, canvas context is `webgpu`, canvas
+   non-black, console clean.
+4. **Screenshot**: `pnpm shot <slug>`. **Never hand-roll a screenshot script** —
+   `scripts/contact-sheet.mjs` already handles `channel: 'chromium'` +
+   `--enable-unsafe-webgpu` (plain `chromium.launch()` has no WebGPU on macOS and
+   silently never reaches readiness), hiding leva, `localStorage.clear()` (leva
+   persists control values across launches), a hard timeout, and an always-run
+   `browser.close()`.
+5. Look at the screenshot. Both test tiers passed `shadowmap-csm`'s tone-mapping bug;
+   only the screenshot caught it.
 
-Every patch/override/pin this repo carries is ledgered in
-[docs/UPSTREAM.md](docs/UPSTREAM.md) (Part A: what + unwind condition; Part B:
-agent-ready upstream fix briefs for fiber/drei). **House rule: any new patch, pin, or
-override lands with an UPSTREAM.md entry in the same commit.** Highlights:
+**Full sweeps are wave-end only.** Running many heavy WebGPU examples in one process
+produces contention flakes on a different example each run. Test scoped, one at a time
+(`-g "<slug>"`). Local Metal is the oracle — land nothing not green here. An example
+that verifiably cannot reach readiness on SwiftShader declares `"ciSkip": "<reason>"`.
+CI runs smoke on PRs, nightly, and on demand — not every push.
 
-- fiber `.` vs `./webgpu` are two separate builds of the same runtime — the regex alias
-  in [vite.config.ts](vite.config.ts) forces one; keep it until fiber fixes packaging.
-- drei alpha.5 is patched via `pnpm patch` for three ≥0.183's `WebGLCubeRenderTarget` →
-  `CubeRenderTarget` rename; a drei version bump errors on the stale patch — that's the
-  cue to delete `patches/` (fresh alphas ship the rename).
-- Vite's dep scanner would crawl `reference/**/*.html` — `optimizeDeps.entries` in
-  vite.config.ts scopes it; don't remove.
-- v10 docs exist only as `.mdx` in `reference/react-three-fiber/docs/` (the public site
-  404s on v10 pages). Check `webgpu/` and `migration/v10.mdx` before inventing API.
-- The `reference/three.js` clone is NEWER than npm `three@0.185.1` on the same release
-  line — an addon the original imports (`three/addons/...`) may not exist in
-  `node_modules/three/examples/jsm/`. CHECK node_modules before importing; if missing,
-  inline the addon's code into the example with attribution (pattern:
-  `backdrop-water/voronoiNoise.ts`) — never import from the gitignored clone.
-- The mirror-image trap: installed @types/three can be NEWER than the npm runtime
-  for jsm addons — `hashBlur`'s typed options (`{ size, mask, ... }`) track a newer
-  three than 0.185.1's runtime signature (`{ repeats, ... }`). When an addon's typed
-  surface rejects the ORIGINAL's exact arguments, check the npm runtime source, not
-  just @types; cast with a comment (`as Parameters<typeof fn>[n]`) if the runtime is
-  right (pattern: `reflection-blurred`).
+Expected cold-start transients (first-ever run of an example with multi-MB assets or a
+fresh shader build) — **one occurrence is not a bug, a recurrence is**:
+
+- readiness timeout, then passes in ~1s thereafter
+- `Destroyed texture [PMREM.cubeUv] used in a submit` (but see B28 — on `tsl-wood` this
+  RECURS and is a known flake)
+- one-time `R3F.createRoot should only be called once!` on a heavy example
+
+## Environment gotchas
+
+Every patch/override/pin is ledgered in [docs/UPSTREAM.md](docs/UPSTREAM.md) (Part A:
+what + unwind condition; Part B: agent-ready upstream fix briefs). **House rule: any
+new patch, pin, or override lands with an UPSTREAM.md entry in the same commit.**
+
+- **After ANY dependency bump, kill the dev server and `rm -rf node_modules/.vite`.**
+  Vite keeps serving the previously pre-bundled dep. **Kill the server FIRST** — wiping
+  the cache underneath a running server puts it into exactly the broken state you were
+  trying to fix, serving `504 (Outdated Optimize Dep)` for every dynamic import. The
+  smoke tests run against that server, so this presents as a batch of unrelated examples
+  failing readiness. A sweep that suddenly takes 10x longer is the tell that the
+  environment is broken, not the code — re-run one example scoped before believing it. The drei alpha.5→.6 bump presented
+  as two phantom runtime errors against source that was already correct.
+- fiber `.` vs `./webgpu` are two builds of one runtime — the regex alias in
+  [vite.config.ts](vite.config.ts) forces one; keep it.
+- `optimizeDeps.entries` scopes Vite's dep scanner away from `reference/**/*.html`;
+  don't remove.
+- The `reference/three.js` clone is NEWER than npm `three@0.185.1` — an addon the
+  original imports may not exist in `node_modules`. Check before importing; if missing,
+  inline it with attribution (pattern: `backdrop-water/voronoiNoise.ts`). Never import
+  from the gitignored clone.
+- Mirror image: installed `@types/three` can be NEWER than the npm runtime for jsm
+  addons. When a typed surface rejects the original's exact arguments, check the
+  runtime source, not just the types.
 
 ## Changelog
 
-- 2026-07-29 — v0.26 from wave 13, the first **cluster-batch** wave (8 quartets, one
-  agent per 4 sibling examples instead of one per example; 95 → 131). Cost fell from
-  ~115k to ~60k tokens/port, and doc bookkeeping moved from per-pair to one batched
-  pass (this entry). New rules: acronym JSX tags (`<iESSpotLight>`); declarative
-  camera-child lights (supersedes `skinning-instancing`'s header claim); callback refs
-  never re-render; addon shadow nodes' rebuild-vs-mutate split + helper first-update
-  and lazy-`_init()` traps; `.js`-only addons typecheck via JSDoc; never `await` in
-  `phase:'render'`; `state.pointer` is (0,0) before the first event; `.assign(bool())`;
-  the `ReturnType<typeof uniform>` trap; B21's property-assignment variant; shared
-  `mrt()` needs matching texture names on every target (B22); `useLoader`'s N-resource
-  form; memoize derived loader textures; the B17 gate's SCOPE CHECK (suspending hooks
-  only — over-applied then reverted in `postprocessing-ca`); verify dead/no-op code
-  before porting it; curl-check jsdelivr asset variants; leva localStorage leaks across
-  screenshot runs; scoped one-at-a-time testing (batched WebGPU runs produce spurious
-  warnings). B11 bullet now lists which `*Node` fields ARE typed, ending the reflexive
-  casting. New util: `src/utils/VolumetricFog.ts`. New briefs B22–B25.
-- 2026-07-28 — v0.25 from wave-12 pair 2 (compute-water + instance-sprites,
-  both zero-review-fix): first struct-storage port — new bullets for the
-  struct-storage/select() cast family and the missing integer min/max/mod in
-  typed TSL (float math + uint() workaround). Confirmed: `requiredLimits`
-  passes through the Canvas `renderer` prop to the WebGPURenderer constructor;
-  r185 `SpriteNodeMaterial.sizeAttenuation` setter self-bumps needsUpdate
-  (inverse of the alphaToCoverage finding). Orchestration note: subagent
-  screenshot scripts must NOT kill the shared :5173 dev server when done —
-  Playwright's webServer reuse and the contact-sheet script depend on it.
-- 2026-07-28 — v0.24 from wave-11 pair 4 (pmrem-equirectangular +
-  reflection-blurred, both zero-review-fix — wave 11 closes at 89 examples,
-  the whole wave zero-fix): B13 sharpened (UltraHDRLoader works via useLoader
-  on /webgpu — the gap is strictly drei Environment's loader selection);
-  new mirror-image trap bullet (@types newer than npm runtime for jsm addons —
-  hashBlur options drift); retrofit candidate logged: reflection's
-  resolutionScale-needs-recreation rationale is outdated for r185 (it's
-  live-mutable, verified in source by the blurred cousin).
-- 2026-07-27 — v0.23 from wave-11 pair 2 (mesh-batch + skinning-points, both
-  zero-review-fix): UPSTREAM B21 (fiber's three/tsl module augmentation SHADOWS
-  @types' Fn overloads — new mechanism, statement-form `Fn(fn,'void')` fails
-  strict tsc); `.mix`-is-mixElement arg-order landmine bullet (wrong order
-  renders wrong colors silently — screenshot review caught it);
-  `computeSkinning` @types return-type bug flagged (DefinitelyTyped candidate).
-  Retrofit: skinning-instancing now plays SambaDance BY NAME (predated the
-  rule). BatchedMesh port confirmed lazy-useState + remount-over-dispose for
-  count changes.
-- 2026-07-27 — v0.22 from wave-11 pair 1 (postprocessing-godrays +
-  postprocessing-motion-blur, both zero-review-fix): third cold-start signature
-  documented (one-time dual-root warning on cold fetch + fresh MRT build —
-  motion-blur falsified the ordering hypothesis deliberately before reporting;
-  recurring = B17, once-only = transient). Motion-blur is the first port using
-  setupCB MRT on the main scene pass — worked exactly as documented. Godrays
-  confirmed samples:0 applies to arbitrary-UV depth SAMPLING too, not just
-  copies.
-- 2026-07-27 — v0.21 from wave-10 pair 2 (materials-transmission +
-  materials-alphahash, both zero-review-fix, both static-by-design, both ran
-  the animates tier as step 0 on first use): samples:0 bullet extended with
-  ssaaPass + the don't-reason-from-updateBefore warning + PassNode.options
-  typing note (alphahash initially mis-reasoned and self-corrected).
-  Third-occurrence confirmation: ALL MeshPhysicalMaterial scalar/color fields
-  are reference-node-backed in the node pipeline (sheen, clearcoat,
-  transmission each verified subsets) — leva → plain JSX material props with
-  zero plumbing is the default for physical-material studies.
-- 2026-07-27 — v0.20: **the animates tier ships** (tests/animates.spec.ts,
-  `pnpm test:animates`) — the pixel-diff assertion queued since v0.12, made
-  urgent by rain's finding that consoles stay clean while frozen. Two-frame
-  diff + frame-loop liveness + dual-root-warning capture per example; manifest
-  flags `static` (18 confirmed statics — loader-gltf and materials-envmaps
-  verified faithful-static against their originals' defaults),
-  `animationWindowMs` (geometry-loft), `animatesSkip` (geometry-loft's ledgered
-  B17 anomaly, skip-with-reason). 74 pass + 1 ledgered skip. Local-only for
-  now — SwiftShader's ~1fps would need window retuning before CI wiring
-  (candidate). Port checklist gained step 0. SPEC §10 tier-1.5 amendment is a
-  candidate for Dennis.
-- 2026-07-27 — v0.19 from wave-10 pair 1 (compute-particles-rain +
-  compute-particles-snow — the compute weather pair, both landed clean after
-  rain self-fixed a major find): **B18 escalation rule** (creator-hook
-  components before suspending SIBLINGS — the setState-in-render cascades into
-  the full B17 freeze, and smoke's console assertion passes while frozen:
-  pixel-diff tier now urgent); lazy-useState rule for non-node instances
-  captured by create-once closures; overrideMaterial positionNode-transfer
-  note. Also flagged (B10 family): `hash(instanceIndex.add(time))` needs a
-  uint cast under strict tsc. CI: custom-fog ciSkip #3 (WebGPU Device Lost on
-  SwiftShader, deterministic).
-- 2026-07-27 — v0.18 from wave-9 pairs 2–4 (mirror, materials-sss, custom-fog,
-  fog-height, instance-points, instance-uniform — all zero-review-fix; wave 9
-  closes at 73 examples). **CI milestone folded in: smoke is BLOCKING and green**
-  (the B17 repair resolved the SwiftShader stall matrix; exception list is 2
-  legitimate ciSkips). Flagged once each, not yet rules: leva `onEditEnd` as the
-  commit gate for expensive synchronous bakes (custom-fog); uniform-driven
-  fogNode graphs beat rebuild-per-change (fog-height); `Material.alphaToCoverage`
-  has no version-bumping setter in 0.185.1 — toggle needs `needsUpdate`
-  (instance-points); InsetView now duplicated in two ports (third occurrence →
-  src/utils/). Playwright `-g`/--list note added to verification (v0.17.1).
-- 2026-07-27 — v0.17 amendments from wave-9 pair 1 (ocean + clearcoat, both
-  zero-review-fix): UPSTREAM B20 — Environment/useEnvironment hardwire
-  CubeTextureLoader for 6-file arrays (HDR cubemaps unloadable declaratively;
-  workaround `useLoader(HDRCubeTextureLoader, [files])` in `clearcoat`).
-  Pattern noted once (not yet a rule): reparenting a fiber-mounted primitive
-  into a side scene for `PMREMGenerator.fromScene` within one effect is safe —
-  fiber reconciles parents only on commits (`ocean/OceanSky.tsx`).
-- 2026-07-27 — v0.16 amendments from wave-8 pair 4 (shadowmap-vsm +
-  shadowmap-pointlight, both zero-review-fix — wave 8 closes at 65 examples):
-  clarification both shadow agents converged on independently — fiber dash-path
-  props apply ANY `shadow.*` scalar at runtime (`shadow-radius`,
-  `shadow-blurSamples`, `shadow-bias` all work live); the lights-spotlight
-  imperative-sync precedent is about missing TYPED props, not capability.
-  `shadows="variance"` → VSMShadowMap confirmed against the fiber variant table.
-- 2026-07-27 — v0.15 amendments from wave-8 pair 3 (volume-cloud + volume-fire,
-  both zero-review-fix; fire is the biggest port yet — full GPU fluid sim): TSL
-  stack rule (helpers with internal toVar/assign need Fn() — runtime-only
-  failure); useNodes wrapper-identity rule (2nd occurrence, now a bullet);
-  useLayoutEffect rule extended to renderer-level first-render flags
-  (shadowMap.transmitted); UPSTREAM B19 (fiber StorageLike misses
-  Storage3DTexture). volume-fire ships the corpus's 5th ciSkip (2M-voxel sim,
-  hopeless on software raster — legitimate, unlike the B17 four).
-- 2026-07-27 — v0.14 amendments from wave-8 pair 2 (lines-fat + lensflares, both
-  zero-review-fix): WebGPU setViewport/setScissor TOP-origin rule (upstream
-  originals' bottom-origin inset math silently lands wrong — second scissor port
-  exposed it). Flagged once, not yet rules: setHSL-without-colorSpace originals
-  produce linear components (fiber color props are sRGB-managed — precompute);
-  LensflareMesh mutates the caller's Color in place on first render.
-- 2026-07-27 — v0.13: corpus-wide B17 audit + repair (wave-8 interlude). A
-  full-corpus pixel-diff + frameCount sweep found 14 more B17-frozen examples
-  beyond flames' original three — every ungated suspending hook in the corpus,
-  including all four SwiftShader-stall examples (that CI mystery is plausibly
-  THIS bug; try dropping ciSkips). All repaired with explicit Suspense gates and
-  probe-verified. Fingerprint for the future: `__frameCount` advances while
-  pixels freeze = dual-root, check for the createRoot warning. Probe windows
-  must exceed stop-go animation periods (postprocessing-pixel false-alarmed at
-  1.5s; clean at 4s). Statics-by-design confirmed: morphtargets, depth-texture,
-  tonemapping, postprocessing-ao, compute-texture family.
-- 2026-07-27 — v0.12 amendments from wave-7 pair 4 (tsl-vfx-flames +
-  tsl-vfx-tornado — wave 7 closes at 57 examples): **the explicit-Suspense rule**
-  (Canvas-boundary suspension re-runs createRoot on alpha.3 and freezes all TSL
-  `time` graphs, UPSTREAM B17 — flames' pixel-diff sweep found THREE shipped
-  examples latently frozen: sprites/tsl-earth/refraction, all repaired this
-  commit); useUniforms-before-suspending-hooks ordering (setState-in-render via
-  useRenderPipeline's whole-store subscription, UPSTREAM B18). Follow-up queued:
-  a two-frame pixel-diff assertion tier — smoke's non-black check cannot see
-  animation freezes.
-- 2026-07-27 — v0.11 amendments from wave-7 pair 2 (postprocessing-pixel +
-  postprocessing-ao): TRAA/depth-copy passes need `samples: 0` targets (fiber's
-  MSAA-4x default propagates into pass() — real WebGPU validation error, found and
-  fixed by the AO port); CameraControls/DemoHelpers gained `minZoom`/`maxZoom`
-  (second ortho port to need the cap via controlsRef — pixel port retrofitted onto
-  the prop). Also of note: `camera={{ manual: true }}` hands the frustum to the
-  example (fiber's updateCamera early-returns) — used by pixel's per-frame
-  frustum-snap.
-- 2026-07-27 — v0.10 amendments from wave-7 pair 1 (postprocessing +
-  postprocessing-dof, both zero-review-fix — postprocessing cluster opens): the
-  pipeline dynamism patterns grew from two to THREE — (c) const-wrapping pass
-  factories (dof) need user-created three/tsl uniform() nodes registered via
-  return-to-register. v0.9's tone-mapping rule applied correctly on first use by
-  both ports (both originals default NoToneMapping).
-- 2026-07-27 — v0.9 amendments from wave-6 pair 4 (tsl-raging-sea +
-  tsl-compute-attractors-particles, both zero-review-fix — wave 6 closes at 49
-  examples): tone-mapping parity trap (fiber Canvas defaults ACESFilmic, originals
-  default NoToneMapping — compare against the LIVE original, not gallery
-  thumbnails); instancedBufferAttribute bullet generalized to all typed-TSL
-  creators (uniformArray<'vec3'> joins it). v0.8's compute bullets verified on
-  first use by the attractors port: applied verbatim, zero rediscovery.
-- 2026-07-27 — v0.8 amendments from wave-6 pair 3 — the first compute ports
-  (compute-texture + compute-particles, both zero-review-fix): the compute pattern
-  (kernels in useNodes, three dispatch cadences, no fiber dispatch hook — useCompute
-  is an upstream candidate); scoped-store WGSL-unsafety rule (new UPSTREAM B16:
-  fiber's `${scope}.${name}` separator is an illegal WGSL identifier char — found by
-  the smoke console assertion, invisible to tsc/build); ScopedStore type-widening +
-  setName-by-key notes.
-- 2026-07-27 — v0.7 amendments from wave-6 pair 2 (tsl-galaxy +
-  tsl-procedural-terrain, both zero-review-fix): `frustumCulled = false` rule for
-  positionNode-relocated geometry (latent upstream bug class, will recur across the
-  particle/compute cluster); Suspense-gate custom-node materials on async
-  Environment (three 0.185.1 IBL race, new UPSTREAM B15 — found and verified by the
-  terrain port, 12/12 clean loads after the fix). Uniform-driven `Loop` octave
-  count (terrain) confirmed the build-vs-run-time doc holds for loop bounds.
-- 2026-07-27 — v0.6 amendments from wave-6 pair 1 (loader-gltf-dispersion +
-  loader-gltf-compressed, both zero-review-fix): KTX2 `extendLoader` wiring became a
-  Layer 1 bullet (first compressed-asset port); cold-start transient broadened with
-  its second signature (one-time PMREM destroyed-texture console error, not just
-  readiness timeout); screenshot-script location note (repo root, not scratchpad).
-- 2026-07-27 — v0.5 amendments from the wave-5 glTF-extension cluster (8 ports:
-  lights-phong, materials-basic, camera-array, backdrop-area, loader-gltf-iridescence,
-  loader-gltf-sheen, loader-gltf-anisotropy, textures-anisotropy): screenshot-script
-  WebGPU launch note (channel 'chromium' + --enable-unsafe-webgpu — two agents
-  independently rediscovered it); UPSTREAM B13 evidence bumped to 4 hits (whole
-  UltraHDR cluster). Patterns confirmed without amendment: leva → plain material
-  accessor (TSL material reference nodes re-read per frame, no uniform plumbing —
-  sheen); createPortal scenes + `<fog attach="fog">` compose fine (textures-anisotropy).
-- 2026-07-27 — v0.1 seeded from example #1 (`animation-skinning-blending`), the v10
-  `.mdx` docs, and the M0/M1 gotcha log. Set the folder-pattern threshold at ~200
-  lines (example #1 landed at ~110). Established: titleblock is shell furniture;
-  readiness signal rides in DemoHelpers.
-- 2026-07-27 — v0.4 amendments from the M2 dry-run wave (5 ports: sky, rtt,
-  shadow-contact, tsl-halftone, sprites — all single-Sonnet): slug rule reworded
-  (prefix ALWAYS drops — sky port violated the ambiguous version); explicit `renderer`
-  prop rule; fiber-hooks-inside-Canvas rule; **WGSL identifier rule for useUniforms
-  scopes** (hyphens compile-error shaders at runtime; caught by the smoke console
-  assertion); Fn param cast (B10); scene.fogNode cast (B11); useThree renderer union
-  cast (B9); ciSkip exception-list mechanism; CameraControls gained pan lock.
-- 2026-07-27 — v0.3 amendments from gate port #3 (`postprocessing-bloom-emissive`,
-  Sonnet, zero human edits, cheaper than #2 — doc steering works): documented the two
-  pipeline-dynamism patterns (fiber useUniforms vs pass-owned uniform fields via
-  return-to-register) and the setupCB/MRT pointer. CameraControls gained
-  `minDistance`/`maxDistance` (gap flagged by the port; forwarded through DemoHelpers).
-- 2026-07-27 — v0.2 amendments from gate port #2 (`skinning-instancing`, Sonnet,
-  zero human edits): useRenderPipeline null-guard + uniform-not-closure rules;
-  `UniformNode` → `Node<'float'>` cast for the fiber typing gap; smoke-tier
-  cold-start allowance. Play-only-named-clips lesson from the Soldier TPose bug
-  folded into example #1 review: never `Object.values(actions).play()` blindly —
-  GLTFs ship rest/utility clips.
+- **2026-09-01 — v1.1, amended by the `postprocessing` restyle pilot.** 17 examples
+  restyled against v1.0; the doc changed where the pilot proved it wrong.
+  **§ Post-processing: three dynamism patterns → four, and the SELECTION RULE is now
+  stated** — that omission was the pilot's single biggest source of agent guessing.
+  `dof()` was **misfiled** under (c): it exposes public writable `*Node` fields like
+  every other node-class factory, so (b) is the default and (c) narrows to two verified
+  cases — `Fn()` helpers with no instance to assign onto (`depthAwareBlend`), and
+  int/uint fields `useUniforms` cannot produce (`godrays().raymarchSteps`). B29's wording
+  corrected: what freezes a knob is passing a **raw number**, not passing a uniform.
+  Added **(d) structural toggle** with an explicit carve-out from rule 5 — its read-back
+  cast is forced by `PassRecord = Record<string, any>` and is not a bug report (B30).
+  **Rule 1** gained the two-sibling-consumer case and the colocation→B18 hazard (found as
+  a live bug in `postprocessing-ao`). **Rule 7** now says markers are file-level.
+  Pilot result: 2641 → 2395 code lines (−9.3%), 131/131 smoke, 130 animates + 1 skipped.
+  **Rule 3 amended** (Dennis, same day): performance wins over declarative when an
+  instance is genuinely shared by many meshes — but it is a smell, so it ships with a
+  `REVIEW(shared-instance):` comment naming what the reviewer should weigh. Introduced
+  `REVIEW(<topic>):` as the repo's flag-for-human marker.
+- **2026-09-01 — v1.0, full rewrite.** Rebuilt against fiber alpha.4 + drei alpha.6 and
+  Dennis's style review of the first 16 hand-tuned examples. Added the **House style**
+  section as the primary contract. **Retired** the alpha.3-era rules alpha.4 fixed: the
+  `useThree` renderer cast (B9), the WGSL no-hyphen scope rule (B12), the scoped-store
+  ban (B16), the blanket "every suspending subtree needs its own Suspense" rule (B17),
+  and the `useRenderPipeline` null guard. **Inverted** the controls rule — controls now
+  live with their consumer, not the page root (the old rule was the direct cause of
+  corpus-wide prop drilling). Header schema slimmed and DIVERGENCE made optional. Added
+  folder categories, import hierarchy, ref naming, and the derive-types-from-elements
+  rule. Pre-v1.0 changelog (v0.1–v0.27) is in git history.

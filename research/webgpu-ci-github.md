@@ -82,7 +82,7 @@ a non-starter escape hatch, not a real option.
   dependency on Chrome-for-Testing installation with no WebGPU benefit.
 - Pass the flag list above via `launchOptions.args` in `playwright.config.ts`, plus
   `headless: false` and run the whole job under `xvfb-run --auto-servernum
-  --server-args="-screen 0 1920x1080x24"` (or `xvfb-action`/`Xvfb` GH Action). This is
+--server-args="-screen 0 1920x1080x24"` (or `xvfb-action`/`Xvfb` GH Action). This is
   the exact pattern in the Promaton/Dave Snider GPU-runner post and in
   barthpaleologue.github.io's WebGL/WebGPU Playwright setup post (`--use-gl=swiftshader`
   there, for WebGL; add the Vulkan/WebGPU flags above for WebGPU specifically).
@@ -103,7 +103,7 @@ a non-starter escape hatch, not a real option.
 
 - `test/e2e/puppeteer.js`: Puppeteer (not Playwright) launches Chromium with the flag
   set in §1, viewport 800×500 rendered at 2x then downsampled, JPEG @95%. Waits for
-  network-idle (2s) *and* polls a `window._renderFinished` flag every 100ms (configurable
+  network-idle (2s) _and_ polls a `window._renderFinished` flag every 100ms (configurable
   timeout, default 5s), plus a size-proportional parse-time buffer (~1s/MB) before
   starting that poll — belt-and-suspenders against both "canvas not ready" and "network
   still loading" flakiness.
@@ -140,7 +140,7 @@ a non-starter escape hatch, not a real option.
   the current file states came back mostly empty/stale in this session — the repo may
   have reorganized recently). **Recommend a direct clone-and-read** before final design
   since this is the single most relevant prior-art repo (same rendering stack) — worth a
-  follow-up pass with `gh repo clone pmndrs/examples` or `WebFetch` on the *current*
+  follow-up pass with `gh repo clone pmndrs/examples` or `WebFetch` on the _current_
   default branch tree once available.
 - Related: `pmndrs/playwright` — a maintained Docker image
   (`mcr.microsoft.com/playwright:v1.45.3-jammy`-based) used across pmndrs projects
@@ -200,12 +200,12 @@ Consistent findings across three.js, Promaton, and barthpaleologue:
    - three.js: per-pixel threshold 0.1, global 0.1% of pixels.
    - barthpaleologue's WebGL/WebGPU Playwright setup: 3% global pixel-diff ratio, 1%
      per-pixel threshold (looser — explicitly to tolerate anti-aliasing jitter).
-   Given SwiftShader (software rasterizer) will differ subtly from any real-GPU-rendered
-   golden image if goldens are ever regenerated on a GPU runner, **keep goldens and CI
-   renderer matched** — i.e., generate/update golden images using the exact same
-   software-rendering path (SwiftShader via Xvfb) that CI diffs against, not a
-   developer's real GPU locally. This avoids the single most common source of "works on
-   my machine, fails in CI" for this kind of test.
+     Given SwiftShader (software rasterizer) will differ subtly from any real-GPU-rendered
+     golden image if goldens are ever regenerated on a GPU runner, **keep goldens and CI
+     renderer matched** — i.e., generate/update golden images using the exact same
+     software-rendering path (SwiftShader via Xvfb) that CI diffs against, not a
+     developer's real GPU locally. This avoids the single most common source of "works on
+     my machine, fails in CI" for this kind of test.
 4. **Network idle + parse-time buffer** before starting the readiness poll (three.js's
    pattern) guards against premature capture on slower CI runners.
 5. **Restart browser on WebGPU device loss** (three.js does this explicitly) — a
@@ -221,8 +221,8 @@ scale plus standard Playwright/GH Actions patterns:
   (`vite build` or equivalent) and either uploads it as an artifact for shard jobs to
   download, or shard jobs share a single `serve` step if using a single long-running
   job with `--shard=N/M`. Matrix-based sharding (`strategy.matrix: shardIndex:
-  [1..N]`) is the standard GH Actions + Playwright pattern; `playwright test
-  --shard=${{matyrix.shardIndex}}/${{matrix.shardTotal}}` splits by test file, and
+[1..N]`) is the standard GH Actions + Playwright pattern; `playwright test
+--shard=${{matyrix.shardIndex}}/${{matrix.shardTotal}}` splits by test file, and
   results merge via Playwright's blob reporter. three.js uses a flatter matrix
   (`CI: [0,1,2,3,4]`) consumed by its own custom test runner script rather than
   Playwright's built-in `--shard`, since it's Puppeteer-based — either approach works;
@@ -270,8 +270,8 @@ In rough order of cost/complexity:
    GPU-less-Linux-CI problem specifically; would still hit the same SwiftShader-vs-GPU
    tradeoff unless the service specifically offers GPU-backed browser instances.
 4. **Cloudflare Workers Browser Rendering** — investigated per the task's "escape
-   hatch" framing, but it's the wrong tool here. Cloudflare Workers gained a *WebGPU
-   compute* binding in 2023 (GPU compute inside a Worker, unrelated to browser
+   hatch" framing, but it's the wrong tool here. Cloudflare Workers gained a _WebGPU
+   compute_ binding in 2023 (GPU compute inside a Worker, unrelated to browser
    rendering), and Browser Rendering (recently rebranded "Browser Run") is a managed
    headless-browser-as-a-service product for scraping/PDF/screenshot automation — it
    runs on Cloudflare's own headless Chrome fleet, which inherits the same
@@ -320,6 +320,7 @@ tree) and treat regeneration (`--make` a la three.js) as an explicit, reviewed a
 in a PR — never auto-committed by CI.
 
 Example harness needs (build once, shared across tiers):
+
 - A test-mode query param / global flag (`window.__e2eReady`, or reuse
   `pmndrs/examples`' CheesyCanvas pattern if it fits this repo's `<Canvas>` usage) set
   after first stable frame.
@@ -328,8 +329,8 @@ Example harness needs (build once, shared across tiers):
   delta when a `?e2e=1`-style flag is present.
 - A machine-readable exception list (three.js-style) for examples that are
   legitimately non-deterministic or expensive (webcam, physics, audio-reactive,
-  >60s render) — excluded from Tier 2/3 pixel diffing but still covered by Tier 1
-  smoke checks.
+  > 60s render) — excluded from Tier 2/3 pixel diffing but still covered by Tier 1
+  > smoke checks.
 
 ---
 

@@ -2,46 +2,48 @@
 // A visible, generic, toggleable component: infinite grid + camera controls,
 // with an inspector/perf slot to come. Examples opt out per-prop when the
 // original look demands it.
-import { Grid } from '@react-three/drei/webgpu'
-import { CameraControls, type CameraControlsProps } from './CameraControls'
-import { ReadinessSignal } from './ReadinessSignal'
+import { Grid } from '@react-three/drei/webgpu';
+import { CameraControls, type CameraControlsProps } from './CameraControls';
+import { ReadinessSignal } from './ReadinessSignal';
 
 export interface DemoHelpersProps {
   /** Infinite ground grid. Default on. */
-  grid?: boolean
+  grid?: boolean;
+  /** Vertical offset from the grid's default ground position. */
+  gridOffset?: number;
   /** camera-controls orbit controls. Default on. */
-  controls?: boolean
+  controls?: boolean;
   /** Orbit/look-at target. */
-  target?: [number, number, number]
+  target?: [number, number, number];
   /** Dolly-in limit, forwarded to CameraControls. */
-  minDistance?: number
+  minDistance?: number;
   /** Dolly-out limit, forwarded to CameraControls. */
-  maxDistance?: number
+  maxDistance?: number;
   /** Polar (vertical orbit) limits in radians, forwarded to CameraControls. */
-  minPolarAngle?: number
-  maxPolarAngle?: number
+  minPolarAngle?: number;
+  maxPolarAngle?: number;
   /** Orthographic zoom limits (OrbitControls' minZoom/maxZoom), forwarded. */
-  minZoom?: number
-  maxZoom?: number
+  minZoom?: number;
+  maxZoom?: number;
   /** Allow panning; false = orbit/dolly only. Forwarded to CameraControls. */
-  pan?: boolean
+  pan?: boolean;
   /** Continuous auto-orbit. Forwarded to CameraControls. */
-  autoRotate?: boolean
+  autoRotate?: boolean;
   /** OrbitControls-compatible auto-orbit speed (2 ≈ 30s/orbit). */
-  autoRotateSpeed?: number
+  autoRotateSpeed?: number;
   /** Escape hatch to the live camera-controls instance (fitToBox/setLookAt/…). */
-  controlsRef?: CameraControlsProps['controlsRef']
+  controlsRef?: CameraControlsProps['controlsRef'];
 }
 
 // Test-only escape hatch: `?nogrid` suppresses the grid regardless of props. CI uses
 // it for examples hitting the SwiftShader stall (Grid + custom node graph hangs
 // pipeline compile on software Vulkan — see docs/HANDOFF.md); also the bisection
 // probe for that bug. Read once at module load; not part of the component API.
-const NOGRID_OVERRIDE =
-  typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('nogrid')
+const NOGRID_OVERRIDE = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('nogrid');
 
 export function DemoHelpers({
   grid = true,
+  gridOffset = 0,
   controls = true,
   target,
   minDistance,
@@ -59,7 +61,7 @@ export function DemoHelpers({
     <>
       {grid && !NOGRID_OVERRIDE && (
         <Grid
-          position={[0, 0.002, 0]}
+          position={[0, 0.002 + gridOffset, 0]}
           infiniteGrid
           cellSize={0.5}
           sectionSize={2.5}
@@ -90,5 +92,5 @@ export function DemoHelpers({
       )}
       <ReadinessSignal />
     </>
-  )
+  );
 }

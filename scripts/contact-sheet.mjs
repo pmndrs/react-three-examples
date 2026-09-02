@@ -1,55 +1,93 @@
-// Contact-sheet generator (ROADMAP M1): captures every manifest example and
-// assembles screenshots/index.html for batch visual review. Review oracle is a
-// person (SPEC §10) — this is the artifact they review.
-// Usage: pnpm contact-sheet   (dev server must be running on :5173)
-import { mkdir, writeFile } from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
-import { chromium } from '@playwright/test'
-import examples from '../src/examples.json' with { type: 'json' }
+// Screenshot capture + contact sheet (ROADMAP M1). Review oracle is a person
+// (SPEC §10); this produces the artifact they review.
+//
+// Usage (dev server must be running on :5173):
+//   pnpm shot <slug> [slug...]   capture just those examples
+//   pnpm shot --changed          capture examples touched vs origin/main
+//   pnpm contact-sheet           capture everything (wave-end sweep)
+//
+// PORTING AGENTS: use this. Do not write a throwaway screenshot script — three
+// agents hung 10 minutes each on open-ended waits doing exactly that (HANDOFF
+// wave 13). Every capture here is hard-bounded and the browser always closes.
+import { mkdir, writeFile, readdir } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import { chromium } from '@playwright/test';
+import examples from '../src/examples.json' with { type: 'json' };
+import { selectSlugs } from './slugs.mjs';
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:5173'
-const OUT = new URL('../screenshots/', import.meta.url)
+const BASE = process.env.BASE_URL ?? 'http://localhost:5173';
+const OUT = new URL('../screenshots/', import.meta.url);
+// Hard ceiling per example. Nothing here may wait indefinitely.
+const READY_TIMEOUT_MS = Number(process.env.SHOT_TIMEOUT_MS ?? 60_000);
 
-await mkdir(OUT, { recursive: true })
+const selected = selectSlugs();
+const bySlug = new Map(examples.map((e) => [e.slug, e]));
+
+await mkdir(OUT, { recursive: true });
 
 const browser = await chromium.launch({
   channel: 'chromium',
   headless: process.platform !== 'linux', // Linux: headed under xvfb-run (see ci.yml)
   args: ['--enable-unsafe-webgpu'],
-})
-const page = await browser.newPage({ viewport: { width: 1280, height: 800 } })
+});
 
-const rows = []
-for (const { slug, title } of examples) {
-  process.stdout.write(`${slug} … `)
-  try {
-    await page.goto(`${BASE}/examples/${slug}`)
-    await page.waitForFunction(() => window.__exampleReady === true, undefined, {
-      timeout: 60_000,
-    })
-    // Readiness fires at animation t≈0; let motion get past the rest pose so
-    // animated scenes don't contact-sheet as static A-poses.
-    await page.waitForTimeout(800)
-    // Hide control-surface chrome — we're reviewing the scene, not the panel
-    // (leva overlays center-frame subjects at small viewports).
-    await page.addStyleTag({ content: '[class^="leva"], [class*=" leva"] { display: none !important; }' })
-    await page.locator('canvas').first().screenshot({ path: fileURLToPath(new URL(`${slug}.png`, OUT)) })
-    rows.push({ slug, title, ok: true })
-    console.log('ok')
-  } catch (error) {
-    rows.push({ slug, title, ok: false, error: String(error).slice(0, 200) })
-    console.log(`FAILED: ${String(error).slice(0, 120)}`)
+const results = [];
+try {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+  page.setDefaultTimeout(READY_TIMEOUT_MS);
+
+  for (const slug of selected) {
+    process.stdout.write(`${slug} … `);
+    try {
+      await page.goto(`${BASE}/examples/${slug}`);
+      // leva persists control values in localStorage across browser launches —
+      // without this a capture can show a PREVIOUS run's slider drags instead of
+      // the example's coded defaults (AGENTS.md §Verification).
+      await page.evaluate(() => localStorage.clear());
+      await page.reload();
+      await page.waitForFunction(() => window.__exampleReady === true, undefined, {
+        timeout: READY_TIMEOUT_MS,
+      });
+      // Readiness fires at animation t≈0; let motion get past the rest pose so
+      // animated scenes don't contact-sheet as static A-poses.
+      await page.waitForTimeout(800);
+      // Hide control-surface chrome — we're reviewing the scene, not the panel
+      // (leva overlays center-frame subjects at small viewports).
+      await page.addStyleTag({
+        content: '[class^="leva"], [class*=" leva"] { display: none !important; }',
+      });
+      await page
+        .locator('canvas')
+        .first()
+        .screenshot({ path: fileURLToPath(new URL(`${slug}.png`, OUT)) });
+      results.push({ slug, ok: true });
+      console.log('ok');
+    } catch (error) {
+      results.push({ slug, ok: false, error: String(error).slice(0, 200) });
+      console.log(`FAILED: ${String(error).slice(0, 120)}`);
+    }
   }
+} finally {
+  // Always closes, even on an unexpected throw — a leaked browser is what turns
+  // a failed capture into a hung agent.
+  await browser.close();
 }
-await browser.close()
 
-const cells = rows
-  .map(({ slug, title, ok, error }) =>
-    ok
-      ? `<figure><a href="${BASE}/examples/${slug}"><img src="${slug}.png" loading="lazy" alt="${title}"></a><figcaption>${title}<br><code>${slug}</code></figcaption></figure>`
-      : `<figure class="fail"><div class="err">${error}</div><figcaption>${title}<br><code>${slug}</code></figcaption></figure>`,
+// Rebuild the sheet from every PNG on disk, not just this run's slugs, so a
+// scoped `pnpm shot <slug>` refreshes one tile without discarding the rest.
+const captured = new Set((await readdir(OUT)).filter((f) => f.endsWith('.png')).map((f) => f.slice(0, -4)));
+const failedNow = new Map(results.filter((r) => !r.ok).map((r) => [r.slug, r.error]));
+
+const cells = examples
+  .filter(({ slug }) => captured.has(slug) || failedNow.has(slug))
+  .map(({ slug, title }) =>
+    failedNow.has(slug)
+      ? `<figure class="fail"><div class="err">${failedNow.get(slug)}</div><figcaption>${title}<br><code>${slug}</code></figcaption></figure>`
+      : `<figure><a href="${BASE}/examples/${slug}"><img src="${slug}.png" loading="lazy" alt="${title}"></a><figcaption>${title}<br><code>${slug}</code></figcaption></figure>`,
   )
-  .join('\n')
+  .join('\n');
+
+const okCount = results.filter((r) => r.ok).length;
 
 await writeFile(
   new URL('index.html', OUT),
@@ -63,9 +101,9 @@ await writeFile(
   code{color:#737373}
   .fail{border-color:#7f1d1d}.err{padding:1rem;color:#fca5a5;font-family:monospace;font-size:12px}
 </style>
-<h1>Contact sheet — ${rows.filter((r) => r.ok).length}/${rows.length} captured</h1>
+<h1>Contact sheet — ${captured.size} captured (last run: ${okCount}/${selected.length})</h1>
 <main>${cells}</main>`,
-)
+);
 
-console.log(`\nContact sheet: screenshots/index.html (${rows.filter((r) => r.ok).length}/${rows.length})`)
-if (rows.some((r) => !r.ok)) process.exitCode = 1
+console.log(`\nContact sheet: screenshots/index.html (this run ${okCount}/${selected.length})`);
+if (results.some((r) => !r.ok)) process.exitCode = 1;

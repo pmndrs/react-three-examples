@@ -1,13 +1,13 @@
-import type { ExampleMeta } from './manifest'
-import { exampleFilePaths } from './routes'
-import { githubBlobUrl, stackblitzUrl, vscodeDevUrl, codespacesUrl, claudeCodeUrl, cursorUrl } from './agentLinks'
+import type { ExampleMeta } from './manifest';
+import { exampleFilePaths } from './routes';
+import { githubBlobUrl, stackblitzUrl, vscodeDevUrl, codespacesUrl, claudeCodeUrl, cursorUrl } from './agentLinks';
 
 // Standard per-example titleblock — shell-level DOM overlay, not in-canvas furniture.
 // Driven entirely by examples.json (+ the routes glob, for the source path) so ports
 // get it for free. Sits on top of a live WebGPU canvas, so it stays small: a title
 // row plus one row of monogram "open in ..." buttons rather than a labeled toolbar.
 export function Titleblock({ meta }: { meta: ExampleMeta }) {
-  const path = exampleFilePaths.get(meta.slug)
+  const path = exampleFilePaths.get(meta.slug);
 
   return (
     <div className="pointer-events-none absolute bottom-4 left-4 z-10 flex max-w-xs flex-col gap-2 rounded-lg border border-white/10 bg-neutral-950/70 px-3.5 py-2.5 backdrop-blur-sm">
@@ -24,8 +24,7 @@ export function Titleblock({ meta }: { meta: ExampleMeta }) {
                 href={meta.original}
                 target="_blank"
                 rel="noreferrer"
-                className="pointer-events-auto underline-offset-2 hover:text-white hover:underline"
-              >
+                className="pointer-events-auto underline-offset-2 hover:text-white hover:underline">
                 three.js original ↗
               </a>
             )}
@@ -47,7 +46,7 @@ export function Titleblock({ meta }: { meta: ExampleMeta }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 
 function ActionLink({
@@ -56,10 +55,10 @@ function ActionLink({
   title,
   external = true,
 }: {
-  href: string
-  label: string
-  title: string
-  external?: boolean
+  href: string;
+  label: string;
+  title: string;
+  external?: boolean;
 }) {
   return (
     <a
@@ -67,9 +66,8 @@ function ActionLink({
       {...(external && { target: '_blank', rel: 'noreferrer' })}
       title={title}
       aria-label={title}
-      className="grid h-6 w-6 shrink-0 place-items-center rounded bg-white/10 text-[9px] font-bold tracking-tight text-white/70 transition-colors hover:bg-white/20 hover:text-white"
-    >
+      className="grid h-6 w-6 shrink-0 place-items-center rounded bg-white/10 text-[9px] font-bold tracking-tight text-white/70 transition-colors hover:bg-white/20 hover:text-white">
       {label}
     </a>
-  )
+  );
 }

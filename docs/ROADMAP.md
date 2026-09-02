@@ -4,6 +4,7 @@
 > "done when" so agent batches don't run ahead of an unvalidated foundation.
 
 ## M0 — Foundations
+
 - [x] Pick name: **r3f-examples** (may fold into pmndrs/examples someday)
 - [ ] Create `pmndrs/r3f-examples` repo (Dennis); MIT license; branch protection
 - [x] SPEC v1.0 finalized (2026-07-26)
@@ -25,6 +26,7 @@ adapter, not WebGL2 fallback), console clean. AGENTS.md + eslint scaffolds folde
 since they're seeded by example #1 anyway.
 
 ## M1 — Golden path (built together, Dennis + Fable)
+
 - [x] First example built pair-style → establishes the baseline: `<DemoHelpers>`
       (infinite grid, CameraControls, Inspector/perf slot, toggleable), ACES tonemap,
       header-comment schema, metadata shape (2026-07-26; Dennis look-review pending;
@@ -51,6 +53,7 @@ ports. Remaining for gate: **Dennis sign-off without touching the code.**
 signs off on it without needing to touch the code.
 
 ## M2 — Pilot batch: the 77 dual-renderer examples
+
 - [ ] Batch pipeline live (Workflow orchestration): port → self-verify → screenshot →
       Fable review → contact-sheet to Dennis
 - [ ] Co-evolution loop running: divergences → doc amendments or example fixes; lint
@@ -69,6 +72,7 @@ matrix) and their resolution is a later-phase item — do NOT block or bisect du
 the porting push.
 
 ## M3 — Full WebGPU set (~144 webgpu-only: compute, TSL, MRT…)
+
 - [ ] Stricter review tier for thin-training-data territory (TSL/compute)
 - [ ] `utils/` drei-gap components accumulate; each ships with an upstream brief
       (candidate drei component spec)
@@ -78,6 +82,7 @@ the porting push.
 **Done when:** 100% of teaching-value `webgpu_*` set merged (stress tests excluded).
 
 ## M4 — Launch
+
 - [ ] Patterns track (~12–20 app-scale examples); gallery site documented as meta-example
 - [ ] `AGENTS.md` finalized; `examples.json` complete; agent launch-task page + top-level
       HTML pointer on every example page; in-repo Claude Code skill; llms.txt generated
@@ -110,18 +115,21 @@ tier below demonstrably fails, and record the escalation.
   the launch pass (M4), not routine ports.
 
 ## Later phase: CI hardening (deferred from M2, 2026-07-27)
+
 - SwiftShader stall bisection (HANDOFF matrix + frame-count instrumentation ready)
 - Flip smoke back to blocking once the exception list is stable
 - Screenshot-regression tier 2 goldens (SwiftShader-path, changed-examples-only)
 - Manual real-GPU dispatch runner (tier 4)
 
 ## Post-launch (standing)
+
 - Monthly: re-diff three.js `files.json` → port new webgpu examples; three version bump PR
 - Drei gap-closure watch: when drei ships a stubbed component, migrate examples, retire util
 - Phase 2 curation: the 34 unique webgl examples + loader-gallery subset decision
 - Later phases: WebXR (@react-three/xr), webaudio, TSL editor tooling
 
 ## Open decisions
+
 - Repo name (suggestions with Dennis)
 - Loader gallery scope (all 47 formats vs representative subset) — decide at Phase 2
 - Asset hosting revisit when swapping in alternate models (then self-host)

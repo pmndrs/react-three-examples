@@ -1,0 +1,10 @@
+{
+  // Use the WORKSPACE TypeScript (pinned ^6 — see AGENTS.md stack pins), not the
+  // editor's bundled 5.x. Without this, VS Code's language server reads a TS 6
+  // project with a TS 5 server and reports phantom "cannot find name" errors on
+  // things that compile clean from the CLI (R3F JSX intrinsics, three types).
+  // `npx tsc --noEmit` is always the source of truth — if it disagrees with the
+  // editor, the editor is wrong.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}

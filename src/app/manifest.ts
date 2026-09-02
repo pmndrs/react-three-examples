@@ -1,4 +1,4 @@
-import examples from '../examples.json'
+import examples from '../examples.json';
 
 // The 15 example categories (AGENTS.md § Files, routes, manifest). Examples live
 // FLAT under src/examples/<slug>(/<slug>).tsx — there is no category folder to read
@@ -20,9 +20,9 @@ export const CATEGORIES = [
   'textures',
   'tsl',
   'volume',
-] as const
+] as const;
 
-export type Category = (typeof CATEGORIES)[number]
+export type Category = (typeof CATEGORIES)[number];
 
 // Human-readable label for a category slug — home page + sidebar group headers.
 export const categoryLabels: Record<Category, string> = {
@@ -41,7 +41,7 @@ export const categoryLabels: Record<Category, string> = {
   textures: 'Textures',
   tsl: 'TSL',
   volume: 'Volume',
-}
+};
 
 // Accent color per category (hex) — spread across the wheel in CATEGORIES order, used
 // by the home page's card grid and section headers. No screenshots are committed
@@ -63,25 +63,25 @@ export const categoryAccent: Record<Category, string> = {
   textures: '#d946ef',
   tsl: '#ec4899',
   volume: '#f43f5e',
-}
+};
 
 // Typed view over examples.json (SPEC: manifest is the agent/site backbone; schema
 // hardens through M1–M2). Optional fields appear as examples fill them in.
 export interface ExampleMeta {
-  slug: string
-  title: string
-  category: Category
-  tags: string[]
+  slug: string;
+  title: string;
+  category: Category;
+  tags: string[];
   /** URL of the original three.js example this ports. */
-  original?: string
+  original?: string;
   /** Asset/author attribution shown in the titleblock. */
-  credits?: string
+  credits?: string;
   /** CI smoke-tier exception (SPEC §10): reason this example can't run on SwiftShader. */
-  ciSkip?: string
+  ciSkip?: string;
   /** CI runs this example with ?nogrid (DemoHelpers grid suppressed) — SwiftShader
    * Grid+node-graph stall workaround that keeps smoke coverage. Value = reason. */
-  ciNoGrid?: string
+  ciNoGrid?: string;
 }
 
-export const exampleMeta = examples as ExampleMeta[]
-export const metaBySlug = new Map(exampleMeta.map((example) => [example.slug, example]))
+export const exampleMeta = examples as ExampleMeta[];
+export const metaBySlug = new Map(exampleMeta.map((example) => [example.slug, example]));

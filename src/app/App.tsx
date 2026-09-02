@@ -1,10 +1,10 @@
-import { Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router'
-import { Layout } from './Layout'
-import { exampleRoutes } from './routes'
-import { metaBySlug } from './manifest'
-import { Titleblock } from './Titleblock'
-import { Home } from './Home'
+import { Suspense } from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router';
+import { Layout } from './Layout';
+import { exampleRoutes } from './routes';
+import { metaBySlug } from './manifest';
+import { Titleblock } from './Titleblock';
+import { Home } from './Home';
 
 export function App() {
   return (
@@ -13,7 +13,7 @@ export function App() {
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           {exampleRoutes.map(({ slug, Component }) => {
-            const meta = metaBySlug.get(slug)
+            const meta = metaBySlug.get(slug);
             return (
               <Route
                 key={slug}
@@ -27,10 +27,10 @@ export function App() {
                   </div>
                 }
               />
-            )
+            );
           })}
         </Route>
       </Routes>
     </BrowserRouter>
-  )
+  );
 }

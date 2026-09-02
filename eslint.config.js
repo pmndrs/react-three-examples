@@ -1,10 +1,13 @@
 // Conventions lint (SPEC §7: mechanize everything mechanizable).
 // Custom corpus rules live in eslint-rules/ as a local flat-config plugin —
 // promoted from repeated review notes; prose in AGENTS.md is the fallback, not the rule.
-import tseslint from 'typescript-eslint'
-import reactHooks from 'eslint-plugin-react-hooks'
-import * as r3f from '@react-three/eslint-plugin'
-import requireHeaderBlock from './eslint-rules/require-header-block.js'
+import tseslint from 'typescript-eslint';
+import prettierConfig from 'eslint-config-prettier';
+import reactHooks from 'eslint-plugin-react-hooks';
+import * as r3f from '@react-three/eslint-plugin';
+import requireHeaderBlock from './eslint-rules/require-header-block.js';
+import importHierarchy from './eslint-rules/import-hierarchy.js';
+import noRetiredPatterns from './eslint-rules/no-retired-patterns.js';
 
 export default tseslint.config(
   { ignores: ['dist/', 'reference/', 'node_modules/', 'patches/', 'test-results/'] },
@@ -14,7 +17,13 @@ export default tseslint.config(
     plugins: {
       'react-hooks': reactHooks,
       '@react-three': r3f,
-      corpus: { rules: { 'require-header-block': requireHeaderBlock } },
+      corpus: {
+        rules: {
+          'require-header-block': requireHeaderBlock,
+          'import-hierarchy': importHierarchy,
+          'no-retired-patterns': noRetiredPatterns,
+        },
+      },
     },
     rules: {
       'react-hooks/rules-of-hooks': 'error',
@@ -22,6 +31,10 @@ export default tseslint.config(
       '@react-three/no-clone-in-loop': 'error',
       '@react-three/no-new-in-loop': 'warn',
       'corpus/require-header-block': 'error',
+      // Swept to zero 2026-09-02 (137 violations at introduction) — now an error.
+      'corpus/import-hierarchy': 'error',
+      // Swept to zero 2026-09-02 (36 sites) — now an error so they cannot come back.
+      'corpus/no-retired-patterns': 'error',
       // AGENTS.md Layer 1: single fiber entry, renderer-split drei subpaths only.
       'no-restricted-imports': [
         'error',
@@ -37,8 +50,7 @@ export default tseslint.config(
             },
             {
               name: '@react-three/drei',
-              message:
-                'Root drei is legacy-flavored. Import from @react-three/drei/webgpu or /core.',
+              message: 'Root drei is legacy-flavored. Import from @react-three/drei/webgpu or /core.',
             },
             {
               name: '@react-three/drei/legacy',
@@ -49,4 +61,6 @@ export default tseslint.config(
       ],
     },
   },
-)
+  // Last: switch off every stylistic rule prettier owns.
+  prettierConfig,
+);
