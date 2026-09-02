@@ -6,3 +6,6 @@ reference/
 test-results/
 playwright-report/
 screenshots/
+
+# Agent worktrees (created by the Claude Code Agent tool; never part of the repo).
+.claude/worktrees/
