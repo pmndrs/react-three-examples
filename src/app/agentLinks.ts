@@ -23,9 +23,12 @@ export function githubBlobUrl(path: string): string {
 // is the closest we can point it at (a flat single-file example's "folder" is just
 // src/examples, which still opens the right project; a folder-based example's own
 // slug folder is a precise target).
+// NOTE: StackBlitz has excellent subfolder support, but that is for MONOREPOS where the
+// subfolder is itself a project. This repo is ONE Vite app — `src/examples/<category>/`
+// has no package.json, so a /tree/<subfolder> link boots nothing. Open the repo root and
+// use `?file=` to focus the example instead.
 export function stackblitzUrl(path: string): string {
-  const dir = path.slice(0, path.lastIndexOf('/'));
-  return `https://stackblitz.com/github/${REPO_SLUG}/tree/${REPO_BRANCH}/${dir}`;
+  return `https://stackblitz.com/github/${REPO_SLUG}/tree/${REPO_BRANCH}?file=${encodeURIComponent(path)}`;
 }
 
 export function vscodeDevUrl(path: string): string {

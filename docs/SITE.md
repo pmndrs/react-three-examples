@@ -1,7 +1,7 @@
 # Site shell — contract
 
 > Companion to [SPEC.md](SPEC.md) §9 ("Site") and §6 ("Agent-facing design"). SPEC
-> states the *goals* for the shell; this doc records what was actually built and the
+> states the _goals_ for the shell; this doc records what was actually built and the
 > decisions behind it, the way AGENTS.md does for examples. Amend it here when the
 > shell changes shape — don't let it go stale the way a couple of other docs in this
 > repo did against a newer AGENTS.md (see "A note on doc drift" below).
@@ -56,25 +56,25 @@ Audited all 172 distinct tags across 131 examples (`scripts/generate-manifest.mj
 **Semantic duplicates merged** (same concept, two spellings — the ones that would
 have fragmented a tag-filter UI):
 
-| From | To | Occurrences |
-| --- | --- | --- |
-| `post-processing` | `postprocessing` | 10 |
-| `shadow` | `shadows` | 2 |
-| `texture` | `textures` | 3 |
-| `reflector` | `reflection` | 2 |
-| `glTF` | `gltf` | 1 |
-| `compressed-textures` | `compression` | 1 |
-| `data-3d-texture` | `3d-texture` | 1 |
-| `envmap` | `environment` | 2 |
-| `render-to-texture` | `render-target` | 5 |
-| `webgpu` | *(dropped)* | 1 — redundant, every example in this repo is WebGPU |
+| From                  | To               | Occurrences                                         |
+| --------------------- | ---------------- | --------------------------------------------------- |
+| `post-processing`     | `postprocessing` | 10                                                  |
+| `shadow`              | `shadows`        | 2                                                   |
+| `texture`             | `textures`       | 3                                                   |
+| `reflector`           | `reflection`     | 2                                                   |
+| `glTF`                | `gltf`           | 1                                                   |
+| `compressed-textures` | `compression`    | 1                                                   |
+| `data-3d-texture`     | `3d-texture`     | 1                                                   |
+| `envmap`              | `environment`    | 2                                                   |
+| `render-to-texture`   | `render-target`  | 5                                                   |
+| `webgpu`              | _(dropped)_      | 1 — redundant, every example in this repo is WebGPU |
 
 **Casing normalized** (camelCase / smashed-compound outliers, kebab-cased to match
 the other ~165 tags — e.g. `pointlight` → `point-light`, `lightsNode` →
 `lights-node`, `cameraHelper` → `camera-helper`; 15 tags, see `TAG_RENAME` for the
 full list).
 
-Net: **172 → 162 distinct tags.** Deliberately *not* merged, even though they look
+Net: **172 → 162 distinct tags.** Deliberately _not_ merged, even though they look
 similar at a glance: general/specific pairs that are a real, useful pattern
 throughout the existing vocabulary (`environment` + `hdr`, `loader` + `gltf`/`obj`/
 `ply`/`fbx`, `lines` + `line2`) — collapsing those would lose a real filter
@@ -99,7 +99,7 @@ fuzzy matching, no index; 131 items is nowhere near where that would matter
 (`Layout.tsx`, `useMemo`d on the query string). Matching groups collapse to zero
 entries rather than staying open empty. The active example's `NavLink` gets a ref
 that's scrolled into view (`scrollIntoView({ block: 'nearest' })`) on navigation —
-deliberately *not* on every keystroke, so typing a search query doesn't yank the
+deliberately _not_ on every keystroke, so typing a search query doesn't yank the
 scroll position around.
 
 ## Action row: what shipped and what didn't
@@ -107,14 +107,14 @@ scroll position around.
 Per `research/agent-open-buttons.md`'s v1 recommendation (also independently listed
 in `docs/ROADMAP.md`'s M2 site bullet):
 
-| Button | Mechanism | Why |
-| --- | --- | --- |
-| **GH** (source) | `github.com/pmndrs/react-three-examples/blob/main/<path>` | Table stakes, zero auth, always works. |
-| **SB** (StackBlitz) | `stackblitz.com/github/<repo>/tree/main/<dir>` | Best subfolder support of anything surveyed; zero auth. |
-| **VS** (vscode.dev) | `vscode.dev/github/<repo>/blob/main/<path>` | Zero-auth, zero-install code viewer; explicitly called out in the task brief. |
-| **CS** (Codespaces) | `codespaces.new/<repo>?quickstart=1` | Official badge pattern, near-zero cost to add alongside StackBlitz. |
-| **CC** (Claude Code) | `claude.ai/code?repositories=<repo>&prompt=<...>` | Only mechanism with a documented, stable query string carrying *both* a real prompt and repo targeting. |
-| **CX** (Cursor) | `cursor://anysphere.cursor-deeplink/prompt?text=<...>` | Best-effort: the deeplink is prompt-text-only (no repo/path params), so the clone URL and target path are spelled out in the prompt text itself. Rendered without `target="_blank"` — a custom protocol link paired with `target="_blank"` opens a stray blank tab in some browsers alongside the OS-level confirmation prompt. |
+| Button               | Mechanism                                                 | Why                                                                                                                                                                                                                                                                                                                             |
+| -------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **GH** (source)      | `github.com/pmndrs/react-three-examples/blob/main/<path>` | Table stakes, zero auth, always works.                                                                                                                                                                                                                                                                                          |
+| **SB** (StackBlitz)  | `stackblitz.com/github/<repo>/tree/main/<dir>`            | Best subfolder support of anything surveyed; zero auth.                                                                                                                                                                                                                                                                         |
+| **VS** (vscode.dev)  | `vscode.dev/github/<repo>/blob/main/<path>`               | Zero-auth, zero-install code viewer; explicitly called out in the task brief.                                                                                                                                                                                                                                                   |
+| **CS** (Codespaces)  | `codespaces.new/<repo>?quickstart=1`                      | Official badge pattern, near-zero cost to add alongside StackBlitz.                                                                                                                                                                                                                                                             |
+| **CC** (Claude Code) | `claude.ai/code?repositories=<repo>&prompt=<...>`         | Only mechanism with a documented, stable query string carrying _both_ a real prompt and repo targeting.                                                                                                                                                                                                                         |
+| **CX** (Cursor)      | `cursor://anysphere.cursor-deeplink/prompt?text=<...>`    | Best-effort: the deeplink is prompt-text-only (no repo/path params), so the clone URL and target path are spelled out in the prompt text itself. Rendered without `target="_blank"` — a custom protocol link paired with `target="_blank"` opens a stray blank tab in some browsers alongside the OS-level confirmation prompt. |
 
 **Explicitly not built** (both per the research doc):
 
@@ -125,7 +125,7 @@ in `docs/ROADMAP.md`'s M2 site bullet):
   July 2026. Building against it would ship a dead button on day one.
 
 `exampleFilePaths` in `routes.ts` is the single source for "where does this example's
-code live" — StackBlitz opens the *containing folder* of that path (its importer
+code live" — StackBlitz opens the _containing folder_ of that path (its importer
 takes a directory; for a flat single-file example that's `src/examples/`, for a
 folder-based example it's that example's own folder), GitHub/vscode.dev open the file
 directly.
