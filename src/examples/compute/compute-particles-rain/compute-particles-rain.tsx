@@ -47,8 +47,7 @@ export default function ComputeParticlesRain() {
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [40, 8, 0], fov: 60, near: 0.1, far: 110 }}
-    >
+      camera={{ position: [40, 8, 0], fov: 60, near: 0.1, far: 110 }}>
       <directionalLight position={[3, 17, 17]} intensity={0.5} />
       <ambientLight color="#111111" />
 

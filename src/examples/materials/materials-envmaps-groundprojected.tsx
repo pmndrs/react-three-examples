@@ -68,15 +68,7 @@ const AO_URL = `${ASSET_BASE}models/gltf/ferrari_ao.png`
 // The HDR is both the scene's IBL environment (equirect, as loaded) and — converted
 // to a cube map to avoid visual artifacts at the skybox's poles — the source the
 // ground-projected sky dome samples per fragment.
-function GroundedEnvironment({
-  grounded,
-  height,
-  radius,
-}: {
-  grounded: boolean
-  height: number
-  radius: number
-}) {
+function GroundedEnvironment({ grounded, height, radius }: { grounded: boolean; height: number; radius: number }) {
   // Creator hook BEFORE the suspending hooks below (B18: deferred to the
   // post-suspense re-render, the store write would land after siblings subscribed).
   const { uHeight, uRadius } = useUniforms(() => ({ uHeight: 15, uRadius: 100 }))
@@ -114,14 +106,7 @@ function GroundedEnvironment({
   }, [cubeRT, renderer, equirect])
 
   const colorNode = useMemo(
-    () =>
-      cubeTexture(
-        cubeRT.texture,
-        getGroundProjectedNormal(
-          uRadius,
-          uHeight,
-        ),
-      ),
+    () => cubeTexture(cubeRT.texture, getGroundProjectedNormal(uRadius, uHeight)),
     [cubeRT, uRadius, uHeight],
   )
 
@@ -208,8 +193,7 @@ export default function MaterialsEnvmapsGroundprojected() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [-20, 7, 20], fov: 40, near: 1, far: 1000 }}
-    >
+      camera={{ position: [-20, 7, 20], fov: 40, near: 1, far: 1000 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

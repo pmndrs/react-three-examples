@@ -8,9 +8,7 @@ import tailwindcss from '@tailwindcss/vite'
 // our code imports /webgpu — without this alias BOTH files load, creating two fiber
 // runtimes (two React contexts, two reconcilers) and crashing every drei hook.
 // TODO(upstream): fiber's root entry should re-export a shared chunk; drop this once fixed.
-const fiberWebgpu = fileURLToPath(
-  new URL('./node_modules/@react-three/fiber/dist/webgpu/index.mjs', import.meta.url),
-)
+const fiberWebgpu = fileURLToPath(new URL('./node_modules/@react-three/fiber/dist/webgpu/index.mjs', import.meta.url))
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],

@@ -57,17 +57,11 @@ export default function VolumeCausticsExample() {
       renderer={{ toneMapping: NoToneMapping }}
       shadows
       background="#000000"
-      camera={{ position: [-0.7, 0.2, 0.2], fov: 25, near: 0.025, far: 5 }}
-    >
+      camera={{ position: [-0.7, 0.2, 0.2], fov: 25, near: 0.025, far: 5 }}>
       <Suspense fallback={null}>
         <VolumeCaustics />
       </Suspense>
-      <DemoHelpers
-        grid={false}
-        target={[0, 0.02, -0.05]}
-        maxDistance={1}
-        controlsRef={cameraControlsRef}
-      />
+      <DemoHelpers grid={false} target={[0, 0.02, -0.05]} maxDistance={1} controlsRef={cameraControlsRef} />
     </Canvas>
   )
 }

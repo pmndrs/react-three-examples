@@ -44,11 +44,7 @@ export function SphereCloud() {
     () =>
       Array.from({ length: 20 }, () => ({
         color: new Color().setHSL(Math.random(), 1.0, 0.3),
-        position: [Math.random() * 4 - 2, Math.random() * 4 - 2, Math.random() * 4 - 2] as [
-          number,
-          number,
-          number,
-        ],
+        position: [Math.random() * 4 - 2, Math.random() * 4 - 2, Math.random() * 4 - 2] as [number, number, number],
         scale: Math.random() * 0.3 + 0.1,
       })),
     [],
@@ -57,14 +53,7 @@ export function SphereCloud() {
   return (
     <>
       {spheres.map((sphere, i) => (
-        <mesh
-          key={i}
-          geometry={geometry}
-          position={sphere.position}
-          scale={sphere.scale}
-          castShadow
-          receiveShadow
-        >
+        <mesh key={i} geometry={geometry} position={sphere.position} scale={sphere.scale} castShadow receiveShadow>
           <meshLambertMaterial color={sphere.color} />
         </mesh>
       ))}

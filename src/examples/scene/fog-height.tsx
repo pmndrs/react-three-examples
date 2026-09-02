@@ -109,8 +109,7 @@ export default function FogHeight() {
       // default would mute the pastel palette (AGENTS.md tone-mapping parity rule).
       renderer={{ toneMapping: NoToneMapping }}
       background={fogColor}
-      camera={{ position: [20, 10, 25], fov: 45, near: 1, far: 600 }}
-    >
+      camera={{ position: [20, 10, 25], fov: 45, near: 1, far: 600 }}>
       <HeightFog fogColor={fogColor} />
       <BoxField />
       <directionalLight color="#ffc0cb" intensity={2} position={[-10, 10, 10]} />

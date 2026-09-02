@@ -41,8 +41,7 @@ import { DemoHelpers } from '../../utils/DemoHelpers'
 // ObjectLoader resolves the JSON's relative image URLs (lightmap-ao-shadow.png,
 // rocks.jpg, stone.jpg) against the JSON's own directory — hotlinking the .json is
 // enough to pull the whole texture set from the pinned CDN.
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/json/lightmap/lightmap.json'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/json/lightmap/lightmap.json'
 
 // The original's DirectionalLight color; the skydome's top color copies it.
 const LIGHT_COLOR = '#d5deff'
@@ -98,20 +97,14 @@ export default function MaterialsLightmap() {
     <Canvas
       // NoToneMapping = original's renderer default (see header DEMONSTRATES).
       renderer={{ toneMapping: NoToneMapping }}
-      camera={{ position: [700, 200, -500], fov: 40, near: 1, far: 10000 }}
-    >
+      camera={{ position: [700, 200, -500], fov: 40, near: 1, far: 10000 }}>
       <directionalLight color={LIGHT_COLOR} position={[300, 250, -500]} />
       <Skydome />
       {/* B17 gate: the JSON fetch suspends; never let that reach Canvas's boundary. */}
       <Suspense fallback={null}>
         <LightmapModel intensity={lightMapIntensity} />
       </Suspense>
-      <DemoHelpers
-        grid={false}
-        maxPolarAngle={0.9 * (Math.PI / 2)}
-        minDistance={100}
-        maxDistance={2500}
-      />
+      <DemoHelpers grid={false} maxPolarAngle={0.9 * (Math.PI / 2)} minDistance={100} maxDistance={2500} />
     </Canvas>
   )
 }

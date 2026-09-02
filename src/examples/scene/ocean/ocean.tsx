@@ -65,8 +65,7 @@ export default function Ocean() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [30, 30, 100], fov: 55, near: 1, far: 20000 }}
-    >
+      camera={{ position: [30, 30, 100], fov: 55, near: 1, far: 20000 }}>
       <Suspense fallback={null}>
         <OceanSky />
         {/* Inside the same gate: first commit must coincide with the env bake (B15). */}

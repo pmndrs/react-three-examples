@@ -41,11 +41,7 @@ export function ValleyFog() {
 
     // The noise lifts and drops the top of the band so it breaks into wisps.
     const bandTop = fogTop.add(fogNoise.sub(0.7).mul(22))
-    const groundFogArea = bandTop
-      .sub(positionWorld.y)
-      .div(bandTop.sub(fogBase))
-      .saturate()
-      .mul(0.98)
+    const groundFogArea = bandTop.sub(positionWorld.y).div(bandTop.sub(fogBase)).saturate().mul(0.98)
 
     // The valley band plus a distance haze, so the far peaks dissolve into the grey too.
     const fogArea = groundFogArea.oneMinus().mul(densityFogFactor(fogHaze).oneMinus()).oneMinus()

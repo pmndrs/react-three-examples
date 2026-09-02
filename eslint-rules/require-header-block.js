@@ -42,11 +42,7 @@ export default {
     return {
       Program(node) {
         const first = context.sourceCode.getAllComments()[0]
-        const ok =
-          first &&
-          first.type === 'Block' &&
-          first.loc.start.line <= 2 &&
-          first.value.includes('DEMONSTRATES')
+        const ok = first && first.type === 'Block' && first.loc.start.line <= 2 && first.value.includes('DEMONSTRATES')
         if (!ok) context.report({ node, messageId: 'missingHeader' })
       },
     }

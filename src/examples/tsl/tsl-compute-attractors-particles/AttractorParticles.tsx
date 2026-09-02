@@ -18,7 +18,8 @@ import {
   uint,
   uniformArray,
   vec3,
-  vec4 } from 'three/tsl'
+  vec4,
+} from 'three/tsl'
 import { AdditiveBlending, Vector3 } from 'three/webgpu'
 
 import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
@@ -82,7 +83,8 @@ export function AttractorParticles({ attractorPositions }: AttractorParticlesPro
     uScale,
     uBoundHalfExtent,
     uColorA,
-    uColorB } = useUniforms(
+    uColorB,
+  } = useUniforms(
     {
       uAttractorMass: 10 ** attractorMassExponent,
       uParticleGlobalMass: 10 ** particleGlobalMassExponent,
@@ -93,7 +95,8 @@ export function AttractorParticles({ attractorPositions }: AttractorParticlesPro
       uScale: scale,
       uBoundHalfExtent: boundHalfExtent,
       uColorA: colorA,
-      uColorB: colorB },
+      uColorB: colorB,
+    },
     'attractorParticles', // WGSL-identifier rule: camelCase scope, never kebab-case
   )
   // The particle state, GPU-only. UNSCOPED on purpose: scoped useBuffers names
@@ -102,7 +105,8 @@ export function AttractorParticles({ attractorPositions }: AttractorParticlesPro
   // are bare identifiers, so they stay WGSL-legal; prefix them instead.
   const { attractorParticlePositions, attractorParticleVelocities } = useBuffers(() => ({
     attractorParticlePositions: instancedArray(PARTICLE_COUNT, 'vec3'),
-    attractorParticleVelocities: instancedArray(PARTICLE_COUNT, 'vec3') }))
+    attractorParticleVelocities: instancedArray(PARTICLE_COUNT, 'vec3'),
+  }))
 
   // All node graphs built exactly once; we close over the TYPED useBuffers
   // returns instead of reading back through the creator-state ScopedStore
@@ -182,11 +186,7 @@ export function AttractorParticles({ attractorPositions }: AttractorParticlesPro
           const direction = toAttractor.normalize()
 
           // gravity
-          const gravityStrength = particleMass
-            .mul(uAttractorMass)
-            .mul(GRAVITY_CONSTANT)
-            .div(distance.pow(2))
-            .toVar()
+          const gravityStrength = particleMass.mul(uAttractorMass).mul(GRAVITY_CONSTANT).div(distance.pow(2)).toVar()
           force.addAssign(direction.mul(gravityStrength))
 
           // spinning
@@ -221,7 +221,8 @@ export function AttractorParticles({ attractorPositions }: AttractorParticlesPro
         uAttractorPositions,
         spritePositionNode: attractorParticlePositions.toAttribute(),
         spriteColorNode: vec4(mix(uColorA, uColorB, colorMix), 1),
-        spriteScaleNode: particleMassMultiplier.mul(uScale) }
+        spriteScaleNode: particleMassMultiplier.mul(uScale),
+      }
     })
 
   // ONCE at mount + on every leva Reset press: (re)seed the buffers. Sync

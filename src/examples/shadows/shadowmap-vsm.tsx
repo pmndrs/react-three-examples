@@ -178,8 +178,7 @@ export default function ShadowmapVsm() {
       renderer={{ toneMapping: NoToneMapping }}
       shadows="variance"
       background="#222244"
-      camera={{ position: [0, 10, 30], fov: 45, near: 1, far: 1000 }}
-    >
+      camera={{ position: [0, 10, 30], fov: 45, near: 1, far: 1000 }}>
       <fog attach="fog" args={['#222244', 50, 100]} />
       <Lights speed={speed} />
       <TorusKnot speed={speed} />

@@ -28,7 +28,8 @@ export function TorusKnot({ spinSpeed }: TorusKnotProps) {
   const { threshold } = useUniforms({ threshold: maskThreshold }, 'shadowmapMask')
 
   const { maskNode } = useNodes(() => ({
-    maskNode: mx_fractal_noise_float(positionLocal.mul(0.1)).x.greaterThan(threshold) }))
+    maskNode: mx_fractal_noise_float(positionLocal.mul(0.1)).x.greaterThan(threshold),
+  }))
 
   useFrame(({ delta }) => {
     const mesh = meshRef.current

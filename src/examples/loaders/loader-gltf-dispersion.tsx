@@ -47,8 +47,7 @@ import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DispersionTest.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DispersionTest.glb'
 const HDR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/pedestrian_overpass_1k.hdr'
 
@@ -70,8 +69,7 @@ export default function LoaderGltfDispersion() {
   return (
     <Canvas
       renderer={{ toneMapping: ReinhardToneMapping }}
-      camera={{ position: [0.1, 0.05, 0.15], fov: 45, near: 0.01, far: 5 }}
-    >
+      camera={{ position: [0.1, 0.05, 0.15], fov: 45, near: 0.01, far: 5 }}>
       {/* One Suspense over environment + model: serializes the Environment HDR
           resolve ahead of the model mount. Without it this example intermittently
           hit the PMREM destroyed-texture race under full-suite contention (the

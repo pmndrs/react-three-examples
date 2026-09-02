@@ -4,7 +4,20 @@
 // state.
 import { useMemo, useRef } from 'react'
 import type { MutableRefObject } from 'react'
-import { blendOverlay, checker, color, grayscale, hue, oscSine, saturation, screenUV, uv, vec3, viewportSafeUV, viewportSharedTexture } from 'three/tsl'
+import {
+  blendOverlay,
+  checker,
+  color,
+  grayscale,
+  hue,
+  oscSine,
+  saturation,
+  screenUV,
+  uv,
+  vec3,
+  viewportSafeUV,
+  viewportSharedTexture,
+} from 'three/tsl'
 import { MathUtils } from 'three/webgpu'
 import type { Group, Node } from 'three/webgpu'
 
@@ -24,9 +37,7 @@ function usePortalConfigs() {
         { backdropNode: blendOverlay(viewportSharedTexture().rgb, checker(uv().mul(10))) },
         { backdropNode: viewportSharedTexture(viewportSafeUV(screenUV.mul(40).floor().div(40))) },
         {
-          backdropNode: viewportSharedTexture(viewportSafeUV(screenUV.mul(80).floor().div(80))).add(
-            color(0x0033ff),
-          ),
+          backdropNode: viewportSharedTexture(viewportSafeUV(screenUV.mul(80).floor().div(80))).add(color(0x0033ff)),
         },
         { backdropNode: vec3(0, 0, viewportSharedTexture().b) },
       ] satisfies { backdropNode: Node; backdropAlphaNode?: Node }[],

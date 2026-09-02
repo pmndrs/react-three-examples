@@ -60,10 +60,7 @@ export function CameraControls({
   // Construct WITHOUT the element; attach via connect/disconnect in a symmetric effect.
   // (Disposing a useMemo'd instance in an effect cleanup breaks under StrictMode: the
   // simulated unmount disposes the instance the memo will reuse on remount.)
-  const controls = useMemo(
-    () => new CameraControlsImpl(camera as THREE.PerspectiveCamera),
-    [camera],
-  )
+  const controls = useMemo(() => new CameraControlsImpl(camera as THREE.PerspectiveCamera), [camera])
 
   useEffect(() => {
     controls.connect(domElement)

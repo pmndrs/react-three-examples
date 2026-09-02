@@ -150,8 +150,7 @@ function VideoGrid() {
             meshRefs.current[i] = m
           }}
           geometry={cell.geometry}
-          position={cell.position}
-        >
+          position={cell.position}>
           <meshPhongNodeMaterial map={texture} />
         </mesh>
       ))}

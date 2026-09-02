@@ -32,6 +32,7 @@ used for version numbers or API shapes.
   of 2026-07-25), it reads as active, serious pre-release development rather than a stalled effort.
 
 Sources:
+
 - https://registry.npmjs.org/@react-three/fiber (dist-tags, version times)
 - https://github.com/pmndrs/react-three-fiber/releases
 - https://github.com/pmndrs/react-three-fiber/releases/tag/v10.0.0-alpha.1
@@ -42,8 +43,8 @@ Sources:
 ## 2. Who's driving it
 
 Notable for this project: the v10 effort was **initiated and is being driven by DennisSmolek**
-(per the `v10.0.0-alpha.1` GitHub Release notes: *"late last year @DennisSmolek took the initiative
-to do it all himself"*, PR #3620 "Start of the v10 Branch"), and essentially every commit/PR merged
+(per the `v10.0.0-alpha.1` GitHub Release notes: _"late last year @DennisSmolek took the initiative
+to do it all himself"_, PR #3620 "Start of the v10 Branch"), and essentially every commit/PR merged
 into the `v10` branch since is authored by DennisSmolek. The pinned announcement discussion
 (https://github.com/pmndrs/react-three-fiber/discussions/3665, posted by `krispya` 2026-01-17) also
 credits DennisSmolek. Worth knowing given this project's SPEC.md already names "promoting the v10
@@ -56,13 +57,14 @@ Source: `docs/migration/v10.mdx` on the `v10` branch
 fetched and verified 2026-07-26.
 
 ### Renderer-agnostic core
+
 - **`state.gl` → `state.renderer`.** `gl` still works but logs a deprecation warning.
 - **Three entry points**, matched to renderer needs:
-  | Import | Renderer | Notes |
-  |---|---|---|
-  | `@react-three/fiber` | WebGL (WebGPU-ready) | default, backwards compatible |
-  | `@react-three/fiber/legacy` | WebGLRenderer only | smaller bundle, no deprecation warnings |
-  | `@react-three/fiber/webgpu` | WebGPURenderer | includes WebGPU/TSL hooks, auto-`extend()`s the WebGPU node-material namespace |
+  | Import                      | Renderer             | Notes                                                                          |
+  | --------------------------- | -------------------- | ------------------------------------------------------------------------------ |
+  | `@react-three/fiber`        | WebGL (WebGPU-ready) | default, backwards compatible                                                  |
+  | `@react-three/fiber/legacy` | WebGLRenderer only   | smaller bundle, no deprecation warnings                                        |
+  | `@react-three/fiber/webgpu` | WebGPURenderer       | includes WebGPU/TSL hooks, auto-`extend()`s the WebGPU node-material namespace |
 - **Opt into WebGPU with a single prop** — no manual async init required:
   ```tsx
   <Canvas renderer>              {/* shorthand, WebGPU with defaults */}
@@ -73,17 +75,19 @@ fetched and verified 2026-07-26.
 - Your existing v9 WebGL code is stated to keep working unchanged; WebGPU is opt-in.
 
 ### Scheduler / `useFrame` rewrite
+
 - Whole new scheduler, decoupled from `<Canvas>` (can run standalone/outside R3F tree, shareable
   across multiple canvases in one RAF loop).
 - `priority`-number ordering replaced by named **phases**: `useFrame(fn, { phase: 'physics' })`, plus
   `before`/`after` constraints, per-hook `fps` throttling, and `pause()`/`resume()` controls returned
   from `useFrame`.
-- **Breaking:** registering *any* callback on the `'render'` phase now takes over rendering entirely
+- **Breaking:** registering _any_ callback on the `'render'` phase now takes over rendering entirely
   (v9 required a nonzero `priority` for this) — a likely gotcha for anyone porting v9 patterns.
 - **Breaking:** `state.clock` (`THREE.Clock`) removed. Use `state.time` (ms, RAF timestamp),
   `state.delta` (s), `state.elapsed` (s) directly from frame state instead.
 
 ### Canvas prop changes
+
 - Removed: `legacy`, `linear`, `flat`, `colorSpace`, `toneMapping` — now configured via
   `gl={...}` (legacy) or `renderer={...}` (WebGPU) directly.
 - New first-class `background` prop replacing the `<color attach="background">` JSX pattern —
@@ -92,6 +96,7 @@ fetched and verified 2026-07-26.
 - New `forceEven` prop (Safari workaround — rounds canvas dims to even numbers).
 
 ### React support
+
 - React `>=19.0 <19.3` required (peer dep on the `v10` branch) — no React 18 support in v10.
 
 Full doc: https://raw.githubusercontent.com/pmndrs/react-three-fiber/v10/docs/migration/v10.mdx
@@ -104,12 +109,14 @@ Source: `docs/webgpu/overview.mdx`, `docs/webgpu/tsl-hooks.mdx`, `docs/webgpu/re
 ### Canonical Canvas pattern
 
 ```tsx
-import { Canvas } from '@react-three/fiber/webgpu'   // auto-extends node materials into JSX
+import { Canvas } from '@react-three/fiber/webgpu' // auto-extends node materials into JSX
 import { positionLocal, normalLocal } from 'three/tsl'
 
 function App() {
   return (
-    <Canvas renderer>                 {/* WebGPURenderer, R3F awaits init() internally */}
+    <Canvas renderer>
+      {' '}
+      {/* WebGPURenderer, R3F awaits init() internally */}
       <mesh>
         <sphereGeometry />
         <meshStandardNodeMaterial positionNode={positionLocal.add(normalLocal.mul(0.1))} />
@@ -120,6 +127,7 @@ function App() {
 ```
 
 Key points:
+
 - **No manual `gl={(props) => new WebGPURenderer(props)}` + manual `await init()` factory is needed
   in v10** — that was the v9-era pattern (still works as a fallback, but has a known race — see §6).
   In v10 the `renderer` prop (boolean shorthand, params object, or a pre-built instance) is the
@@ -131,6 +139,7 @@ Key points:
 - `useThree()`/`useFrame()` expose the renderer at `state.renderer` (not `state.gl`).
 
 ### TSL-specific hooks (only exported from the `/webgpu` entry point)
+
 - `useUniform(name, value)` / `useUniforms(creatorOrScopeOrFn, scope?)` — create-if-not-exists,
   shared-by-name uniforms in R3F's root store; scoping to avoid name collisions; Leva-friendly
   (plain objects auto-convert to `Vector2/3`, deep-compare avoids redundant GPU writes).
@@ -148,6 +157,7 @@ Key points:
   exception noted above. Can be disabled repo-wide via `<Canvas hmr={false}>`.
 
 ### TSL build-time vs run-time gotcha (worth putting in the project's conventions doc)
+
 The docs are explicit that this is the #1 mental-model trap: JS `if/for` inside a node-creator
 callback runs **once at graph-build time** and won't react to uniform changes; use TSL's own
 `If()/Loop()/select()` for GPU-side branching that reacts to uniform changes every frame. Also:
@@ -156,6 +166,7 @@ prefer TSL built-ins (`cameraPosition`, `time`, etc.) over hand-rolled uniforms 
 have no TSL built-in equivalent.
 
 Sources:
+
 - https://raw.githubusercontent.com/pmndrs/react-three-fiber/v10/docs/webgpu/overview.mdx
 - https://raw.githubusercontent.com/pmndrs/react-three-fiber/v10/docs/webgpu/tsl-hooks.mdx
 - https://raw.githubusercontent.com/pmndrs/react-three-fiber/v10/docs/webgpu/render-pipeline.mdx
@@ -192,14 +203,14 @@ site redeploys.
 ## 6. Known gaps / open risks (from open issues + branch state, verified 2026-07-26)
 
 - **Open bug — async `gl` factory race (issue #3782, filed 2026-07-13, still open):**
-  *"Re-render during async gl factory invokes it twice and corrupts the renderer."* If a component
+  _"Re-render during async gl factory invokes it twice and corrupts the renderer."_ If a component
   re-renders while a `gl={async (props) => { const r = new WebGPURenderer(props); await r.init(); return r }}`
   factory is still pending, `configure()` can run a second time before the first await resolves,
   creating **two renderers on one canvas** — manifests as per-frame `GPUValidationError` (mismatched
   depth/stencil attachment sizes) and, worse, "silent WebGPU canvas death" on client-side navigation
   in static exports (adapter request never reached on the second pass). Reporter says a fix (serialize
   `configure()`) is written with a regression test and pending a PR against master.
-  Filed against **v9.6.1** using the manual `gl={async...}` factory pattern — the *exact* pattern
+  Filed against **v9.6.1** using the manual `gl={async...}` factory pattern — the _exact_ pattern
   this project would have used pre-v10, and worth double-checking against once v10's declarative
   `<Canvas renderer>` path ships, since that path is supposed to short-circuit this whole class of bug
   by having R3F own the async init sequencing itself.
@@ -231,15 +242,15 @@ site redeploys.
 
 ## Version/date quick reference
 
-| Item | Value | Verified via |
-|---|---|---|
-| npm `@react-three/fiber@latest` | 9.6.1 (2026-04-28) | registry.npmjs.org |
-| npm `@react-three/fiber@alpha` | 10.0.0-alpha.2 (2026-01-20) | registry.npmjs.org |
-| npm `@react-three/fiber@canary` | 10.0.0-canary.0706a92 (2026-07-25) | registry.npmjs.org |
-| `v10` branch `packages/fiber` version | 10.0.0-alpha.3 (bumped 2026-07-25) | raw.githubusercontent.com |
-| Only formal GH Release for v10 | v10.0.0-alpha.1 (2026-01-17) | api.github.com/releases |
-| `v10` branch peer deps | react/react-dom >=19.0 <19.3, three >=0.185.0 | package.json on branch |
-| npm `three@latest` | 0.185.1 | registry.npmjs.org |
-| npm `@react-three/drei@alpha` | 11.0.0-alpha.5 (2026-02-03) | registry.npmjs.org |
-| docs.pmnd.rs v10/webgpu pages | 404 — not published | live fetch |
-| Open async-renderer-race bug | #3782 (filed 2026-07-13, open) | api.github.com/issues |
+| Item                                  | Value                                         | Verified via              |
+| ------------------------------------- | --------------------------------------------- | ------------------------- |
+| npm `@react-three/fiber@latest`       | 9.6.1 (2026-04-28)                            | registry.npmjs.org        |
+| npm `@react-three/fiber@alpha`        | 10.0.0-alpha.2 (2026-01-20)                   | registry.npmjs.org        |
+| npm `@react-three/fiber@canary`       | 10.0.0-canary.0706a92 (2026-07-25)            | registry.npmjs.org        |
+| `v10` branch `packages/fiber` version | 10.0.0-alpha.3 (bumped 2026-07-25)            | raw.githubusercontent.com |
+| Only formal GH Release for v10        | v10.0.0-alpha.1 (2026-01-17)                  | api.github.com/releases   |
+| `v10` branch peer deps                | react/react-dom >=19.0 <19.3, three >=0.185.0 | package.json on branch    |
+| npm `three@latest`                    | 0.185.1                                       | registry.npmjs.org        |
+| npm `@react-three/drei@alpha`         | 11.0.0-alpha.5 (2026-02-03)                   | registry.npmjs.org        |
+| docs.pmnd.rs v10/webgpu pages         | 404 — not published                           | live fetch                |
+| Open async-renderer-race bug          | #3782 (filed 2026-07-13, open)                | api.github.com/issues     |

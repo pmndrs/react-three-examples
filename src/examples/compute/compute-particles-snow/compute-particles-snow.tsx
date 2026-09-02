@@ -70,8 +70,7 @@ export default function ComputeParticlesSnow() {
       // The original sets ACESFilmic explicitly — same as fiber's Canvas default,
       // but the corpus rule is to decide tone mapping deliberately on every port.
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [20, 2, 20], fov: 60, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [20, 2, 20], fov: 60, near: 0.1, far: 100 }}>
       <fog attach="fog" args={['#0f3c37', 5, 40]} />
       <SnowScenery />
       <primitive object={teapot} />

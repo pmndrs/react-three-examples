@@ -16,21 +16,23 @@ Research for building R3F ports of the official three.js examples, WebGPU-first,
 Drei v11 is explicitly the WebGPU-compatibility major version, developed in lockstep with react-three-fiber v10 (see §6). It restructures the package into **renderer-specific entry points** so WebGL-only code (GLSL materials, `WebGLRenderTarget`) doesn't get bundled into WebGPU/TSL apps and vice versa. From the v11 README (`https://github.com/pmndrs/drei/blob/v11.0.0-alpha.5/README.md`):
 
 ```jsx
-import { OrbitControls, Environment } from '@react-three/drei'          // All, renderer-agnostic
-import { OrbitControls } from '@react-three/drei/core'                  // Core only, smallest bundle
-import { Bvh } from '@react-three/drei/external'                        // External lib wrappers
-import { MarchingCubes } from '@react-three/drei/experimental'          // Rough/experimental
-import { MeshDistortMaterial, Fbo } from '@react-three/drei/legacy'     // WebGL-only (GLSL)
-import { MeshDistortMaterial, Fbo } from '@react-three/drei/webgpu'     // WebGPU-only (TSL)
+import { OrbitControls, Environment } from '@react-three/drei' // All, renderer-agnostic
+import { OrbitControls } from '@react-three/drei/core' // Core only, smallest bundle
+import { Bvh } from '@react-three/drei/external' // External lib wrappers
+import { MarchingCubes } from '@react-three/drei/experimental' // Rough/experimental
+import { MeshDistortMaterial, Fbo } from '@react-three/drei/legacy' // WebGL-only (GLSL)
+import { MeshDistortMaterial, Fbo } from '@react-three/drei/webgpu' // WebGPU-only (TSL)
 ```
 
 Confirmed via the package.json `exports` map at tag `v11.0.0-alpha.5`:
+
 ```json
 "exports": {
   ".": {...}, "./core": {...}, "./external": {...},
   "./experimental": {...}, "./legacy": {...}, "./webgpu": {...}, "./native": {...}
 }
 ```
+
 And `src/` is physically split into `core/`, `legacy/`, `webgpu/`, `external/`, `experimental/`, `native/`, `utils/` directories (confirmed via GitHub tree at that tag). The `webgpu/` source tree has `Effects/ Geometry/ Helpers/ Materials/ Staging/ Textures/ UI/` — i.e. TSL rewrites are being built out per-category, not as a thin shim.
 
 A `MIGRATION_V10_TO_V11.md` is referenced from the README but did **not** exist in the repo tree at the alpha.5 tag or on `master`/`v11` branches at research time — docs are still catching up to the code.
@@ -42,12 +44,14 @@ A `MIGRATION_V10_TO_V11.md` is referenced from the README but did **not** exist 
 - Entry-point design discussion — [#2537 "Entry Points"](https://github.com/pmndrs/drei/issues/2537) and [#2535 "webgpu entry point"](https://github.com/pmndrs/drei/issues/2535). Key quote from #2537 (maintainer draft): components that can support both renderers "live in a shared location structure wise, but import wise we are going to do a hard split down the WebGLRenderer and WebGPURenderer lines... touching ANYTHING in the main three setup will import `three.module.js` giving us a few extra mb."
 
 **Open per-component migration issues (still WebGL-only as of research date):**
+
 - [#2661 MeshReflectorMaterial](https://github.com/pmndrs/drei/issues/2661) — open
 - [#2663 SpotlightMaterial](https://github.com/pmndrs/drei/issues/2663) — open
 - [#2659 Accumulative Shadows](https://github.com/pmndrs/drei/issues/2659) — open
 - [#2628 Split Depth Component](https://github.com/pmndrs/drei/issues/2628) — open
 
 **Closed / already ported:**
+
 - [#2588 Update Text for WebGPU Support](https://github.com/pmndrs/drei/issues/2588) — closed
 - [#2528](https://github.com/pmndrs/drei/pull/2528) / [#2582](https://github.com/pmndrs/drei/pull/2582) `<View>` WebGPU support — merged (note: [#2519](https://github.com/pmndrs/drei/issues/2519) reported ghosting when using `View` with `WebGPURenderer`, worth re-checking if you use `View`)
 - [#2603 Remaining Components for WebGPU migration](https://github.com/pmndrs/drei/issues/2603) — closed
@@ -61,7 +65,7 @@ A `MIGRATION_V10_TO_V11.md` is referenced from the README but did **not** exist 
 
 Repo: https://github.com/pmndrs/examples ("🍱 A monorepo holding pmndrs demos", 68 stars, last push 2026-04-08).
 
-**Important distinction:** this is *not* a port of the official three.js examples — it's a curated showcase of community/original R3F demos (158 demos at research time: `aquarium`, `arkanoid`, `caustics`, `csg-house`, `shoe-configurator`, etc.), many originally sourced from CodeSandbox community submissions. It predates the WebGPU push: the `basic-demo` demo's `package.json` still pins `@react-three/fiber@^8.17.5`, `@react-three/drei@^9.109.5`, `three@^0.165.0` — i.e. **the repo has not been migrated to R3F v9/v10 or WebGPU.** Useful as a structural precedent, not as a source of current-gen code.
+**Important distinction:** this is _not_ a port of the official three.js examples — it's a curated showcase of community/original R3F demos (158 demos at research time: `aquarium`, `arkanoid`, `caustics`, `csg-house`, `shoe-configurator`, etc.), many originally sourced from CodeSandbox community submissions. It predates the WebGPU push: the `basic-demo` demo's `package.json` still pins `@react-three/fiber@^8.17.5`, `@react-three/drei@^9.109.5`, `three@^0.165.0` — i.e. **the repo has not been migrated to R3F v9/v10 or WebGPU.** Useful as a structural precedent, not as a source of current-gen code.
 
 ### Monorepo shape (pnpm + turborepo)
 
@@ -131,16 +135,18 @@ turbo.json
 - Each example is a **fully self-contained static HTML file** at `examples/<id>.html` — no build step, no bundler. WebGPU examples use an **import map** pointing bare `three`/`three/webgpu` specifiers straight at `../build/three.webgpu.js` and `three/tsl` at `../build/three.tsl.js`, with `three/addons/` mapped to `./jsm/`. Example confirmed via `webgpu_backdrop.html`:
   ```html
   <script type="importmap">
-  { "imports": {
-      "three": "../build/three.webgpu.js",
-      "three/webgpu": "../build/three.webgpu.js",
-      "three/tsl": "../build/three.tsl.js",
-      "three/addons/": "./jsm/"
-  }}
+    {
+      "imports": {
+        "three": "../build/three.webgpu.js",
+        "three/webgpu": "../build/three.webgpu.js",
+        "three/tsl": "../build/three.tsl.js",
+        "three/addons/": "./jsm/"
+      }
+    }
   </script>
   ```
 - Standard per-example `<head>` metadata: `<title>three.js - WebGPU - Backdrop</title>`, `og:title`, `og:image` pointing at a pre-rendered `examples/screenshots/<id>.jpg`, and a shared `example.css`. There's a consistent `#info` div with title + one-line description overlay.
-- No per-example iframe wrapper at the HTML level — each example *is* a standalone page; the gallery/listing page presumably iframes these standalone pages in a grid (consistent with `files.json`/`tags.json` driving a listing UI that embeds each URL). Screenshots are pre-generated static JPGs referenced by convention (`screenshots/<id>.jpg`), not live-rendered thumbnails.
+- No per-example iframe wrapper at the HTML level — each example _is_ a standalone page; the gallery/listing page presumably iframes these standalone pages in a grid (consistent with `files.json`/`tags.json` driving a listing UI that embeds each URL). Screenshots are pre-generated static JPGs referenced by convention (`screenshots/<id>.jpg`), not live-rendered thumbnails.
 
 **Relevant for a "similar but better" gallery:** the files.json/tags.json + convention-based screenshot pattern is simple and effective for a large flat catalog; the self-contained-page-per-example + import-map pattern maps naturally to "one Vite/React app per port" as in pmndrs/examples (§2), just swap the plain-JS importmap approach for a bundler since R3F needs JSX/React.
 
@@ -166,11 +172,11 @@ Sources: https://github.com/pmndrs/react-three-fiber/releases/tag/v10.0.0-alpha.
 
 Confirmed **live** (HTTP 200) at research time:
 
-| URL | Notes |
-|---|---|
-| https://threejs.org/llms.txt | Thin pointer file: `# Three.js` blurb, then links to `https://threejs.org/docs/llms.txt` (full nav) and `https://threejs.org/docs/llms-full.txt` (full inline docs incl. TSL) |
-| https://docs.pmnd.rs/llms.txt | Full nav index for the pmndrs docs generator itself, **plus** advertises an MCP server at `https://docs.pmnd.rs/api/mcp` (streamable-HTTP) with a ready-to-paste MCP client config block |
-| https://r3f.docs.pmnd.rs/llms.txt | 200 OK (content not fully inspected, but present) |
+| URL                                | Notes                                                                                                                                                                                                                                                                                                      |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| https://threejs.org/llms.txt       | Thin pointer file: `# Three.js` blurb, then links to `https://threejs.org/docs/llms.txt` (full nav) and `https://threejs.org/docs/llms-full.txt` (full inline docs incl. TSL)                                                                                                                              |
+| https://docs.pmnd.rs/llms.txt      | Full nav index for the pmndrs docs generator itself, **plus** advertises an MCP server at `https://docs.pmnd.rs/api/mcp` (streamable-HTTP) with a ready-to-paste MCP client config block                                                                                                                   |
+| https://r3f.docs.pmnd.rs/llms.txt  | 200 OK (content not fully inspected, but present)                                                                                                                                                                                                                                                          |
 | https://drei.docs.pmnd.rs/llms.txt | Full flat index of every drei component/hook page (Abstractions, Cameras, Controls, Gizmos, Loaders, Misc, Modifiers, Performances, Portals, Shaders, Shapes, Staging — ~120 entries), each with a doc-site path. Also advertises an MCP SSE endpoint at `https://docs.pmnd.rs/api/sse` with client config |
 
 **Pattern:** the whole `docs.pmnd.rs` family (drei, r3f, and presumably other pmndrs doc sites) is generated by a shared "pmndrs docs" framework (`pmndrs/docs`, referenced in the docs.pmnd.rs llms.txt itself) that emits `llms.txt` automatically for every project's doc site, **and** exposes an MCP server/SSE endpoint alongside it so agents can query docs live instead of scraping. three.js's own `llms.txt` is much thinner and simply defers to its full docs index + a `llms-full.txt` variant with everything inlined.

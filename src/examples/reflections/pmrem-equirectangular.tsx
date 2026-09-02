@@ -104,8 +104,7 @@ export default function PmremEquirectangular() {
     <Canvas
       // Original sets ACESFilmic explicitly — mirrored deliberately (parity rule).
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [0, 0, 8], fov: 45, near: 0.25, far: 20 }}
-    >
+      camera={{ position: [0, 0, 8], fov: 45, near: 0.25, far: 20 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

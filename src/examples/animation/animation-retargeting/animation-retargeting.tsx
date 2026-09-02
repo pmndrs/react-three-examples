@@ -68,8 +68,7 @@ export default function AnimationRetargeting() {
   return (
     <Canvas
       renderer={{ toneMapping: NeutralToneMapping }}
-      camera={{ position: [0, 1, 4], fov: 40, near: 0.25, far: 50 }}
-    >
+      camera={{ position: [0, 1, 4], fov: 40, near: 0.25, far: 50 }}>
       <SceneBackground />
       <hemisphereLight args={['#e9c0a5', '#0175ad', 5]} />
       <directionalLight color="#fff9ea" intensity={4} position={[2, 5, 2]} />

@@ -2,7 +2,7 @@
 
 R3F v10 ports of the official three.js examples, WebGPU-first.
 
-**The point of this repo**: show that the same demo is *clearer* in React than in
+**The point of this repo**: show that the same demo is _clearer_ in React than in
 vanilla three.js. A port that is longer, more indirect, or more imperative than the
 original has failed even if it renders perfectly. Read [House style](#house-style)
 before writing a line.
@@ -60,7 +60,12 @@ function SeaSurface() {
   const { color, roughness, ...waveValues } = useControls('Raging Sea', seaControls)
   const uniforms = useUniforms(waveValues)
   const matNodes = useNodes(() => makeSeaNodes(uniforms))
-  return <mesh><TerrainGeometry /><meshStandardNodeMaterial color={color} {...matNodes} /></mesh>
+  return (
+    <mesh>
+      <TerrainGeometry />
+      <meshStandardNodeMaterial color={color} {...matNodes} />
+    </mesh>
+  )
 }
 
 // BAD — controls at the page root, values drilled down as props
@@ -76,7 +81,7 @@ means state was lifted too far and is being reassembled.
 
 **When TWO siblings consume the same value**, it stays at their shared parent — one hop
 up, passed down. Do not duplicate the `useControls` call: the same leva key registered
-twice renders two sliders. "Next to its consumer" means *as close as it can go*, not
+twice renders two sliders. "Next to its consumer" means _as close as it can go_, not
 "always in a leaf".
 
 **Repeated instances take DATA, not controls.** A component rendered N times
@@ -117,12 +122,12 @@ const { checkerSpecular, waterNormalNode } = useNodes(() => ({
 // BAD — three separate useMemos doing the same thing
 ```
 
-`useMemo` is still correct for values that must be rebuilt when a runtime *instance*
+`useMemo` is still correct for values that must be rebuilt when a runtime _instance_
 changes (e.g. `lights([instance])`) — `useNodes` is create-once and can't express that.
 
 ## 3. Declarative first
 
-Build the scene in JSX. Imperative three.js is an intentional, *showcased* escape
+Build the scene in JSX. Imperative three.js is an intentional, _showcased_ escape
 hatch — keep it visible in the component that owns it, never hidden in a helper.
 
 - No `useMemo(() => new SomeMaterial())` + `material={…}`. Write
@@ -162,7 +167,7 @@ count — the demo has to still be the demo.
 
 ## 4. Don't add features the original doesn't have
 
-We are comparing *this demo* to *that demo*. A leva selector that triples the code is
+We are comparing _this demo_ to _that demo_. A leva selector that triples the code is
 a net loss even if it's fun. Add controls only where the original had GUI, or where
 one slider makes a hidden constant explorable. If a control forces state lifting,
 registries, or instance plumbing, it is not worth it — drop it.
@@ -244,7 +249,7 @@ parent-relative, then sibling-relative
 ## 9. Name refs for what they hold
 
 `const meshRef = useRef<Mesh>(null)`, not `const ref = …`. Console errors and
-`ref.current` reads are unreadable otherwise. A component that *exposes* a ref should
+`ref.current` reads are unreadable otherwise. A component that _exposes_ a ref should
 still have a local one to work with:
 
 ```tsx
@@ -353,8 +358,8 @@ admits callback refs, which have no `.current` to read.
   `MappedUniforms<T>`/`UniformNodeFor<V>` infer a concrete node type per input
   (`number` -> `UniformNode<'float', number>`, a hex string -> `UniformNode<'color', Color>`),
   and `UniformNode<'float', number>` structurally satisfies `Node<'float'>` — chaining
-  `.mul()`/`.mix()`/`Fn()` args works uncast. A comment claiming *"`UniformNode<T>` pins
-  its TSL type param to `unknown`"* propagated this cast to **87 sites**; it was false,
+  `.mul()`/`.mix()`/`Fn()` args works uncast. A comment claiming _"`UniformNode<T>` pins
+  its TSL type param to `unknown`"_ propagated this cast to **87 sites**; it was false,
   and 64 of them were swept 2026-09-02. **Try removing the cast first.**
   After the sweep, the 23 surviving `as unknown as Node<…>` casts are a DIFFERENT family
   and are correct: struct member access (`duckElement.get('position')` types as bare
@@ -394,12 +399,12 @@ Four dynamism patterns. **The selection rule is what matters** — read the fact
 in `node_modules/three/examples/jsm/tsl/display/` and pick by what it actually does:
 
 - **(a)** values you introduce → fiber `useUniforms`, no cast.
-- **(b)** *default for node-class passes.* The pass keeps its knob in a public writable
+- **(b)** _default for node-class passes._ The pass keeps its knob in a public writable
   field holding a `uniform()` node (`bloom().strength`, `dotScreen().scale`,
   `dof().bokehScaleNode`) AND the field is float-typed → construct with defaults, then
   assign your `useUniforms` node onto the field inside the mainCB **before** shader
   compilation. Every node-class factory this corpus imports works this way.
-  **Never pass your uniform as a factory *argument*.** Whether identity survives is
+  **Never pass your uniform as a factory _argument_.** Whether identity survives is
   inconsistent per factory and invisible at the call site: `bloom()` guards with
   `strength.isNode ? strength : uniform(strength)` and `dof()` uses `nodeObject()` (both
   preserve), but `dotScreen()`/`rgbShift()` call `uniform(angle)` unconditionally, which
@@ -414,20 +419,20 @@ in `node_modules/three/examples/jsm/tsl/display/` and pick by what it actually d
   **mutate `.value` in place** — the field swap fails silently, which is the worst
   failure mode there is. Check where the graph is built before choosing.
 
-- **(c)** *fallback, three cases.* There is no instance to assign onto — an
+- **(c)** _fallback, three cases._ There is no instance to assign onto — an
   `Fn()`-style helper taking an options object (`depthAwareBlend`) — or the field is
   **int/uint** (`godrays().raymarchSteps` is `uniform(uint(60))`) and `useUniforms` can
   only produce `UniformNode<'float'>` for a JS number; or the graph was built in the
   constructor (above). → create three/tsl `uniform()`
   nodes inside the mainCB, pass them in, register via return-to-register, mutate
   `.value` in an effect.
-- **(d)** *structural toggle.* A boolean that swaps the whole `outputNode` between two
+- **(d)** _structural toggle._ A boolean that swaps the whole `outputNode` between two
   different node graphs (`enabled ? sobelPass : outputPass`) has no field to assign onto
   → register both from the mainCB, read them back off `passes` in an effect, set
   `outputNode` and `renderPipeline.needsUpdate = true`. That read-back needs
   `passes.xPass as ReturnType<typeof x> | undefined`. **Keep that cast** — it is exempt
   from House style rule 5: `useRenderPipeline` is non-generic and `PassRecord =
-  Record<string, any>`, so the cast ADDS type information to an `any` rather than hiding
+Record<string, any>`, so the cast ADDS type information to an `any` rather than hiding
   an error. There is no way to write it without one (UPSTREAM B30).
 
 Verified against r185; re-verify the field types on a three bump.
@@ -451,7 +456,7 @@ set samples 0.
   custom-node materials still needs the lit scene gated on the HDR, or three 0.185.1
   intermittently never folds IBL in (B15; pattern `tsl-procedural-terrain`). Do NOT
   reflexively split boundaries — two independently-suspending resources in ONE boundary
-  can be *protective*, because the boundary delays first render until both resolve
+  can be _protective_, because the boundary delays first render until both resolve
   (B28).
 - StrictMode double-invokes effects: never `dispose()` a `useMemo`'d instance in an
   effect cleanup. Use symmetric connect/disconnect (see `src/utils/CameraControls.tsx`).
@@ -465,11 +470,11 @@ set samples 0.
   (`renderer.shadowMap.transmitted`).
 - **A callback ref never triggers a re-render.** A component that must hand its mounted
   object to something else mirrors it into `useState` — or, simpler, pass the
-  `useState` setter *as* the ref: `<pointLight ref={setLight} />`.
+  `useState` setter _as_ the ref: `<pointLight ref={setLight} />`.
 - `useAnimations`: play clips **by name**, never `Object.values(actions)` — GLTFs ship
   rest/utility clips that pollute the blend at weight 1.
 - `useGLTF` takes an **options object**: `useGLTF(url, { draco: true, meshopt: true,
-  ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
+ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
   `setTranscoderPath` from the string, automatic `detectSupport`). Positional booleans
   are deprecated. Pass the explicit transcoder path — the default resolves via
   `import.meta.url` and is unreliable under Vite.

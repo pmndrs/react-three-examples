@@ -57,8 +57,7 @@ export default function ShadowmapProgressive() {
       renderer={{ toneMapping: NoToneMapping }}
       shadows
       background="#949494"
-      camera={{ position: [0, 100, 200], fov: 70, near: 1, far: 1000 }}
-    >
+      camera={{ position: [0, 100, 200], fov: 70, near: 1, far: 1000 }}>
       <fog attach="fog" args={['#949494', 1000, 3000]} />
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}

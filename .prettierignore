@@ -1,0 +1,15 @@
+dist/
+node_modules/
+reference/
+test-results/
+screenshots/
+pnpm-lock.yaml
+
+# Generated research data dumps — large, machine-written, no value in reformatting.
+research/data/
+
+# Dennis's personal notes; his formatting, not the formatter's.
+styleNotes.md
+
+# Deliberately non-canonical scratch (see the banner in the file).
+docs/style-drafts/

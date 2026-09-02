@@ -31,20 +31,13 @@
  */
 import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { mix, normalWorld, oscSine, range, time } from 'three/tsl'
-import {
-  BufferGeometryLoader,
-  Color,
-  DynamicDrawUsage,
-  MeshBasicNodeMaterial,
-  Object3D,
-} from 'three/webgpu'
+import { BufferGeometryLoader, Color, DynamicDrawUsage, MeshBasicNodeMaterial, Object3D } from 'three/webgpu'
 import type { InstancedMesh } from 'three/webgpu'
 import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const SUZANNE_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/json/suzanne_buffergeometry.json'
+const SUZANNE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/json/suzanne_buffergeometry.json'
 
 // Scratch object reused across the per-frame matrix loop (no per-frame allocation).
 const dummy = new Object3D()
@@ -132,8 +125,7 @@ export default function InstanceMesh() {
     <Canvas
       renderer
       background="#000000"
-      camera={{ position: [amount * 0.9, amount * 0.9, amount * 0.9], fov: 60, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [amount * 0.9, amount * 0.9, amount * 0.9], fov: 60, near: 0.1, far: 100 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

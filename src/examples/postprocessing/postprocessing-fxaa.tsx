@@ -16,13 +16,7 @@
  *   field, unlike `instance-mesh`'s per-frame version
  */
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import {
-  Group,
-  MeshStandardMaterial,
-  NoToneMapping,
-  Object3D,
-  TetrahedronGeometry,
-} from 'three/webgpu'
+import { Group, MeshStandardMaterial, NoToneMapping, Object3D, TetrahedronGeometry } from 'three/webgpu'
 import type { InstancedMesh } from 'three/webgpu'
 import { renderOutput } from 'three/tsl'
 import { fxaa } from 'three/addons/tsl/display/FXAANode.js'
@@ -44,10 +38,7 @@ function TetrahedronField() {
   const meshRef = useRef<InstancedMesh>(null)
 
   const geometry = useMemo(() => new TetrahedronGeometry(), [])
-  const material = useMemo(
-    () => new MeshStandardMaterial({ color: 0xf73232, flatShading: true }),
-    [],
-  )
+  const material = useMemo(() => new MeshStandardMaterial({ color: 0xf73232, flatShading: true }), [])
 
   useLayoutEffect(() => {
     const mesh = meshRef.current
@@ -112,8 +103,7 @@ export default function PostprocessingFxaa() {
       // would otherwise default to ACESFilmic.
       renderer={{ toneMapping: NoToneMapping }}
       background="#ffffff"
-      camera={{ position: [0, 0, 50], fov: 45, near: 0.1, far: 200 }}
-    >
+      camera={{ position: [0, 0, 50], fov: 45, near: 0.1, far: 200 }}>
       <hemisphereLight args={['#ffffff', '#8d8d8d']} position={[0, 1000, 0]} />
       <directionalLight color="#ffffff" intensity={3} position={[-3000, 1000, -1000]} />
       <TetrahedronField />

@@ -125,8 +125,7 @@ function ShadowLight({ color, intensity, speed, bias, radius, offset = 0 }: Shad
       shadow-bias={bias}
       shadow-radius={radius}
       shadow-mapSize-width={128}
-      shadow-mapSize-height={128}
-    >
+      shadow-mapSize-height={128}>
       <mesh geometry={bulbGeometry}>
         <meshBasicMaterial color={bulbColor} />
       </mesh>
@@ -166,8 +165,7 @@ export default function ShadowmapPointlight() {
       renderer={{ toneMapping: NoToneMapping }}
       shadows
       background="#000000"
-      camera={{ position: [0, 10, 40], fov: 45, near: 1, far: 1000 }}
-    >
+      camera={{ position: [0, 10, 40], fov: 45, near: 1, far: 1000 }}>
       <ambientLight color="#111122" intensity={3} />
       <ShadowLight color={light1Color} intensity={intensity} speed={speed} bias={bias} radius={radius} />
       <ShadowLight color={light2Color} intensity={intensity} speed={speed} bias={bias} radius={radius} offset={10000} />

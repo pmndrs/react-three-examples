@@ -208,8 +208,7 @@ export default function ComputePoints() {
       renderer={{ requiredLimits: { maxStorageBuffersInVertexStage: 1 } }}
       orthographic
       background="#000000"
-      camera={{ position: [0, 0, 1], near: 0, far: 1 }}
-    >
+      camera={{ position: [0, 0, 1], near: 0, far: 1 }}>
       <OrthographicFraming />
       <PointsField />
       <DemoHelpers grid={false} controls={false} />

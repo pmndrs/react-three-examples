@@ -44,7 +44,12 @@ export function Cloth() {
   const renderer = useThree((state) => state.renderer)
 
   //* Controls ======================================================
-  const { stiffness, wind, sphere: sphereEnabled, wireframe } = useControls('compute-cloth', {
+  const {
+    stiffness,
+    wind,
+    sphere: sphereEnabled,
+    wireframe,
+  } = useControls('compute-cloth', {
     stiffness: { value: 0.2, min: 0.1, max: 0.5, step: 0.01 },
     wireframe: false,
     sphere: true,
@@ -273,11 +278,7 @@ export function Cloth() {
       while (sim.accumulator >= TIME_PER_STEP) {
         sim.timestamp += TIME_PER_STEP
         sim.accumulator -= TIME_PER_STEP
-        uSpherePosition.value.set(
-          Math.sin(sim.timestamp * 2.1) * 0.1,
-          0,
-          Math.sin(sim.timestamp * 0.8),
-        )
+        uSpherePosition.value.set(Math.sin(sim.timestamp * 2.1) * 0.1, 0, Math.sin(sim.timestamp * 0.8))
         renderer.compute(computeSpringForces)
         renderer.compute(computeVertexForces)
       }

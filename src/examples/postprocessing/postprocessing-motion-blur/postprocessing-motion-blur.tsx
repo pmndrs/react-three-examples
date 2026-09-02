@@ -38,8 +38,7 @@ export default function PostprocessingMotionBlur() {
       // Original sets no tone mapping (three.js default); fiber would default ACES.
       renderer={{ toneMapping: NoToneMapping }}
       shadows="percentage"
-      camera={{ position: [0, 1.5, 4.5], fov: 50, near: 0.25, far: 30 }}
-    >
+      camera={{ position: [0, 1.5, 4.5], fov: 50, near: 0.25, far: 30 }}>
       <fog attach="fog" args={[0x0487e2, 7, 25]} />
       <directionalLight
         color={0xffe499}

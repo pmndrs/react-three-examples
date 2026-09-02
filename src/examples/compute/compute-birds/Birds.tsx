@@ -111,197 +111,186 @@ export function Birds() {
   // All node graphs built exactly once, closing over the TYPED hook returns above
   // (creator-state reads widen to fiber's BufferLike — AGENTS.md). Also UNSCOPED
   // (UPSTREAM.md B16): kernels and the vertex graph all reach WGSL codegen.
-  const { computeVelocity, computePosition, uDeltaTime, uRayOrigin, uRayDirection, birdVertexNode } =
-    useNodes(() => {
-      // Frame-driven uniforms: plain TSL `uniform()`, NOT useUniforms — mutated
-      // imperatively in useFrame every frame; a React re-render must never write
-      // them back (compute-particles' uClickPos rationale).
-      const uDeltaTime = uniform(0)
-      const uRayOrigin = uniform(new Vector3())
-      const uRayDirection = uniform(new Vector3())
+  const { computeVelocity, computePosition, uDeltaTime, uRayOrigin, uRayDirection, birdVertexNode } = useNodes(() => {
+    // Frame-driven uniforms: plain TSL `uniform()`, NOT useUniforms — mutated
+    // imperatively in useFrame every frame; a React re-render must never write
+    // them back (compute-particles' uClickPos rationale).
+    const uDeltaTime = uniform(0)
+    const uRayOrigin = uniform(new Vector3())
+    const uRayDirection = uniform(new Vector3())
 
-      // Velocity kernel: pointer avoidance, pull to center, then the O(N²)
-      // separation/alignment/cohesion pass over every other bird. All branching is
-      // GPU-side If/ElseIf/Else + Loop/Continue — a JS `if` here would run once at
-      // graph build (AGENTS.md build-time vs run-time rule).
-      const computeVelocity = Fn(() => {
-        const PI = float(3.141592653589793)
-        const PI_2 = PI.mul(2.0)
-        const limit = float(SPEED_LIMIT).toVar('limit')
+    // Velocity kernel: pointer avoidance, pull to center, then the O(N²)
+    // separation/alignment/cohesion pass over every other bird. All branching is
+    // GPU-side If/ElseIf/Else + Loop/Continue — a JS `if` here would run once at
+    // graph build (AGENTS.md build-time vs run-time rule).
+    const computeVelocity = Fn(() => {
+      const PI = float(3.141592653589793)
+      const PI_2 = PI.mul(2.0)
+      const limit = float(SPEED_LIMIT).toVar('limit')
 
-        const zoneRadius = uSeparation.add(uAlignment).add(uCohesion).toConst()
-        const separationThresh = uSeparation.div(zoneRadius).toConst()
-        const alignmentThresh = uSeparation.add(uAlignment).div(zoneRadius).toConst()
-        const zoneRadiusSq = zoneRadius.mul(zoneRadius).toConst()
+      const zoneRadius = uSeparation.add(uAlignment).add(uCohesion).toConst()
+      const separationThresh = uSeparation.div(zoneRadius).toConst()
+      const alignmentThresh = uSeparation.add(uAlignment).div(zoneRadius).toConst()
+      const zoneRadiusSq = zoneRadius.mul(zoneRadius).toConst()
 
-        // Cache this bird's position and velocity outside the loop.
-        const birdIndex = instanceIndex.toConst('birdIndex')
-        const position = birdPositions.element(birdIndex).toVar()
-        const velocity = birdVelocities.element(birdIndex).toVar()
+      // Cache this bird's position and velocity outside the loop.
+      const birdIndex = instanceIndex.toConst('birdIndex')
+      const position = birdPositions.element(birdIndex).toVar()
+      const velocity = birdVelocities.element(birdIndex).toVar()
 
-        // Pointer avoidance: distance from the bird to the camera-ray LINE.
-        const directionToRay = uRayOrigin.sub(position).toConst()
-        const projectionLength = dot(directionToRay, uRayDirection).toConst()
-        const closestPoint = uRayOrigin.sub(uRayDirection.mul(projectionLength)).toConst()
-        const directionToClosestPoint = closestPoint.sub(position).toConst()
-        const distanceToClosestPoint = length(directionToClosestPoint).toConst()
-        const distanceToClosestPointSq = distanceToClosestPoint.mul(distanceToClosestPoint).toConst()
+      // Pointer avoidance: distance from the bird to the camera-ray LINE.
+      const directionToRay = uRayOrigin.sub(position).toConst()
+      const projectionLength = dot(directionToRay, uRayDirection).toConst()
+      const closestPoint = uRayOrigin.sub(uRayDirection.mul(projectionLength)).toConst()
+      const directionToClosestPoint = closestPoint.sub(position).toConst()
+      const distanceToClosestPoint = length(directionToClosestPoint).toConst()
+      const distanceToClosestPointSq = distanceToClosestPoint.mul(distanceToClosestPoint).toConst()
 
-        const rayRadius = float(150.0).toConst()
-        const rayRadiusSq = rayRadius.mul(rayRadius).toConst()
+      const rayRadius = float(150.0).toConst()
+      const rayRadiusSq = rayRadius.mul(rayRadius).toConst()
 
-        If(distanceToClosestPointSq.lessThan(rayRadiusSq), () => {
-          const velocityAdjust = distanceToClosestPointSq
-            .div(rayRadiusSq)
-            .sub(1.0)
-            .mul(uDeltaTime)
-            .mul(100.0)
-          velocity.addAssign(normalize(directionToClosestPoint).mul(velocityAdjust))
-          limit.addAssign(5.0)
+      If(distanceToClosestPointSq.lessThan(rayRadiusSq), () => {
+        const velocityAdjust = distanceToClosestPointSq.div(rayRadiusSq).sub(1.0).mul(uDeltaTime).mul(100.0)
+        velocity.addAssign(normalize(directionToClosestPoint).mul(velocityAdjust))
+        limit.addAssign(5.0)
+      })
+
+      // Attract flocks to the center (y weighted heavier, like the original).
+      const dirToCenter = position.toVar()
+      dirToCenter.y.mulAssign(2.5)
+      velocity.subAssign(normalize(dirToCenter).mul(uDeltaTime).mul(5.0))
+
+      Loop({ start: uint(0), end: uint(BIRDS), type: 'uint', condition: '<' }, ({ i }) => {
+        If(i.equal(birdIndex), () => {
+          Continue()
         })
 
-        // Attract flocks to the center (y weighted heavier, like the original).
-        const dirToCenter = position.toVar()
-        dirToCenter.y.mulAssign(2.5)
-        velocity.subAssign(normalize(dirToCenter).mul(uDeltaTime).mul(5.0))
+        const birdPosition = birdPositions.element(i)
+        const dirToBird = birdPosition.sub(position)
+        const distToBird = length(dirToBird)
 
-        Loop({ start: uint(0), end: uint(BIRDS), type: 'uint', condition: '<' }, ({ i }) => {
-          If(i.equal(birdIndex), () => {
-            Continue()
-          })
-
-          const birdPosition = birdPositions.element(i)
-          const dirToBird = birdPosition.sub(position)
-          const distToBird = length(dirToBird)
-
-          If(distToBird.lessThan(0.0001), () => {
-            Continue()
-          })
-
-          const distToBirdSq = distToBird.mul(distToBird)
-
-          // Outside the zone radius: no influence at all.
-          If(distToBirdSq.greaterThan(zoneRadiusSq), () => {
-            Continue()
-          })
-
-          // Which band of the zone is the neighbour in?
-          const percent = distToBirdSq.div(zoneRadiusSq)
-
-          If(percent.lessThan(separationThresh), () => {
-            // Separation - move apart for comfort
-            const velocityAdjust = separationThresh.div(percent).sub(1.0).mul(uDeltaTime)
-            velocity.subAssign(normalize(dirToBird).mul(velocityAdjust))
-          })
-            .ElseIf(percent.lessThan(alignmentThresh), () => {
-              // Alignment - fly the same direction
-              const threshDelta = alignmentThresh.sub(separationThresh)
-              const adjustedPercent = percent.sub(separationThresh).div(threshDelta)
-              const birdVelocity = birdVelocities.element(i)
-
-              const cosRange = cos(adjustedPercent.mul(PI_2))
-              const cosRangeAdjust = float(0.5).sub(cosRange.mul(0.5)).add(0.5)
-              const velocityAdjust = cosRangeAdjust.mul(uDeltaTime)
-              velocity.addAssign(normalize(birdVelocity).mul(velocityAdjust))
-            })
-            .Else(() => {
-              // Attraction / cohesion - move closer. Functional select (the
-              // original chains `.select` off the bool — same graph).
-              const threshDelta = alignmentThresh.oneMinus()
-              const adjustedPercent = select(
-                threshDelta.equal(0.0),
-                1.0,
-                percent.sub(alignmentThresh).div(threshDelta),
-              )
-
-              const cosRange = cos(adjustedPercent.mul(PI_2))
-              const adj1 = cosRange.mul(-0.5)
-              const adj2 = adj1.add(0.5)
-              const adj3 = float(0.5).sub(adj2)
-
-              const velocityAdjust = adj3.mul(uDeltaTime)
-              velocity.addAssign(normalize(dirToBird).mul(velocityAdjust))
-            })
+        If(distToBird.lessThan(0.0001), () => {
+          Continue()
         })
 
-        // Speed limit (raised while fleeing the pointer).
-        If(length(velocity).greaterThan(limit), () => {
-          velocity.assign(normalize(velocity).mul(limit))
+        const distToBirdSq = distToBird.mul(distToBird)
+
+        // Outside the zone radius: no influence at all.
+        If(distToBirdSq.greaterThan(zoneRadiusSq), () => {
+          Continue()
         })
 
-        birdVelocities.element(birdIndex).assign(velocity)
-      })().compute(BIRDS)
+        // Which band of the zone is the neighbour in?
+        const percent = distToBirdSq.div(zoneRadiusSq)
 
-      // Position/phase integrator: advance positions along velocity, advance the
-      // wing-flap phase faster the faster (and the more upward) the bird flies.
-      const computePosition = Fn(() => {
-        birdPositions
-          .element(instanceIndex)
-          .addAssign(birdVelocities.element(instanceIndex).mul(uDeltaTime).mul(15.0))
-
-        const velocity = birdVelocities.element(instanceIndex)
-        const phase = birdPhases.element(instanceIndex)
-
-        const modValue = phase
-          .add(uDeltaTime)
-          .add(length(velocity.xz).mul(uDeltaTime).mul(3.0))
-          .add(max(velocity.y, 0.0).mul(uDeltaTime).mul(6.0))
-        birdPhases.element(instanceIndex).assign(modValue.mod(62.83))
-      })().compute(BIRDS)
-
-      // Vertex-stage takeover: flap the wing-tip vertices by the phase buffer,
-      // orient the bird along its (normalized) velocity with two hand-built mat3
-      // rotations, then translate by the position buffer. Reads all three storage
-      // buffers in the vertex stage — hence maxStorageBuffersInVertexStage: 3.
-      const birdVertexNode = Fn(() => {
-        const position = positionLocal.toVar()
-        const newPhase = birdPhases.element(instanceIndex).toVar()
-        const newVelocity = normalize(birdVelocities.element(instanceIndex)).toVar()
-
-        If(vertexIndex.equal(4).or(vertexIndex.equal(7)), () => {
-          // flap wings
-          position.y.assign(sin(newPhase).mul(5.0))
+        If(percent.lessThan(separationThresh), () => {
+          // Separation - move apart for comfort
+          const velocityAdjust = separationThresh.div(percent).sub(1.0).mul(uDeltaTime)
+          velocity.subAssign(normalize(dirToBird).mul(velocityAdjust))
         })
+          .ElseIf(percent.lessThan(alignmentThresh), () => {
+            // Alignment - fly the same direction
+            const threshDelta = alignmentThresh.sub(separationThresh)
+            const adjustedPercent = percent.sub(separationThresh).div(threshDelta)
+            const birdVelocity = birdVelocities.element(i)
 
-        // Explicit vec4/xyz conversions where the original relies on TSL's
-        // implicit mat/vec promotion (typed-TSL gap, B10 family) — same math.
-        const newPosition = modelWorldMatrix.mul(vec4(position, 1.0))
+            const cosRange = cos(adjustedPercent.mul(PI_2))
+            const cosRangeAdjust = float(0.5).sub(cosRange.mul(0.5)).add(0.5)
+            const velocityAdjust = cosRangeAdjust.mul(uDeltaTime)
+            velocity.addAssign(normalize(birdVelocity).mul(velocityAdjust))
+          })
+          .Else(() => {
+            // Attraction / cohesion - move closer. Functional select (the
+            // original chains `.select` off the bool — same graph).
+            const threshDelta = alignmentThresh.oneMinus()
+            const adjustedPercent = select(threshDelta.equal(0.0), 1.0, percent.sub(alignmentThresh).div(threshDelta))
 
-        newVelocity.z.mulAssign(-1.0)
-        const xz = length(newVelocity.xz)
-        const xyz = float(1.0)
-        const x = sqrt(newVelocity.y.mul(newVelocity.y).oneMinus())
+            const cosRange = cos(adjustedPercent.mul(PI_2))
+            const adj1 = cosRange.mul(-0.5)
+            const adj2 = adj1.add(0.5)
+            const adj3 = float(0.5).sub(adj2)
 
-        const cosry = newVelocity.x.div(xz).toVar()
-        const sinry = newVelocity.z.div(xz).toVar()
+            const velocityAdjust = adj3.mul(uDeltaTime)
+            velocity.addAssign(normalize(dirToBird).mul(velocityAdjust))
+          })
+      })
 
-        const cosrz = x.div(xyz)
-        const sinrz = newVelocity.y.div(xyz).toVar()
+      // Speed limit (raised while fleeing the pointer).
+      If(length(velocity).greaterThan(limit), () => {
+        velocity.assign(normalize(velocity).mul(limit))
+      })
 
-        // Nodes must be negated with negate() — with JS '-' they resolve to NaN
-        // (the original carries the same comment).
-        // prettier-ignore
-        const maty = mat3(
+      birdVelocities.element(birdIndex).assign(velocity)
+    })().compute(BIRDS)
+
+    // Position/phase integrator: advance positions along velocity, advance the
+    // wing-flap phase faster the faster (and the more upward) the bird flies.
+    const computePosition = Fn(() => {
+      birdPositions.element(instanceIndex).addAssign(birdVelocities.element(instanceIndex).mul(uDeltaTime).mul(15.0))
+
+      const velocity = birdVelocities.element(instanceIndex)
+      const phase = birdPhases.element(instanceIndex)
+
+      const modValue = phase
+        .add(uDeltaTime)
+        .add(length(velocity.xz).mul(uDeltaTime).mul(3.0))
+        .add(max(velocity.y, 0.0).mul(uDeltaTime).mul(6.0))
+      birdPhases.element(instanceIndex).assign(modValue.mod(62.83))
+    })().compute(BIRDS)
+
+    // Vertex-stage takeover: flap the wing-tip vertices by the phase buffer,
+    // orient the bird along its (normalized) velocity with two hand-built mat3
+    // rotations, then translate by the position buffer. Reads all three storage
+    // buffers in the vertex stage — hence maxStorageBuffersInVertexStage: 3.
+    const birdVertexNode = Fn(() => {
+      const position = positionLocal.toVar()
+      const newPhase = birdPhases.element(instanceIndex).toVar()
+      const newVelocity = normalize(birdVelocities.element(instanceIndex)).toVar()
+
+      If(vertexIndex.equal(4).or(vertexIndex.equal(7)), () => {
+        // flap wings
+        position.y.assign(sin(newPhase).mul(5.0))
+      })
+
+      // Explicit vec4/xyz conversions where the original relies on TSL's
+      // implicit mat/vec promotion (typed-TSL gap, B10 family) — same math.
+      const newPosition = modelWorldMatrix.mul(vec4(position, 1.0))
+
+      newVelocity.z.mulAssign(-1.0)
+      const xz = length(newVelocity.xz)
+      const xyz = float(1.0)
+      const x = sqrt(newVelocity.y.mul(newVelocity.y).oneMinus())
+
+      const cosry = newVelocity.x.div(xz).toVar()
+      const sinry = newVelocity.z.div(xz).toVar()
+
+      const cosrz = x.div(xyz)
+      const sinrz = newVelocity.y.div(xyz).toVar()
+
+      // Nodes must be negated with negate() — with JS '-' they resolve to NaN
+      // (the original carries the same comment).
+      // prettier-ignore
+      const maty = mat3(
           cosry, 0, negate(sinry),
           0, 1, 0,
           sinry, 0, cosry,
         )
 
-        // prettier-ignore
-        const matz = mat3(
+      // prettier-ignore
+      const matz = mat3(
           cosrz, sinrz, 0,
           negate(sinrz), cosrz, 0,
           0, 0, 1,
         )
 
-        const finalVert = maty.mul(matz).mul(newPosition.xyz).toVar()
-        finalVert.addAssign(birdPositions.element(instanceIndex))
+      const finalVert = maty.mul(matz).mul(newPosition.xyz).toVar()
+      finalVert.addAssign(birdPositions.element(instanceIndex))
 
-        return cameraProjectionMatrix.mul(cameraViewMatrix).mul(vec4(finalVert, 1.0))
-      })()
+      return cameraProjectionMatrix.mul(cameraViewMatrix).mul(vec4(finalVert, 1.0))
+    })()
 
-      return { computeVelocity, computePosition, uDeltaTime, uRayOrigin, uRayDirection, birdVertexNode }
-    })
+    return { computeVelocity, computePosition, uDeltaTime, uRayOrigin, uRayDirection, birdVertexNode }
+  })
 
   //* Scene ==========================================================
   const geometry = useMemo(createBirdGeometry, [])

@@ -21,7 +21,9 @@ function git(args) {
 /** Slugs whose files are uncommitted, or committed but not yet on origin/main. */
 export function changedSlugs() {
   const paths = [
-    ...git(['status', '--porcelain']).split('\n').map((l) => l.slice(3)),
+    ...git(['status', '--porcelain'])
+      .split('\n')
+      .map((l) => l.slice(3)),
     ...git(['diff', '--name-only', 'origin/main...HEAD']).split('\n'),
   ]
   const found = new Set()
@@ -30,7 +32,10 @@ export function changedSlugs() {
     // <category>/<slug>/<file>. Match ANY path segment against the manifest so the
     // folder depth can change without touching this.
     if (!path.trim().startsWith('src/examples/')) continue
-    for (const segment of path.trim().replace(/\.tsx?$/, '').split('/')) {
+    for (const segment of path
+      .trim()
+      .replace(/\.tsx?$/, '')
+      .split('/')) {
       if (ALL.includes(segment)) found.add(segment)
     }
   }

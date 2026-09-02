@@ -32,8 +32,7 @@ import { useGLTF } from '@react-three/drei/webgpu'
 import { DemoHelpers } from '../../../utils/DemoHelpers'
 import { GodraysPipeline } from './GodraysPipeline'
 
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/godrays_demo.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/godrays_demo.glb'
 
 const LIGHT_COLOR = 0xf6287d
 const LIGHT_POS: [number, number, number] = [0, 50, 0]
@@ -118,8 +117,7 @@ export default function PostprocessingGodrays() {
       // Original enables shadowMap with the three.js default type (PCF).
       shadows="percentage"
       background="#000000"
-      camera={{ position: [-175, 50, 0], fov: 60, near: 0.1, far: 1000 }}
-    >
+      camera={{ position: [-175, 50, 0], fov: 60, near: 0.1, far: 1000 }}>
       {/* Pipeline (creator hook) rendered BEFORE the suspending sibling — B18. */}
       <GodraysPipeline light={pointLight} />
       <ambientLight color="#cccccc" intensity={0.4} />

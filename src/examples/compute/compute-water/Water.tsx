@@ -200,10 +200,7 @@ export function Water({ controlsRef }: WaterProps) {
 
     // One wave-equation step with explicit read/write buffers — built twice below
     // for the A→B and B→A ping-pong directions.
-    const createComputeHeight = (
-      readBuffer: StorageBufferNode<'float'>,
-      writeBuffer: StorageBufferNode<'float'>,
-    ) =>
+    const createComputeHeight = (readBuffer: StorageBufferNode<'float'>, writeBuffer: StorageBufferNode<'float'>) =>
       Fn(() => {
         const height = readBuffer.element(instanceIndex).toVar()
         const prevHeight = waterPrevHeight.element(instanceIndex).toVar()
@@ -238,11 +235,7 @@ export function Water({ controlsRef }: WaterProps) {
     // Cast: select()'s typed cond param wants Node<'bool'>, but the runtime converts
     // the numeric uniform (the original passes this exact uniform(1)) — B10 family.
     const getCurrentHeight = (index: Node<'uint'>) =>
-      select(
-        uReadFromA as unknown as Node<'bool'>,
-        waterHeightA.element(index),
-        waterHeightB.element(index),
-      )
+      select(uReadFromA as unknown as Node<'bool'>, waterHeightA.element(index), waterHeightB.element(index))
 
     const getCurrentNormals = (index: Node<'uint'>) => {
       const { northIndex, southIndex, eastIndex, westIndex } = getNeighborIndices(index)
@@ -258,9 +251,7 @@ export function Water({ controlsRef }: WaterProps) {
 
     // Water surface graphs: the vertex stage reads the height buffers directly —
     // this is what the Canvas-level `maxStorageBuffersInVertexStage` limit is for.
-    const waterPositionNode = Fn(() =>
-      vec3(positionLocal.x, positionLocal.y, getCurrentHeight(vertexIndex)),
-    )()
+    const waterPositionNode = Fn(() => vec3(positionLocal.x, positionLocal.y, getCurrentHeight(vertexIndex)))()
 
     const waterNormalNode = Fn(() => {
       // Lighting normals rebuilt from the undulating heightfield, once per vertex.

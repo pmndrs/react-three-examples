@@ -70,11 +70,7 @@ export default function BackdropWater() {
   })
 
   return (
-    <Canvas
-      renderer
-      shadows
-      camera={{ position: [3, 2, 4], fov: 50, near: 0.25, far: 30 }}
-    >
+    <Canvas renderer shadows camera={{ position: [3, 2, 4], fov: 50, near: 0.25, far: 30 }}>
       <fog attach="fog" args={[0x0487e2, 7, 25]} />
       <SceneBackground />
 

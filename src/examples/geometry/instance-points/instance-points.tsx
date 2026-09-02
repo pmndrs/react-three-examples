@@ -55,8 +55,7 @@ export default function InstancePoints() {
     <Canvas
       // Original renders with the WebGPURenderer default (NoToneMapping) — see header.
       renderer={{ toneMapping: NoToneMapping }}
-      camera={{ position: [-40, 0, 60], fov: 40, near: 1, far: 1000 }}
-    >
+      camera={{ position: [-40, 0, 60], fov: 40, near: 1, far: 1000 }}>
       <InstancedPoints />
       <InsetView />
       <DemoHelpers grid={false} minDistance={10} maxDistance={500} />

@@ -59,14 +59,23 @@ export function CameraRig() {
 
     // A small marker sphere riding along on the rig, mounted the same way the original
     // hangs `mesh3` off `cameraRig` (not off the tracked subject).
-    const rigMarker = new Mesh(new SphereGeometry(5, 16, 8), new MeshBasicMaterial({ color: 0x0000ff, wireframe: true }))
+    const rigMarker = new Mesh(
+      new SphereGeometry(5, 16, 8),
+      new MeshBasicMaterial({ color: 0x0000ff, wireframe: true }),
+    )
     rigMarker.position.z = 150
     cameraRigGroup.add(rigMarker)
 
     // The tracked subject: an orbiting wireframe sphere with a smaller child sphere,
     // both animated per-frame below (original's `mesh`/`mesh.children[0]`).
-    const subject = new Mesh(new SphereGeometry(100, 16, 8), new MeshBasicMaterial({ color: 0xffffff, wireframe: true }))
-    const subjectInner = new Mesh(new SphereGeometry(50, 16, 8), new MeshBasicMaterial({ color: 0x00ff00, wireframe: true }))
+    const subject = new Mesh(
+      new SphereGeometry(100, 16, 8),
+      new MeshBasicMaterial({ color: 0xffffff, wireframe: true }),
+    )
+    const subjectInner = new Mesh(
+      new SphereGeometry(50, 16, 8),
+      new MeshBasicMaterial({ color: 0x00ff00, wireframe: true }),
+    )
     subjectInner.position.y = 150
     subject.add(subjectInner)
 

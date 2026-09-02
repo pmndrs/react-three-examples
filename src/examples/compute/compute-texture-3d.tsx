@@ -199,8 +199,7 @@ export default function ComputeTexture3D() {
       // Canvas defaults to ACESFilmic, which would mute the unlit additive cloud
       // shading (same rationale as volume-cloud).
       renderer={{ toneMapping: NoToneMapping }}
-      camera={{ position: [0, 1, 1.5], fov: 60, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [0, 1, 1.5], fov: 60, near: 0.1, far: 100 }}>
       <Sky />
       <CloudVolume />
       <DemoHelpers grid={false} />

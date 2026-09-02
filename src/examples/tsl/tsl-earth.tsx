@@ -37,7 +37,21 @@
  *   `minDistance`/`maxDistance` (0.1 / 50)
  */
 import { Suspense, useRef } from 'react'
-import { bumpMap, cameraPosition, max, mix, normalWorldGeometry, normalize, output, positionWorld, step, texture, uv, vec3, vec4 } from 'three/tsl'
+import {
+  bumpMap,
+  cameraPosition,
+  max,
+  mix,
+  normalWorldGeometry,
+  normalize,
+  output,
+  positionWorld,
+  step,
+  texture,
+  uv,
+  vec3,
+  vec4,
+} from 'three/tsl'
 import { BackSide, SRGBColorSpace } from 'three/webgpu'
 import type { Mesh } from 'three/webgpu'
 import { Canvas, useFrame, useLocalNodes, useTexture, useUniforms } from '@react-three/fiber/webgpu'
@@ -70,10 +84,7 @@ function Globe() {
     rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
   })
 
-  const { uDayColor, uTwilightColor, uRoughnessLow, uRoughnessHigh } = useUniforms(
-    uniformValues,
-    'earth',
-  )
+  const { uDayColor, uTwilightColor, uRoughnessLow, uRoughnessHigh } = useUniforms(uniformValues, 'earth')
 
   const textures = useTexture({
     day: DAY_URL,
@@ -82,13 +93,12 @@ function Globe() {
   })
 
   //* Refs ---------------
-  const globeRef = useRef<Mesh>(null);
-  const atmosphereRef = useRef<Mesh>(null);
-
+  const globeRef = useRef<Mesh>(null)
+  const atmosphereRef = useRef<Mesh>(null)
 
   //* Nodes ---------------
-  const { globeColorNode, globeRoughnessNode, globeNormalNode, globeOutputNode, atmosphereOutputNode } =
-    useLocalNodes(() => {
+  const { globeColorNode, globeRoughnessNode, globeNormalNode, globeOutputNode, atmosphereOutputNode } = useLocalNodes(
+    () => {
       // Color-critical textures need sRGB decoding; the packed bump/roughness/clouds
       // texture is data, not color, so it is left in its default color space.
       textures.day.colorSpace = SRGBColorSpace
@@ -126,7 +136,8 @@ function Globe() {
       const atmosphereOutputNode = vec4(atmosphereColor, alpha)
 
       return { globeColorNode, globeRoughnessNode, globeNormalNode, globeOutputNode, atmosphereOutputNode }
-    })
+    },
+  )
 
   useFrame(({ delta }) => {
     if (globeRef.current) globeRef.current.rotation.y += delta * 0.025 * rotationSpeed
@@ -135,7 +146,7 @@ function Globe() {
   return (
     <>
       <mesh ref={globeRef}>
-        <sphereGeometry  args={[1, 64, 64]} />
+        <sphereGeometry args={[1, 64, 64]} />
         <meshStandardNodeMaterial
           colorNode={globeColorNode}
           roughnessNode={globeRoughnessNode}

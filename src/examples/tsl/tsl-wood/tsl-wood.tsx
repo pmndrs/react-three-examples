@@ -58,8 +58,7 @@ export default function TslWood() {
       renderer={{ toneMapping: NeutralToneMapping }}
       dpr={1}
       background="#ffffff"
-      camera={{ position: [-0.1, 5, 0.548], fov: 75, near: 0.1, far: 1000 }}
-    >
+      camera={{ position: [-0.1, 5, 0.548], fov: 75, near: 0.1, far: 1000 }}>
       {/* One Suspense over environment + scene (B15/B17): <Environment> suspends
           on the HDR and the showcase suspends on the font, so the wood materials'
           first shader build already sees scene.environment — IBL is the ONLY

@@ -144,8 +144,7 @@ function Scene() {
         position={[0, 1, 0]}
         scale={[scaleX, scaleY, 1]}
         material={materials[material as keyof typeof materials]}
-        renderOrder={1}
-      >
+        renderOrder={1}>
         <boxGeometry args={[2, 2, 2]} />
       </mesh>
       <mesh position={[0, 0, 0]}>
@@ -165,8 +164,7 @@ export default function BackdropArea() {
   return (
     <Canvas
       renderer={{ toneMapping: NeutralToneMapping, toneMappingExposure: 0.9 }}
-      camera={{ position: [3, 2, 3], fov: 50, near: 0.25, far: 25 }}
-    >
+      camera={{ position: [3, 2, 3], fov: 50, near: 0.25, far: 25 }}>
       <SceneBackground />
       <Scene />
       {/* Grid off: the example draws its own radially-fading grid floor — the

@@ -45,9 +45,7 @@ import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
-const PISA_HDR_FILES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map(
-  (face) => `${TEXTURE_BASE}cube/pisaHDR/${face}.hdr`,
-)
+const PISA_HDR_FILES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map((face) => `${TEXTURE_BASE}cube/pisaHDR/${face}.hdr`)
 const UV_GRID_URL = `${TEXTURE_BASE}uv_grid_opengl.jpg`
 
 // The mirror sphere. drei's useCubeCamera hook (not the <CubeCamera> render-prop —
@@ -179,8 +177,7 @@ export default function CubemapDynamic() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [0, 0, 75], fov: 60, near: 1, far: 1000 }}
-    >
+      camera={{ position: [0, 0, 75], fov: 60, near: 1, far: 1000 }}>
       <ReflectiveSphere />
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}

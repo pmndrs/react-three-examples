@@ -104,8 +104,7 @@ export default function TexturesPartialUpdate() {
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 0, 2], fov: 70, near: 0.01, far: 10 }}
-    >
+      camera={{ position: [0, 0, 2], fov: 70, near: 0.01, far: 10 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

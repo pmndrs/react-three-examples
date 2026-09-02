@@ -658,7 +658,18 @@
   {
     "slug": "postprocessing-motion-blur",
     "title": "Postprocessing / Motion Blur",
-    "tags": ["postprocessing", "motion-blur", "velocity", "mrt", "tsl", "gltf", "animation", "skinning", "shadows", "leva"],
+    "tags": [
+      "postprocessing",
+      "motion-blur",
+      "velocity",
+      "mrt",
+      "tsl",
+      "gltf",
+      "animation",
+      "skinning",
+      "shadows",
+      "leva"
+    ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_motion_blur",
     "credits": "Xbot model, checkerboard floor and uv_grid textures from the three.js examples"
   },

@@ -195,8 +195,7 @@ export default function LightsSelective() {
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 0, 7], fov: 50, near: 0.01, far: 100 }}
-    >
+      camera={{ position: [0, 0, 7], fov: 50, near: 0.01, far: 100 }}>
       <OrbitingLight id={1} lightRef={light1Ref} color={light1Color} speed={speed} />
       <OrbitingLight id={2} lightRef={light2Ref} color={light2Color} speed={speed} />
       <OrbitingLight id={3} lightRef={light3Ref} color={light3Color} speed={speed} />

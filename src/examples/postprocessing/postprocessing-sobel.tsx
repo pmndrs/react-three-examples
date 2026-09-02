@@ -29,8 +29,7 @@ import { useControls } from 'leva'
 
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DragonAttenuation.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DragonAttenuation.glb'
 
 //* Scene =========================================================
 
@@ -103,8 +102,7 @@ export default function PostprocessingSobel() {
       // Canvas would otherwise default to ACESFilmic.
       renderer={{ toneMapping: LinearToneMapping }}
       background="#000000"
-      camera={{ position: [0, 1, 3], fov: 70, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [0, 1, 3], fov: 70, near: 0.1, far: 100 }}>
       {/* SobelPipeline (a creator-hook component) renders BEFORE the suspending
           Dragon sibling — a creator hook after a suspending sibling can trigger the
           B18 setState-in-render escalation into a full B17 pixel freeze (AGENTS.md). */}

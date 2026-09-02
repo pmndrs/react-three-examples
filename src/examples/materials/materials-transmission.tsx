@@ -40,13 +40,7 @@
  *   the param is declared but never wired to anything upstream).
  */
 import { Suspense, useEffect } from 'react'
-import {
-  ACESFilmicToneMapping,
-  CanvasTexture,
-  DoubleSide,
-  NearestFilter,
-  RepeatWrapping,
-} from 'three/webgpu'
+import { ACESFilmicToneMapping, CanvasTexture, DoubleSide, NearestFilter, RepeatWrapping } from 'three/webgpu'
 import { Canvas, useThree } from '@react-three/fiber/webgpu'
 import { Environment } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
@@ -144,8 +138,7 @@ export default function MaterialsTransmission() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [0, 0, 120], fov: 40, near: 1, far: 2000 }}
-    >
+      camera={{ position: [0, 0, 120], fov: 40, near: 1, far: 2000 }}>
       <ToneMappingExposure exposure={exposure} />
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}

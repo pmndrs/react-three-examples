@@ -131,8 +131,7 @@ export default function PostprocessingLensflare() {
     <Canvas
       // Original sets ACESFilmic explicitly — tone-mapping parity rule.
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [0, 0.5, -0.5], fov: 45, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [0, 0.5, -0.5], fov: 45, near: 0.1, far: 100 }}>
       <Suspense fallback={null}>
         <Environment />
         <SpaceShipHallway />

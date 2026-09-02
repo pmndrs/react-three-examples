@@ -75,8 +75,7 @@ export default function TslProceduralTerrain() {
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       shadows
       background="#201919"
-      camera={{ position: [-10, 8, -2.2], fov: 35, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [-10, 8, -2.2], fov: 35, near: 0.1, far: 100 }}>
       {/* One Suspense over environment + scene: <Environment> suspends on the HDR
           fetch, so the terrain's (expensive, built-once) shader graph only compiles
           AFTER `scene.environment` is set. Mounting the terrain before the HDR lands
@@ -108,12 +107,7 @@ export default function TslProceduralTerrain() {
         {/* Water: a plain transmissive physical material — no node graph needed. */}
         <mesh rotation-x={-Math.PI * 0.5} position-y={-0.1}>
           <planeGeometry args={[10, 10]} />
-          <meshPhysicalNodeMaterial
-            transmission={1}
-            roughness={waterRoughness}
-            ior={waterIor}
-            color={waterColor}
-          />
+          <meshPhysicalNodeMaterial transmission={1} roughness={waterRoughness} ior={waterIor} color={waterColor} />
         </mesh>
       </Suspense>
 

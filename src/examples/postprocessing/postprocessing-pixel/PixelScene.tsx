@@ -56,13 +56,7 @@ function Crystal() {
   return (
     <mesh ref={meshRef} castShadow receiveShadow>
       <icosahedronGeometry args={[0.2]} />
-      <meshPhongMaterial
-        ref={materialRef}
-        color={0x68b7e9}
-        emissive={0x4f7e8b}
-        shininess={10}
-        specular={0xffffff}
-      />
+      <meshPhongMaterial ref={materialRef} color={0x68b7e9} emissive={0x4f7e8b} shininess={10} specular={0xffffff} />
     </mesh>
   )
 }

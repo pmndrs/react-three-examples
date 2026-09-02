@@ -102,7 +102,10 @@ for (const relative of TARGETS) {
 
   let out = source
   for (const [from, to] of REPLACEMENTS) out = out.replaceAll(from, to)
-  out = out.replace(anchor.replace('UniformsWithUtils<UniformRecord<UniformNode>>', 'MappedUniforms<T>'), (m) => HELPER + m)
+  out = out.replace(
+    anchor.replace('UniformsWithUtils<UniformRecord<UniformNode>>', 'MappedUniforms<T>'),
+    (m) => HELPER + m,
+  )
 
   await writeFile(path, out)
   patched++

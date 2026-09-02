@@ -96,7 +96,10 @@ export function Flames() {
       mainUv.x.addAssign(gradient1.mul(gradient2).mul(0.2))
 
       // cellular noise
-      const cellularUv = mainUv.mul(0.5).add(vec2(0, t.negate().mul(0.5))).mod(1)
+      const cellularUv = mainUv
+        .mul(0.5)
+        .add(vec2(0, t.negate().mul(0.5)))
+        .mod(1)
       const cellularNoise = texture(cellularTexture, cellularUv, 0).r.oneMinus().smoothstep(0, 0.5).oneMinus().toVar()
       cellularNoise.mulAssign(gradient2)
 
@@ -136,9 +139,15 @@ export function Flames() {
       mainUv.x.addAssign(gradient1.mul(gradient2).mul(0.2))
 
       // displaced perlin noise
-      const displacementPerlinUv = mainUv.mul(0.5).add(vec2(0, t.negate().mul(0.25))).mod(1)
+      const displacementPerlinUv = mainUv
+        .mul(0.5)
+        .add(vec2(0, t.negate().mul(0.25)))
+        .mod(1)
       const displacementPerlinNoise = texture(perlinTexture, displacementPerlinUv, 0).sub(0.5).mul(1)
-      const displacedPerlinUv = mainUv.add(vec2(0, t.negate().mul(0.5))).add(displacementPerlinNoise).mod(1)
+      const displacedPerlinUv = mainUv
+        .add(vec2(0, t.negate().mul(0.5)))
+        .add(displacementPerlinNoise)
+        .mod(1)
       const displacedPerlinNoise = texture(perlinTexture, displacedPerlinUv, 0).sub(0.5).mul(1)
       mainUv.x.addAssign(displacedPerlinNoise.mul(0.5))
 

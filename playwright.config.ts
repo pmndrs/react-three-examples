@@ -10,12 +10,7 @@ const LINUX = process.platform === 'linux'
 const WEBGPU_ARGS = [
   '--enable-unsafe-webgpu',
   ...(LINUX
-    ? [
-        '--enable-features=Vulkan',
-        '--use-angle=vulkan',
-        '--use-vulkan=swiftshader',
-        '--use-webgpu-adapter=swiftshader',
-      ]
+    ? ['--enable-features=Vulkan', '--use-angle=vulkan', '--use-vulkan=swiftshader', '--use-webgpu-adapter=swiftshader']
     : []),
 ]
 

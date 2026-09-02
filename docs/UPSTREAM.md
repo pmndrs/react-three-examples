@@ -17,17 +17,17 @@ origin), drei `11.0.0-alpha.5`, three `0.185.1`.
 
 ## Part A — What this repo carries (unwind ledger)
 
-| # | What | Where | Unwinds when |
-|---|------|-------|--------------|
-| ~~A1~~ **UNWOUND 2026-08-31** | ~~fiber from locally-built tarball, vendored in git for CI~~ | — | `10.0.0-alpha.4` published on npm and installs clean against three 0.185.1. package.json repointed, tarball + `.gitignore` exception deleted. |
-| ~~A2~~ **UNWOUND 2026-08-31** | ~~drei alpha.5 patched for the `CubeRenderTarget` rename~~ | — | drei `11.0.0-alpha.6` ships the rename (B4 fixed: 0 `WebGLCubeRenderTarget`, 6 `CubeRenderTarget`). `patches/` deleted, `patchedDependencies` removed from pnpm-workspace.yaml. |
-| A3 | Vite regex alias forcing one fiber build | `vite.config.ts` (`/^@react-three\/fiber(\/webgpu)?$/`) | fiber packaging makes `.` and `./webgpu` share a runtime chunk (B2) |
-| A4 | `typescript` pinned `^6` (repo was on 7.0.2) | `package.json` devDeps | typescript-eslint ships TS7 support (typescript-eslint#10940) |
-| A5 | react-router pinned to v7 (`version-7` dist-tag; npm latest is v8) | `package.json` | Deliberate scope decision, not a bug — revisit as its own migration task |
-| A6 | `optimizeDeps.entries: ['index.html']` | `vite.config.ts` | Permanent while `reference/` clones exist in the worktree (Vite scans every `*.html` by default). Not an upstream issue |
-| A7 | `UniformNode → Node<'float'>` double cast in examples (now REDUNDANT, superseded by A9 — harmless, a cast through `unknown` still compiles) | grep `as unknown as Node` in `src/examples/` | Removed opportunistically; A9 already makes new code cast-free |
-| A8 | pnpm pinned via `packageManager` | `package.json` | Hygiene, not a shim; keep |
-| A9 | **fiber `useUniforms` return type patched locally** so uniforms keep three's real types (no cast, typed `.value`, checked keys) | `scripts/patch-fiber-types.mjs`, run from `postinstall` — rewrites `dist/webgpu/index.d.{ts,mts,cts}` ONLY, types-only, idempotent | fiber ships the B1 fix (both halves). The script FAILS LOUDLY with exit 1 if its anchor string is gone — that error is the removal reminder: delete the script, the postinstall hook, and the remaining A7 casts. Not `pnpm patch` because fiber installs from a `file:` tarball, which `pnpm patch` can't resolve |
+| #                             | What                                                                                                                                        | Where                                                                                                                              | Unwinds when                                                                                                                                                                                                                                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| ~~A1~~ **UNWOUND 2026-08-31** | ~~fiber from locally-built tarball, vendored in git for CI~~                                                                                | —                                                                                                                                  | `10.0.0-alpha.4` published on npm and installs clean against three 0.185.1. package.json repointed, tarball + `.gitignore` exception deleted.                                                                                                                                                                      |
+| ~~A2~~ **UNWOUND 2026-08-31** | ~~drei alpha.5 patched for the `CubeRenderTarget` rename~~                                                                                  | —                                                                                                                                  | drei `11.0.0-alpha.6` ships the rename (B4 fixed: 0 `WebGLCubeRenderTarget`, 6 `CubeRenderTarget`). `patches/` deleted, `patchedDependencies` removed from pnpm-workspace.yaml.                                                                                                                                    |
+| A3                            | Vite regex alias forcing one fiber build                                                                                                    | `vite.config.ts` (`/^@react-three\/fiber(\/webgpu)?$/`)                                                                            | fiber packaging makes `.` and `./webgpu` share a runtime chunk (B2)                                                                                                                                                                                                                                                |
+| A4                            | `typescript` pinned `^6` (repo was on 7.0.2)                                                                                                | `package.json` devDeps                                                                                                             | typescript-eslint ships TS7 support (typescript-eslint#10940)                                                                                                                                                                                                                                                      |
+| A5                            | react-router pinned to v7 (`version-7` dist-tag; npm latest is v8)                                                                          | `package.json`                                                                                                                     | Deliberate scope decision, not a bug — revisit as its own migration task                                                                                                                                                                                                                                           |
+| A6                            | `optimizeDeps.entries: ['index.html']`                                                                                                      | `vite.config.ts`                                                                                                                   | Permanent while `reference/` clones exist in the worktree (Vite scans every `*.html` by default). Not an upstream issue                                                                                                                                                                                            |
+| A7                            | `UniformNode → Node<'float'>` double cast in examples (now REDUNDANT, superseded by A9 — harmless, a cast through `unknown` still compiles) | grep `as unknown as Node` in `src/examples/`                                                                                       | Removed opportunistically; A9 already makes new code cast-free                                                                                                                                                                                                                                                     |
+| A8                            | pnpm pinned via `packageManager`                                                                                                            | `package.json`                                                                                                                     | Hygiene, not a shim; keep                                                                                                                                                                                                                                                                                          |
+| A9                            | **fiber `useUniforms` return type patched locally** so uniforms keep three's real types (no cast, typed `.value`, checked keys)             | `scripts/patch-fiber-types.mjs`, run from `postinstall` — rewrites `dist/webgpu/index.d.{ts,mts,cts}` ONLY, types-only, idempotent | fiber ships the B1 fix (both halves). The script FAILS LOUDLY with exit 1 if its anchor string is gone — that error is the removal reminder: delete the script, the postinstall hook, and the remaining A7 casts. Not `pnpm patch` because fiber installs from a `file:` tarball, which `pnpm patch` can't resolve |
 
 House rule: **every new patch/override/pin lands with an entry here in the same
 commit** (AGENTS.md points agents at this file).
@@ -44,7 +44,7 @@ commit** (AGENTS.md points agents at this file).
   `interface UniformNode<T> extends Node { value: T }` to an alias of three's own
   two-param `UniformNode<TNodeType, TValue>` — but the alias pins `TNodeType` to
   `unknown`.
-- **Why it breaks**: `Node<unknown>` is a *supertype* of `Node<'float'>`, so a fiber
+- **Why it breaks**: `Node<unknown>` is a _supertype_ of `Node<'float'>`, so a fiber
   uniform is not assignable to any TSL signature expecting
   `Node<'float'> | number` (`mix`, `bloom` args, …) under strict tsc. Every TSL-using
   consumer needs `uFoo as unknown as Node<'float'>`.
@@ -63,8 +63,7 @@ its input type independently:
 
 ```ts
 // dist/webgpu/index.d.ts:3809 — T is captured, then never used
-declare function useUniforms<T extends UniformInputRecord>(uniforms: T):
-  UniformsWithUtils<UniformRecord<UniformNode>>   // = Record<string, UniformNode<unknown, unknown>>
+declare function useUniforms<T extends UniformInputRecord>(uniforms: T): UniformsWithUtils<UniformRecord<UniformNode>> // = Record<string, UniformNode<unknown, unknown>>
 ```
 
 So BOTH the node type and the **value** type are erased, and the keys with them.
@@ -76,12 +75,12 @@ which is why this is purely fiber's to fix:
 
 ```ts
 const a = uniform(0.5)
-const a1: Node<'float'> = a   // ✓ compiles with no cast
-const a2: number = a.value    // ✓
+const a1: Node<'float'> = a // ✓ compiles with no cast
+const a2: number = a.value // ✓
 
-declare const b: UniformNode<unknown, unknown>   // what useUniforms returns today
-const b1: Node<'float'> = b   // ✗ TS2322
-const b2: number = b.value    // ✗ TS2322
+declare const b: UniformNode<unknown, unknown> // what useUniforms returns today
+const b1: Node<'float'> = b // ✗ TS2322
+const b2: number = b.value // ✗ TS2322
 ```
 
 three composes as `UniformNode<TNodeType, TValue> = UniformNodeClass<TValue> &
@@ -94,17 +93,27 @@ to mirror.
 locally and what the PR should contain):
 
 ```ts
-type UniformNodeFor<V> = V extends Node ? V           // pass TSL nodes through
-  : V extends number  ? UniformNode<'float', number>
-  : V extends boolean ? UniformNode<'bool', boolean>
-  : V extends Vector2 ? UniformNode<'vec2', Vector2>
-  : V extends Vector3 ? UniformNode<'vec3', Vector3>
-  : V extends Vector4 ? UniformNode<'vec4', Vector4>
-  : V extends Color   ? UniformNode<'color', Color>
-  : V extends Matrix3 ? UniformNode<'mat3', Matrix3>
-  : V extends Matrix4 ? UniformNode<'mat4', Matrix4>
-  : V extends string  ? UniformNode<'color', Color>   // fiber converts color strings
-  : UniformNode<unknown, V>
+type UniformNodeFor<V> = V extends Node
+  ? V // pass TSL nodes through
+  : V extends number
+    ? UniformNode<'float', number>
+    : V extends boolean
+      ? UniformNode<'bool', boolean>
+      : V extends Vector2
+        ? UniformNode<'vec2', Vector2>
+        : V extends Vector3
+          ? UniformNode<'vec3', Vector3>
+          : V extends Vector4
+            ? UniformNode<'vec4', Vector4>
+            : V extends Color
+              ? UniformNode<'color', Color>
+              : V extends Matrix3
+                ? UniformNode<'mat3', Matrix3>
+                : V extends Matrix4
+                  ? UniformNode<'mat4', Matrix4>
+                  : V extends string
+                    ? UniformNode<'color', Color> // fiber converts color strings
+                    : UniformNode<unknown, V>
 
 declare function useUniforms<T extends UniformInputRecord>(
   uniforms: T,
@@ -326,7 +335,7 @@ do not count those as fixed.
 
 - **What**: when a child suspends all the way up to Canvas's own internal boundary
   (no user `<Suspense>` in between), fiber alpha.3 logs `R3F.createRoot should only
-  be called once!` and every TSL `time`-driven node graph freezes permanently at
+be called once!` and every TSL `time`-driven node graph freezes permanently at
   frame one. Scenes still render (non-black), so smoke tiers that only assert
   pixels miss it entirely.
 - **Evidence**: found porting `tsl-vfx-flames`; a pixel-diff sweep (two frames
@@ -486,6 +495,7 @@ do not count those as fixed.
   ```
 
   So the documented, type-checked usage crashes at runtime.
+
 - **Evidence**: `lights-phong`. This typechecks clean and throws
   `TypeError: Cannot set properties of undefined (setting 'wrapT')`, which surfaces as
   an `<CanvasImpl>` error boundary trip and a never-ready example (readiness timeout,
@@ -504,17 +514,18 @@ do not count those as fixed.
   `object[prop] = ref.current` verbatim. Two consequences:
   1. Resolution is TOP-LEVEL props on a three instance only. A marker nested inside a
      value (`lights([fromRef(ref)])`) is never resolved.
-  2. The resolved value is assigned RAW. A prop that needs the sibling *wrapped* —
+  2. The resolved value is assigned RAW. A prop that needs the sibling _wrapped_ —
      the common case for node materials — cannot use `fromRef` at all.
 - **Evidence**: `lights-phong` needs `material.lightsNode = lights([theLight])`.
   Verified both readings empirically:
   - `lights([fromRef(ref)])` → `THREE.LightsNode.setupNodeLights: Light node not found
-    for Object` (the marker is not a Light, and never becomes one).
+for Object` (the marker is not a Light, and never becomes one).
   - `lightsNode={fromRef(ref)}` → `TypeError: lightsNode.getScope is not a function`
     (a raw `PointLight` assigned where a `LightsNode` was required).
 
   Note `fromRef` also cannot reach a React component: `<Teapot light={fromRef(ref)} />`
   delivers the opaque marker, since only three instances go through `commitMount`.
+
 - **Suggested fix**: an optional transform —
   `fromRef<T, R>(ref: RefObject<T | null>, transform?: (value: T) => R): R`, applied in
   `commitMount` before assignment. That makes the whole family of instance-consuming
@@ -526,6 +537,7 @@ do not count those as fixed.
 
   This generalises well beyond lights — anything taking an object reference
   (`SpotLight.target`, `LOD` levels, `SkinnedMesh` skeletons) hits the same wall.
+
 - **Workaround in the corpus** (`lights-phong`): pass the plain ref down and exploit the
   fact that `LightsNode.setLights()` is a bare reference assignment
   (`this._lights = lights`, no copy) while `setupLightsNode()` doesn't read `_lights`
@@ -536,7 +548,7 @@ do not count those as fixed.
 ### B28 · three/drei (OPEN): `PMREM.cubeUv` disposed mid-submit — recurring, not the cold-start transient
 
 - **What**: `THREE.WebGPURenderer: Uncaptured WebGPU GPUValidationError: Destroyed
-  texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as a
+texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as a
   ONE-TIME cold-start signature that never repeats. On `tsl-wood` it RECURS, so the
   "gone on run 2" rule does not cover it.
 - **Evidence** (2026-08-31, fiber 10.0.0-alpha.4 + drei 11.0.0-alpha.6, StrictMode on):
@@ -570,16 +582,17 @@ do not count those as fixed.
 - **Rescoped 2026-09-01 (wave-2 measurement)**: this is NOT `tsl-wood`-specific. Measured
   5 scoped runs per example on a healthy dev server:
 
-  | example | pass | fail | failures carrying the `PMREM.cubeUv` signature |
-  |---|---|---|---|
-  | `tsl-wood` | 4/5 | 1/5 | 1 of 1 |
-  | `loader-gltf-dispersion` | 2/5 | **3/5** | **3 of 3** |
+  | example                  | pass | fail    | failures carrying the `PMREM.cubeUv` signature |
+  | ------------------------ | ---- | ------- | ---------------------------------------------- |
+  | `tsl-wood`               | 4/5  | 1/5     | 1 of 1                                         |
+  | `loader-gltf-dispersion` | 2/5  | **3/5** | **3 of 3**                                     |
 
   `loader-gltf-dispersion` reproduces at ~60% versus `tsl-wood`'s ~20%, so **it is the
   better repro case** for anyone chasing this upstream. Both drive `scene.environment`
   from an HDR through drei's `<Environment>` (`/webgpu`), which is what builds the PMREM.
   **27 corpus examples import `Environment`**, so the blast radius is far wider than the
   two that happen to trip it in CI.
+
 - The failure is console-only: the canvas renders and the non-black assertion passes; it
   is the `expect(errors).toEqual([])` console-clean assertion that fails. So it degrades
   the test signal rather than the demo.

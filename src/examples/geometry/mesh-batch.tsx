@@ -76,19 +76,12 @@ function randomizeMatrix(matrix: Matrix4) {
 
 /** One BatchedMesh holding `count` instances of three template geometries. */
 function buildBatch(count: number) {
-  const geometries = [
-    new ConeGeometry(1.0, 2.0),
-    new BoxGeometry(2.0, 2.0, 2.0),
-    new SphereGeometry(1.0, 16, 8),
-  ]
+  const geometries = [new ConeGeometry(1.0, 2.0), new BoxGeometry(2.0, 2.0, 2.0), new SphereGeometry(1.0, 16, 8)]
 
   // Unlit shading: per-instance diffuse color scaled by the packed view-space normal's
   // green channel — a cheap top-lit look with no lights in the scene.
   const material = new MeshBasicNodeMaterial()
-  material.outputNode = vec4(
-    diffuseColor.mul(packNormalToRGB(normalView).y.add(0.5)).rgb,
-    diffuseColor.a,
-  )
+  material.outputNode = vec4(diffuseColor.mul(packNormalToRGB(normalView).y.add(0.5)).rgb, diffuseColor.a)
 
   // Vertex/index budget covers the three template geometries once — instances share them.
   const mesh = new BatchedMesh(count, geometries.length * 512, geometries.length * 1024, material)
@@ -166,10 +159,7 @@ function BatchedShapes({
   // re-renders (AGENTS.md).
   const [{ mesh, material, ids, rotationSpeeds, geometryCount }] = useState(() => buildBatch(count))
 
-  const customSort = useMemo(
-    () => createRadixSort(mesh.maxInstanceCount, material),
-    [mesh, material],
-  )
+  const customSort = useMemo(() => createRadixSort(mesh.maxInstanceCount, material), [mesh, material])
 
   useEffect(() => {
     mesh.setCustomSort(useCustomSort ? customSort : null)
@@ -202,28 +192,21 @@ function BatchedShapes({
     }
   })
 
-  return (
-    <primitive
-      object={mesh}
-      sortObjects={sortObjects}
-      perObjectFrustumCulled={perObjectFrustumCulled}
-    />
-  )
+  return <primitive object={mesh} sortObjects={sortObjects} perObjectFrustumCulled={perObjectFrustumCulled} />
 }
 
 export default function MeshBatch() {
   const [randomizeNonce, setRandomizeNonce] = useState(0)
 
-  const { count, dynamic, opacity, sortObjects, perObjectFrustumCulled, useCustomSort } =
-    useControls('mesh-batch', {
-      count: { value: 512, min: 1, max: MAX_INSTANCE_COUNT, step: 1 },
-      dynamic: { value: 16, min: 0, max: MAX_INSTANCE_COUNT, step: 1 },
-      opacity: { value: 1, min: 0, max: 1 },
-      sortObjects: true,
-      perObjectFrustumCulled: true,
-      useCustomSort: true,
-      'randomize geometry': button(() => setRandomizeNonce((n) => n + 1)),
-    })
+  const { count, dynamic, opacity, sortObjects, perObjectFrustumCulled, useCustomSort } = useControls('mesh-batch', {
+    count: { value: 512, min: 1, max: MAX_INSTANCE_COUNT, step: 1 },
+    dynamic: { value: 16, min: 0, max: MAX_INSTANCE_COUNT, step: 1 },
+    opacity: { value: 1, min: 0, max: 1 },
+    sortObjects: true,
+    perObjectFrustumCulled: true,
+    useCustomSort: true,
+    'randomize geometry': button(() => setRandomizeNonce((n) => n + 1)),
+  })
 
   return (
     <Canvas
@@ -231,8 +214,7 @@ export default function MeshBatch() {
       // (NoToneMapping) — ACESFilmic would mute the unlit instance palette.
       renderer={{ toneMapping: NoToneMapping }}
       background="#c1c1ff"
-      camera={{ position: [0, 0, 30], fov: 70, near: 1, far: 100 }}
-    >
+      camera={{ position: [0, 0, 30], fov: 70, near: 1, far: 100 }}>
       <BatchedShapes
         key={count}
         count={count}

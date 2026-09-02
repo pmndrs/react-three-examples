@@ -167,8 +167,7 @@ export default function TslAngularSlicing() {
       // Original sets ACESFilmic + exposure 1 explicitly — mirrored deliberately
       // (tone-mapping parity rule).
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [-5, 5, 12], fov: 35, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [-5, 5, 12], fov: 35, near: 0.1, far: 100 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes TSL graphs. One boundary wraps lights + backdrop + model so the
           lit scene commits only after the environment is live (B15). */}

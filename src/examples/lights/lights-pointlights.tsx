@@ -36,7 +36,14 @@
  *   with no floor; an infinite ground grid would be pure invention
  */
 import { Suspense, useMemo, useRef, type RefObject } from 'react'
-import { BufferGeometry, Float32BufferAttribute, MeshPhongNodeMaterial, Plane, SphereGeometry, Vector3 } from 'three/webgpu'
+import {
+  BufferGeometry,
+  Float32BufferAttribute,
+  MeshPhongNodeMaterial,
+  Plane,
+  SphereGeometry,
+  Vector3,
+} from 'three/webgpu'
 import type { BufferAttribute, Mesh, PointLight } from 'three/webgpu'
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
 import {
@@ -140,7 +147,9 @@ function createMaterial(light1: PointLight, light2: PointLight) {
   const invDistance1 = max(0, float(20).sub(distance1)).div(2)
   const invDistance2 = max(0, float(20).sub(distance2)).div(2)
 
-  const s = abs(sin(localTime.mul(2).add(seedAttribute)).mul(0.5)).add(invDistance1).add(invDistance2)
+  const s = abs(sin(localTime.mul(2).add(seedAttribute)).mul(0.5))
+    .add(invDistance1)
+    .add(invDistance2)
 
   material.positionNode = positionLocal.add(displaceNormalAttribute.mul(s))
 

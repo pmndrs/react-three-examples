@@ -48,11 +48,11 @@ const HDR_URL =
 // plain number accessor that TSL's `materialSheen` reference node re-reads every frame,
 // so no useUniforms/build-graph plumbing is needed (see header DEMONSTRATES).
 function SheenChair({ sheen }: { sheen: number }) {
-  const { scene } = useGLTF(MODEL_URL);
+  const { scene } = useGLTF(MODEL_URL)
   const material = useMemo(() => {
     const fabric = scene.getObjectByName('SheenChair_fabric') as Mesh | undefined
-    return fabric?.material as MeshPhysicalNodeMaterial | undefined;
-  }, [scene]);
+    return fabric?.material as MeshPhysicalNodeMaterial | undefined
+  }, [scene])
 
   useEffect(() => {
     if (material) material.sheen = sheen
@@ -62,7 +62,7 @@ function SheenChair({ sheen }: { sheen: number }) {
 }
 
 export default function LoaderGltfSheen() {
-  // NOTE: would be cleaner just to put this in the component, but we are showing passing values down. 
+  // NOTE: would be cleaner just to put this in the component, but we are showing passing values down.
   const { sheen } = useControls('loader-gltf-sheen', {
     // SheenChair.glb authors `KHR_materials_sheen` with an implicit sheen factor of 1 —
     // matches the original's un-set dat.gui default (it only wires the slider, never
@@ -73,8 +73,7 @@ export default function LoaderGltfSheen() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [-0.75, 0.7, 1.25], fov: 45, near: 0.1, far: 20 }}
-    >
+      camera={{ position: [-0.75, 0.7, 1.25], fov: 45, near: 0.1, far: 20 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

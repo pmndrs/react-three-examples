@@ -103,11 +103,7 @@ function Blossoms({ layer, tint, map, geometry }: BlossomsProps) {
     const v = new Vector3()
 
     for (let i = 0; i < COUNT; i++) {
-      positions.push(
-        MathUtils.randFloat(-25, -20),
-        MathUtils.randFloat(-10, 50),
-        MathUtils.randFloat(-5, 5),
-      )
+      positions.push(MathUtils.randFloat(-25, -20), MathUtils.randFloat(-10, 50), MathUtils.randFloat(-5, 5))
       v.set(MathUtils.randFloat(0.7, 0.9), MathUtils.randFloat(-0.3, -0.15), 0).normalize()
       rotations.push(Math.random(), Math.random(), Math.random())
       directions.push(v.x, v.y, v.z)
@@ -139,12 +135,7 @@ function Blossoms({ layer, tint, map, geometry }: BlossomsProps) {
   }, [positionAttribute, rotationAttribute, directionAttribute, timeAttribute])
 
   return (
-    <mesh
-      geometry={geometry}
-      count={COUNT}
-      frustumCulled={false}
-      layers-mask={1 << layer}
-    >
+    <mesh geometry={geometry} count={COUNT} frustumCulled={false} layers-mask={1 << layer}>
       <meshBasicNodeMaterial
         color={tint}
         map={map}
@@ -192,8 +183,7 @@ export default function Layers() {
     <Canvas
       // Original renders with the WebGPURenderer default tone mapping (none) —
       // match it explicitly; fiber's Canvas default is ACESFilmic (AGENTS.md).
-      renderer={{ toneMapping: NoToneMapping }}
-    >
+      renderer={{ toneMapping: NoToneMapping }}>
       <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={60} near={0.1} far={100} layers-mask={layerMask} />
       <Background />
       {/* B17 gate: useTexture suspends — never let suspension reach Canvas. */}

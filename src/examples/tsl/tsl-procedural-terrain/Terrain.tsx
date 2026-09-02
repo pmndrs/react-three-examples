@@ -102,9 +102,7 @@ export function Terrain({ controlsRef }: TerrainProps) {
 
       const warpedPosition = position.add(uOffset).toVar()
       warpedPosition.addAssign(
-        mx_noise_float(warpedPosition.mul(uPositionFrequency).mul(uWarpFrequency), 1, 0).mul(
-          uWarpStrength,
-        ),
+        mx_noise_float(warpedPosition.mul(uPositionFrequency).mul(uWarpFrequency), 1, 0).mul(uWarpStrength),
       )
 
       const elevation = float(0).toVar()
@@ -234,8 +232,7 @@ export function Terrain({ controlsRef }: TerrainProps) {
         }}
         onPointerOut={() => {
           if (!dragging.current) domElement.style.cursor = 'default'
-        }}
-      >
+        }}>
         <planeGeometry args={[10, 10]} />
         <meshBasicMaterial visible={false} />
       </mesh>

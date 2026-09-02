@@ -64,8 +64,7 @@ export default function LoaderGltfCompressed() {
     <Canvas
       renderer={{ toneMapping: ReinhardToneMapping }}
       background="#eeeeee"
-      camera={{ position: [2, 2, 2], fov: 50, near: 1, far: 20 }}
-    >
+      camera={{ position: [2, 2, 2], fov: 50, near: 1, far: 20 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

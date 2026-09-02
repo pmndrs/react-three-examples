@@ -50,8 +50,7 @@ export default function VolumeLightingExample() {
       renderer={{ toneMapping: NeutralToneMapping, toneMappingExposure: 2 }}
       shadows
       background="#000000"
-      camera={{ position: [-8, 1, -6], fov: 60, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [-8, 1, -6], fov: 60, near: 0.1, far: 100 }}>
       <Suspense fallback={null}>
         <VolumeLighting />
       </Suspense>

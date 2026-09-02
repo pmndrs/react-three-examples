@@ -119,13 +119,7 @@ function Cameras() {
 
   return (
     <>
-      <PerspectiveCamera
-        makeDefault={!orthographic}
-        position={CAMERA_POSITION}
-        fov={70}
-        near={0.1}
-        far={5000}
-      />
+      <PerspectiveCamera makeDefault={!orthographic} position={CAMERA_POSITION} fov={70} near={0.1} far={5000} />
       <OrthographicCamera
         makeDefault={orthographic}
         position={CAMERA_POSITION}
@@ -164,13 +158,7 @@ export default function ShadowmapCsm() {
       <CsmLight lightDirection={[lightX, lightY, lightZ]} />
       <Floor />
       <BoxRows />
-      <DemoHelpers
-        grid={false}
-        target={CAMERA_TARGET}
-        maxPolarAngle={Math.PI / 2}
-        minZoom={0.1}
-        maxZoom={10}
-      />
+      <DemoHelpers grid={false} target={CAMERA_TARGET} maxPolarAngle={Math.PI / 2} minZoom={0.1} maxZoom={10} />
     </Canvas>
   )
 }

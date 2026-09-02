@@ -57,8 +57,7 @@ import { useControls } from 'leva'
 
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DragonAttenuation.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DragonAttenuation.glb'
 
 // toneMappingExposure + shadowMap.transmitted are WebGPURenderer properties with no
 // Canvas prop — set imperatively (pattern: materials-transmission, volume-fire).
@@ -150,8 +149,7 @@ export default function ShadowmapOpacity() {
       renderer={{ toneMapping: AgXToneMapping }}
       shadows
       background="#9e9eff"
-      camera={{ position: [-4, 2, 6], fov: 45, near: 0.1, far: 40 }}
-    >
+      camera={{ position: [-4, 2, 6], fov: 45, near: 0.1, far: 40 }}>
       <RendererSetup />
       <ambientLight intensity={0.5} />
       <directionalLight

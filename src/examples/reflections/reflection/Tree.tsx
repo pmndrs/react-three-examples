@@ -181,9 +181,7 @@ export function Tree() {
       // Effectors: blob-like scale bumps as the traveling pulse passes each instance's
       // `instanceTime` position along the branch.
       const dif1 = abs(instanceTime.sub(uEffector1)).toConst()
-      let effect = dif1
-        .lessThanEqual(0.15)
-        .select(sub(0.15, dif1).mul(sub(1.7, instanceTime).mul(10)), float(0))
+      let effect = dif1.lessThanEqual(0.15).select(sub(0.15, dif1).mul(sub(1.7, instanceTime).mul(10)), float(0))
 
       const dif2 = abs(instanceTime.sub(uEffector2)).toConst()
       effect = dif2.lessThanEqual(0.15).select(sub(0.15, dif2).mul(sub(1.7, instanceTime).mul(10)), effect)
@@ -215,9 +213,7 @@ export function Tree() {
       const instanceTime = instanceData.y
 
       const dif1 = abs(instanceTime.sub(uEffector1)).toConst()
-      const effect1 = dif1
-        .lessThanEqual(0.15)
-        .select(sub(0.15, dif1).mul(sub(1.7, instanceTime).mul(10)), float(0))
+      const effect1 = dif1.lessThanEqual(0.15).select(sub(0.15, dif1).mul(sub(1.7, instanceTime).mul(10)), float(0))
 
       const dif2 = abs(instanceTime.sub(uEffector2)).toConst()
       const effect2 = dif2.lessThanEqual(0.15).select(sub(0.15, dif2).mul(sub(1.7, instanceTime).mul(10)), effect1)

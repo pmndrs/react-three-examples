@@ -87,12 +87,7 @@ function PixelAlignedFrustum({ enabled, pixelSize }: { enabled: boolean; pixelSi
   useFrame(() => {
     const aspectRatio = size.width / size.height
     if (enabled) {
-      pixelAlignFrustum(
-        camera,
-        aspectRatio,
-        Math.floor(size.width / pixelSize),
-        Math.floor(size.height / pixelSize),
-      )
+      pixelAlignFrustum(camera, aspectRatio, Math.floor(size.width / pixelSize), Math.floor(size.height / pixelSize))
     } else if (camera.left !== -aspectRatio || camera.top !== 1) {
       // Reset the frustum if pixel alignment (or a resize) has modified it
       camera.left = -aspectRatio
@@ -136,8 +131,7 @@ export default function PostprocessingPixel() {
         near: 0.1,
         far: 10,
         position: [0, 2 * Math.tan(Math.PI / 6), 2],
-      }}
-    >
+      }}>
       <Suspense fallback={null}>
         <PixelScene />
       </Suspense>

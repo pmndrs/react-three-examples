@@ -37,14 +37,7 @@
  *   ACESFilmic and mute the random instance palette
  */
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import {
-  Color,
-  IcosahedronGeometry,
-  Matrix4,
-  MeshStandardMaterial,
-  NoToneMapping,
-  PMREMGenerator,
-} from 'three/webgpu'
+import { Color, IcosahedronGeometry, Matrix4, MeshStandardMaterial, NoToneMapping, PMREMGenerator } from 'three/webgpu'
 import type { InstancedMesh } from 'three/webgpu'
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
 import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js'
@@ -87,10 +80,7 @@ function SphereGrid({ amount, alpha, alphaHash }: SphereGridProps) {
   const meshRef = useRef<InstancedMesh>(null)
 
   const geometry = useMemo(() => new IcosahedronGeometry(0.5, 3), [])
-  const material = useMemo(
-    () => new MeshStandardMaterial({ color: 0xffffff, alphaHash: true, opacity: 0.5 }),
-    [],
-  )
+  const material = useMemo(() => new MeshStandardMaterial({ color: 0xffffff, alphaHash: true, opacity: 0.5 }), [])
 
   // Static transforms + per-instance colors, written BEFORE the first RAF render:
   // the WebGPU shader-graph build reads the mesh once — setColorAt must have created
@@ -175,8 +165,7 @@ export default function MaterialsAlphaHash() {
       // match it explicitly; fiber's Canvas default is ACESFilmic.
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [3, 3, 3], fov: 60, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [3, 3, 3], fov: 60, near: 0.1, far: 100 }}>
       <RoomEnv />
       <SphereGrid key={amount} amount={amount} alpha={alpha} alphaHash={alphaHash} />
       <SSAAPipeline sampleLevel={sampleLevel} />

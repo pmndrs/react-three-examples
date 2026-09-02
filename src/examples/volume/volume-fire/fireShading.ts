@@ -294,13 +294,9 @@ export function createFireShading({ u, velTexA, dyeTexA, dyeTexNode }: FireShadi
     // solid surfaces keep their physical falloff.
     const distToLight = P.sub(A).length()
     const defaultAttenuation = distToLight.pow(2.0).max(0.01).reciprocal()
-    const attenuationCorrection = isVolume
-      .equal(1.0)
-      .select(softAttenuation.div(defaultAttenuation), float(1.0))
+    const attenuationCorrection = isVolume.equal(1.0).select(softAttenuation.div(defaultAttenuation), float(1.0))
 
-    const currentIntensity = isVolume
-      .equal(1.0)
-      .select(float(PL_VOLUME_INTENSITY), float(PL_SURFACE_INTENSITY))
+    const currentIntensity = isVolume.equal(1.0).select(float(PL_VOLUME_INTENSITY), float(PL_SURFACE_INTENSITY))
 
     // Color temperature with a slight CPU-noise oscillation (uniform for the volume)
     const colorT = u.uEmitTemperature.div(8.34).mul(0.5).add(0.2).add(u.uColorNoise).clamp(0.0, 1.0)
@@ -314,11 +310,7 @@ export function createFireShading({ u, velTexA, dyeTexA, dyeTexNode }: FireShadi
 
     const freqScale = float(PL_PROJECTION_FREQUENCY)
     const angleNoise = mx_noise_float(
-      vec3(
-        cos(angle).mul(float(1.5).mul(freqScale)),
-        sin(angle).mul(float(1.5).mul(freqScale)),
-        u.uTime.mul(0.6),
-      ),
+      vec3(cos(angle).mul(float(1.5).mul(freqScale)), sin(angle).mul(float(1.5).mul(freqScale)), u.uTime.mul(0.6)),
     )
       .mul(0.5)
       .add(0.5)
@@ -368,11 +360,7 @@ export function createFireShading({ u, velTexA, dyeTexA, dyeTexNode }: FireShadi
 
     // Near/far intensity blend, applied only when shading the volume
     const distRatio = distToSegment.div(LIGHT_FAR_DISTANCE).clamp(0.0, 1.0)
-    const distanceScale = mix(
-      float(LIGHT_NEAR_INTENSITY),
-      float(LIGHT_FAR_INTENSITY),
-      smoothstep(0.0, 1.0, distRatio),
-    )
+    const distanceScale = mix(float(LIGHT_NEAR_INTENSITY), float(LIGHT_FAR_INTENSITY), smoothstep(0.0, 1.0, distRatio))
     const finalScale = isVolume.equal(1.0).select(distanceScale, float(1.0))
 
     return baseColor.mul(attenuationCorrection).mul(finalScale)
@@ -387,7 +375,9 @@ export function createFireShading({ u, velTexA, dyeTexA, dyeTexNode }: FireShadi
 
     const n1 = mx_noise_float(p.add(flow)).mul(0.5).add(0.5)
     const p2 = p.mul(2.0).sub(flow.mul(1.5))
-    const n2 = mx_noise_float(p2.add(vec3(n1.mul(0.4)))).mul(0.5).add(0.5)
+    const n2 = mx_noise_float(p2.add(vec3(n1.mul(0.4))))
+      .mul(0.5)
+      .add(0.5)
     const p3 = p.mul(4.0).add(flow.mul(2.5))
     const n3 = mx_noise_float(p3).mul(0.5).add(0.5)
 

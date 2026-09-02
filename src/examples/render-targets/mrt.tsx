@@ -36,18 +36,7 @@
  *   `screenUV.x` layout, not a parameter
  */
 import { Suspense, useLayoutEffect } from 'react'
-import {
-  diffuseColor,
-  emissive,
-  mix,
-  mrt,
-  normalView,
-  output,
-  pass,
-  packNormalToRGB,
-  screenUV,
-  step,
-} from 'three/tsl'
+import { diffuseColor, emissive, mix, mrt, normalView, output, pass, packNormalToRGB, screenUV, step } from 'three/tsl'
 import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js'
 import { ACESFilmicToneMapping, EquirectangularReflectionMapping, NearestFilter, UnsignedByteType } from 'three/webgpu'
 import { Canvas, useLoader, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
@@ -141,8 +130,7 @@ export default function Mrt() {
       // Original sets ACESFilmic explicitly — mirrored deliberately (parity rule),
       // even though it happens to match fiber's Canvas default.
       renderer={{ toneMapping: ACESFilmicToneMapping, requiredLimits: { maxColorAttachments: 5 } }}
-      camera={{ position: [-1.8, 0.6, 2.7], fov: 45, near: 0.25, far: 20 }}
-    >
+      camera={{ position: [-1.8, 0.6, 2.7], fov: 45, near: 0.25, far: 20 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

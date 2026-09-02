@@ -54,8 +54,7 @@ export default function PostprocessingOutline() {
       renderer={{ toneMapping: NoToneMapping }}
       shadows
       background="#000000"
-      camera={{ position: [0, 0, 8], fov: 45, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [0, 0, 8], fov: 45, near: 0.1, far: 100 }}>
       <ambientLight color="#aaaaaa" intensity={0.6} />
       <directionalLight
         color="#ddffdd"
@@ -84,8 +83,7 @@ export default function PostprocessingOutline() {
           ref={(g) => {
             const mesh = g?.children[0]
             if (mesh && selectionRef.current.length === 0) selectionRef.current.push(mesh)
-          }}
-        >
+          }}>
           <Torus />
         </group>
       </group>

@@ -54,8 +54,7 @@ import { useTexture } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const SNOWFLAKE_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sprites/snowflake1.png'
+const SNOWFLAKE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sprites/snowflake1.png'
 
 function SnowField() {
   const { sizeAttenuation, hueSpeed, count } = useControls('instance-sprites', {
@@ -116,8 +115,7 @@ export default function InstanceSprites() {
       // match it explicitly; fiber's Canvas default is ACESFilmic (AGENTS.md).
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 0, 1000], fov: 55, near: 2, far: 2000 }}
-    >
+      camera={{ position: [0, 0, 1000], fov: 55, near: 2, far: 2000 }}>
       <fogExp2 attach="fog" args={['#000000', 0.001]} />
       {/* B17 gate: useTexture suspends — never let suspension reach Canvas. */}
       <Suspense fallback={null}>

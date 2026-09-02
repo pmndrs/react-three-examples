@@ -212,8 +212,7 @@ export default function ComputeGeometry() {
       // Canvas defaults to ACESFilmic, which would mute the flat-shaded normal-material
       // head against the saturated gradient background.
       renderer={{ toneMapping: NoToneMapping }}
-      camera={{ position: [0, 0, 1], fov: 50, near: 0.1, far: 10 }}
-    >
+      camera={{ position: [0, 0, 1], fov: 50, near: 0.1, far: 10 }}>
       <SceneBackground />
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes every time-driven graph (AGENTS.md; corpus-wide repair). */}

@@ -34,7 +34,16 @@
  *   unlit blue/orange point palette
  */
 import { Suspense, useEffect, useLayoutEffect, useMemo } from 'react'
-import { Fn, color, computeSkinning, instanceIndex, instancedArray, mix, objectWorldMatrix, shapeCircle } from 'three/tsl'
+import {
+  Fn,
+  color,
+  computeSkinning,
+  instanceIndex,
+  instancedArray,
+  mix,
+  objectWorldMatrix,
+  shapeCircle,
+} from 'three/tsl'
 import { NoToneMapping } from 'three/webgpu'
 import type { Node, Renderer, SkinnedMesh } from 'three/webgpu'
 import { Canvas } from '@react-three/fiber/webgpu'
@@ -183,8 +192,7 @@ export default function SkinningPoints() {
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
       background="#111111"
-      camera={{ position: [0, 160, 320], fov: 50, near: 1, far: 2000 }}
-    >
+      camera={{ position: [0, 160, 320], fov: 50, near: 1, far: 2000 }}>
       <ambientLight intensity={10} />
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes every time-driven graph (AGENTS.md; corpus-wide repair). */}

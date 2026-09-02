@@ -52,12 +52,7 @@ export function SunSky({ sunRef }: SunSkyProps) {
   // Unit sun direction from the two angles — feeds the sky uniform, the light
   // position and the env bake alike.
   const sunDir = useMemo(
-    () =>
-      new Vector3().setFromSphericalCoords(
-        1,
-        MathUtils.degToRad(90 - elevation),
-        MathUtils.degToRad(azimuth),
-      ),
+    () => new Vector3().setFromSphericalCoords(1, MathUtils.degToRad(90 - elevation), MathUtils.degToRad(azimuth)),
     [elevation, azimuth],
   )
 

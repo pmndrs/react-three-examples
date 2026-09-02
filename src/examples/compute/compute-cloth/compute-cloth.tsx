@@ -57,8 +57,7 @@ export default function ComputeCloth() {
         toneMapping: NeutralToneMapping,
         requiredLimits: { maxStorageBuffersInVertexStage: 1 },
       }}
-      camera={{ position: [-1.6, -0.1, -1.6], fov: 40, near: 0.01, far: 10 }}
-    >
+      camera={{ position: [-1.6, -0.1, -1.6], fov: 40, near: 0.01, far: 10 }}>
       {/* Cloth suspends on the UltraHDR itself, creator hooks (and its own leva
           controls) first — see its header comments (B15 + B18) and the
           DIVERGENCE block above. The scene has no analytic lights: lighting is

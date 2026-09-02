@@ -46,16 +46,13 @@ export function Shapes() {
       new IcosahedronGeometry(2.5),
       new TorusKnotGeometry(1.5, 0.5, 64, 8),
     ]
-    const materials = COLORS.map(
-      (color) => new MeshStandardMaterial({ color, roughness: 0.2, metalness: 0.8 }),
-    )
+    const materials = COLORS.map((color) => new MeshStandardMaterial({ color, roughness: 0.2, metalness: 0.8 }))
     return { geometries, materials }
   }, [])
 
   const centralGeometry = useMemo(() => new TorusGeometry(5, 1.5, 16, 32), [])
   const centralMaterial = useMemo(
-    () =>
-      new MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 1, emissive: 0x222222 }),
+    () => new MeshStandardMaterial({ color: 0xffffff, roughness: 0.1, metalness: 1, emissive: 0x222222 }),
     [],
   )
 
@@ -76,11 +73,7 @@ export function Shapes() {
       Array.from({ length: OUTER_COUNT }, (_, i) => {
         const angle = (i / OUTER_COUNT) * Math.PI * 2
         return {
-          position: [
-            Math.cos(angle) * OUTER_RADIUS,
-            Math.sin(i * 0.5) * 2,
-            Math.sin(angle) * OUTER_RADIUS,
-          ],
+          position: [Math.cos(angle) * OUTER_RADIUS, Math.sin(i * 0.5) * 2, Math.sin(angle) * OUTER_RADIUS],
           geometryIndex: i % geometries.length,
         }
       }),

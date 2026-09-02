@@ -13,8 +13,7 @@ import { TransformControls, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import type CameraControlsImpl from 'camera-controls'
 
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/ShadowmappableMesh.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/ShadowmappableMesh.glb'
 const LIGHT_COUNT = 4
 const SHADOW_MAP_RES = 1024
 const LIGHT_MAP_RES = 1024
@@ -181,9 +180,7 @@ export function LightmapScene({ controlsRef }: LightmapSceneProps) {
       {lightOriginObject && (
         <TransformControls object={lightOriginObject} onMouseDown={beginDrag} onMouseUp={endDrag} />
       )}
-      {modelObject && (
-        <TransformControls object={modelObject} onMouseDown={beginDrag} onMouseUp={endDrag} />
-      )}
+      {modelObject && <TransformControls object={modelObject} onMouseDown={beginDrag} onMouseUp={endDrag} />}
 
       {/* Debug lightmap plane toggle — showDebugLightmap() lazily creates its own
           display mesh the first time it's called with `true`. Gated on modelObject:

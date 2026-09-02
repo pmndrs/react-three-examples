@@ -74,11 +74,11 @@ function BoxField() {
   const transforms = useMemo(
     () =>
       Array.from({ length: boxCount }, () => ({
-        position: [
-          8000 * (2 * Math.random() - 1),
-          8000 * (2 * Math.random() - 1),
-          8000 * (2 * Math.random() - 1),
-        ] as [number, number, number],
+        position: [8000 * (2 * Math.random() - 1), 8000 * (2 * Math.random() - 1), 8000 * (2 * Math.random() - 1)] as [
+          number,
+          number,
+          number,
+        ],
         rotation: [Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI] as [
           number,
           number,
@@ -165,8 +165,7 @@ export default function Lensflares() {
       // the additive flares).
       renderer={{ toneMapping: NoToneMapping }}
       background={BACKGROUND}
-      camera={{ position: [0, 0, 250], fov: 40, near: 1, far: 15000 }}
-    >
+      camera={{ position: [0, 0, 250], fov: 40, near: 1, far: 15000 }}>
       <fog attach="fog" args={[BACKGROUND, 3500, 15000]} />
       <BoxField />
       <directionalLight position={[0, -1, 0]} color={DIR_LIGHT_COLOR} intensity={dirIntensity} />

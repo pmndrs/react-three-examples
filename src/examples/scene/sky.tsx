@@ -144,8 +144,7 @@ export default function WebgpuSky() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: CAMERA_POSITION, fov: 60, near: 100, far: 2000000 }}
-    >
+      camera={{ position: CAMERA_POSITION, fov: 60, near: 100, far: 2000000 }}>
       <Sky />
       <ReflectiveSphere />
       <ToneMappingExposure />

@@ -26,7 +26,7 @@ R3F is an AND with vanilla three.js, not an OR.
   hooks, `fromRef()`, `background`/`environment` as Canvas options, declarative
   postprocessing — consult the v10 branch docs (.mdx) as we build; they are the primary
   source (the docs site is not yet updated).
-- Establish and document the *conventions* of modern R3F — general "how R3F works," not
+- Establish and document the _conventions_ of modern R3F — general "how R3F works," not
   "how to build one-page demos." The doc co-evolves with the examples (§7) and is
   exportable as docs + lint rules.
 - Serve as v10/drei-v11's de facto integration test suite; surface drei WebGPU gaps by
@@ -38,7 +38,7 @@ R3F is an AND with vanilla three.js, not an OR.
 
 - Not a re-teaching of three.js fundamentals.
 - No ports of API/stress/capability tests or renderer internals; the TSL editor/transpiler
-  pages are a *later-phase project*, not v1.
+  pages are a _later-phase project_, not v1.
 - WebXR and webaudio: explicitly out of scope for now — final-phase items if things go fast.
 - **Not pixel-parity with upstream.** Idiomatic-primary; divergence expected (§8).
 - Not a fork of the three.js examples — originals are linked, not vendored.
@@ -75,7 +75,7 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   **~200 lines on the index file** triggers the folder pattern, and that split is itself a
   taught, standardized pattern: split by scene role, not by arbitrary size.
 - **The example owns its `<Canvas>`.** The scene lives self-contained inside `<Canvas>` —
-  no forced `<Scene>` extraction (real-world r3f almost never does that). The *file* is the
+  no forced `<Scene>` extraction (real-world r3f almost never does that). The _file_ is the
   unit of reuse; extraction into a user's project is handled by tooling (§6), not by file
   structure contortions.
 - **Header comment block** at the top of every entry file, written for an intermediate
@@ -89,8 +89,8 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   and the v10 TSL hooks are designed to consume its output directly
   (`useControls` -> `useUniforms` -> `useNodes`). The only hard constraint is that fiber
   hooks must be inside `<Canvas>`, so the consuming component is a Canvas child.
-  *(Amended: the original "controls at the edge" wording is what produced corpus-wide
-  prop drilling.)*
+  _(Amended: the original "controls at the edge" wording is what produced corpus-wide
+  prop drilling.)_
 - **Inspector: deferred.** v10 has a root-state slot but this repo has never wired it;
   every port drops `renderer.inspector` and leva covers the control surface. Revisit when
   the drei wrapper lands — until then do not write it into examples.
@@ -123,7 +123,7 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   - **MCP server: deferred.** Real precedents are shared hubs (docs.pmnd.rs, Context7), not
     per-repo servers; users don't install long-tail project servers, and GitHub Pages
     cannot host one (static-only). Revisit on Cloudflare Workers if the corpus outgrows the
-    static manifest; meanwhile pursue *inclusion in existing hubs* (docs.pmnd.rs MCP,
+    static manifest; meanwhile pursue _inclusion in existing hubs_ (docs.pmnd.rs MCP,
     Context7 indexing) rather than running our own.
   - Consumers served: (a) site-browsing agents → HTML + manifest; (b) cloned-repo agents →
     AGENTS.md + structure; (c) user's-own-project agents → extraction CLI + skill.
@@ -151,7 +151,7 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
      original has failed even if it renders perfectly.
   2. **R3F v10 idioms** — general rules valid in any app (the "how R3F works" layer).
   3. **Repo format** — this repo's shape (categories, header schema, thresholds, manifest).
-  The doc states that examples are micro-scoped by design and points to the patterns track.
+     The doc states that examples are micro-scoped by design and points to the patterns track.
 - **Prune on every dependency bump.** The doc went stale against fiber alpha.4 and kept
   mandating workarounds for four bugs that had been fixed (B9/B12/B16/B17), which is how
   agents ended up writing `useMemo` where v10 hooks belong and prop-drilling nodes that a
@@ -176,13 +176,13 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   (NoToneMapping) unless they set one; taking the default visibly mutes emissive and unlit
   palettes. Decide `renderer={{ toneMapping }}` deliberately on every port and compare
   against the LIVE original, not the (stale) gallery thumbnail.
-  *(Amended: "not picky" was wrong — it silently changed the look of emissive examples.)*
+  _(Amended: "not picky" was wrong — it silently changed the look of emissive examples.)_
 - **Enhancements: restrained, and NOT extra controls.** A richer drei option or a better
   GLB is welcome. Adding UI the original never had is not: we are comparing this demo to
   that demo, so a control that doubles or triples the code is a net loss even when it is
   fun. If a control forces state lifting, registries or instance plumbing, drop it.
-  *(Amended: "added controls" as a blanket encouragement is a direct cause of the bloat
-  found in the first style review.)*
+  _(Amended: "added controls" as a blanket encouragement is a direct cause of the bloat
+  found in the first style review.)_
 - Quality/perf drift vs vanilla would be surprising (thin wrapper over core) — not a
   primary test axis.
 
@@ -205,7 +205,7 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
 - **Regression thereafter**: golden screenshots of OUR OWN output via Playwright.
 - **CI design (researched — research/webgpu-ci-github.md):** free `ubuntu-latest` runners
   ARE viable. Key fact: WebGPU initializes fine on SwiftShader (software Vulkan), but
-  *headless* Chrome on Linux never presents the WebGPU canvas (confirmed Chromium bug →
+  _headless_ Chrome on Linux never presents the WebGPU canvas (confirmed Chromium bug →
   black screenshots — the likely cause of past bad headless experiences). Fix: **headed
   Chromium under Xvfb**. Three.js's own screenshot CI proves the pattern at 150+ examples:
   puppeteer + mesa/xvfb, 5-way sharding, pixelmatch with loose thresholds, a readiness
@@ -220,7 +220,7 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
     manifest (the test then asserts a live loop instead); long stop-go easings declare
     `"animationWindowMs"`. Local-only for now: SwiftShader's frame rate would need the
     window retuned before this can gate CI.
-  - **Tier 2** (every PR): screenshot regression on *changed* examples only; goldens
+  - **Tier 2** (every PR): screenshot regression on _changed_ examples only; goldens
     generated on the same SwiftShader path (never mix GPU/software goldens).
   - **Tier 3** (nightly): full-corpus screenshot run (catches shared-utils regressions).
   - **Tier 4** (manual dispatch): real-GPU runner (GitHub gpu-t4 or cheaper third-party)
@@ -270,7 +270,7 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
 ## 15. Amendment log
 
 - **v1.1 (2026-09-01)** — first style review of the ported corpus (131 examples, 16
-  hand-tuned by Dennis). Three spec clauses turned out to be *causes* of the drift, not
+  hand-tuned by Dennis). Three spec clauses turned out to be _causes_ of the drift, not
   just silent about it:
   - §5 "controls at the edge" -> **controls next to what they control**. The old wording
     produced corpus-wide prop drilling of leva values into `useUniforms`.
@@ -278,7 +278,7 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
     controls**. Invented UI is the main reason several ports are 2-3x the size they need.
   - §8 "Tonemapping: R3F's ACES default, not picky" -> **a deliberate per-port decision**.
     The default silently mutes emissive palettes against the originals.
-  Also: §5 folder categories + ~200-line threshold + DIVERGENCE made optional; §5
-  Inspector marked deferred (never wired, every port drops it); §7 restructured to three
-  labelled sections with a prune-on-bump rule; §10 records the shipped animates tier and
-  the real CI cadence. Operational detail lives in [AGENTS.md](../AGENTS.md) v1.0.
+    Also: §5 folder categories + ~200-line threshold + DIVERGENCE made optional; §5
+    Inspector marked deferred (never wired, every port drops it); §7 restructured to three
+    labelled sections with a prune-on-bump rule; §10 records the shipped animates tier and
+    the real CI cadence. Operational detail lives in [AGENTS.md](../AGENTS.md) v1.0.

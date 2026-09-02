@@ -18,8 +18,8 @@ import hierarchy, retired patterns.
 
 ### The `as unknown as Node<'float'>` sweep: 87 -> 23
 
-All 87 were justified by a comment claiming *"fiber's `UniformNode<T>` pins the TSL
-node-type param to `unknown`"*. **The claim was false.** Four agents disproved it
+All 87 were justified by a comment claiming _"fiber's `UniformNode<T>` pins the TSL
+node-type param to `unknown`"_. **The claim was false.** Four agents disproved it
 independently — via the fiber type chain (`UniformNodeFor<V>` -> `UniformNode<'float',
 number>` -> structurally satisfies `Node<'float'>`), via the runtime source
 (`createUniform()` calls TSL's own `uniform()`), and empirically.
@@ -83,7 +83,6 @@ To reach zero lint warnings I reordered imports in 3 hand-tuned files
 
 - **85 examples still to PORT** (Phase 1 webgpu). The restyle backlog is zero.
 - Stream C (sidebar grouping + working search) and Stream D (upstream fixes) still parked.
-
 
 ## Restyle wave 3 + corpus sweep — materials, scene, shadows (2026-09-02)
 
@@ -154,7 +153,6 @@ measured B28 flake (1-in-5), in 3.5m normal timing.
 - `backdrop-area`'s 4-material runtime switcher is a THIRD material pattern that neither
   "declarative JSX" nor "shared instance" describes. Marked `REVIEW(shared-instance)`.
 
-
 ## Restyle wave 2 — lights, animation, camera, geometry (2026-09-01)
 
 25 more examples restyled against AGENTS.md v1.1 (brief v2). **44 of 131 done**
@@ -163,12 +161,12 @@ measured B28 flake (1-in-5), in 3.5m normal timing.
 **This wave proved the thesis where the pilot could not.** Verified against the real r185
 sources:
 
-| example | ours | vanilla original |
-|---|---|---|
-| `animation-skinning-blending` | **102** | **514** (`webgl_animation_skinning_blending`) |
-| `clipping` | **157** | **278** |
-| `materials-displacementmap` | **191** | **267** |
-| `camera` | 268 | 268 — parity, viewport/scissor-heavy, expected |
+| example                       | ours    | vanilla original                               |
+| ----------------------------- | ------- | ---------------------------------------------- |
+| `animation-skinning-blending` | **102** | **514** (`webgl_animation_skinning_blending`)  |
+| `clipping`                    | **157** | **278**                                        |
+| `materials-displacementmap`   | **191** | **267**                                        |
+| `camera`                      | 268     | 268 — parity, viewport/scissor-heavy, expected |
 
 `lensflares`: the original builds **3000 individual `THREE.Mesh`** objects and bakes
 transforms with `matrixAutoUpdate = false`; now one drei `<Instances>` — one draw call,
@@ -223,7 +221,6 @@ renders, the console-clean assertion fails. Details in UPSTREAM B28.
   shadows 8, loaders 7, render-targets 7, reflections 6, volume 6, textures 5), 85 left
   to port. Streams C (sidebar/search) and D
   (upstream fixes) still parked.
-
 
 ## Postprocessing restyle pilot — COMPLETE (2026-09-01)
 
@@ -280,7 +277,6 @@ The doc was wrong in ways only running it could reveal:
   corpus — sweep these when those categories are restyled.
 - Working tree is STAGED BUT UNCOMMITTED (230 files: the category reorg, AGENTS.md v1.1,
   SPEC v1.1, the pilot). Pre-restyle sources snapshotted outside the repo.
-
 
 ## Halftone graph simplification (2026-09-01)
 
@@ -385,34 +381,35 @@ The doc was wrong in ways only running it could reveal:
 Dennis approved resuming under the cost plan from the 07-28 policy change. This wave
 changed HOW we port, not just what:
 
-| Change | Effect |
-|---|---|
-| **4 sibling examples per agent** (was 1) | The ~15k-token doc read + pattern discovery amortize across the batch |
-| **Agents own visual review** | Screenshots never enter the orchestrator context; justified by 40 consecutive zero-review-fix ports |
-| **Scoped tests during the batch** (`-g "<slug>"`) | Full suite runs ONCE at wave end |
-| **Agents don't commit or edit docs** | Rule candidates reported; one batched doc pass (this entry + AGENTS.md v0.26) instead of 4 per wave |
-| **`model: 'sonnet'` pinned explicitly** | Session parent is Opus; unpinned agents would inherit it |
+| Change                                            | Effect                                                                                              |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| **4 sibling examples per agent** (was 1)          | The ~15k-token doc read + pattern discovery amortize across the batch                               |
+| **Agents own visual review**                      | Screenshots never enter the orchestrator context; justified by 40 consecutive zero-review-fix ports |
+| **Scoped tests during the batch** (`-g "<slug>"`) | Full suite runs ONCE at wave end                                                                    |
+| **Agents don't commit or edit docs**              | Rule candidates reported; one batched doc pass (this entry + AGENTS.md v0.26) instead of 4 per wave |
+| **`model: 'sonnet'` pinned explicitly**           | Session parent is Opus; unpinned agents would inherit it                                            |
 
 **Measured result: ~115k → ~60k tokens per port**, roughly 2× cheaper, on top of a
 much smaller orchestrator burn (no per-pair screenshot reads, gate output, or doc
 edits).
 
-| Quartet | Ports | Tokens | Per port |
-|---|---|---|---|
-| postprocessing | sobel, fxaa, smaa, ca | 171k | 43k |
-| lights | selective, ies-spotlight, projector, physical | 209k | 52k |
-| bloom/glow | bloom, bloom-selective, anamorphic, lensflare | 230k | 58k |
-| materials-texture | arrays, video, texture-manualmipmap, cubemap-mipmaps | 162k | 41k |
-| shadowmap | opacity, array, csm, progressive | 317k | 79k |
-| compute | points, geometry, texture-pingpong, texture-3d | 352k | 88k |
-| MRT/render-target | mrt, mrt-mask, multiple-rendertargets, …-readback | 271k | 68k |
-| volume | perlin, caustics, lighting, lighting-rectarea | 269k | 67k |
-| array-texture | partialupdate, 2d-array, 2d-array-compressed, rendertarget-2d-array-3d | (stalled 3×) | — |
+| Quartet           | Ports                                                                  | Tokens       | Per port |
+| ----------------- | ---------------------------------------------------------------------- | ------------ | -------- |
+| postprocessing    | sobel, fxaa, smaa, ca                                                  | 171k         | 43k      |
+| lights            | selective, ies-spotlight, projector, physical                          | 209k         | 52k      |
+| bloom/glow        | bloom, bloom-selective, anamorphic, lensflare                          | 230k         | 58k      |
+| materials-texture | arrays, video, texture-manualmipmap, cubemap-mipmaps                   | 162k         | 41k      |
+| shadowmap         | opacity, array, csm, progressive                                       | 317k         | 79k      |
+| compute           | points, geometry, texture-pingpong, texture-3d                         | 352k         | 88k      |
+| MRT/render-target | mrt, mrt-mask, multiple-rendertargets, …-readback                      | 271k         | 68k      |
+| volume            | perlin, caustics, lighting, lighting-rectarea                          | 269k         | 67k      |
+| array-texture     | partialupdate, 2d-array, 2d-array-compressed, rendertarget-2d-array-3d | (stalled 3×) | —        |
 
 Hard clusters (shadowmap, compute) ran hot as expected — thin training data, three
 folder-pattern ports, addons with no `.d.ts`. Routine clusters landed near 40k.
 
 **Findings worth keeping:**
+
 - **A real bug in a shipped three.js example** (UPSTREAM B22): `MRTNode.setup()`
   name-matches outputs against the bound target's textures and silently drops
   unmatched ones; `webgpu_multiple_rendertargets_readback` never names its readback
@@ -432,6 +429,7 @@ folder-pattern ports, addons with no `.d.ts`. Routine clusters landed near 40k.
   `unknown` (documented cast in `textures-2d-array-compressed`).
 
 **Process notes for next time:**
+
 - The array-texture agent **stalled three times**, always on an open-ended screenshot
   wait. Resuming via message preserved its context and lost no work, but the fix is
   prescriptive: screenshot scripts need a hard timeout + always-run `browser.close()`
@@ -448,7 +446,6 @@ folder-pattern ports, addons with no `.d.ts`. Routine clusters landed near 40k.
   before assuming. Every other failure this run passed first retry.
 
 Cumulative: **131 examples**, 36 ports this wave.
-
 
 ## POLICY CHANGE — porting cadence + CI cost (2026-07-28, Dennis)
 
@@ -486,16 +483,16 @@ Dennis hit Claude usage limits and called a slowdown. Two decisions:
 green on Metal. FIFTH consecutive zero-review-fix wave** (one retrofit landed
 alongside: skinning-instancing now plays SambaDance by name).
 
-| Example | Notes | Cost |
-|---|---|---|
-| postprocessing-godrays | raymarch vs cube shadow map; samples:0 extended to arbitrary-UV depth sampling | 118k |
-| postprocessing-motion-blur | first setupCB MRT on main pass; third cold-start signature isolated (falsified own hypothesis) | 124k |
-| mesh-batch | 20k BatchedMesh + radix custom sort; remount-over-dispose | 114k |
-| skinning-points | compute kernel AS positionNode; **found B21** (fiber module augmentation shadows @types Fn); .mix landmine | 161k |
-| occlusion | WebGPU occlusion queries; state flip captured live; occlusionTest DT gap flagged | 91k |
-| layers | blossom storms on camera layers; first consumer of the fresh .mix rule | 114k |
-| pmrem-equirectangular | pmremTexture live level uniform; **B13 sharpened** (UltraHDRLoader works via useLoader) | 101k |
-| reflection-blurred | depth-masked hashBlur reflector; @types-newer-than-runtime drift found; reflection retrofit candidate | 131k |
+| Example                    | Notes                                                                                                      | Cost |
+| -------------------------- | ---------------------------------------------------------------------------------------------------------- | ---- |
+| postprocessing-godrays     | raymarch vs cube shadow map; samples:0 extended to arbitrary-UV depth sampling                             | 118k |
+| postprocessing-motion-blur | first setupCB MRT on main pass; third cold-start signature isolated (falsified own hypothesis)             | 124k |
+| mesh-batch                 | 20k BatchedMesh + radix custom sort; remount-over-dispose                                                  | 114k |
+| skinning-points            | compute kernel AS positionNode; **found B21** (fiber module augmentation shadows @types Fn); .mix landmine | 161k |
+| occlusion                  | WebGPU occlusion queries; state flip captured live; occlusionTest DT gap flagged                           | 91k  |
+| layers                     | blossom storms on camera layers; first consumer of the fresh .mix rule                                     | 114k |
+| pmrem-equirectangular      | pmremTexture live level uniform; **B13 sharpened** (UltraHDRLoader works via useLoader)                    | 101k |
+| reflection-blurred         | depth-masked hashBlur reflector; @types-newer-than-runtime drift found; reflection retrofit candidate      | 131k |
 
 Cumulative: **95 agent ports across 11 waves + 2 gate ports, zero manifest
 clobbers across 48+ concurrent pair-registrations.** AGENTS.md v0.21→v0.24;
@@ -508,18 +505,19 @@ UPSTREAM briefs at B21.
 skip). Fourth consecutive zero-review-fix wave** (rain self-fixed its own
 find pre-report).
 
-| Example | Notes | Cost |
-|---|---|---|
-| compute-particles-rain | live scene collision via layer-routed height prepass; **found the B18→B17 sibling escalation** | 131k |
-| compute-particles-snow | self-feeding accumulation (settled flakes render into the collision map); lazy-useState rule | 149k |
-| materials-transmission | 10 knobs → plain JSX props (reference-backed rule now default, 3rd confirmation); B13 hit #5 | 102k |
-| materials-alphahash | ssaaPass joins the samples:0 list (self-corrected mis-reasoning → bullet hardened) | 102k |
-| cubemap-dynamic | live CubeCamera reflections; pure pattern reuse, zero rediscovery | 108k |
-| materials-envmaps-groundprojected | Ferrari beach classic; TSL ground projection with live uniforms | 126k |
-| materials-lightmap | baked castle scene; slider starts at the value the JSON ships (upstream GUI quirk fixed) | 99k |
-| parallax-uv | ice-sheet parallaxUV + blendOverlay; zero rediscovery | 89k |
+| Example                           | Notes                                                                                          | Cost |
+| --------------------------------- | ---------------------------------------------------------------------------------------------- | ---- |
+| compute-particles-rain            | live scene collision via layer-routed height prepass; **found the B18→B17 sibling escalation** | 131k |
+| compute-particles-snow            | self-feeding accumulation (settled flakes render into the collision map); lazy-useState rule   | 149k |
+| materials-transmission            | 10 knobs → plain JSX props (reference-backed rule now default, 3rd confirmation); B13 hit #5   | 102k |
+| materials-alphahash               | ssaaPass joins the samples:0 list (self-corrected mis-reasoning → bullet hardened)             | 102k |
+| cubemap-dynamic                   | live CubeCamera reflections; pure pattern reuse, zero rediscovery                              | 108k |
+| materials-envmaps-groundprojected | Ferrari beach classic; TSL ground projection with live uniforms                                | 126k |
+| materials-lightmap                | baked castle scene; slider starts at the value the JSON ships (upstream GUI quirk fixed)       | 99k  |
+| parallax-uv                       | ice-sheet parallaxUV + blendOverlay; zero rediscovery                                          | 89k  |
 
 **Infra shipped mid-wave:**
+
 - **The animates tier** (tests/animates.spec.ts, `pnpm test:animates`): two-frame
   pixel diff + frame-loop liveness + dual-root-warning capture. 18 confirmed
   statics flagged in the manifest; geometry-loft carries the one animatesSkip
@@ -539,16 +537,16 @@ BLOCKING and green** — the B17 repair resolved the SwiftShader stall matrix
 (all four former stalls pass; run 30261064018), exception list down to 2
 legitimate ciSkips (volume-fire perf, geometry-loft B17-anomaly).
 
-| Example | Notes | Cost |
-|---|---|---|
-| ocean | WaterMesh/SkyMesh + per-sun-move PMREM bake; safe primitive-reparenting pattern | 95k |
-| clearcoat | 4 physical spheres over Pisa HDR cube; found B20 (Environment can't load HDR cubemaps) | 114k |
-| mirror | two TSL reflectors (decal-masked floor, rippled blue wall) | 108k |
-| materials-sss | first FBX port; MeshSSSNodeMaterial, zero casts | 111k |
-| custom-fog | showpiece: procedural alpine valley, 500k trees, triNoise3D fog wisps; leva onEditEnd bake gate | 132k |
-| fog-height | exponential height fog, uniform-driven (no rebuilds) | 89k |
-| instance-points | PointsNodeMaterial fat points + compute pulse + inset (top-origin fix reapplied) | 121k |
-| instance-uniform | custom InstanceUniformNode (per-object uniform updates) ported faithfully | 115k |
+| Example          | Notes                                                                                           | Cost |
+| ---------------- | ----------------------------------------------------------------------------------------------- | ---- |
+| ocean            | WaterMesh/SkyMesh + per-sun-move PMREM bake; safe primitive-reparenting pattern                 | 95k  |
+| clearcoat        | 4 physical spheres over Pisa HDR cube; found B20 (Environment can't load HDR cubemaps)          | 114k |
+| mirror           | two TSL reflectors (decal-masked floor, rippled blue wall)                                      | 108k |
+| materials-sss    | first FBX port; MeshSSSNodeMaterial, zero casts                                                 | 111k |
+| custom-fog       | showpiece: procedural alpine valley, 500k trees, triNoise3D fog wisps; leva onEditEnd bake gate | 132k |
+| fog-height       | exponential height fog, uniform-driven (no rebuilds)                                            | 89k  |
+| instance-points  | PointsNodeMaterial fat points + compute pulse + inset (top-origin fix reapplied)                | 121k |
+| instance-uniform | custom InstanceUniformNode (per-object uniform updates) ported faithfully                       | 115k |
 
 Watch: custom-fog (500k trees) may time out on blocking SwiftShader CI — if
 the next run goes red there, add its ciSkip (agent correctly didn't preempt).
@@ -562,16 +560,16 @@ clobbers across 36+ concurrent pair-registrations.** AGENTS.md v0.16→v0.18.
 smoke + contact sheet green on Metal.** Zero review fixes across all 8 ports —
 second consecutive zero-fix wave.
 
-| Example | Notes | Cost |
-|---|---|---|
-| materials-matcap | EXR/JPG matcap swap, both decode paths | 107k |
-| materials-toon | 6³ toon lattice + ToonOutlinePassNode; pattern-(c) wrinkle (constructor takes Nodes where factory types don't) | 106k |
-| lines-fat | Line2NodeMaterial vs native strip + PiP inset; **found WebGPU setViewport/setScissor TOP-origin rule** | 118k |
-| lensflares | LensflareMesh field; occlusion test verified live; sRGB/linear setHSL parity flagged | 109k |
-| volume-cloud | Data3DTexture raymarch; **found TSL stack rule** (helpers with internal toVar/assign need Fn) | 97k |
-| volume-fire | biggest port ever (258k): 8-kernel GPU fluid sim + volumetric shadows + draggable emitter; legitimate ciSkip #5; B19 filed | 258k |
-| shadowmap-vsm | shadows="variance" verified; VSM blur knobs live via dash-paths | 100k |
-| shadowmap-pointlight | cube shadow maps, striped shells; intensity/distance parity checked at review | 100k |
+| Example              | Notes                                                                                                                      | Cost |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------- | ---- |
+| materials-matcap     | EXR/JPG matcap swap, both decode paths                                                                                     | 107k |
+| materials-toon       | 6³ toon lattice + ToonOutlinePassNode; pattern-(c) wrinkle (constructor takes Nodes where factory types don't)             | 106k |
+| lines-fat            | Line2NodeMaterial vs native strip + PiP inset; **found WebGPU setViewport/setScissor TOP-origin rule**                     | 118k |
+| lensflares           | LensflareMesh field; occlusion test verified live; sRGB/linear setHSL parity flagged                                       | 109k |
+| volume-cloud         | Data3DTexture raymarch; **found TSL stack rule** (helpers with internal toVar/assign need Fn)                              | 97k  |
+| volume-fire          | biggest port ever (258k): 8-kernel GPU fluid sim + volumetric shadows + draggable emitter; legitimate ciSkip #5; B19 filed | 258k |
+| shadowmap-vsm        | shadows="variance" verified; VSM blur knobs live via dash-paths                                                            | 100k |
+| shadowmap-pointlight | cube shadow maps, striped shells; intensity/distance parity checked at review                                              | 100k |
 
 Cumulative: **63 agent ports across 8 waves + 2 gate ports, zero manifest
 clobbers across 32+ concurrent pair-registrations.** AGENTS.md v0.12→v0.16.
@@ -606,18 +604,19 @@ total, 57/57 smoke + contact sheet green on Metal.** Review fixes: 1 across the
 wave (outline's seeded initial selection); plus two REAL shipped-bug repairs the
 wave's finds triggered (below).
 
-| Example | Notes | Cost |
-|---|---|---|
-| postprocessing | dotScreen+rgbShift chain; pattern (b); corrected orchestrator's own prompt error (not bloom) | 95k |
-| postprocessing-dof | established dynamism pattern (c): const-wrapping factories need user uniform() via return-to-register | 85k |
-| postprocessing-pixel | pixelationPass as full-pipeline PassNode; manual ortho + frustum snap; drove minZoom/maxZoom wrapper props | 123k |
-| postprocessing-ao | GTAO into ambient via builtinAOContext + TRAA; found the samples:0 rule (fiber MSAA-4x default breaks depth copies) | 157k |
-| postprocessing-outline | OutlineNode masks in user TSL; bubbled pointer-event selection; review fix: seed torus selection | 109k |
-| postprocessing-afterimage | 50k-sprite spiral; history trails; outputNode-swap+needsUpdate bypass idiom | 112k |
-| tsl-vfx-flames | fragment-stage fire; **found B17** (Canvas-boundary suspension freezes TSL time) via pixel-diff bisect | 161k |
-| tsl-vfx-tornado | parabola-twisted funnel + bloom; **found B18** (useUniforms-after-suspense setState-in-render) | 140k |
+| Example                   | Notes                                                                                                               | Cost |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------- | ---- |
+| postprocessing            | dotScreen+rgbShift chain; pattern (b); corrected orchestrator's own prompt error (not bloom)                        | 95k  |
+| postprocessing-dof        | established dynamism pattern (c): const-wrapping factories need user uniform() via return-to-register               | 85k  |
+| postprocessing-pixel      | pixelationPass as full-pipeline PassNode; manual ortho + frustum snap; drove minZoom/maxZoom wrapper props          | 123k |
+| postprocessing-ao         | GTAO into ambient via builtinAOContext + TRAA; found the samples:0 rule (fiber MSAA-4x default breaks depth copies) | 157k |
+| postprocessing-outline    | OutlineNode masks in user TSL; bubbled pointer-event selection; review fix: seed torus selection                    | 109k |
+| postprocessing-afterimage | 50k-sprite spiral; history trails; outputNode-swap+needsUpdate bypass idiom                                         | 112k |
+| tsl-vfx-flames            | fragment-stage fire; **found B17** (Canvas-boundary suspension freezes TSL time) via pixel-diff bisect              | 161k |
+| tsl-vfx-tornado           | parabola-twisted funnel + bloom; **found B18** (useUniforms-after-suspense setState-in-render)                      | 140k |
 
 **Shipped-bug repairs this wave:**
+
 - `loader-gltf-dispersion` suite flake was NOT the cold-start transient — it was
   the B15-family PMREM destroyed-texture race under suite contention. Suspense
   gate fixed it; first back-to-back clean full-suite runs since it landed.
@@ -644,16 +643,16 @@ pair-registrations.**
 compute ports opened. **49 examples total, 49/49 smoke + contact sheet green on
 Metal.** ZERO review fixes across all 8 ports (doc steering fully compounding).
 
-| Example | Notes | Cost |
-|---|---|---|
-| loader-gltf-dispersion | KHR dispersion test card; clamped dolly inside original's far plane | 66k |
-| loader-gltf-compressed | first KTX2/Meshopt port; extendLoader wiring → Layer 1 bullet | 89k |
-| tsl-galaxy | 20k GPU sprites; build-vs-run-time split visible in leva; frustumCulled rule | 74k |
-| tsl-procedural-terrain | found + verified three 0.185.1 IBL race (B15); Suspense-gate fix; drag-to-scroll via pointer events | 164k |
-| compute-texture | first compute port; explicit-dispatch pattern; found fiber B16 (scoped useNodes breaks WGSL) | 110k |
-| compute-particles | 200k particles; three dispatch cadences; proved B16 worse (scoped useBuffers always broken) | 159k |
-| tsl-raging-sea | displaced sea + emissive troughs; caught the tone-mapping parity trap (fiber ACESFilmic default vs originals' NoToneMapping) | 128k |
-| tsl-compute-attractors-particles | 262k attractor sim; v0.8 compute bullets verified on first use — zero rediscovery; uniformArray type-arg gap | 114k |
+| Example                          | Notes                                                                                                                        | Cost |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---- |
+| loader-gltf-dispersion           | KHR dispersion test card; clamped dolly inside original's far plane                                                          | 66k  |
+| loader-gltf-compressed           | first KTX2/Meshopt port; extendLoader wiring → Layer 1 bullet                                                                | 89k  |
+| tsl-galaxy                       | 20k GPU sprites; build-vs-run-time split visible in leva; frustumCulled rule                                                 | 74k  |
+| tsl-procedural-terrain           | found + verified three 0.185.1 IBL race (B15); Suspense-gate fix; drag-to-scroll via pointer events                          | 164k |
+| compute-texture                  | first compute port; explicit-dispatch pattern; found fiber B16 (scoped useNodes breaks WGSL)                                 | 110k |
+| compute-particles                | 200k particles; three dispatch cadences; proved B16 worse (scoped useBuffers always broken)                                  | 159k |
+| tsl-raging-sea                   | displaced sea + emissive troughs; caught the tone-mapping parity trap (fiber ACESFilmic default vs originals' NoToneMapping) | 128k |
+| tsl-compute-attractors-particles | 262k attractor sim; v0.8 compute bullets verified on first use — zero rediscovery; uniformArray type-arg gap                 | 114k |
 
 Wave-6 upstream yield (best wave yet): **B15** (three: env-change rebuild misses
 custom-node materials — real three.js bug, verified both ways) and **B16** (fiber:
@@ -672,16 +671,16 @@ across 22+ concurrent pair-registrations.**
 
 8 ports, 4 pairs. **41 examples total, 41/41 smoke + contact sheet green on Metal.**
 
-| Example | Notes | Cost |
-|---|---|---|
-| lights-phong | pair 1 (commit 0524eb6) | — |
-| materials-basic | pair 1 (commit 0524eb6) | — |
-| camera-array | pair 2 (commit e882f96) | — |
-| backdrop-area | pair 2; review fix: grid={false} (double grid) | — |
-| loader-gltf-iridescence | KHR iridescence lamp; zero review fixes; both r185 assets existed verbatim | 84k |
-| loader-gltf-sheen | KHR sheen chair; leva → plain `material.sheen` (TSL materialSheen re-reads per frame, no uniforms); review fix: grid={false} (moiré vs HDR studio floor); UltraHDR swap #3 | 103k |
-| loader-gltf-anisotropy | KHR anisotropy barn lamp; zero review fixes; UltraHDR swap #4 (B13 evidence bumped) | 77k |
-| textures-anisotropy | split-scissor dual-scene via phase:'render' takeover + createPortal; corner labels upgraded to live per-pane leva selects | 87k |
+| Example                 | Notes                                                                                                                                                                      | Cost |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| lights-phong            | pair 1 (commit 0524eb6)                                                                                                                                                    | —    |
+| materials-basic         | pair 1 (commit 0524eb6)                                                                                                                                                    | —    |
+| camera-array            | pair 2 (commit e882f96)                                                                                                                                                    | —    |
+| backdrop-area           | pair 2; review fix: grid={false} (double grid)                                                                                                                             | —    |
+| loader-gltf-iridescence | KHR iridescence lamp; zero review fixes; both r185 assets existed verbatim                                                                                                 | 84k  |
+| loader-gltf-sheen       | KHR sheen chair; leva → plain `material.sheen` (TSL materialSheen re-reads per frame, no uniforms); review fix: grid={false} (moiré vs HDR studio floor); UltraHDR swap #3 | 103k |
+| loader-gltf-anisotropy  | KHR anisotropy barn lamp; zero review fixes; UltraHDR swap #4 (B13 evidence bumped)                                                                                        | 77k  |
+| textures-anisotropy     | split-scissor dual-scene via phase:'render' takeover + createPortal; corner labels upgraded to live per-pane leva selects                                                  | 87k  |
 
 Wave-5 doc yield: screenshot-script WebGPU launch note (AGENTS §Verification);
 B13 evidence now 4 hits — the whole glTF-material-extension cluster ships UltraHDR
@@ -693,16 +692,16 @@ clobbers across 18+ concurrent pair-registrations.**
 
 8 ports, 4 pairs. **33 examples total, 33/33 smoke + contact sheet green on Metal.**
 
-| Example | Notes | Cost |
-|---|---|---|
-| backdrop | 8-sphere viewportSharedTexture ring; first controlsRef consumer | 122k |
-| camera | split-viewport dual camera — scissor/viewport intact, first phase:'render' takeover; NO blocker | 150k |
-| portal | first createPortal-second-scene port (pattern → Layer 1) | 171k |
-| lights-pointlights | uniform(light.position) live-wrap pattern (→ Layer 1) | 127k |
-| materials-displacementmap | first orthographic port; zoom-sync frustum derivation | 111k |
-| geometry-loft | biggest port yet: 17-exhibit LoftGeometry gallery, 4 files | 186k |
-| animation-retargeting | SkeletonUtils.retargetClip via useMemo + dual useAnimations | 149k |
-| backdrop-water | water refraction + inlined voronoi (addon missing from npm three 0.185.1 — clone is newer; AGENTS rule added) | 178k |
+| Example                   | Notes                                                                                                         | Cost |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------- | ---- |
+| backdrop                  | 8-sphere viewportSharedTexture ring; first controlsRef consumer                                               | 122k |
+| camera                    | split-viewport dual camera — scissor/viewport intact, first phase:'render' takeover; NO blocker               | 150k |
+| portal                    | first createPortal-second-scene port (pattern → Layer 1)                                                      | 171k |
+| lights-pointlights        | uniform(light.position) live-wrap pattern (→ Layer 1)                                                         | 127k |
+| materials-displacementmap | first orthographic port; zoom-sync frustum derivation                                                         | 111k |
+| geometry-loft             | biggest port yet: 17-exhibit LoftGeometry gallery, 4 files                                                    | 186k |
+| animation-retargeting     | SkeletonUtils.retargetClip via useMemo + dual useAnimations                                                   | 149k |
+| backdrop-water            | water refraction + inlined voronoi (addon missing from npm three 0.185.1 — clone is newer; AGENTS rule added) | 178k |
 
 New ledger items: B14 (TSL Loop/Fn-layout typed-surface lag), B9 extended (camera
 union), B11 family confirmed again. Cumulative session stats: **31 agent ports across
@@ -714,16 +713,16 @@ union), B11 family confirmed again. Cumulative session stats: **31 agent ports a
 8 more ports, 4 parallel pairs, zero manifest clobbers again. **25 examples total,
 25/25 smoke + contact sheet green.**
 
-| Example | Notes | Cost |
-|---|---|---|
-| instance-mesh | JSX instancedMesh + setMatrixAt; useLoader-cache clone rule | 92k |
-| morphtargets | found the useLayoutEffect-vs-first-RAF-render race (now a Layer 1 rule) | 119k |
-| clipping | nested clippingGroup JSX intrinsics (auto-derived, no extend) | 105k |
-| loader-gltf | live Khronos catalog (148 models); drove controlsRef escape hatch | 155k |
-| lights-spotlight | SpotLight.map projection, PLY loader; drove polar-limit props | 141k |
-| materials-envmaps | cube/equirect toggles; zero casts; build-vs-live semantics traced | 148k |
-| depth-texture | scene-pass depth node; added raw/linear select() toggle | 138k |
-| loader-gltf-transmission | KHR transmission; frame-probe correctly classified its one cold-start timeout (frames:4 = fetch crawl) | 85k |
+| Example                  | Notes                                                                                                  | Cost |
+| ------------------------ | ------------------------------------------------------------------------------------------------------ | ---- |
+| instance-mesh            | JSX instancedMesh + setMatrixAt; useLoader-cache clone rule                                            | 92k  |
+| morphtargets             | found the useLayoutEffect-vs-first-RAF-render race (now a Layer 1 rule)                                | 119k |
+| clipping                 | nested clippingGroup JSX intrinsics (auto-derived, no extend)                                          | 105k |
+| loader-gltf              | live Khronos catalog (148 models); drove controlsRef escape hatch                                      | 155k |
+| lights-spotlight         | SpotLight.map projection, PLY loader; drove polar-limit props                                          | 141k |
+| materials-envmaps        | cube/equirect toggles; zero casts; build-vs-live semantics traced                                      | 148k |
+| depth-texture            | scene-pass depth node; added raw/linear select() toggle                                                | 138k |
+| loader-gltf-transmission | KHR transmission; frame-probe correctly classified its one cold-start timeout (frames:4 = fetch crawl) | 85k  |
 
 Wrapper additions this wave (all port-flagged): `controlsRef` (imperative
 fitToBox/setLookAt escape hatch), `minPolarAngle`/`maxPolarAngle`. UPSTREAM B13
@@ -736,16 +735,16 @@ controlsRef.
 8 more ports, run as 4 parallel PAIRS of single-Sonnet agents (examples.json
 append-discipline held — zero clobbers across 8 concurrent registrations):
 
-| Example | Notes | Cost |
-|---|---|---|
-| tsl-earth | day/night terminator + atmosphere on outputNode — showpiece | 107k |
-| shadowmap | maskNode discard + receivedShadowPositionNode; CORRECTED the fog rule (plain Fog auto-wraps; fogNode only for custom TSL fog) | 145k |
-| procedural-texture | convertToTexture/gaussianBlur self-bake, no pipeline | 108k |
-| reflection | reflector() floor, instanced voxel tree; TWEEN dropped for a useFrame ramp; drove the autoRotate util addition | 159k |
-| tonemapping | runtime operator swap; draco via useGLTF; cheapest yet (86k) | 86k |
-| refraction | backdropNode + viewportSharedTexture (typed! no cast needed) | 95k |
-| video-panorama | VideoTexture; geometry-baked scale(-1,1,1) (mesh-scale would flip winding); muted+playsInline load-bearing | 96k |
-| lights-rectarealight | LTC setup at module scope (rule clarified: idempotent lib registration ≠ mutable state) | 110k |
+| Example              | Notes                                                                                                                         | Cost |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---- |
+| tsl-earth            | day/night terminator + atmosphere on outputNode — showpiece                                                                   | 107k |
+| shadowmap            | maskNode discard + receivedShadowPositionNode; CORRECTED the fog rule (plain Fog auto-wraps; fogNode only for custom TSL fog) | 145k |
+| procedural-texture   | convertToTexture/gaussianBlur self-bake, no pipeline                                                                          | 108k |
+| reflection           | reflector() floor, instanced voxel tree; TWEEN dropped for a useFrame ramp; drove the autoRotate util addition                | 159k |
+| tonemapping          | runtime operator swap; draco via useGLTF; cheapest yet (86k)                                                                  | 86k  |
+| refraction           | backdropNode + viewportSharedTexture (typed! no cast needed)                                                                  | 95k  |
+| video-panorama       | VideoTexture; geometry-baked scale(-1,1,1) (mesh-scale would flip winding); muted+playsInline load-bearing                    | 96k  |
+| lights-rectarealight | LTC setup at module scope (rule clarified: idempotent lib registration ≠ mutable state)                                       | 110k |
 
 **17 examples total, 17/17 smoke + contact sheet green on Metal.** CameraControls
 wrapper grew from real port needs: `pan` lock, `autoRotate`/`autoRotateSpeed`
@@ -758,8 +757,6 @@ identifier validation).
 Review flags for Dennis: `tonemapping`'s HDR background reads very dark in the
 contact sheet (original is also dark — eyeball live); `lights-rectarealight`
 chunk is 250kB (LTC tables — expected, data not code).
-
-
 
 Read AGENTS.md first (v0.4 — conventions + stack pins + gotchas), then
 [UPSTREAM.md](UPSTREAM.md) (the patch/override ledger + upstream fix briefs Dennis
@@ -774,15 +771,15 @@ merged. **9 examples total**, all green locally (tsc/lint/build/smoke 9/9).
 
 ### The M2 dry-run wave (all single-Sonnet agents, AGENTS.md-steered)
 
-| # | Example | Notes | Agent cost |
-|---|---------|-------|-----------|
-| gate#2 | skinning-instancing | instancing + TSL range + blur pipeline | 146k tok |
-| gate#3 | postprocessing-bloom-emissive | MRT selective bloom | 93k |
-| 1 | sky | SkyMesh + CubeCamera; slug-rule violation (fixed + doc reworded) | 111k |
-| 2 | rtt | pipeline subsumes manual RTT; cleanest port | 78k |
-| 3 | shadow-contact | first folder-pattern; `before:'render'` capture pass | 181k |
-| 4 | tsl-halftone | deepest TSL; found the WGSL-identifier trap | 201k |
-| 5 | sprites | SpriteNodeMaterial + userData node + scene.fogNode | 128k |
+| #      | Example                       | Notes                                                            | Agent cost |
+| ------ | ----------------------------- | ---------------------------------------------------------------- | ---------- |
+| gate#2 | skinning-instancing           | instancing + TSL range + blur pipeline                           | 146k tok   |
+| gate#3 | postprocessing-bloom-emissive | MRT selective bloom                                              | 93k        |
+| 1      | sky                           | SkyMesh + CubeCamera; slug-rule violation (fixed + doc reworded) | 111k       |
+| 2      | rtt                           | pipeline subsumes manual RTT; cleanest port                      | 78k        |
+| 3      | shadow-contact                | first folder-pattern; `before:'render'` capture pass             | 181k       |
+| 4      | tsl-halftone                  | deepest TSL; found the WGSL-identifier trap                      | 201k       |
+| 5      | sprites                       | SpriteNodeMaterial + userData node + scene.fogNode               | 128k       |
 
 Review cost stayed cheap: every port needed at most a slug rename / one-prop
 consistency fix. Cost tracks example difficulty, not doc decay — simple ports got

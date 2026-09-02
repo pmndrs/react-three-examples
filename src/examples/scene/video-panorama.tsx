@@ -108,10 +108,7 @@ function VideoPanoramaSphere() {
 
 export default function VideoPanorama() {
   return (
-    <Canvas
-      renderer
-      camera={{ position: CAMERA_POSITION, fov: 75, near: 0.25, far: 10 }}
-    >
+    <Canvas renderer camera={{ position: CAMERA_POSITION, fov: 75, near: 0.25, far: 10 }}>
       <VideoPanoramaSphere />
       <DemoHelpers grid={false} minDistance={CAMERA_DISTANCE} maxDistance={CAMERA_DISTANCE} pan={false} />
     </Canvas>

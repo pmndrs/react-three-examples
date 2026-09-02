@@ -101,7 +101,13 @@ function Cloud() {
     for (let z = 0; z < size; z++) {
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
-          const d = 1.0 - vector.set(x, y, z).subScalar(size / 2).divideScalar(size).length()
+          const d =
+            1.0 -
+            vector
+              .set(x, y, z)
+              .subScalar(size / 2)
+              .divideScalar(size)
+              .length()
           data[i] = (128 + 128 * perlin.noise((x * scale) / 1.5, y * scale, (z * scale) / 1.5)) * d * d
           i++
         }
@@ -209,8 +215,7 @@ export default function VolumeCloud() {
       // Original renders with the WebGPURenderer default (no tone mapping) — explicit
       // here because fiber's Canvas defaults to ACESFilmic (see header DIVERGENCE).
       renderer={{ toneMapping: NoToneMapping }}
-      camera={{ position: [0, 0, 1.5], fov: 60, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [0, 0, 1.5], fov: 60, near: 0.1, far: 100 }}>
       <Sky />
       <Cloud />
       <DemoHelpers grid={false} maxDistance={9} />

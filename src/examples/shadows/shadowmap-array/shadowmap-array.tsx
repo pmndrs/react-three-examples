@@ -168,8 +168,7 @@ export default function ShadowmapArray() {
       renderer={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
       shadows="basic"
       background="#ccccff"
-      camera={{ position: [45, 60, 100], fov: 45, near: 1, far: 1000 }}
-    >
+      camera={{ position: [45, 60, 100], fov: 45, near: 1, far: 1000 }}>
       <fog attach="fog" args={['#ccccff', 700, 1000]} />
       <ambientLight color="#ccccff" intensity={3} />
       <TiledSun speed={speed} />
@@ -186,4 +185,3 @@ export default function ShadowmapArray() {
     </Canvas>
   )
 }
-

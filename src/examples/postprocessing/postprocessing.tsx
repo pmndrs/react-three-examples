@@ -39,11 +39,7 @@ function SphereField({ count = 100 }: { count?: number }) {
         position: new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
           .normalize()
           .multiplyScalar(Math.random() * 400),
-        rotation: [Math.random() * 2, Math.random() * 2, Math.random() * 2] as [
-          number,
-          number,
-          number,
-        ],
+        rotation: [Math.random() * 2, Math.random() * 2, Math.random() * 2] as [number, number, number],
         scale: Math.random() * 50,
       })),
     [count],
@@ -62,12 +58,7 @@ function SphereField({ count = 100 }: { count?: number }) {
         <sphereGeometry args={[1, 4, 4]} />
         <meshPhongNodeMaterial color="#ffffff" flatShading />
         {spheres.map((sphere, i) => (
-          <Instance
-            key={i}
-            position={sphere.position}
-            rotation={sphere.rotation}
-            scale={sphere.scale}
-          />
+          <Instance key={i} position={sphere.position} rotation={sphere.rotation} scale={sphere.scale} />
         ))}
       </Instances>
     </group>
@@ -110,8 +101,7 @@ export default function Postprocessing() {
       // match it explicitly; fiber's Canvas default is ACESFilmic.
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 0, 400], fov: 70, near: 1, far: 1000 }}
-    >
+      camera={{ position: [0, 0, 400], fov: 70, near: 1, far: 1000 }}>
       <fog attach="fog" args={['#000000', 1, 1000]} />
       <ambientLight color="#cccccc" />
       <directionalLight color="#ffffff" intensity={3} position={[1, 1, 1]} />

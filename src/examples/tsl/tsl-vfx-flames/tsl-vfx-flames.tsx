@@ -53,8 +53,7 @@ export default function TslVfxFlames() {
       // NoToneMapping matches the original (WebGPURenderer default) — see header.
       renderer={{ toneMapping: NoToneMapping }}
       background="#201919"
-      camera={{ position: [1, 1, 3], fov: 25, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [1, 1, 3], fov: 25, near: 0.1, far: 100 }}>
       {/* The Suspense boundary is load-bearing, not cosmetic: letting useTexture's
           suspension bubble to Canvas's own boundary re-runs createRoot ("R3F.createRoot
           should only be called once!") and permanently freezes the TSL `time` update

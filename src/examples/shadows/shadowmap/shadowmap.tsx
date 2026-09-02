@@ -87,8 +87,7 @@ export default function Shadowmap() {
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       shadows
       background="#222244"
-      camera={{ position: [0, 10, 20], fov: 45, near: 1, far: 1000 }}
-    >
+      camera={{ position: [0, 10, 20], fov: 45, near: 1, far: 1000 }}>
       <fog attach="fog" args={['#222244', 50, 100]} />
       <Lights spinSpeed={spinSpeed} />
       <TorusKnot spinSpeed={spinSpeed} />

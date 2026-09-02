@@ -26,8 +26,7 @@ export function Layout() {
                         ? 'bg-neutral-800 text-white'
                         : 'text-neutral-400 hover:bg-neutral-900 hover:text-neutral-200'
                     }`
-                  }
-                >
+                  }>
                   {example.title}
                 </NavLink>
               </li>

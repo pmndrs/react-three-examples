@@ -64,40 +64,37 @@ function ComputedPlane() {
   )
 
   //* Compute Graph =================================================
-  const { computeNode, colorNode } = useNodes(
-    () => {
-      const computeTexture = Fn(() => {
-        // One invocation per texel: unravel the flat dispatch index into x/y.
-        const posX = instanceIndex.mod(WIDTH)
-        const posY = instanceIndex.div(WIDTH)
-        const indexUV = uvec2(posX, posY)
+  const { computeNode, colorNode } = useNodes(() => {
+    const computeTexture = Fn(() => {
+      // One invocation per texel: unravel the flat dispatch index into x/y.
+      const posX = instanceIndex.mod(WIDTH)
+      const posY = instanceIndex.div(WIDTH)
+      const indexUV = uvec2(posX, posY)
 
-        // Sine interference pattern — https://www.shadertoy.com/view/Xst3zN
-        const x = float(posX).div(uScale)
-        const y = float(posY).div(uScale)
+      // Sine interference pattern — https://www.shadertoy.com/view/Xst3zN
+      const x = float(posX).div(uScale)
+      const y = float(posY).div(uScale)
 
-        const v1 = x.sin()
-        const v2 = y.sin()
-        const v3 = x.add(y).sin()
-        const v4 = x.mul(x).add(y.mul(y)).sqrt().add(5.0).sin()
-        const v = v1.add(v2, v3, v4)
+      const v1 = x.sin()
+      const v2 = y.sin()
+      const v3 = x.add(y).sin()
+      const v4 = x.mul(x).add(y.mul(y)).sqrt().add(5.0).sin()
+      const v = v1.add(v2, v3, v4)
 
-        const r = v.sin()
-        const g = v.add(Math.PI).sin()
-        const b = v.add(Math.PI).sub(0.5).sin()
+      const r = v.sin()
+      const g = v.add(Math.PI).sin()
+      const b = v.add(Math.PI).sub(0.5).sin()
 
-        textureStore(patternTexture, indexUV, vec4(r, g, b, 1)).toWriteOnly()
-      })
+      textureStore(patternTexture, indexUV, vec4(r, g, b, 1)).toWriteOnly()
+    })
 
-      return {
-        // .compute(count) wraps the kernel in a ComputeNode sized to the texture.
-        computeNode: computeTexture().compute(WIDTH * HEIGHT),
-        // The very texture the kernel writes, sampled as a regular texture node.
-        colorNode: texture(patternTexture),
-      }
-    },
-    'computeTexture',
-  )
+    return {
+      // .compute(count) wraps the kernel in a ComputeNode sized to the texture.
+      computeNode: computeTexture().compute(WIDTH * HEIGHT),
+      // The very texture the kernel writes, sampled as a regular texture node.
+      colorNode: texture(patternTexture),
+    }
+  }, 'computeTexture')
 
   // Explicit dispatch — the ONLY thing that ever runs the kernel. Runs at mount and
   // once per scale change. Safe to call the sync `compute()` from an effect: fiber

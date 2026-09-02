@@ -102,8 +102,7 @@ export default function Portal() {
   return (
     <Canvas
       renderer={{ toneMapping: LinearToneMapping }}
-      camera={{ position: CAMERA_POSITION, fov: 50, near: 0.01, far: 30 }}
-    >
+      camera={{ position: CAMERA_POSITION, fov: 50, near: 0.01, far: 30 }}>
       <SceneBackground />
       <ToneMappingExposure />
       <hemisphereLight args={['#ff0066', '#0066ff', 7]} />

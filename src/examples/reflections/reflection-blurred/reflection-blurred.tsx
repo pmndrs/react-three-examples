@@ -87,8 +87,7 @@ export default function ReflectionBlurred() {
   return (
     <Canvas
       renderer={{ toneMapping: NeutralToneMapping, toneMappingExposure: 1.3 }}
-      camera={{ position: [-2.5, 2, 2.5], fov: 50, near: 0.25, far: 30 }}
-    >
+      camera={{ position: [-2.5, 2, 2.5], fov: 50, near: 0.25, far: 30 }}>
       <SceneBackground />
       <hemisphereLight color={0xffffff} groundColor={0x0066ff} intensity={10} />
       <BlurredFloor />

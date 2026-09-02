@@ -40,7 +40,11 @@ export const voronoi2d = /*@__PURE__*/ Fn(([p, time]) => {
     ({ i: x, j: y }) => {
       const g = vec2(float(x), float(y)).toConst()
       const o = hash2d(n.add(g)).toConst()
-      const r = g.sub(f).add(sin(time.add(o.mul(TWO_PI))).mul(0.5).add(0.5))
+      const r = g.sub(f).add(
+        sin(time.add(o.mul(TWO_PI)))
+          .mul(0.5)
+          .add(0.5),
+      )
       minDist.assign(min(minDist, dot(r, r)))
     },
   )
@@ -50,9 +54,9 @@ export const voronoi2d = /*@__PURE__*/ Fn(([p, time]) => {
 
 const hash3d = /*@__PURE__*/ Fn(([p]) => {
   return fract(
-    sin(vec3(dot(p, vec3(127.1, 311.7, 74.7)), dot(p, vec3(269.5, 183.3, 246.1)), dot(p, vec3(113.5, 271.9, 124.6)))).mul(
-      18.5453,
-    ),
+    sin(
+      vec3(dot(p, vec3(127.1, 311.7, 74.7)), dot(p, vec3(269.5, 183.3, 246.1)), dot(p, vec3(113.5, 271.9, 124.6))),
+    ).mul(18.5453),
   )
 })
 
@@ -68,7 +72,11 @@ export const voronoi3d = /*@__PURE__*/ Fn(([p, time]) => {
       ({ i: y, j: z }) => {
         const g = vec3(float(x), float(y), float(z)).toConst()
         const o = hash3d(n.add(g)).toConst()
-        const r = g.sub(f).add(sin(time.add(o.mul(TWO_PI))).mul(0.5).add(0.5))
+        const r = g.sub(f).add(
+          sin(time.add(o.mul(TWO_PI)))
+            .mul(0.5)
+            .add(0.5),
+        )
         minDist.assign(min(minDist, dot(r, r)))
       },
     )

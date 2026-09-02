@@ -4,14 +4,7 @@
 import { useEffect } from 'react'
 import { float, Fn, hash, If, instancedArray, instanceIndex, shapeCircle, uniform, uv, vec3 } from 'three/tsl'
 import { Vector3 } from 'three/webgpu'
-import {
-  useBuffers,
-  useFrame,
-  useNodes,
-  useThree,
-  useUniforms,
-  type ThreeEvent,
-} from '@react-three/fiber/webgpu'
+import { useBuffers, useFrame, useNodes, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
 
 const PARTICLE_COUNT = 200_000
@@ -54,69 +47,65 @@ export function Particles() {
 
   //* Compute Graph =================================================
   const { computeInit, computeUpdate, computeHit, uClickPos, spritePositionNode, spriteColorNode, spriteOpacityNode } =
-    useNodes(
-      () => {
-        // This event-driven uniform is intentionally graph-owned: React re-renders
-        // must not overwrite the latest pointer position.
-        const uClickPos = uniform(new Vector3(0, -1, 0))
-        const offset = float(AMOUNT / 2)
+    useNodes(() => {
+      // This event-driven uniform is intentionally graph-owned: React re-renders
+      // must not overwrite the latest pointer position.
+      const uClickPos = uniform(new Vector3(0, -1, 0))
+      const offset = float(AMOUNT / 2)
 
-        // (1) Init kernel: lay particles out as a flat grid and seed their tint.
-        const computeInit = Fn(() => {
-          const position = particlePositions.element(instanceIndex)
-          const color = particleColors.element(instanceIndex)
-          const x = instanceIndex.mod(AMOUNT)
-          const z = instanceIndex.div(AMOUNT)
+      // (1) Init kernel: lay particles out as a flat grid and seed their tint.
+      const computeInit = Fn(() => {
+        const position = particlePositions.element(instanceIndex)
+        const color = particleColors.element(instanceIndex)
+        const x = instanceIndex.mod(AMOUNT)
+        const z = instanceIndex.div(AMOUNT)
 
-          position.x.assign(offset.sub(x).mul(SEPARATION))
-          position.z.assign(offset.sub(z).mul(SEPARATION))
-          color.x.assign(hash(instanceIndex))
-          color.y.assign(hash(instanceIndex.add(2)))
-        })().compute(PARTICLE_COUNT)
+        position.x.assign(offset.sub(x).mul(SEPARATION))
+        position.z.assign(offset.sub(z).mul(SEPARATION))
+        color.x.assign(hash(instanceIndex))
+        color.y.assign(hash(instanceIndex.add(2)))
+      })().compute(PARTICLE_COUNT)
 
-        // (2) Simulation kernel: integrate gravity and bounce off the floor.
-        const computeUpdate = Fn(() => {
-          const position = particlePositions.element(instanceIndex)
-          const velocity = particleVelocities.element(instanceIndex)
+      // (2) Simulation kernel: integrate gravity and bounce off the floor.
+      const computeUpdate = Fn(() => {
+        const position = particlePositions.element(instanceIndex)
+        const velocity = particleVelocities.element(instanceIndex)
 
-          velocity.addAssign(vec3(0.0, uGravity, 0.0))
-          position.addAssign(velocity)
-          velocity.mulAssign(uFriction)
+        velocity.addAssign(vec3(0.0, uGravity, 0.0))
+        position.addAssign(velocity)
+        velocity.mulAssign(uFriction)
 
-          If(position.y.lessThan(0), () => {
-            position.y.assign(0)
-            velocity.y.assign(velocity.y.negate().mul(uBounce))
-            velocity.x.mulAssign(0.9)
-            velocity.z.mulAssign(0.9)
-       
-          })
-        })().compute(PARTICLE_COUNT)
+        If(position.y.lessThan(0), () => {
+          position.y.assign(0)
+          velocity.y.assign(velocity.y.negate().mul(uBounce))
+          velocity.x.mulAssign(0.9)
+          velocity.z.mulAssign(0.9)
+        })
+      })().compute(PARTICLE_COUNT)
 
-        // (3) Hit kernel: apply a randomized radial impulse from the pointer.
-        const computeHit = Fn(() => {
-          const position = particlePositions.element(instanceIndex)
-          const velocity = particleVelocities.element(instanceIndex)
-          const dist = position.distance(uClickPos)
-          const direction = position.sub(uClickPos).normalize()
-          const distArea = float(3).sub(dist).max(0)
-          const power = distArea.mul(0.01)
-          const relativePower = power.mul(hash(instanceIndex).mul(1.5).add(0.5))
+      // (3) Hit kernel: apply a randomized radial impulse from the pointer.
+      const computeHit = Fn(() => {
+        const position = particlePositions.element(instanceIndex)
+        const velocity = particleVelocities.element(instanceIndex)
+        const dist = position.distance(uClickPos)
+        const direction = position.sub(uClickPos).normalize()
+        const distArea = float(3).sub(dist).max(0)
+        const power = distArea.mul(0.01)
+        const relativePower = power.mul(hash(instanceIndex).mul(1.5).add(0.5))
 
-          velocity.addAssign(direction.mul(relativePower))
-        })().compute(PARTICLE_COUNT)
+        velocity.addAssign(direction.mul(relativePower))
+      })().compute(PARTICLE_COUNT)
 
-        return {
-          computeInit,
-          computeUpdate,
-          computeHit,
-          uClickPos,
-          spritePositionNode: particlePositions.toAttribute(),
-          spriteColorNode: uv().mul(particleColors.element(instanceIndex)),
-          spriteOpacityNode: shapeCircle(),
-        }
-      },
-      'computeParticles',
-    )
+      return {
+        computeInit,
+        computeUpdate,
+        computeHit,
+        uClickPos,
+        spritePositionNode: particlePositions.toAttribute(),
+        spriteColorNode: uv().mul(particleColors.element(instanceIndex)),
+        spriteOpacityNode: shapeCircle(),
+      }
+    }, 'computeParticles')
 
   // ONCE: seed the buffers after commit. StrictMode may run this effect twice,
   // but the kernel is idempotent.

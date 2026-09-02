@@ -91,24 +91,31 @@ function Floor() {
 // two three.js-core helpers as real scene-graph children (same pattern as
 // lights-spotlight).
 function ProjectorRig() {
-  const { type, color: lightColor, intensity, distance, angle, penumbra, decay, focus, helpers } = useControls(
-    'lights-projector',
-    {
-      type: { value: 'procedural' as ProjectionType, options: ['procedural', 'video', 'texture'] as ProjectionType[] },
-      light: folder({
-        color: '#ffffff',
-        intensity: { value: 100, min: 0, max: 500, step: 5 },
-        distance: { value: 0, min: 0, max: 20, step: 0.5 },
-        angle: { value: Math.PI / 6, min: 0, max: Math.PI / 3, step: 0.01 },
-        penumbra: { value: 1, min: 0, max: 1, step: 0.01 },
-        decay: { value: 2, min: 1, max: 2, step: 0.01 },
-      }),
-      shadow: folder({
-        focus: { value: 1, min: 0, max: 1, step: 0.01 },
-      }),
-      helpers: false,
-    },
-  )
+  const {
+    type,
+    color: lightColor,
+    intensity,
+    distance,
+    angle,
+    penumbra,
+    decay,
+    focus,
+    helpers,
+  } = useControls('lights-projector', {
+    type: { value: 'procedural' as ProjectionType, options: ['procedural', 'video', 'texture'] as ProjectionType[] },
+    light: folder({
+      color: '#ffffff',
+      intensity: { value: 100, min: 0, max: 500, step: 5 },
+      distance: { value: 0, min: 0, max: 20, step: 0.5 },
+      angle: { value: Math.PI / 6, min: 0, max: Math.PI / 3, step: 0.01 },
+      penumbra: { value: 1, min: 0, max: 1, step: 0.01 },
+      decay: { value: 2, min: 1, max: 2, step: 0.01 },
+    }),
+    shadow: folder({
+      focus: { value: 1, min: 0, max: 1, step: 0.01 },
+    }),
+    helpers: false,
+  })
 
   const lightRef = useRef<ProjectorLightImpl>(null)
   const helperPairRef = useRef<{ spot: SpotLightHelper; shadowCam: CameraHelper } | null>(null)
@@ -236,8 +243,7 @@ export default function LightsProjector() {
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       shadows
       background="#000000"
-      camera={{ position: [7, 4, 1], fov: 40, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [7, 4, 1], fov: 40, near: 0.1, far: 100 }}>
       <hemisphereLight color="#ffffff" groundColor="#8d8d8d" intensity={0.15} />
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
@@ -246,13 +252,7 @@ export default function LightsProjector() {
         <Floor />
         <Lucy />
       </Suspense>
-      <DemoHelpers
-        grid={false}
-        target={[0, 1, 0]}
-        minDistance={2}
-        maxDistance={10}
-        maxPolarAngle={Math.PI / 2}
-      />
+      <DemoHelpers grid={false} target={[0, 1, 0]} minDistance={2} maxDistance={10} maxPolarAngle={Math.PI / 2} />
     </Canvas>
   )
 }

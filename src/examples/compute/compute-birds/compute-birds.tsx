@@ -52,8 +52,7 @@ export default function ComputeBirds() {
         toneMapping: NeutralToneMapping,
         requiredLimits: { maxStorageBuffersInVertexStage: 3 },
       }}
-      camera={{ position: [0, 0, 1000], fov: 50, near: 1, far: 5000 }}
-    >
+      camera={{ position: [0, 0, 1000], fov: 50, near: 1, far: 5000 }}>
       {/* Plain Fog set declaratively IS auto-wrapped into a fog node (AGENTS.md). */}
       <fog attach="fog" args={['#ffffff', 700, 3000]} />
       <Sky />

@@ -88,10 +88,7 @@ export default function Occlusion() {
   // Built once the live sphere Mesh exists; leva colors are applied by mutation below
   // (the node holds the Color instances, update() copies from them per frame).
   const occlusionNode = useMemo(
-    () =>
-      sphere
-        ? new OcclusionNode(sphere, new Color(VISIBLE_COLOR), new Color(OCCLUDED_COLOR))
-        : null,
+    () => (sphere ? new OcclusionNode(sphere, new Color(VISIBLE_COLOR), new Color(OCCLUDED_COLOR)) : null),
     [sphere],
   )
 
@@ -107,8 +104,7 @@ export default function Occlusion() {
       // pinned deliberately; fiber's Canvas would default to ACESFilmic (AGENTS.md).
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 0, 7], fov: 50, near: 0.01, far: 100 }}
-    >
+      camera={{ position: [0, 0, 7], fov: 50, near: 0.01, far: 100 }}>
       <ambientLight color={0xb0b0b0} />
       <directionalLight color={0xffffff} intensity={1} position={[0.32, 0.39, 0.7]} />
 
@@ -123,8 +119,7 @@ export default function Occlusion() {
           // B11 family; verified against renderers/common in node_modules/three).
           ;(mesh as Mesh & { occlusionTest: boolean }).occlusionTest = true
           setSphere(mesh)
-        }}
-      >
+        }}>
         <sphereGeometry args={[0.5]} />
         <meshPhongNodeMaterial color={0xffff00} />
       </mesh>

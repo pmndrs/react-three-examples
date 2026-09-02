@@ -50,8 +50,7 @@ import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/IridescentDishWithOlives.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/IridescentDishWithOlives.glb'
 const HDR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/san_giuseppe_bridge_2k.hdr'
 
@@ -89,8 +88,7 @@ export default function LoaderGltfTransmission() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [0, 0.4, 0.7], fov: 45, near: 0.25, far: 20 }}
-    >
+      camera={{ position: [0, 0.4, 0.7], fov: 45, near: 0.25, far: 20 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

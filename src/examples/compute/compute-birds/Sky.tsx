@@ -8,9 +8,7 @@ import { useNodes } from '@react-three/fiber/webgpu'
 export function Sky() {
   // Static node graph, built once — nothing here reacts to props or uniforms.
   const { colorNode } = useNodes(() => ({
-    colorNode: varying(
-      vec4(sub(0.25, positionLocal.y), sub(-0.25, positionLocal.y), add(1.5, positionLocal.y), 1.0),
-    ),
+    colorNode: varying(vec4(sub(0.25, positionLocal.y), sub(-0.25, positionLocal.y), add(1.5, positionLocal.y), 1.0)),
   }))
 
   return (

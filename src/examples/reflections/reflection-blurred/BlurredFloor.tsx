@@ -37,7 +37,10 @@ function drawCircle(pos: Node<'vec2'>, radius: number, width: number, power: num
   const dist2 = dist1.sub(radius)
   const intensity = pow(float(radius).div(abs(dist2)), width)
 
-  return ringColor.mul(intensity).mul(power).mul(float(0.8).sub(abs(dist2)).max(0.0))
+  return ringColor
+    .mul(intensity)
+    .mul(power)
+    .mul(float(0.8).sub(abs(dist2)).max(0.0))
 }
 
 export function BlurredFloor() {
@@ -55,7 +58,10 @@ export function BlurredFloor() {
     // to violet with distance from the origin, and hue-cycles with time
     const circleFadeY = positionWorld.y.mul(0.7).oneMinus().max(0)
     const animatedColor = mix(color(0x74ccf4), color(0x7f00c5), positionWorld.xz.distance(vec2(0)).div(10).clamp())
-    const animatedCircle = hue(drawCircle(positionWorld.xz.mul(0.1), 0.5, 0.8, 0.01, animatedColor).mul(circleFadeY), time)
+    const animatedCircle = hue(
+      drawCircle(positionWorld.xz.mul(0.1), 0.5, 0.8, 0.01, animatedColor).mul(circleFadeY),
+      time,
+    )
 
     // reflection — half-resolution mirror render with a depth attachment; bounces off
     // since nothing else reflects
@@ -70,16 +76,19 @@ export function BlurredFloor() {
 
       // mask the reflection color by its own depth before blurring, so the blur can't
       // bleed the sky/background into on-floor contact areas
-      const maskReflection = sample((uvNode) => {
-        const reflectionSample = reflection.sample(uvNode)
-        const mask = reflectionDepth.sample(uvNode)
+      const maskReflection = sample(
+        (uvNode) => {
+          const reflectionSample = reflection.sample(uvNode)
+          const mask = reflectionDepth.sample(uvNode)
 
-        return vec4(reflectionSample.rgb, reflectionSample.a.mul(mask.r))
-        // Narrowing cast: `reflector()` always constructs with a vec2 default `uvNode`
-        // (`screenUV.flipX()`), but @types/three declares the general TextureNode field
-        // as `Node<'vec2'> | Node<'vec3'> | null` — same non-null/narrow note as the
-        // `reflection` cousin's `uvNode` use.
-      }, reflection.uvNode as Node<'vec2'> | null)
+          return vec4(reflectionSample.rgb, reflectionSample.a.mul(mask.r))
+          // Narrowing cast: `reflector()` always constructs with a vec2 default `uvNode`
+          // (`screenUV.flipX()`), but @types/three declares the general TextureNode field
+          // as `Node<'vec2'> | Node<'vec3'> | null` — same non-null/narrow note as the
+          // `reflection` cousin's `uvNode` use.
+        },
+        reflection.uvNode as Node<'vec2'> | null,
+      )
 
       // blur the reflection. Cast on the options object: npm three 0.185.1's hashBlur
       // reads `{ repeats, premultipliedAlpha }` (verified in

@@ -16,19 +16,25 @@ const CAMERA_HEIGHT = 0.3
 const PLANE_Y = -0.3
 
 export function ContactShadowCatcher() {
-  const { shadowBlur: blur, shadowDarkness: darkness, shadowOpacity, planeColor, planeOpacity, showWireframe } =
-    useControls('shadow-contact', {
-      Shadow: folder({
-        shadowBlur: { value: 3.5, min: 0, max: 15, step: 0.1 },
-        shadowDarkness: { value: 1, min: 0.1, max: 5, step: 0.1 },
-        shadowOpacity: { value: 1, min: 0, max: 1, step: 0.01 },
-      }),
-      Plane: folder({
-        planeColor: '#ffffff',
-        planeOpacity: { value: 1, min: 0, max: 1, step: 0.01 },
-      }),
-      showWireframe: false,
-    })
+  const {
+    shadowBlur: blur,
+    shadowDarkness: darkness,
+    shadowOpacity,
+    planeColor,
+    planeOpacity,
+    showWireframe,
+  } = useControls('shadow-contact', {
+    Shadow: folder({
+      shadowBlur: { value: 3.5, min: 0, max: 15, step: 0.1 },
+      shadowDarkness: { value: 1, min: 0.1, max: 5, step: 0.1 },
+      shadowOpacity: { value: 1, min: 0, max: 1, step: 0.01 },
+    }),
+    Plane: folder({
+      planeColor: '#ffffff',
+      planeOpacity: { value: 1, min: 0, max: 1, step: 0.01 },
+    }),
+    showWireframe: false,
+  })
 
   // On the `/webgpu` entry, `state.renderer` is already typed WebGPURenderer (B9 fixed
   // in fiber alpha.4) — no cast needed.
@@ -57,9 +63,7 @@ export function ContactShadowCatcher() {
 
     const depthMaterial = new NodeMaterial()
     depthMaterial.colorNode = vec3(0)
-    depthMaterial.opacityNode = float(1)
-      .sub(depth)
-      .mul(uDarkness)
+    depthMaterial.opacityNode = float(1).sub(depth).mul(uDarkness)
     depthMaterial.depthTest = false
     depthMaterial.depthWrite = false
 

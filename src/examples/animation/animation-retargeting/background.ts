@@ -38,16 +38,21 @@ const lightSpeed = /*#__PURE__*/ Fn(([suvIn]) => {
   )
   const rays = vec3(
     vec3(sin(uv.y.mul(150).add(time)).mul(0.5).add(0.5))
-      .mul(vec3(sin(uv.y.mul(80).sub(time.mul(0.6))).mul(0.5).add(0.5)))
-      .mul(vec3(sin(uv.y.mul(45).add(time.mul(0.8))).mul(0.5).add(0.5)))
       .mul(
         vec3(
-          sub(
-            1,
-            cos(uv.y.add(mul(22, time).sub(pow(uv.x.add(offset), 0.3).mul(60)))),
-          ),
+          sin(uv.y.mul(80).sub(time.mul(0.6)))
+            .mul(0.5)
+            .add(0.5),
         ),
       )
+      .mul(
+        vec3(
+          sin(uv.y.mul(45).add(time.mul(0.8)))
+            .mul(0.5)
+            .add(0.5),
+        ),
+      )
+      .mul(vec3(sub(1, cos(uv.y.add(mul(22, time).sub(pow(uv.x.add(offset), 0.3).mul(60)))))))
       .mul(vec3(uv.x.mul(2))),
   )
 

@@ -140,9 +140,7 @@ export function createHandleGeometry(): LoftGeometry {
       const phi = (j / 16) * Math.PI * 2
       const radial = a * Math.cos(phi)
 
-      ring.push(
-        new Vector3(point.x - radial * tangent.y, point.y + radial * tangent.x, b * Math.sin(phi)),
-      )
+      ring.push(new Vector3(point.x - radial * tangent.y, point.y + radial * tangent.x, b * Math.sin(phi)))
     }
 
     sections.push(ring)

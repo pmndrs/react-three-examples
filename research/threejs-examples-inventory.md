@@ -1,7 +1,7 @@
 # three.js Official Examples Inventory — for R3F v10 (WebGPU-first) Port Planning
 
 Source of truth: `https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/files.json` and
-`.../tags.json` (fetched from the `dev` branch — i.e. the *unreleased*, in-progress example set).
+`.../tags.json` (fetched from the `dev` branch — i.e. the _unreleased_, in-progress example set).
 Raw `files.json` snapshot saved alongside this report at `research/data/files.json`.
 
 Fetched: 2026-07-26.
@@ -10,13 +10,13 @@ Fetched: 2026-07-26.
 
 Per `gh`/GitHub Releases API (`api.github.com/repos/mrdoob/three.js/releases`):
 
-| Tag | Published | webgpu example count (as `"webgpu (wip)"` in that tag's files.json) |
-|---|---|---|
-| r185 (latest) | 2026-07-01 | 214 |
-| r184 | 2026-04-16 | 203 |
-| r183 | 2026-02-20 | 196 |
-| r182 | 2025-12-10 | 190 |
-| r181 | 2025-11-19 | 186 |
+| Tag           | Published  | webgpu example count (as `"webgpu (wip)"` in that tag's files.json) |
+| ------------- | ---------- | ------------------------------------------------------------------- |
+| r185 (latest) | 2026-07-01 | 214                                                                 |
+| r184          | 2026-04-16 | 203                                                                 |
+| r183          | 2026-02-20 | 196                                                                 |
+| r182          | 2025-12-10 | 190                                                                 |
+| r181          | 2025-11-19 | 186                                                                 |
 
 **Current release: r185.** The `dev` branch (what `files.json` on `dev` reflects, used for the rest of
 this report) is already ahead of r185 with **221** webgpu examples — the category is still labeled
@@ -24,6 +24,7 @@ this report) is already ahead of r185 with **221** webgpu examples — the categ
 WebGPU examples pre-stable/in-progress even at r185.
 
 **Growth in the last ~6 months** (comparing tagged snapshots to current `dev`):
+
 - Since r183 (2026-02-20, ~5 months ago): **+26 added**, -1 removed/renamed (`webgpu_lights_tiled` → gone, replaced by more granular light examples) → net +25.
 - Since r182 (2025-12-10, ~7.5 months ago): +32 added net.
 - Since r181 (2025-11-19, ~8.2 months ago): +36 added net.
@@ -33,6 +34,7 @@ at ~4-5 new examples/month. A port project needs to treat the WebGPU example set
 not a fixed list.
 
 Examples added since r183 (last ~5 months), for reference:
+
 ```
 webgpu_compile_async, webgpu_compute_rasterizer, webgpu_compute_rasterizer_ibl, webgpu_deferred,
 webgpu_furnace_test, webgpu_generator_building, webgpu_generator_city, webgpu_geometry_loft,
@@ -45,24 +47,24 @@ webgpu_tsl_graph, webgpu_upscaling_fsr1, webgpu_upscaling_taau, webgpu_volume_fi
 
 ## 1. Totals
 
-| Top-level category (files.json key) | Count |
-|---|---|
-| `webgl` | 218 |
-| `webgl / postprocessing` | 26 |
-| `webgl / advanced` | 48 |
-| `webgl / tsl` | 4 |
-| **webgl total (all sub-buckets)** | **296** |
-| `webgpu` | **221** |
-| `webaudio` | 4 |
-| `webxr` | 26 |
-| `games` | 1 |
-| `physics` | 13 |
-| `misc` | 22 |
-| `css2d` | 1 |
-| `css3d` | 7 |
-| `svg` | 2 |
-| `tests` | 2 |
-| **GRAND TOTAL** | **595** |
+| Top-level category (files.json key) | Count   |
+| ----------------------------------- | ------- |
+| `webgl`                             | 218     |
+| `webgl / postprocessing`            | 26      |
+| `webgl / advanced`                  | 48      |
+| `webgl / tsl`                       | 4       |
+| **webgl total (all sub-buckets)**   | **296** |
+| `webgpu`                            | **221** |
+| `webaudio`                          | 4       |
+| `webxr`                             | 26      |
+| `games`                             | 1       |
+| `physics`                           | 13      |
+| `misc`                              | 22      |
+| `css2d`                             | 1       |
+| `css3d`                             | 7       |
+| `svg`                               | 2       |
+| `tests`                             | 2       |
+| **GRAND TOTAL**                     | **595** |
 
 Of the 595, 221 (37%) are WebGPU/TSL renderer examples, 296 (50%) are classic WebGL, and the
 remaining 78 (13%) are renderer-agnostic (physics, webxr, css2d/3d, svg, webaudio, misc, games, tests).
@@ -310,11 +312,11 @@ relevant to an R3F TSL strategy even though they're not in the `webgpu` bucket.)
 
 Matching `webgl_<suffix>` against `webgpu_<suffix>` (exact suffix match only — no fuzzy matching):
 
-| | Count |
-|---|---|
-| **Overlap** — same suffix exists in both `webgl` (incl. postprocessing/advanced/tsl) and `webgpu` | **77** |
-| **webgpu-only** — no webgl example with matching suffix | **144** |
-| **webgl-only** — no webgpu example with matching suffix (the gap) | **219** |
+|                                                                                                   | Count   |
+| ------------------------------------------------------------------------------------------------- | ------- |
+| **Overlap** — same suffix exists in both `webgl` (incl. postprocessing/advanced/tsl) and `webgpu` | **77**  |
+| **webgpu-only** — no webgl example with matching suffix                                           | **144** |
+| **webgl-only** — no webgpu example with matching suffix (the gap)                                 | **219** |
 
 So of the 221 webgpu examples, only 77 (35%) are "the same demo, ported to WebGPU" — the other 144
 (65%) are WebGPU-exclusive content: compute-shader demos, TSL showcase pieces, deferred rendering,
@@ -330,6 +332,7 @@ the geometry primitives gallery, and classic WebGL-specific capability tests (UB
 WebGPU either doesn't need the workaround or three.js just hasn't built the WebGPU version yet.
 
 **Full overlap list (77 pairs):**
+
 ```
 webgl_camera <-> webgpu_camera
 webgl_camera_array <-> webgpu_camera_array
@@ -410,7 +413,7 @@ webgl_volume_cloud <-> webgpu_volume_cloud
 webgl_volume_perlin <-> webgpu_volume_perlin
 ```
 
-Note a handful of *conceptual* (not name-exact) near-matches the suffix match misses, worth folding in
+Note a handful of _conceptual_ (not name-exact) near-matches the suffix match misses, worth folding in
 manually during planning: `webgpu_skinning*` ↔ `webgl_animation_skinning_*`; `webgpu_sky` ↔
 `webgl_shaders_sky`; `webgpu_ocean`/`webgpu_water` ↔ `webgl_shaders_ocean`/`webgl_gpgpu_water`;
 `webgpu_particles` ↔ `webgl_gpgpu_birds`/`webgl_points_*`; `webgpu_compute_birds` ↔
@@ -436,6 +439,7 @@ readability (full flat list is in `research/data/files.json`, key `webgl`/`webgl
 Four buckets, in priority order for a port (i.e. check higher buckets first):
 
 ### (d) WebXR-dependent — 4 in the `webgpu` bucket, +26 more in the dedicated `webxr` category
+
 `webgpu_xr_cubes, webgpu_xr_native_layers, webgpu_xr_rollercoaster, webgpu_xr_shadows`. Requires a
 device/emulator to test at all; low priority for an initial R3F port pass since `@react-three/xr`
 integration is its own workstream. The `webxr` top-level category (26 examples, all still WebGL-only —
@@ -444,6 +448,7 @@ none of the 26 have a `webgpu_xr_*` equivalent except the 4 above happening to a
 patterns for `@react-three/xr` but a separate track from the WebGPU renderer port.
 
 ### (b) API / stress / device-capability tests — 21
+
 Things that exercise renderer internals, GPU limits, or are dev-tooling rather than "here's how you
 build a scene": `webgpu_centroid_sampling, webgpu_compile_async, webgpu_display_stereo,
 webgpu_furnace_test, webgpu_multiple_canvas, webgpu_multiple_elements,
@@ -456,6 +461,7 @@ conformance/smoke-test suite, not a showcase, though a few (`compile_async`, `pe
 are legitimately useful perf-pattern references for advanced users.
 
 ### (c) Loader demos — 9
+
 `webgpu_loader_gltf` (+6 material-feature variants: anisotropy, compressed, dispersion, iridescence,
 sheen, transmission), `webgpu_loader_materialx`, `webgpu_loader_texture_ktx2`. Small set on the
 WebGPU side because most of the loader gallery (35 formats — see §3) simply hasn't been ported off
@@ -464,6 +470,7 @@ wired into a WebGPURenderer-backed `<Canvas>` — genuinely low-effort, high-val
 GLTF pipeline work" R3F story.
 
 ### (a) Teaching-value examples — 187 (the remainder, default bucket)
+
 Everything else: materials, lights, shadows, postprocessing pipeline, compute-shader/GPGPU particle
 systems, TSL node-material showcases (galaxy, earth, wood, halftone, raging_sea, VFX flames/tornado/
 linked-particles, procedural terrain), reflections/refraction, PMREM/env-map handling, MRT, deferred
@@ -476,10 +483,10 @@ are the highest-signal "why WebGPU/TSL matters" content since they have no WebGL
 ## 5. What "port ALL examples" means in practice
 
 - **595 total examples** exist upstream today (`dev` branch); **221 are WebGPU** (37%), growing ~5/month.
-- If "port ALL" means *all WebGPU examples*: that's 221 targets, of which realistically ~187 are
+- If "port ALL" means _all WebGPU examples_: that's 221 targets, of which realistically ~187 are
   teaching-value ports, ~21 are internal tests better handled as automated conformance checks than
   showcase pages, 9 are loader demos, and 4 are XR-gated (needs `@react-three/xr` + a device).
-- If "port ALL" means *the full site* (595): the majority (219 examples, 37% of the whole site) are
+- If "port ALL" means _the full site_ (595): the majority (219 examples, 37% of the whole site) are
   WebGL-only content with zero WebGPU equivalent today — mostly the loader format gallery (35 file
   formats) and low-level BufferGeometry/attribute teaching examples. Porting those to R3F is
   independent of the WebGPU-first goal and would need its own WebGL-backed `<Canvas>` track (R3F

@@ -41,8 +41,7 @@ export function Ducks({ positionNode, visible, wireframe }: DucksProps) {
       args={[undefined, undefined, NUM_DUCKS]}
       geometry={duck.geometry}
       visible={visible}
-      frustumCulled={false}
-    >
+      frustumCulled={false}>
       <meshStandardNodeMaterial
         ref={materialRef}
         map={sourceMaterial.map}

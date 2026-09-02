@@ -109,8 +109,7 @@ export default function PostprocessingDof() {
     <Canvas
       // Original sets no tone mapping (three.js default); fiber would default to ACES.
       renderer={{ toneMapping: NoToneMapping }}
-      camera={{ position: [0, 0, 200], fov: 70, near: 1, far: 3500 }}
-    >
+      camera={{ position: [0, 0, 200], fov: 70, near: 1, far: 3500 }}>
       <Suspense fallback={null}>
         <SphereField />
       </Suspense>

@@ -62,8 +62,7 @@ import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const MODEL_INDEX_URL =
-  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json'
+const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json'
 const MODEL_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models'
 const DEFAULT_MODEL_URL = `${MODEL_BASE_URL}/DamagedHelmet/glTF-Binary/DamagedHelmet.glb`
 const HDR_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/quarry_01_1k.hdr'
@@ -140,8 +139,7 @@ export default function LoaderGltf() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [-1.8, 0.6, 2.7], fov: 45, near: 0.25, far: 20 }}
-    >
+      camera={{ position: [-1.8, 0.6, 2.7], fov: 45, near: 0.25, far: 20 }}>
       <Suspense fallback={null}>
         <Environment files={HDR_URL} background backgroundBlurriness={blurriness} />
         <Model key={modelUrl} url={modelUrl} />

@@ -60,10 +60,7 @@ export function OutlinePipeline({ selectionRef }: OutlinePipelineProps) {
     const period = time.div(uPulsePeriod).mul(2)
     const osc = oscSine(period).mul(0.5).add(0.5) // osc [0.5, 1.0]
 
-    const outlineColor = visibleEdge
-      .mul(uVisibleEdgeColor)
-      .add(hiddenEdge.mul(uHiddenEdgeColor))
-      .mul(uEdgeStrength)
+    const outlineColor = visibleEdge.mul(uVisibleEdgeColor).add(hiddenEdge.mul(uHiddenEdgeColor)).mul(uEdgeStrength)
     const outlinePulse = uPulsePeriod.greaterThan(0).select(outlineColor.mul(osc), outlineColor)
 
     renderPipeline.outputNode = outlinePulse.add(passes.scenePass)
@@ -87,14 +84,7 @@ export function OutlinePipeline({ selectionRef }: OutlinePipelineProps) {
     const uPulsePeriod = passes.uPulsePeriod as UniformNode<unknown, number> | undefined
     const uVisibleEdgeColor = passes.uVisibleEdgeColor as UniformNode<unknown, Color> | undefined
     const uHiddenEdgeColor = passes.uHiddenEdgeColor as UniformNode<unknown, Color> | undefined
-    if (
-      !uEdgeStrength ||
-      !uEdgeGlow ||
-      !uEdgeThickness ||
-      !uPulsePeriod ||
-      !uVisibleEdgeColor ||
-      !uHiddenEdgeColor
-    )
+    if (!uEdgeStrength || !uEdgeGlow || !uEdgeThickness || !uPulsePeriod || !uVisibleEdgeColor || !uHiddenEdgeColor)
       return
     uEdgeStrength.value = edgeStrength
     uEdgeGlow.value = edgeGlow

@@ -46,8 +46,7 @@ export default function Mirror() {
       // Original runs the WebGPURenderer default (NoToneMapping) — deliberate, see header.
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 75, 160], fov: 45, near: 1, far: 500 }}
-    >
+      camera={{ position: [0, 75, 160], fov: 45, near: 1, far: 500 }}>
       {/* Room point lights: the original's decay-0 lights (physically off, look-critical).
           The three colored ones sit far OUTSIDE the room and tint the walls they face. */}
       <pointLight color="#e7e7e7" intensity={2.5} distance={250} decay={0} position={[0, 60, 0]} />

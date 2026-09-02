@@ -61,11 +61,7 @@ export function SnowScenery() {
         {Array.from({ length: TREE_LEVELS }, (_, i) => {
           const radius = 1 + i
           return (
-            <mesh
-              key={i}
-              material={treeMaterial}
-              position-y={(TREE_LEVELS - i) * 1.5 + TREE_LEVELS * 0.6}
-            >
+            <mesh key={i} material={treeMaterial} position-y={(TREE_LEVELS - i) * 1.5 + TREE_LEVELS * 0.6}>
               <coneGeometry args={[radius * 0.95, radius * 1.25, 32]} />
             </mesh>
           )

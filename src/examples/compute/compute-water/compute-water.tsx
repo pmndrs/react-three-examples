@@ -63,8 +63,7 @@ export default function ComputeWater() {
         toneMappingExposure: 0.5,
         requiredLimits: { maxStorageBuffersInVertexStage: 2 },
       }}
-      camera={{ position: [0, 2, 4], fov: 75, near: 1, far: 3000 }}
-    >
+      camera={{ position: [0, 2, 4], fov: 75, near: 1, far: 3000 }}>
       <directionalLight position={[-1, 2.6, 1.4]} intensity={4} />
 
       {/* Water suspends on the HDR itself, after its own creator hooks — see its

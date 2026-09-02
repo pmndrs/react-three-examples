@@ -51,10 +51,7 @@ function IceGround() {
   // Creator hook BEFORE the suspending hook (AGENTS.md / UPSTREAM B18): deferred to
   // the post-suspense re-render, useUniforms' store write would land after siblings
   // have subscribed and trip React's setState-during-render warning.
-  const { uParallaxScale, uUvScale } = useUniforms(
-    { uParallaxScale: parallaxScale, uUvScale: uvScale },
-    'parallaxIce',
-  )
+  const { uParallaxScale, uUvScale } = useUniforms({ uParallaxScale: parallaxScale, uUvScale: uvScale }, 'parallaxIce')
 
   const textures = useTexture({
     top: TOP_URL,
@@ -121,8 +118,7 @@ export default function ParallaxUv() {
   return (
     <Canvas
       renderer={{ toneMapping: ReinhardToneMapping, toneMappingExposure: 6 }}
-      camera={{ position: [15, 7, 15], fov: 45, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [15, 7, 15], fov: 45, near: 0.1, far: 100 }}>
       {/* One explicit Suspense gate (B17) wrapping Environment + the lit node-material
           mesh (B15): the first shader build must already see scene.environment. The
           creator-hook component renders before the suspending Environment sibling
@@ -131,14 +127,7 @@ export default function ParallaxUv() {
         <IceGround />
         <Environment files={HDR_URL} background backgroundBlurriness={backgroundBlurriness} />
       </Suspense>
-      <DemoHelpers
-        grid={false}
-        target={[0, 0, 0]}
-        minDistance={10}
-        maxDistance={40}
-        autoRotate
-        autoRotateSpeed={-1}
-      />
+      <DemoHelpers grid={false} target={[0, 0, 0]} minDistance={10} maxDistance={40} autoRotate autoRotateSpeed={-1} />
     </Canvas>
   )
 }

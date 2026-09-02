@@ -49,8 +49,7 @@ export default function VolumeLightingRectareaExample() {
       renderer={{ toneMapping: NeutralToneMapping, toneMappingExposure: 2 }}
       shadows
       background="#000000"
-      camera={{ position: [0, 5, -15], fov: 60, near: 0.1, far: 250 }}
-    >
+      camera={{ position: [0, 5, -15], fov: 60, near: 0.1, far: 250 }}>
       <Suspense fallback={null}>
         <VolumeLightingRectarea />
       </Suspense>

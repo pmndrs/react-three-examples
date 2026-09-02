@@ -29,15 +29,12 @@ export function VolumeCaustics() {
     causticOcclusion: { value: 1, min: 0, max: 20, step: 0.1 },
     materialColor: '#ffd700',
   })
-  const { smokeAmount, volumetricLightingIntensity, steps, resolution } = useControls(
-    'volume-caustics fog',
-    {
-      smokeAmount: { value: 3, min: 0, max: 10, step: 0.1 },
-      volumetricLightingIntensity: { value: 0.7, min: 0, max: 3, step: 0.01 },
-      steps: { value: 20, min: 4, max: 64, step: 1 },
-      resolution: { value: 0.5, min: 0.1, max: 1, step: 0.05 },
-    },
-  )
+  const { smokeAmount, volumetricLightingIntensity, steps, resolution } = useControls('volume-caustics fog', {
+    smokeAmount: { value: 3, min: 0, max: 10, step: 0.1 },
+    volumetricLightingIntensity: { value: 0.7, min: 0, max: 3, step: 0.01 },
+    steps: { value: 20, min: 4, max: 64, step: 1 },
+    resolution: { value: 0.5, min: 0.1, max: 1, step: 0.05 },
+  })
 
   const gltf = useGLTF(DUCK_URL, { draco: true })
   const causticMap = useTexture(CAUSTIC_MAP_URL)

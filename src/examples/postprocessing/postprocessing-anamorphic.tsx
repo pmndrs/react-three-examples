@@ -190,8 +190,7 @@ export default function PostprocessingAnamorphic() {
     // Original sets NeutralToneMapping explicitly (not fiber's ACESFilmic default).
     <Canvas
       renderer={{ toneMapping: NeutralToneMapping }}
-      camera={{ position: [0, 0, 20], fov: 45, near: 0.25, far: 250 }}
-    >
+      camera={{ position: [0, 0, 20], fov: 45, near: 0.25, far: 250 }}>
       <SceneBackground />
       <InstancedSpheres />
       <PostFX />

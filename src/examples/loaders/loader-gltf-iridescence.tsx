@@ -42,8 +42,7 @@ import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/IridescenceLamp.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/IridescenceLamp.glb'
 const HDR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/venice_sunset_1k.hdr'
 
@@ -64,8 +63,7 @@ export default function LoaderGltfIridescence() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [0.35, 0.05, 0.35], fov: 50, near: 0.05, far: 20 }}
-    >
+      camera={{ position: [0.35, 0.05, 0.35], fov: 50, near: 0.05, far: 20 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

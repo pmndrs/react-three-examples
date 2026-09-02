@@ -66,8 +66,7 @@ export default function PostprocessingAO() {
     <Canvas
       renderer={{ toneMapping: NeutralToneMapping }}
       background="#666666"
-      camera={{ position: [1, 3, 7], fov: 45, near: 0.1, far: 50 }}
-    >
+      camera={{ position: [1, 3, 7], fov: 45, near: 0.1, far: 50 }}>
       {/* AOPipeline (a creator-hook component: useRenderPipeline + useUniforms)
           renders BEFORE the suspending TennysonBust sibling — a creator hook after a
           suspending sibling can trigger the B18 setState-in-render escalation into a

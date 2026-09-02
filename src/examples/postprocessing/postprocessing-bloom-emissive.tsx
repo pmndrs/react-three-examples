@@ -84,8 +84,7 @@ export default function PostprocessingBloomEmissive() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [-1.8, 0.6, 2.7], fov: 45, near: 0.25, far: 20 }}
-    >
+      camera={{ position: [-1.8, 0.6, 2.7], fov: 45, near: 0.25, far: 20 }}>
       <PostFX />
       <Suspense fallback={null}>
         <Environment files={HDR_URL} background />

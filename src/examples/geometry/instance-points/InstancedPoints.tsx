@@ -5,9 +5,20 @@
 // graph reads it back via `.toAttribute()` both as `sizeNode` and as the color-fade
 // factor (small point -> dark). Uses fiber hooks, so it lives inside <Canvas>.
 import { useEffect, useMemo, useRef } from 'react'
-import { Fn, float, instanceIndex, instancedArray, instancedBufferAttribute, mix, shapeCircle, sin, time, vec3 } from 'three/tsl'
+import {
+  Fn,
+  float,
+  instanceIndex,
+  instancedArray,
+  instancedBufferAttribute,
+  mix,
+  shapeCircle,
+  sin,
+  time,
+  vec3,
+} from 'three/tsl'
 import { CatmullRomCurve3, Color, InstancedBufferAttribute, SRGBColorSpace, Vector3 } from 'three/webgpu'
-import type {  PointsNodeMaterial} from 'three/webgpu'
+import type { PointsNodeMaterial } from 'three/webgpu'
 import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js'
 import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
@@ -46,7 +57,8 @@ function buildPointData() {
     divisions,
     positionAttribute: new InstancedBufferAttribute(positions, 3),
     colorsAttribute: new InstancedBufferAttribute(colors, 3),
-    sizes }
+    sizes,
+  }
 }
 
 export function InstancedPoints() {
@@ -54,7 +66,8 @@ export function InstancedPoints() {
     alphaToCoverage: { value: true, label: 'alpha to coverage' },
     minWidth: { value: 6, min: 1, max: 30, step: 1, label: 'min width (px)' },
     maxWidth: { value: 20, min: 2, max: 30, step: 1, label: 'max width (px)' },
-    pulseSpeed: { value: 6, min: 1, max: 20, step: 0.1, label: 'pulse speed' } })
+    pulseSpeed: { value: 6, min: 1, max: 20, step: 0.1, label: 'pulse speed' },
+  })
 
   const renderer = useThree((state) => state.renderer)
 
@@ -75,7 +88,8 @@ export function InstancedPoints() {
   // in the WGSL struct name — runtime shader compile error (fiber bug, UPSTREAM.md
   // B16). Root-level keys are bare identifiers; prefix instead.
   const { ipPointSizes } = useBuffers(() => ({
-    ipPointSizes: instancedArray(sizes, 'float') }))
+    ipPointSizes: instancedArray(sizes, 'float'),
+  }))
 
   // All node graphs built exactly once; we close over the TYPED hook return above
   // (creator-state reads widen to fiber's BufferLike, losing `.element()`/
@@ -91,9 +105,7 @@ export function InstancedPoints() {
       const relativeTime = time.add(float(instanceIndex))
       const sizeFactor = sin(relativeTime.mul(uPulseSpeedNode)).add(1).div(2)
 
-      ipPointSizes
-        .element(instanceIndex)
-        .assign(sizeFactor.mul(uMaxWidthNode.sub(uMinWidthNode)).add(uMinWidthNode))
+      ipPointSizes.element(instanceIndex).assign(sizeFactor.mul(uMaxWidthNode.sub(uMinWidthNode)).add(uMinWidthNode))
     })().compute(divisions)
 
     return {
@@ -108,7 +120,8 @@ export function InstancedPoints() {
         sizeAttrib.div(uMaxWidthNode),
       ),
       ipSizeNode: sizeAttrib,
-      ipOpacityNode: shapeCircle() }
+      ipOpacityNode: shapeCircle(),
+    }
   })
 
   // EVERY FRAME: pulse the sizes before the render phase draws them (compute is not

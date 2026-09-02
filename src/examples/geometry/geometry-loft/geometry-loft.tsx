@@ -81,8 +81,7 @@ export default function GeometryLoft() {
     <Canvas
       renderer={{ toneMapping: NeutralToneMapping }}
       shadows
-      camera={{ position: [0, 15, 40], fov: 45, near: 1, far: 1000 }}
-    >
+      camera={{ position: [0, 15, 40], fov: 45, near: 1, far: 1000 }}>
       <SceneBackground />
       <Environment preset="studio" environmentIntensity={0.4} />
       <directionalLight

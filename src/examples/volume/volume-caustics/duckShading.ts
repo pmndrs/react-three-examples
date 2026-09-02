@@ -4,7 +4,20 @@
 // projection both as the shadow-cast color (glowing caustic patterns on the floor)
 // and — scaled by a light-facing scattering term — as the duck's own emissive (a
 // cheap subsurface-scattering stand-in that brightens the side facing the spot light).
-import { div, float, lightViewPosition, normalView, positionView, positionViewDirection, refract, texture, uniform, vec2, vec3, Fn } from 'three/tsl'
+import {
+  div,
+  float,
+  lightViewPosition,
+  normalView,
+  positionView,
+  positionViewDirection,
+  refract,
+  texture,
+  uniform,
+  vec2,
+  vec3,
+  Fn,
+} from 'three/tsl'
 import type { MeshPhysicalNodeMaterial, Node, SpotLight, Texture } from 'three/webgpu'
 
 export interface DuckShadingDeps {

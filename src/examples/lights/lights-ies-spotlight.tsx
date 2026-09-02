@@ -127,10 +127,22 @@ function Scene() {
     'lights-ies-spotlight',
     {
       helpers: false,
-      light1: folder({ color1: { value: '#ff0000', label: 'color' }, intensity1: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' } }),
-      light2: folder({ color2: { value: '#00ff00', label: 'color' }, intensity2: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' } }),
-      light3: folder({ color3: { value: '#0000ff', label: 'color' }, intensity3: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' } }),
-      light4: folder({ color4: { value: '#ffffff', label: 'color' }, intensity4: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' } }),
+      light1: folder({
+        color1: { value: '#ff0000', label: 'color' },
+        intensity1: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' },
+      }),
+      light2: folder({
+        color2: { value: '#00ff00', label: 'color' },
+        intensity2: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' },
+      }),
+      light3: folder({
+        color3: { value: '#0000ff', label: 'color' },
+        intensity3: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' },
+      }),
+      light4: folder({
+        color4: { value: '#ffffff', label: 'color' },
+        intensity4: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' },
+      }),
     },
   )
 
@@ -168,8 +180,7 @@ export default function LightsIesSpotlight() {
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
       shadows
-      camera={{ position: [16, 4, 1], fov: 35, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [16, 4, 1], fov: 35, near: 0.1, far: 100 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

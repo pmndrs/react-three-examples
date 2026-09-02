@@ -54,9 +54,7 @@ for (const { slug, ...meta } of selected) {
   // upstream's to fix — skip WITH the reason so they stay visible in reports.
   const animatesSkip = 'animatesSkip' in meta ? String(meta.animatesSkip) : undefined
 
-  test(`${slug}: ${isStatic ? 'static-by-design (live loop, clean console)' : 'animates'}`, async ({
-    page,
-  }) => {
+  test(`${slug}: ${isStatic ? 'static-by-design (live loop, clean console)' : 'animates'}`, async ({ page }) => {
     test.skip(Boolean(process.env.CI && ciSkip), ciSkip)
     test.skip(Boolean(animatesSkip), animatesSkip)
 

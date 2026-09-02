@@ -47,8 +47,7 @@ import { Environment, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const MODEL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/AnisotropyBarnLamp.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/AnisotropyBarnLamp.glb'
 const HDR_URL =
   'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/pedestrian_overpass_1k.hdr'
 
@@ -69,8 +68,7 @@ export default function LoaderGltfAnisotropy() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.35 }}
-      camera={{ position: [-0.35, -0.2, 0.35], fov: 40, near: 0.01, far: 10 }}
-    >
+      camera={{ position: [-0.35, -0.2, 0.35], fov: 40, near: 0.01, far: 10 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

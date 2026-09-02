@@ -133,8 +133,7 @@ function MipmapPane({ floorTexture, paintingTexture }: { floorTexture: Texture; 
       <mesh
         rotation-x={-Math.PI / 2}
         position={[0, -1.1 * (image.height / 2), -1.1 * (image.height / 2)]}
-        scale={[frameScaleX, frameScaleY, 1]}
-      >
+        scale={[frameScaleX, frameScaleY, 1]}>
         <planeGeometry args={[100, 100]} />
         <meshBasicNodeMaterial color="#000000" transparent opacity={0.75} />
       </mesh>

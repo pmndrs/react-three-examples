@@ -34,13 +34,7 @@
  *   Inspector RootState slot yet (same gap noted in `lights-phong` / `reflection`)
  */
 import { Suspense, useLayoutEffect, useRef } from 'react'
-import {
-  ACESFilmicToneMapping,
-  CanvasTexture,
-  RepeatWrapping,
-  SphereGeometry,
-  SRGBColorSpace,
-} from 'three/webgpu'
+import { ACESFilmicToneMapping, CanvasTexture, RepeatWrapping, SphereGeometry, SRGBColorSpace } from 'three/webgpu'
 import type { Group, Mesh } from 'three/webgpu'
 import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js'
 import { FlakesTexture } from 'three/addons/textures/FlakesTexture.js'
@@ -50,9 +44,7 @@ import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
 const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
-const PISA_HDR_FILES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map(
-  (face) => `${TEXTURE_BASE}cube/pisaHDR/${face}.hdr`,
-)
+const PISA_HDR_FILES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map((face) => `${TEXTURE_BASE}cube/pisaHDR/${face}.hdr`)
 
 // Shared static assets — constants, not mutable state, so module-scope THREE instances
 // are the idiomatic call (same rationale as lights-phong's teapotGeometry). The flakes
@@ -90,14 +82,13 @@ function ClearcoatSpheres({ clearcoat }: { clearcoat: number }) {
   const groupRef = useRef<Group>(null)
   const lightRef = useRef<Mesh>(null)
 
-  const { carbonDiffuse, carbonNormal, waterNormal, golfballNormal, scratchedGoldNormal } =
-    useTexture({
-      carbonDiffuse: `${TEXTURE_BASE}carbon/Carbon.png`,
-      carbonNormal: `${TEXTURE_BASE}carbon/Carbon_Normal.png`,
-      waterNormal: `${TEXTURE_BASE}water/Water_1_M_Normal.jpg`,
-      golfballNormal: `${TEXTURE_BASE}golfball.jpg`,
-      scratchedGoldNormal: `${TEXTURE_BASE}pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png`,
-    })
+  const { carbonDiffuse, carbonNormal, waterNormal, golfballNormal, scratchedGoldNormal } = useTexture({
+    carbonDiffuse: `${TEXTURE_BASE}carbon/Carbon.png`,
+    carbonNormal: `${TEXTURE_BASE}carbon/Carbon_Normal.png`,
+    waterNormal: `${TEXTURE_BASE}water/Water_1_M_Normal.jpg`,
+    golfballNormal: `${TEXTURE_BASE}golfball.jpg`,
+    scratchedGoldNormal: `${TEXTURE_BASE}pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png`,
+  })
 
   // Wrap/repeat/colorSpace must be applied (and re-uploaded via needsUpdate) before the
   // first RAF render reads the textures — layout effect, not passive (AGENTS.md).
@@ -112,11 +103,7 @@ function ClearcoatSpheres({ clearcoat }: { clearcoat: number }) {
 
   useFrame(({ elapsed, delta }) => {
     const timer = elapsed * 0.25
-    lightRef.current?.position.set(
-      Math.sin(timer * 7) * 3,
-      Math.cos(timer * 5) * 4,
-      Math.cos(timer * 3) * 3,
-    )
+    lightRef.current?.position.set(Math.sin(timer * 7) * 3, Math.cos(timer * 5) * 4, Math.cos(timer * 3) * 3)
     if (groupRef.current) {
       for (const child of groupRef.current.children) child.rotation.y += delta * 0.3
     }
@@ -194,8 +181,7 @@ export default function Clearcoat() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 1.25 }}
-      camera={{ position: [0, 0, 10], fov: 27, near: 0.25, far: 50 }}
-    >
+      camera={{ position: [0, 0, 10], fov: 27, near: 0.25, far: 50 }}>
       {/* B17 gate: ungated suspension reaching Canvas's boundary re-runs createRoot
           and freezes the displayed scene (AGENTS.md; corpus-wide repair, wave 8). */}
       <Suspense fallback={null}>

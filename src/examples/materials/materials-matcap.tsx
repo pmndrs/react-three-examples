@@ -111,8 +111,7 @@ export default function MaterialsMatcap() {
   return (
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
-      camera={{ position: [0, 0, 13], fov: 40, near: 1, far: 100 }}
-    >
+      camera={{ position: [0, 0, 13], fov: 40, near: 1, far: 100 }}>
       <Suspense fallback={null}>
         <Head matcapName={matcap} color={color} />
       </Suspense>

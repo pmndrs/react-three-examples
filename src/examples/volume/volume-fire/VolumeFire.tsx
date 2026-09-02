@@ -28,14 +28,7 @@ import {
 import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js'
 import { bloom } from 'three/addons/tsl/display/BloomNode.js'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
-import {
-  useFrame,
-  useGPUStorage,
-  useNodes,
-  useRenderPipeline,
-  useThree,
-  useUniforms,
-} from '@react-three/fiber/webgpu'
+import { useFrame, useGPUStorage, useNodes, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
 import { DragControls } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import type CameraControlsImpl from 'camera-controls'
@@ -76,11 +69,7 @@ function createStorage3D(wrap: Wrapping = ClampToEdgeWrapping): StorageTexture {
   return texture as unknown as StorageTexture
 }
 
-export function VolumeFire({
-  cameraControlsRef,
-}: {
-  cameraControlsRef: RefObject<CameraControlsImpl | null>
-}) {
+export function VolumeFire({ cameraControlsRef }: { cameraControlsRef: RefObject<CameraControlsImpl | null> }) {
   //* Controls =====================================================
   const { simulate, simSpeed, turbulence, buoyancy, fireLifespan, smokeLifespan } = useControls(
     'volume-fire simulation',
@@ -98,17 +87,14 @@ export function VolumeFire({
     density: { value: 7.0, min: 0, max: 20, step: 0.1 },
     teapotEmissive: { value: 0.2, min: 0, max: 1, step: 0.001 },
   })
-  const { fireHue, glowSpread, fireSaturation, startColor, midColor, endColor } = useControls(
-    'volume-fire look',
-    {
-      fireHue: { value: 0, min: 0, max: 360, step: 1 },
-      glowSpread: { value: 5.0, min: 1, max: 5, step: 0.1 },
-      fireSaturation: { value: 1.1, min: 0, max: 2, step: 0.05 },
-      startColor: '#ffe68c',
-      midColor: '#ff7305',
-      endColor: '#ff0000',
-    },
-  )
+  const { fireHue, glowSpread, fireSaturation, startColor, midColor, endColor } = useControls('volume-fire look', {
+    fireHue: { value: 0, min: 0, max: 360, step: 1 },
+    glowSpread: { value: 5.0, min: 1, max: 5, step: 0.1 },
+    fireSaturation: { value: 1.1, min: 0, max: 2, step: 0.05 },
+    startColor: '#ffe68c',
+    midColor: '#ff7305',
+    endColor: '#ff0000',
+  })
   const { steps, resolution, denoise, bloomStrength, bloomRadius, bloomThreshold } = useControls(
     'volume-fire quality',
     {
@@ -167,62 +153,47 @@ export function VolumeFire({
   //* GPU State ====================================================
   // The simulation's voxel fields. useGPUStorage is create-once, StrictMode-safe,
   // and owns disposal.
-  const {
-    fireVelTexA,
-    fireVelTexB,
-    fireDyeTexA,
-    fireDyeTexB,
-    fireDivTex,
-    firePressTexA,
-    firePressTexB,
-    fireCurlTex,
-  } = useGPUStorage(
-    () => ({
-      fireVelTexA: createStorage3D(), // velocity field (xyz)
-      fireVelTexB: createStorage3D(),
-      fireDyeTexA: createStorage3D(), // r = density, g = temperature, b = age
-      fireDyeTexB: createStorage3D(),
-      fireDivTex: createStorage3D(), // divergence
-      firePressTexA: createStorage3D(), // pressure (Jacobi ping-pong)
-      firePressTexB: createStorage3D(),
-      fireCurlTex: createStorage3D(RepeatWrapping), // precomputed curl noise
-    }),
-    'volumeFire',
-  )
+  const { fireVelTexA, fireVelTexB, fireDyeTexA, fireDyeTexB, fireDivTex, firePressTexA, firePressTexB, fireCurlTex } =
+    useGPUStorage(
+      () => ({
+        fireVelTexA: createStorage3D(), // velocity field (xyz)
+        fireVelTexB: createStorage3D(),
+        fireDyeTexA: createStorage3D(), // r = density, g = temperature, b = age
+        fireDyeTexB: createStorage3D(),
+        fireDivTex: createStorage3D(), // divergence
+        firePressTexA: createStorage3D(), // pressure (Jacobi ping-pong)
+        firePressTexB: createStorage3D(),
+        fireCurlTex: createStorage3D(RepeatWrapping), // precomputed curl noise
+      }),
+      'volumeFire',
+    )
 
   //* Compute Graph =================================================
-  const nodes = useNodes(
-    () => {
-      const dyeTexNode = texture3D(fireDyeTexA)
-      const dyeTexWriteNode = storageTexture(fireDyeTexB).toWriteOnly()
-      const curlNoiseTexNode = texture3D(fireCurlTex)
+  const nodes = useNodes(() => {
+    const dyeTexNode = texture3D(fireDyeTexA)
+    const dyeTexWriteNode = storageTexture(fireDyeTexB).toWriteOnly()
+    const curlNoiseTexNode = texture3D(fireCurlTex)
 
-      // Teapot vertices as a read-only storage buffer for the emitter kernel.
-      const teapotVerts = storage(
-        teapotGeometry.attributes.position as BufferAttribute,
-        'vec3',
-        vertexCount,
-      ).toReadOnly()
+    // Teapot vertices as a read-only storage buffer for the emitter kernel.
+    const teapotVerts = storage(teapotGeometry.attributes.position as BufferAttribute, 'vec3', vertexCount).toReadOnly()
 
-      const kernels = createFluidKernels({
-        u: fireUniforms,
-        velTexA: fireVelTexA,
-        velTexB: fireVelTexB,
-        divTex: fireDivTex,
-        pressTexA: firePressTexA,
-        pressTexB: firePressTexB,
-        curlNoiseTex: fireCurlTex,
-        dyeTexNode,
-        dyeTexWriteNode,
-        curlNoiseTexNode,
-        teapotVerts,
-        vertexCount,
-      })
+    const kernels = createFluidKernels({
+      u: fireUniforms,
+      velTexA: fireVelTexA,
+      velTexB: fireVelTexB,
+      divTex: fireDivTex,
+      pressTexA: firePressTexA,
+      pressTexB: firePressTexB,
+      curlNoiseTex: fireCurlTex,
+      dyeTexNode,
+      dyeTexWriteNode,
+      curlNoiseTexNode,
+      teapotVerts,
+      vertexCount,
+    })
 
-      return { ...kernels, dyeTexNode, dyeTexWriteNode }
-    },
-    'volumeFire',
-  )
+    return { ...kernels, dyeTexNode, dyeTexWriteNode }
+  }, 'volumeFire')
 
   const { dyeTexNode, dyeTexWriteNode, computeCurlNoise } = nodes
 
@@ -414,10 +385,7 @@ export function VolumeFire({
   )
 
   // Drag setup: the teapot starts on the floor, constrained to the volume box.
-  const dragMatrix = useMemo(
-    () => new Matrix4().setPosition(0, FLOOR_Y - teapotMinY, 0),
-    [teapotMinY],
-  )
+  const dragMatrix = useMemo(() => new Matrix4().setPosition(0, FLOOR_Y - teapotMinY, 0), [teapotMinY])
   const dragLimits = useMemo<[[number, number], [number, number], [number, number]]>(
     () => [
       [-(VOLUME_WORLD_SIZE_X / 2 - 1.5), VOLUME_WORLD_SIZE_X / 2 - 1.5],
@@ -460,15 +428,9 @@ export function VolumeFire({
         onDragEnd={() => {
           const controls = cameraControlsRef.current
           if (controls) controls.enabled = true
-        }}
-      >
+        }}>
         <mesh ref={teapotRef} geometry={teapotGeometry} receiveShadow>
-          <meshStandardNodeMaterial
-            color="#000000"
-            roughness={1}
-            metalness={1}
-            emissiveNode={teapotEmissiveNode}
-          />
+          <meshStandardNodeMaterial color="#000000" roughness={1} metalness={1} emissiveNode={teapotEmissiveNode} />
         </mesh>
         <pointLight ref={pointLightRef} color="#ffffff" intensity={1} distance={100} decay={2} />
       </DragControls>

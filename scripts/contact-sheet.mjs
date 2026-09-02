@@ -75,9 +75,7 @@ try {
 
 // Rebuild the sheet from every PNG on disk, not just this run's slugs, so a
 // scoped `pnpm shot <slug>` refreshes one tile without discarding the rest.
-const captured = new Set(
-  (await readdir(OUT)).filter((f) => f.endsWith('.png')).map((f) => f.slice(0, -4)),
-)
+const captured = new Set((await readdir(OUT)).filter((f) => f.endsWith('.png')).map((f) => f.slice(0, -4)))
 const failedNow = new Map(results.filter((r) => !r.ok).map((r) => [r.slug, r.error]))
 
 const cells = examples

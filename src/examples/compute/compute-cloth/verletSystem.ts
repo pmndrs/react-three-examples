@@ -145,10 +145,7 @@ export function buildVerletSystem(): VerletSystem {
   }
 
   const clothGeometry = new BufferGeometry()
-  clothGeometry.setAttribute(
-    'position',
-    new BufferAttribute(new Float32Array(clothVertexCount * 3), 3, false),
-  )
+  clothGeometry.setAttribute('position', new BufferAttribute(new Float32Array(clothVertexCount * 3), 3, false))
   clothGeometry.setAttribute('vertexIds', new BufferAttribute(verletVertexIdArray, 4, false))
   clothGeometry.setIndex(indices)
 

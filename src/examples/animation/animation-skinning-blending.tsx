@@ -22,8 +22,7 @@ import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const SOLDIER_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Soldier.glb'
+const SOLDIER_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Soldier.glb'
 
 function Soldier() {
   const { scene, animations } = useGLTF(SOLDIER_URL)

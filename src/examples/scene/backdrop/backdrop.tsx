@@ -81,8 +81,7 @@ export default function Backdrop() {
   return (
     <Canvas
       renderer={{ antialias: false, toneMapping: NeutralToneMapping, toneMappingExposure: 0.3 }}
-      camera={{ position: [1, 2, 3], fov: 50, near: 0.01, far: 100 }}
-    >
+      camera={{ position: [1, 2, 3], fov: 50, near: 0.01, far: 100 }}>
       <SceneBackground />
       <CameraLight />
       <Suspense fallback={null}>

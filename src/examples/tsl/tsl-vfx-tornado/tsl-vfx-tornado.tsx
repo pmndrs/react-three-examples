@@ -79,8 +79,7 @@ export default function TslVfxTornado() {
       // inherited from fiber's default, per the tone-mapping parity rule.
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       background="#201919"
-      camera={{ position: [1, 1, 3], fov: 25, near: 0.1, far: 50 }}
-    >
+      camera={{ position: [1, 1, 3], fov: 25, near: 0.1, far: 50 }}>
       <Suspense fallback={null}>
         <Tornado />
       </Suspense>

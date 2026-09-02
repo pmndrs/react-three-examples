@@ -71,8 +71,7 @@ export default function CustomFog() {
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       shadows
-      camera={{ position: [-50, 88, 230], fov: 45, near: 1, far: 20000 }}
-    >
+      camera={{ position: [-50, 88, 230], fov: 45, near: 1, far: 20000 }}>
       <ValleyFog />
       <SunSky sunRef={sunRef} />
       <TerrainForest sunRef={sunRef} />

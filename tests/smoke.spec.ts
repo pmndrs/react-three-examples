@@ -6,10 +6,7 @@ import { PNG } from 'pngjs'
 import examples from '../src/examples.json' with { type: 'json' }
 
 // Console noise that is not an example defect.
-const IGNORED_CONSOLE = [
-  /Download the React DevTools/,
-  /\[vite\]/,
-]
+const IGNORED_CONSOLE = [/Download the React DevTools/, /\[vite\]/]
 
 // SLUGS=a,b restricts the run to those examples (set by `pnpm test:changed`).
 // The full 131-example sweep is ~19 min locally and produces contention flakes;

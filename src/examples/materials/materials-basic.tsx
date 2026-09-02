@@ -86,7 +86,7 @@ function SphereSwarm() {
     if (materialRef.current) materialRef.current.needsUpdate = true
   }, [textureCube, refraction])
 
-  useFrame(({ elapsed}) => {
+  useFrame(({ elapsed }) => {
     for (let i = 0; i < SPHERE_COUNT; i++) {
       const { scale, z } = instanceData[i]
       const instance = instanceRefs.current[i]

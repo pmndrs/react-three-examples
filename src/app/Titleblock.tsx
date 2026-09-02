@@ -18,8 +18,7 @@ export function Titleblock({ meta }: { meta: ExampleMeta }) {
               href={meta.original}
               target="_blank"
               rel="noreferrer"
-              className="pointer-events-auto underline-offset-2 hover:text-white hover:underline"
-            >
+              className="pointer-events-auto underline-offset-2 hover:text-white hover:underline">
               three.js original ↗
             </a>
           )}

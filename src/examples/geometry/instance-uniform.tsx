@@ -38,8 +38,7 @@ import { useControls } from 'leva'
 import { TeapotGeometry } from '../../assets/TeapotGeometry'
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const CUBE_PATH =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/SwedishRoyalCastle/'
+const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/SwedishRoyalCastle/'
 const CUBE_FILES = ['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']
 
 const TEAPOT_COUNT = 12
@@ -95,8 +94,7 @@ function Teapots() {
     // B11: NodeMaterial.setupOutgoingLight reads `emissiveNode` generically at runtime
     // (verified in renderers/common), but @types/three declares it only on
     // MeshStandardNodeMaterial — documented duck-typing cast.
-    ;(mat as MeshBasicNodeMaterial & { emissiveNode: Node | null }).emissiveNode =
-      instanceColor.mul(envColor)
+    ;(mat as MeshBasicNodeMaterial & { emissiveNode: Node | null }).emissiveNode = instanceColor.mul(envColor)
     return mat
   }, [textureCube])
 
@@ -106,11 +104,7 @@ function Teapots() {
       Array.from({ length: TEAPOT_COUNT }, (_, i) => ({
         color: new Color(Math.random() * 0xffffff),
         position: [(i % 4) * 200 - 300, 0, Math.floor(i / 4) * 200 - 200],
-        rotation: [
-          Math.random() * 200 - 100,
-          Math.random() * 200 - 100,
-          Math.random() * 200 - 100,
-        ],
+        rotation: [Math.random() * 200 - 100, Math.random() * 200 - 100, Math.random() * 200 - 100],
       })),
     [],
   )
@@ -153,8 +147,7 @@ export default function InstanceUniform() {
       // pinned deliberately; fiber's Canvas would default to ACESFilmic (AGENTS.md).
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 200, 1200], fov: 45, near: 1, far: 4000 }}
-    >
+      camera={{ position: [0, 200, 1200], fov: 45, near: 1, far: 4000 }}>
       {/* B17 gate: useCubeTexture suspends — never let suspension reach Canvas. */}
       <Suspense fallback={null}>
         <Teapots />

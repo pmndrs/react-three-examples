@@ -83,9 +83,7 @@ function ToonSpheres() {
         for (let gammaIndex = 0; gammaIndex <= SPHERES_PER_SIDE; gammaIndex++) {
           const gamma = gammaIndex / SPHERES_PER_SIDE
 
-          const diffuseColor = new Color()
-            .setHSL(alpha, 0.5, gamma * 0.5 + 0.1)
-            .multiplyScalar(1 - beta * 0.2)
+          const diffuseColor = new Color().setHSL(alpha, 0.5, gamma * 0.5 + 0.1).multiplyScalar(1 - beta * 0.2)
 
           out.push({
             material: new MeshToonNodeMaterial({ color: diffuseColor, gradientMap }),
@@ -136,11 +134,7 @@ function ParticleLight() {
 
   useFrame((state) => {
     const timer = state.elapsed * 0.25 // original: Date.now() * 0.00025
-    meshRef.current?.position.set(
-      Math.sin(timer * 7) * 300,
-      Math.cos(timer * 5) * 400,
-      Math.cos(timer * 3) * 300,
-    )
+    meshRef.current?.position.set(Math.sin(timer * 7) * 300, Math.cos(timer * 5) * 400, Math.cos(timer * 3) * 300)
   })
 
   return (
@@ -204,8 +198,7 @@ export default function MaterialsToon() {
       // match it explicitly; fiber's Canvas default is ACESFilmic.
       renderer={{ toneMapping: NoToneMapping }}
       background="#444488"
-      camera={{ position: [0, 400, 1400], fov: 40, near: 1, far: 2500 }}
-    >
+      camera={{ position: [0, 400, 1400], fov: 40, near: 1, far: 2500 }}>
       <ambientLight color="#c1c1c1" intensity={3} />
       <ToonSpheres />
       <Suspense fallback={null}>

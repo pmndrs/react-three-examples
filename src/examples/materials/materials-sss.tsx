@@ -127,8 +127,7 @@ export default function MaterialsSSS() {
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 300, 1600], fov: 40, near: 1, far: 5000 }}
-    >
+      camera={{ position: [0, 300, 1600], fov: 40, near: 1, far: 5000 }}>
       <ambientLight color="#c1c1c1" />
       <directionalLight color="#ffffff" intensity={0.03} position={[0, 0.5, 0.5]} />
       {/* Front white light — its sphere marker doubles as the visible light source. */}

@@ -36,19 +36,22 @@ export function ReadinessSignal() {
     }
   }, [])
 
-  useFrame(() => {
-    window.__frameCount = (window.__frameCount ?? 0) + 1
-    window.__loadersActive = useProgress.getState().active
-    if (useProgress.getState().active) {
-      settled.current = 0
-      window.__exampleReady = false
-      return
-    }
-    if (settled.current < SETTLE_FRAMES) {
-      settled.current += 1
-      if (settled.current === SETTLE_FRAMES) window.__exampleReady = true
-    }
-  }, { phase: 'finish' })
+  useFrame(
+    () => {
+      window.__frameCount = (window.__frameCount ?? 0) + 1
+      window.__loadersActive = useProgress.getState().active
+      if (useProgress.getState().active) {
+        settled.current = 0
+        window.__exampleReady = false
+        return
+      }
+      if (settled.current < SETTLE_FRAMES) {
+        settled.current += 1
+        if (settled.current === SETTLE_FRAMES) window.__exampleReady = true
+      }
+    },
+    { phase: 'finish' },
+  )
 
   return null
 }

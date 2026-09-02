@@ -21,21 +21,14 @@ import {
   vec3,
   vec4,
 } from 'three/tsl'
-import {
-  CylinderGeometry,
-  DoubleSide,
-  MeshBasicNodeMaterial,
-  PlaneGeometry,
-  RepeatWrapping,
-} from 'three/webgpu'
+import { CylinderGeometry, DoubleSide, MeshBasicNodeMaterial, PlaneGeometry, RepeatWrapping } from 'three/webgpu'
 import type { Node } from 'three/webgpu'
 
 import { useUniforms } from '@react-three/fiber/webgpu'
 import { useTexture } from '@react-three/drei/webgpu'
 import { useControls } from 'leva'
 
-const PERLIN_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/noises/perlin/rgb-256x256.png'
+const PERLIN_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/noises/perlin/rgb-256x256.png'
 
 export function Tornado() {
   //* Controls ====================================================
@@ -58,17 +51,16 @@ export function Tornado() {
   // to the whole store via bare `useThree()`) gets a setState scheduled mid-render —
   // React's "cannot update PostFX while rendering Tornado" console error. Creating
   // them on the first (pre-commit, pre-subscription) render attempt avoids it.
-  const { uEmissiveColor, uTimeScale, uParabolStrength, uParabolOffset, uParabolAmplitude } =
-    useUniforms(
-      {
-        uEmissiveColor: emissiveColor,
-        uTimeScale: timeScale,
-        uParabolStrength: parabolStrength,
-        uParabolOffset: parabolOffset,
-        uParabolAmplitude: parabolAmplitude,
-      },
-      'vfxTornado',
-    )
+  const { uEmissiveColor, uTimeScale, uParabolStrength, uParabolOffset, uParabolAmplitude } = useUniforms(
+    {
+      uEmissiveColor: emissiveColor,
+      uTimeScale: timeScale,
+      uParabolStrength: parabolStrength,
+      uParabolOffset: parabolOffset,
+      uParabolAmplitude: parabolAmplitude,
+    },
+    'vfxTornado',
+  )
 
   const perlinTexture = useTexture(PERLIN_URL)
 
@@ -112,10 +104,7 @@ export function Tornado() {
       const uvInput = uvIn as unknown as Node<'vec2'> // B10 cast, as above
       const skew = skewIn as unknown as Node<'vec2'>
 
-      return vec2(
-        uvInput.x.add(uvInput.y.mul(skew.x)),
-        uvInput.y.add(uvInput.x.mul(skew.y)),
-      )
+      return vec2(uvInput.x.add(uvInput.y.mul(skew.x)), uvInput.y.add(uvInput.x.mul(skew.y)))
     })
 
     // The funnel: re-radius every cylinder vertex along a parabola of its height,
@@ -169,10 +158,7 @@ export function Tornado() {
       const effect = noise1.mul(noise2).mul(outerFade).toVar()
 
       // output: hard-thresholded emissive cells (×3 so bloom picks them up)
-      return vec4(
-        uEmissiveColor.mul(effect.step(0.2)).mul(3),
-        effect.smoothstep(0, 0.01),
-      )
+      return vec4(uEmissiveColor.mul(effect.step(0.2)).mul(3), effect.smoothstep(0, 0.01))
     })()
 
     // -- tornado emissive cylinder: the glowing core of the funnel -----------------
@@ -197,7 +183,9 @@ export function Tornado() {
       const noise1 = texture(perlinTexture, noise1Uv, 1).r.remap(0.45, 0.7)
 
       // noise 2
-      const noise2Uv = uv().add(vec2(scaledTime.mul(0.5), scaledTime.negate())).toVar()
+      const noise2Uv = uv()
+        .add(vec2(scaledTime.mul(0.5), scaledTime.negate()))
+        .toVar()
       noise2Uv.assign(toSkewedUv(noise2Uv, vec2(-1, 0)))
       noise2Uv.mulAssign(vec2(5, 1))
       const noise2 = texture(perlinTexture, noise2Uv, 1).g.remap(0.45, 0.7)
@@ -211,10 +199,7 @@ export function Tornado() {
       // emissive normalized by its own luminance so any picked color glows equally
       const emissiveColorLuminance = luminance(uEmissiveColor)
 
-      return vec4(
-        uEmissiveColor.mul(1.2).div(emissiveColorLuminance),
-        effect.smoothstep(0, 0.1),
-      )
+      return vec4(uEmissiveColor.mul(1.2).div(emissiveColorLuminance), effect.smoothstep(0, 0.1))
     })()
 
     // -- tornado dark cylinder: the smoke shell wrapped around the core ------------
@@ -239,7 +224,9 @@ export function Tornado() {
       const noise1 = texture(perlinTexture, noise1Uv, 1).g.remap(0.45, 0.7)
 
       // noise 2
-      const noise2Uv = uv().add(vec2(scaledTime.mul(0.5), scaledTime.negate())).toVar()
+      const noise2Uv = uv()
+        .add(vec2(scaledTime.mul(0.5), scaledTime.negate()))
+        .toVar()
       noise2Uv.assign(toSkewedUv(noise2Uv, vec2(-1, 0)))
       noise2Uv.mulAssign(vec2(5, 1))
       const noise2 = texture(perlinTexture, noise2Uv, 1).b.remap(0.45, 0.7)
@@ -262,14 +249,7 @@ export function Tornado() {
     cylinderGeometry.translate(0, 0.5, 0)
 
     return { floorGeometry, cylinderGeometry, floorMaterial, emissiveMaterial, darkMaterial }
-  }, [
-    perlinTexture,
-    uEmissiveColor,
-    uTimeScale,
-    uParabolStrength,
-    uParabolOffset,
-    uParabolAmplitude,
-  ])
+  }, [perlinTexture, uEmissiveColor, uTimeScale, uParabolStrength, uParabolOffset, uParabolAmplitude])
 
   return (
     <>

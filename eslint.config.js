@@ -2,6 +2,7 @@
 // Custom corpus rules live in eslint-rules/ as a local flat-config plugin —
 // promoted from repeated review notes; prose in AGENTS.md is the fallback, not the rule.
 import tseslint from 'typescript-eslint'
+import prettierConfig from 'eslint-config-prettier'
 import reactHooks from 'eslint-plugin-react-hooks'
 import * as r3f from '@react-three/eslint-plugin'
 import requireHeaderBlock from './eslint-rules/require-header-block.js'
@@ -49,8 +50,7 @@ export default tseslint.config(
             },
             {
               name: '@react-three/drei',
-              message:
-                'Root drei is legacy-flavored. Import from @react-three/drei/webgpu or /core.',
+              message: 'Root drei is legacy-flavored. Import from @react-three/drei/webgpu or /core.',
             },
             {
               name: '@react-three/drei/legacy',
@@ -61,4 +61,6 @@ export default tseslint.config(
       ],
     },
   },
+  // Last: switch off every stylistic rule prettier owns.
+  prettierConfig,
 )

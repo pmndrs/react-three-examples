@@ -46,21 +46,17 @@ function useSpheres(): SphereData[] {
     () =>
       Array.from({ length: SPHERE_COUNT }, (_, i) => {
         const color = new Color().setHSL(Math.random(), 0.7, Math.random() * 0.2 + 0.05)
-        const position = [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5] as [
-          number,
-          number,
-          number,
-        ]
+        const position = [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5] as [number, number, number]
         const len = Math.hypot(...position) || 1
         const dist = Math.random() * 4.0 + 2.0
         return {
           key: i,
           color,
-          position: [
-            (position[0] / len) * dist,
-            (position[1] / len) * dist,
-            (position[2] / len) * dist,
-          ] as [number, number, number],
+          position: [(position[0] / len) * dist, (position[1] / len) * dist, (position[2] / len) * dist] as [
+            number,
+            number,
+            number,
+          ],
           scale: Math.random() * Math.random() + 0.5,
           uBloomIntensity: uniform(Math.random() > 0.5 ? 1 : 0),
         }
@@ -80,15 +76,11 @@ function SphereCloud({ spheres }: { spheres: SphereData[] }) {
           onClick={(e) => {
             e.stopPropagation()
             sphere.uBloomIntensity.value = sphere.uBloomIntensity.value === 0 ? 1 : 0
-          }}
-        >
+          }}>
           <icosahedronGeometry args={[1, 15]} />
           {/* mrtNode is typed on NodeMaterial (@types/three) — plain JSX prop, applied
               before the material's first shader build. */}
-          <meshBasicNodeMaterial
-            color={sphere.color}
-            mrtNode={mrt({ bloomIntensity: sphere.uBloomIntensity })}
-          />
+          <meshBasicNodeMaterial color={sphere.color} mrtNode={mrt({ bloomIntensity: sphere.uBloomIntensity })} />
         </mesh>
       ))}
     </>
@@ -144,8 +136,7 @@ export default function PostprocessingBloomSelective() {
     <Canvas
       // Original sets NeutralToneMapping explicitly (not fiber's ACESFilmic default).
       renderer={{ toneMapping: NeutralToneMapping }}
-      camera={{ position: [0, 0, 20], fov: 40, near: 1, far: 200 }}
-    >
+      camera={{ position: [0, 0, 20], fov: 40, near: 1, far: 200 }}>
       <SphereCloud spheres={spheres} />
       <PostFX />
       <DemoHelpers grid={false} minDistance={1} maxDistance={100} maxPolarAngle={Math.PI * 0.5} />

@@ -79,8 +79,7 @@ export default function Reflection() {
     <Canvas
       renderer={{ toneMapping: ACESFilmicToneMapping }}
       shadows
-      camera={{ position: [4, 2, 4], fov: 50, near: 0.25, far: 30 }}
-    >
+      camera={{ position: [4, 2, 4], fov: 50, near: 0.25, far: 30 }}>
       <fog attach="fog" args={['#4195a4', 1, 20]} />
       <directionalLight
         color="#ffe499"

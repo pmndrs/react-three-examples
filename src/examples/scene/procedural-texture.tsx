@@ -55,12 +55,7 @@ function ProceduralPlane() {
   // an `RTTNode` (typed as such by @types/three) — no cast needed to reach `.autoUpdate`/
   // `.textureNeedsUpdate` below.
   const proceduralToTexture = useMemo(
-    () =>
-      convertToTexture(
-        checker(uv().mul(uvScaleNode)),
-        512,
-        512,
-      ),
+    () => convertToTexture(checker(uv().mul(uvScaleNode)), 512, 512),
     // `useUniforms` returns the same uniform-node instance across re-renders (values are
     // mutated in place via `.value`), so this dep never actually changes identity — listed
     // for the lint rule, not for churn. It guards against re-baking a brand new RTTNode

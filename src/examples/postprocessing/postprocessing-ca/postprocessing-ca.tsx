@@ -64,19 +64,12 @@ export default function PostprocessingCa() {
       // would otherwise default to ACESFilmic.
       renderer={{ antialias: true, toneMapping: NoToneMapping }}
       background="#0a0a0a"
-      camera={{ position: [0, 15, 40], fov: 45, near: 0.1, far: 200 }}
-    >
+      camera={{ position: [0, 15, 40], fov: 45, near: 0.1, far: 200 }}>
       <CAPipeline />
       <RoomEnv />
       <Shapes />
       <gridHelper args={[40, 20, '#444444', '#222222']} position={[0, -10, 0]} />
-      <DemoHelpers
-        grid={false}
-        target={[0, 0.5, 0]}
-        maxDistance={150}
-        autoRotate={autoRotate}
-        autoRotateSpeed={-0.1}
-      />
+      <DemoHelpers grid={false} target={[0, 0.5, 0]} maxDistance={150} autoRotate={autoRotate} autoRotateSpeed={-0.1} />
     </Canvas>
   )
 }

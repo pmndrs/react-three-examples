@@ -28,11 +28,7 @@ export function Room() {
   // deferred past the suspense re-render it becomes a setState-during-render warning.
   const distortion = useUniforms({ ground: groundDistortion, wall: wallDistortion }, 'mirrorRoom')
 
-  const [floorNormal, decalDiffuse, decalNormal] = useTexture([
-    FLOOR_NORMAL_URL,
-    DECAL_DIFFUSE_URL,
-    DECAL_NORMAL_URL,
-  ])
+  const [floorNormal, decalDiffuse, decalNormal] = useTexture([FLOOR_NORMAL_URL, DECAL_DIFFUSE_URL, DECAL_NORMAL_URL])
 
   const { groundNode, verticalNode, groundTarget, verticalTarget } = useMemo(() => {
     floorNormal.wrapS = RepeatWrapping

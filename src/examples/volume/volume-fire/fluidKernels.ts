@@ -51,7 +51,9 @@ const getVoxelCoord = (id: typeof instanceIndex) => {
 
 // voxel coordinate -> normalized uvw at the cell center
 const coordToUVW = (coord: Node<'uvec3'>) =>
-  vec3(coord).add(0.5).div(vec3(GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z))
+  vec3(coord)
+    .add(0.5)
+    .div(vec3(GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z))
 
 export interface FluidKernelDeps {
   u: FireUniforms
@@ -96,9 +98,7 @@ export function createFluidKernels({
     const dy = vec3(0.0, e, 0.0)
     const dz = vec3(0.0, 0.0, e)
 
-    const p = uvw.mul(
-      vec3(VOLUME_WORLD_SIZE_X / VOLUME_WORLD_SIZE_Y, 1.0, VOLUME_WORLD_SIZE_Z / VOLUME_WORLD_SIZE_Y),
-    )
+    const p = uvw.mul(vec3(VOLUME_WORLD_SIZE_X / VOLUME_WORLD_SIZE_Y, 1.0, VOLUME_WORLD_SIZE_Z / VOLUME_WORLD_SIZE_Y))
     const p_x0 = snoiseVec3(p.sub(dx).mul(freq))
     const p_x1 = snoiseVec3(p.add(dx).mul(freq))
     const p_y0 = snoiseVec3(p.sub(dy).mul(freq))
@@ -135,16 +135,11 @@ export function createFluidKernels({
     const age = dye.b
 
     // buoyancy (hot rises) vs smoke weight (cold falls)
-    const buoyancyForce = temperature
-      .mul(u.uBuoyancy)
-      .sub(density.mul(SMOKE_WEIGHT))
-      .mul(VOLUME_WORLD_SIZE_Y)
+    const buoyancyForce = temperature.mul(u.uBuoyancy).sub(density.mul(SMOKE_WEIGHT)).mul(VOLUME_WORLD_SIZE_Y)
     newVel.addAssign(vec3(0, buoyancyForce, 0).mul(u.uDt))
 
     // 1) Thermal/convective turbulence: stronger where it's hot, decaying over age
-    const thermalNoisePos = uvw.add(
-      vec3(0, age.negate().mul(0.6), age.mul(0.13)).div(TURB_FREQUENCY),
-    )
+    const thermalNoisePos = uvw.add(vec3(0, age.negate().mul(0.6), age.mul(0.13)).div(TURB_FREQUENCY))
     const decay = age.mul(-TURBULENCE_DECAY).exp()
     const thermalTurbulence = curlNoiseTexNode
       .sample(thermalNoisePos)
@@ -154,9 +149,7 @@ export function createFluidKernels({
       .mul(decay)
 
     // 2) Ambient turbulence: lower frequency, weaker, acts on smoke density
-    const ambientNoisePos = uvw
-      .mul(0.5)
-      .add(vec3(0, u.uTime.mul(0.25), u.uTime.mul(0.06)).div(TURB_FREQUENCY))
+    const ambientNoisePos = uvw.mul(0.5).add(vec3(0, u.uTime.mul(0.25), u.uTime.mul(0.06)).div(TURB_FREQUENCY))
     const ambientTurbulence = curlNoiseTexNode
       .sample(ambientNoisePos)
       .level(float(0))
@@ -313,9 +306,7 @@ export function createFluidKernels({
         const coord = uvec3(uvw.mul(vec3(GRID_SIZE_X, GRID_SIZE_Y, GRID_SIZE_Z)))
 
         // Flicker / animated noise based on the local vertex position
-        const flicker = mx_noise_float(
-          vertexPos.mul(9.0).add(vec3(0.0, u.uTime.negate().mul(2.5), u.uTime.mul(0.7))),
-        )
+        const flicker = mx_noise_float(vertexPos.mul(9.0).add(vec3(0.0, u.uTime.negate().mul(2.5), u.uTime.mul(0.7))))
           .mul(0.5)
           .add(0.5)
 

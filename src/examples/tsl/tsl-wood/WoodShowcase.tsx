@@ -15,11 +15,7 @@ const FONT_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/font
 
 // Original's getGridPosition — coordinates are local to the rotated base group.
 function gridPosition(woodIndex: number, finishIndex: number): [number, number, number] {
-  return [
-    0,
-    (finishIndex - Finishes.length / 2) * 1.0,
-    (woodIndex - WoodGenuses.length / 2 + 0.45) * 1.0,
-  ]
+  return [0, (finishIndex - Finishes.length / 2) * 1.0, (woodIndex - WoodGenuses.length / 2 + 0.45) * 1.0]
 }
 
 // A bbox-centered TextGeometry label, rotated to face up through the base
@@ -45,11 +41,7 @@ function Label({
     })
     geo.computeBoundingBox()
     const bb = geo.boundingBox!
-    geo.translate(
-      -0.5 * (bb.max.x - bb.min.x),
-      -0.5 * (bb.max.y - bb.min.y),
-      -0.5 * (bb.max.z - bb.min.z),
-    )
+    geo.translate(-0.5 * (bb.max.x - bb.min.x), -0.5 * (bb.max.y - bb.min.y), -0.5 * (bb.max.z - bb.min.z))
     return geo
   }, [text, font])
 
@@ -165,7 +157,12 @@ export function WoodShowcase() {
           leva values onto <primitive attach="material"> mutates the live
           material properties — every one is re-read per frame by the shared
           wood node graph, zero rebuilds. */}
-      <Label text="custom" font={font} material={labelMaterial} position={gridPosition(WoodGenuses.length / 2 - 1, 5)} />
+      <Label
+        text="custom"
+        font={font}
+        material={labelMaterial}
+        position={gridPosition(WoodGenuses.length / 2 - 1, 5)}
+      />
       <mesh geometry={blockGeometry} position={gridPosition(WoodGenuses.length / 2, 5)}>
         <primitive object={customMaterial} attach="material" {...custom} />
       </mesh>

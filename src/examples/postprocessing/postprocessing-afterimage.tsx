@@ -166,8 +166,7 @@ export default function PostprocessingAfterimage() {
       // match it explicitly; fiber's Canvas default is ACESFilmic.
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 0, 1000], fov: 60, near: 1, far: 10000 }}
-    >
+      camera={{ position: [0, 0, 1000], fov: 60, near: 1, far: 10000 }}>
       <Suspense fallback={null}>
         <ParticleSpiral />
       </Suspense>

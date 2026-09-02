@@ -74,16 +74,9 @@ export default function VolumeFireExample() {
       renderer={{ toneMapping: ACESFilmicToneMapping, toneMappingExposure: 2 }}
       shadows
       background="#000000"
-      camera={{ position: [14, 5.5, 4.4], fov: 60, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [14, 5.5, 4.4], fov: 60, near: 0.1, far: 100 }}>
       <VolumeFire cameraControlsRef={cameraControlsRef} />
-      <DemoHelpers
-        grid={false}
-        target={[0, 3.6, 0]}
-        minDistance={2}
-        maxDistance={40}
-        controlsRef={cameraControlsRef}
-      />
+      <DemoHelpers grid={false} target={[0, 3.6, 0]} minDistance={2} maxDistance={40} controlsRef={cameraControlsRef} />
     </Canvas>
   )
 }

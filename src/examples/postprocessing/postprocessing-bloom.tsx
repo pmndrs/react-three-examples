@@ -21,8 +21,7 @@ import { useControls } from 'leva'
 
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const SHIP_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/PrimaryIonDrive.glb'
+const SHIP_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/PrimaryIonDrive.glb'
 
 //* Scene =========================================================
 

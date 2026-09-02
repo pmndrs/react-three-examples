@@ -130,11 +130,16 @@ function ClippingScene() {
           clippingPlanes={knotClippingPlanes}
           clipIntersection={knotIntersection}
           clipShadows={knotShadows}
-          enabled={knotEnabled}
-        >
+          enabled={knotEnabled}>
           <mesh ref={knotRef} castShadow>
             <torusKnotGeometry args={[0.4, 0.08, 95, 20]} />
-            <meshPhongNodeMaterial ref={knotMaterialRef} color="#80ee10" shininess={0} side={DoubleSide} alphaToCoverage />
+            <meshPhongNodeMaterial
+              ref={knotMaterialRef}
+              color="#80ee10"
+              shininess={0}
+              side={DoubleSide}
+              alphaToCoverage
+            />
           </mesh>
         </clippingGroup>
 

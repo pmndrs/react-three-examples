@@ -8,14 +8,7 @@ import { bayer16 } from 'three/addons/tsl/math/Bayer.js'
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
 import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js'
 import { checker, pass, screenCoordinate, screenUV, uv } from 'three/tsl'
-import {
-  BackSide,
-  Layers,
-  RectAreaLightNode,
-  VolumeNodeMaterial,
-  type Mesh,
-  type RectAreaLight,
-} from 'three/webgpu'
+import { BackSide, Layers, RectAreaLightNode, VolumeNodeMaterial, type Mesh, type RectAreaLight } from 'three/webgpu'
 import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
 import { useControls } from 'leva'
 import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog'

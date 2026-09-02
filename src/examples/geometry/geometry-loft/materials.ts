@@ -32,7 +32,9 @@ export function createFloorMaterial(): MeshStandardNodeMaterial {
 export function createCurtainMaterial(): MeshStandardNodeMaterial {
   const material = new MeshStandardNodeMaterial({ roughness: 0.9, side: DoubleSide })
   material.colorNode = color(0x86222e).mul(
-    mx_noise_float(vec3(uv().y.mul(300), uv().x.mul(6), 0)).mul(0.08).add(0.96),
+    mx_noise_float(vec3(uv().y.mul(300), uv().x.mul(6), 0))
+      .mul(0.08)
+      .add(0.96),
   )
   return material
 }
@@ -43,7 +45,9 @@ export function createCurtainMaterial(): MeshStandardNodeMaterial {
 export function createPedestalMaterial(): MeshStandardNodeMaterial {
   const p = positionLocal.mul(0.9)
 
-  const vein = mx_fractal_noise_float(p.add(mx_fractal_noise_float(p.mul(0.4), 3).mul(2)), 4).abs().oneMinus()
+  const vein = mx_fractal_noise_float(p.add(mx_fractal_noise_float(p.mul(0.4), 3).mul(2)), 4)
+    .abs()
+    .oneMinus()
   const fine = mx_fractal_noise_float(p.mul(3).add(11), 3).abs().oneMinus()
 
   const veining = vein.pow(4).mul(0.3).add(vein.pow(12).mul(0.7)).add(fine.pow(14).mul(0.2))
@@ -89,7 +93,9 @@ export function createShellMaterial(): MeshStandardNodeMaterial {
   material.colorNode = mix(
     color(0xc9a87f),
     color(0xf2e6d8),
-    mx_noise_float(vec3(uv().x.mul(24), 0, 0)).mul(0.5).add(0.5),
+    mx_noise_float(vec3(uv().x.mul(24), 0, 0))
+      .mul(0.5)
+      .add(0.5),
   )
   material.normalNode = bumpMap(sin(uv().x.mul(480)).mul(0.02))
   return material
@@ -130,7 +136,9 @@ export function createToothpasteMaterial(): MeshStandardNodeMaterial {
 // Pumpkin: the shading follows the same crease function as the geometry, so the
 // narrow creases are darker and rougher than the broad lobes.
 export function createPumpkinMaterial(): MeshStandardNodeMaterial {
-  const lobe = cos(uv().y.mul(Math.PI * 7)).abs().pow(0.35)
+  const lobe = cos(uv().y.mul(Math.PI * 7))
+    .abs()
+    .pow(0.35)
 
   const material = new MeshStandardNodeMaterial()
   material.colorNode = mix(
@@ -155,8 +163,13 @@ export function createPumpkinStemMaterial(): MeshStandardNodeMaterial {
 export function createMushroomCapMaterial(): MeshStandardNodeMaterial {
   const capU = uv().x
   const dome = smoothstep(0.42, 0.58, capU)
-  const warts = smoothstep(0.18, 0.38, mx_worley_noise_float(positionLocal.mul(2.4))).oneMinus().mul(dome)
-  const gills = sin(uv().y.mul(Math.PI * 120)).mul(0.5).add(0.5).mul(dome.oneMinus())
+  const warts = smoothstep(0.18, 0.38, mx_worley_noise_float(positionLocal.mul(2.4)))
+    .oneMinus()
+    .mul(dome)
+  const gills = sin(uv().y.mul(Math.PI * 120))
+    .mul(0.5)
+    .add(0.5)
+    .mul(dome.oneMinus())
 
   const material = new MeshStandardNodeMaterial()
   material.colorNode = mix(
@@ -172,7 +185,9 @@ export function createMushroomCapMaterial(): MeshStandardNodeMaterial {
 export function createMushroomStemMaterial(): MeshStandardNodeMaterial {
   const material = new MeshStandardNodeMaterial()
   material.colorNode = color(0xe5d5b5).mul(
-    mx_noise_float(vec3(uv().y.mul(24), uv().x.mul(2), 0)).mul(0.1).add(0.94),
+    mx_noise_float(vec3(uv().y.mul(24), uv().x.mul(2), 0))
+      .mul(0.1)
+      .add(0.94),
   )
   material.roughnessNode = mx_noise_float(positionLocal.mul(12)).mul(0.15).add(0.55)
   return material
@@ -201,6 +216,12 @@ export function createBrassMaterial(): MeshStandardNodeMaterial {
 export function createRopeMaterial(): MeshStandardNodeMaterial {
   const material = new MeshStandardNodeMaterial({ color: 0x8a2433, roughness: 0.65 })
   // The twist of the cord.
-  material.normalNode = bumpMap(sin(uv().x.mul(200).add(uv().y.mul(Math.PI * 2))).mul(0.015))
+  material.normalNode = bumpMap(
+    sin(
+      uv()
+        .x.mul(200)
+        .add(uv().y.mul(Math.PI * 2)),
+    ).mul(0.015),
+  )
   return material
 }

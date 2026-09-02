@@ -34,15 +34,7 @@
  */
 import { useMemo } from 'react'
 import { Break, Fn, If, Loop, bool, select, texture3D, vec3, vec4 } from 'three/tsl'
-import {
-  BackSide,
-  Data3DTexture,
-  LinearFilter,
-  NodeMaterial,
-  NoToneMapping,
-  RedFormat,
-  Vector3,
-} from 'three/webgpu'
+import { BackSide, Data3DTexture, LinearFilter, NodeMaterial, NoToneMapping, RedFormat, Vector3 } from 'three/webgpu'
 import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js'
 import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js'
 import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
@@ -167,8 +159,7 @@ export default function VolumePerlin() {
       // Original renders with the WebGPURenderer default (no tone mapping) — explicit
       // here because fiber's Canvas defaults to ACESFilmic (see header DIVERGENCE).
       renderer={{ toneMapping: NoToneMapping }}
-      camera={{ position: [0, 0, 2], fov: 60, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [0, 0, 2], fov: 60, near: 0.1, far: 100 }}>
       <PerlinBox />
       <DemoHelpers grid={false} maxDistance={9} />
     </Canvas>

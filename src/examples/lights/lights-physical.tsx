@@ -117,8 +117,7 @@ function Bulb({ shadows }: { shadows: boolean }) {
       distance={100}
       decay={2}
       position={[0, 2, 0]}
-      castShadow={shadows}
-    >
+      castShadow={shadows}>
       <mesh>
         <sphereGeometry args={[0.02, 16, 8]} />
         <meshStandardMaterial ref={matRef} emissive="#ffffee" emissiveIntensity={1} color="#000000" />
@@ -128,15 +127,7 @@ function Bulb({ shadows }: { shadows: boolean }) {
 }
 
 function Room({ shadows }: { shadows: boolean }) {
-  const {
-    floorDiffuse,
-    floorBump,
-    floorRoughness,
-    cubeDiffuse,
-    cubeBump,
-    earthDiffuse,
-    earthSpecular,
-  } = useTexture({
+  const { floorDiffuse, floorBump, floorRoughness, cubeDiffuse, cubeBump, earthDiffuse, earthSpecular } = useTexture({
     floorDiffuse: `${TEXTURE_BASE}hardwood2_diffuse.jpg`,
     floorBump: `${TEXTURE_BASE}hardwood2_bump.jpg`,
     floorRoughness: `${TEXTURE_BASE}hardwood2_roughness.jpg`,
@@ -146,8 +137,14 @@ function Room({ shadows }: { shadows: boolean }) {
     earthSpecular: `${TEXTURE_BASE}planets/earth_specular_2048.jpg`,
   })
 
-  const floorMat = useMemo(() => new MeshStandardMaterial({ roughness: 0.8, color: 0xffffff, metalness: 0.2, bumpScale: 1 }), [])
-  const cubeMat = useMemo(() => new MeshStandardMaterial({ roughness: 0.7, color: 0xffffff, metalness: 0.2, bumpScale: 1 }), [])
+  const floorMat = useMemo(
+    () => new MeshStandardMaterial({ roughness: 0.8, color: 0xffffff, metalness: 0.2, bumpScale: 1 }),
+    [],
+  )
+  const cubeMat = useMemo(
+    () => new MeshStandardMaterial({ roughness: 0.7, color: 0xffffff, metalness: 0.2, bumpScale: 1 }),
+    [],
+  )
   const ballMat = useMemo(() => new MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 1.0 }), [])
 
   useEffect(() => {
@@ -182,7 +179,18 @@ function Room({ shadows }: { shadows: boolean }) {
     ballMat.map = earthDiffuse
     ballMat.metalnessMap = earthSpecular
     ballMat.needsUpdate = true
-  }, [floorDiffuse, floorBump, floorRoughness, cubeDiffuse, cubeBump, earthDiffuse, earthSpecular, floorMat, cubeMat, ballMat])
+  }, [
+    floorDiffuse,
+    floorBump,
+    floorRoughness,
+    cubeDiffuse,
+    cubeBump,
+    earthDiffuse,
+    earthSpecular,
+    floorMat,
+    cubeMat,
+    ballMat,
+  ])
 
   // Forces shader recompilation on the shadow toggle — matches the original's
   // `previousShadowMap` diff (see header DIVERGENCE).
@@ -217,7 +225,11 @@ export default function LightsPhysical() {
   const { shadows, hemiIrradiance } = useControls('lights-physical', {
     shadows: true,
     hemi: folder({
-      hemiIrradiance: { value: '0.0001 lx (Moonless Night)', options: Object.keys(HEMI_IRRADIANCES), label: 'irradiance' },
+      hemiIrradiance: {
+        value: '0.0001 lx (Moonless Night)',
+        options: Object.keys(HEMI_IRRADIANCES),
+        label: 'irradiance',
+      },
     }),
   })
 
@@ -225,8 +237,7 @@ export default function LightsPhysical() {
     <Canvas
       renderer={{ toneMapping: ReinhardToneMapping }}
       shadows
-      camera={{ position: [-4, 2, 4], fov: 50, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [-4, 2, 4], fov: 50, near: 0.1, far: 100 }}>
       <RendererSync shadows={shadows} />
       <hemisphereLight color="#ddeeff" groundColor="#0f0e0d" intensity={HEMI_IRRADIANCES[hemiIrradiance]} />
       <Bulb shadows={shadows} />

@@ -16,15 +16,12 @@ import { createFogScatteringNode, createFogTexture3D } from '../../../utils/Volu
 import { COLORS_MAP_URL, LAYER_VOLUMETRIC_LIGHTING } from './constants'
 
 export function VolumeLighting() {
-  const { pointLightIntensity, spotIntensity, fogIntensity, smokeAmount } = useControls(
-    'volume-lighting scene',
-    {
-      pointLightIntensity: { value: 3, min: 0, max: 6, step: 0.1 },
-      spotIntensity: { value: 100, min: 0, max: 200, step: 1 },
-      fogIntensity: { value: 1, min: 0, max: 2, step: 0.01 },
-      smokeAmount: { value: 2, min: 0, max: 3, step: 0.05 },
-    },
-  )
+  const { pointLightIntensity, spotIntensity, fogIntensity, smokeAmount } = useControls('volume-lighting scene', {
+    pointLightIntensity: { value: 3, min: 0, max: 6, step: 0.1 },
+    spotIntensity: { value: 100, min: 0, max: 200, step: 1 },
+    fogIntensity: { value: 1, min: 0, max: 2, step: 0.01 },
+    smokeAmount: { value: 2, min: 0, max: 3, step: 0.05 },
+  })
   const { steps, resolution, denoiseStrength } = useControls('volume-lighting quality', {
     steps: { value: 12, min: 2, max: 16, step: 1 },
     resolution: { value: 0.25, min: 0.1, max: 1, step: 0.05 },

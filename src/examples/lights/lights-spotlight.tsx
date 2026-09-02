@@ -205,13 +205,7 @@ export default function LightsSpotlight() {
         <Floor />
         <Lucy />
       </Suspense>
-      <DemoHelpers
-        grid={false}
-        target={[0, 1, 0]}
-        minDistance={2}
-        maxDistance={10}
-        maxPolarAngle={Math.PI / 2}
-      />
+      <DemoHelpers grid={false} target={[0, 1, 0]} minDistance={2} maxDistance={10} maxPolarAngle={Math.PI / 2} />
     </Canvas>
   )
 }

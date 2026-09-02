@@ -57,10 +57,7 @@ function groupBox(geometry: BufferGeometry) {
 function MaterialArraysScene() {
   // Solid materials (shared by the plane and the box) plus a wireframe clone per
   // color, matching the original's separate `materialsWireframe` array.
-  const materials = useMemo(
-    () => COLORS.map((color) => ({ color, side: DoubleSide })),
-    [],
-  )
+  const materials = useMemo(() => COLORS.map((color) => ({ color, side: DoubleSide })), [])
 
   const planeRef = useRef<Mesh>(null)
   const planeWireframeRef = useRef<Mesh>(null)
@@ -106,21 +103,13 @@ function MaterialArraysScene() {
       </mesh>
 
       {/* Box — solid (bottom-right, spinning) and wireframe (top-right, spinning) */}
-      <mesh
-        ref={boxRef}
-        position={[1.5, -0.75, 0]}
-        rotation={[-Math.PI / 8, Math.PI / 4, Math.PI / 4]}
-      >
+      <mesh ref={boxRef} position={[1.5, -0.75, 0]} rotation={[-Math.PI / 8, Math.PI / 4, Math.PI / 4]}>
         <boxGeometry args={[0.75, 0.75, 0.75]} />
         {materials.map((m, i) => (
           <meshBasicNodeMaterial key={i} attach={`material-${i}`} color={m.color} side={m.side} />
         ))}
       </mesh>
-      <mesh
-        ref={boxWireframeRef}
-        position={[1.5, 1.25, 0]}
-        rotation={[-Math.PI / 8, Math.PI / 4, Math.PI / 4]}
-      >
+      <mesh ref={boxWireframeRef} position={[1.5, 1.25, 0]} rotation={[-Math.PI / 8, Math.PI / 4, Math.PI / 4]}>
         <boxGeometry args={[0.75, 0.75, 0.75]} />
         {materials.map((m, i) => (
           <meshBasicNodeMaterial key={i} attach={`material-${i}`} color={m.color} side={m.side} wireframe />

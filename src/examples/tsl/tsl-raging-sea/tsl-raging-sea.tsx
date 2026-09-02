@@ -44,8 +44,7 @@ export default function TslRagingSea() {
     <Canvas
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [1.25, 1.25, 1.25], fov: 50, near: 0.1, far: 100 }}
-    >
+      camera={{ position: [1.25, 1.25, 1.25], fov: 50, near: 0.1, far: 100 }}>
       <directionalLight position={[-4, 2, 0]} intensity={3} />
       <SeaSurface />
       <DemoHelpers grid={false} target={[0, -0.25, 0]} minDistance={0.1} maxDistance={50} />

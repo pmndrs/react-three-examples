@@ -24,8 +24,7 @@ import { useControls } from 'leva'
 
 import { DemoHelpers } from '../../utils/DemoHelpers'
 
-const BRICK_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/brick_diffuse.jpg'
+const BRICK_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/brick_diffuse.jpg'
 
 //* Scene =========================================================
 
@@ -37,10 +36,7 @@ function Boxes() {
   const texRef = useRef<Mesh>(null)
 
   const geometry = useMemo(() => new BoxGeometry(120, 120, 120), [])
-  const wireMaterial = useMemo(
-    () => new MeshBasicMaterial({ color: 0xffffff, wireframe: true }),
-    [],
-  )
+  const wireMaterial = useMemo(() => new MeshBasicMaterial({ color: 0xffffff, wireframe: true }), [])
 
   const brickTexture = useTexture(BRICK_URL)
   const texMaterial = useMemo(() => {
@@ -96,8 +92,7 @@ export default function PostprocessingSmaa() {
       // would otherwise default to ACESFilmic.
       renderer={{ toneMapping: NoToneMapping }}
       background="#000000"
-      camera={{ position: [0, 0, 300], fov: 70, near: 1, far: 1000 }}
-    >
+      camera={{ position: [0, 0, 300], fov: 70, near: 1, far: 1000 }}>
       {/* SMAAPipeline (a creator-hook component) renders BEFORE the suspending
           Boxes sibling — a creator hook after a suspending sibling can trigger the
           B18 setState-in-render escalation into a full B17 pixel freeze (AGENTS.md). */}

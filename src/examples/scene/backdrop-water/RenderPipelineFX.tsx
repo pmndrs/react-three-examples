@@ -25,10 +25,7 @@ export function RenderPipelineFX() {
     const waterMask = objectPosition(camera).y.greaterThan(screenUV.y.sub(0.5).mul(near))
 
     const scenePassColorBlurred = gaussianBlur(scenePassColor)
-    scenePassColorBlurred.directionNode = waterMask.select(
-      scenePassDepth,
-      passes.scenePass.getLinearDepthNode().mul(5),
-    )
+    scenePassColorBlurred.directionNode = waterMask.select(scenePassDepth, passes.scenePass.getLinearDepthNode().mul(5))
 
     const vignette = screenUV.distance(0.5).mul(1.35).clamp().oneMinus()
 

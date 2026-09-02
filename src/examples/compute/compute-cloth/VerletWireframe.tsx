@@ -3,13 +3,7 @@
 // spring as an instanced two-vertex Line whose positionNode dereferences the
 // spring's endpoint ids from the storage buffers. Toggled by leva `wireframe`.
 import { useMemo } from 'react'
-import {
-  BufferAttribute,
-  InstancedBufferGeometry,
-  Line,
-  LineBasicNodeMaterial,
-  type Node,
-} from 'three/webgpu'
+import { BufferAttribute, InstancedBufferGeometry, Line, LineBasicNodeMaterial, type Node } from 'three/webgpu'
 
 export interface VerletWireframeProps {
   visible: boolean
