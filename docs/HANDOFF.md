@@ -1,5 +1,73 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–2)
 
+## Porting wave 2 — 21 examples, 147 -> 168 (2026-09-02)
+
+lights 6, scene 7, materials+animation 8. **2584 vs 3143 code lines — -17.8%.**
+`pnpm tick` says **31 left to port**.
+
+Standouts: `skinning` 43 vs 84, `multiple-canvas` 77 vs 135, `lightprobe` 59 vs 123,
+`loader-materialx` 174 vs 216. Only `lights-clustered` over, at +15.
+
+### Two real bugs found, neither a style nit
+
+- **`lights-clustered` crashed every frame** (`Cannot read properties of null (reading
+'toVar')`). The resize effect calling `.setSize()` — which lazily allocates the
+  cluster-index buffers the heatmap node reads — was a passive `useEffect`, firing AFTER
+  the first RAF render. `useLayoutEffect` fixed it. The "imperative setup that must precede
+  first render" rule catching a hard failure.
+- **B15 bites at scale, in an unrecognisable shape.** `loader-materialx` renders 28
+  independently-suspending samples, each in its own boundary, beside an `<Environment>` in
+  a SEPARATE boundary. Some samples built their node material before `scene.environment`
+  existed and permanently baked in "no IBL" — solid black, no error. Fix: nest the per-item
+  boundaries inside the same outer `<Suspense>` as the Environment. **Many small boundaries
+  is the risky shape**, not just one. Added to AGENTS.md.
+
+### New traps documented
+
+- **`useUniforms` takes VALUES, not nodes.** `useUniforms({ tint: color('#f00') })` throws
+  `Uniform node not implemented` at shader-build time. Pass `new Color('#f00')`.
+- **Multi-canvas: `renderer.domElement` is the PRIMARY canvas.** All roots share one
+  `WebGPURenderer` whose `domElement` is fixed at construction, so DOM listeners on a
+  secondary canvas attach to the wrong element — `src/utils/CameraControls.tsx` cannot be
+  reused as-is there.
+- **UPSTREAM B35**: a field declared as a bare `Node` loses the entire fluent TSL surface.
+  `LightingModelReflectedLight.directDiffuse` is `Node`, so the canonical
+  `reflectedLight.directDiffuse.addAssign(…)` doesn't typecheck. Verified: `addAssign` is
+  declared on the TYPED extension interfaces in `OperatorNode.d.ts`. Same family as B10.
+
+### The dead-code rule keeps paying
+
+`volume-lighting-traa`'s original builds a `volumetricIntensity` uniform, wires it to a
+slider, and never multiplies it into anything. Verified, then dropped — same class as
+`volume_lighting`'s no-op `spotLight.lookAt()`.
+
+### Shared utils grew (second request, so it earned a prop)
+
+`CameraControls` + `DemoHelpers` gained `minAzimuthAngle`/`maxAzimuthAngle`, defaulting to
+`±Infinity` so unset means free-spin. `morphtargets-face` was the second port to want a
+horizontal-orbit lock and reach for the `controlsRef` escape hatch.
+
+New shared addon: `src/assets/LightProbeHelper.ts` — a cleaner `extend()` candidate than
+the imperative helper precedent, because it self-refreshes via `onBeforeRender()`.
+
+### Needs Dennis (in REVIEW-QUEUE.md)
+
+- 🔴 **`materials-texture-html` loads EXECUTABLE JS from a CDN at runtime**
+  (`three-html-render@0.1.2`, pinned, feature-detected — the original does the same).
+  A new dependency category: § Assets covers hotlinked DATA, not runtime third-party JS
+  outside the lockfile. My call: add it as a real dependency if the package is sane.
+
+### FYI
+
+`loader-materialx` ships 28 of 31 upstream samples. Three reference sibling textures that
+don't exist at that path upstream (they live under `resources/Images/`) — verified via the
+GitHub API; the official three.js demo 404s identically today. Dropped, not fabricated.
+
+### Verified
+
+tsc 0, lint 0, build clean, manifest `--check` clean, smoke **167/168** — sole failure
+`tsl-wood`, confirmed by its `PMREM.cubeUv` signature (B28, ~1 in 5).
+
 ## Porting wave 1 — 16 new examples, 131 -> 147 (2026-09-02)
 
 First ports against `PORTING-BRIEF.md`. reflections 5, textures+camera 6, geometry 5.

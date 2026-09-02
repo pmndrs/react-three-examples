@@ -690,6 +690,23 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
 - **Fix**: declare `count` wherever the renderer reads it — most simply on the shared
   geometry-bearing base rather than per subclass.
 
+### B35 · @types/three: fields typed as a bare `Node` lose the whole fluent TSL surface
+
+- **What**: the operator/chain methods (`addAssign`, `add`, `mul`, `context`, …) are
+  declared on the type-parameterised extension interfaces in
+  `src/nodes/math/OperatorNode.d.ts` (`NumExtensions`, `NumVec3Extensions`, …), which apply
+  to `Node<'vec3'>`-shaped values. Anything declared as a BARE `Node` gets none of them.
+  `LightingModelReflectedLight.directDiffuse` is typed `Node`
+  (`src/nodes/core/LightingModel.d.ts:6`), so the canonical custom-lighting line —
+  `reflectedLight.directDiffuse.addAssign(…)` — does not typecheck.
+- **Cost**: writing a `LightingModel` subclass (the documented way to do custom lighting)
+  needs a cast to `Node<'vec3'>` per field touched, or the standalone `context()` function
+  instead of the chain method.
+- **Where it bites**: `lights/lights-custom`.
+- **Same family as B10** (`Fn` params type as bare `ShaderNodeObject<Node>`): the fluent
+  surface is attached by node TYPE, and every interface that stores a node untyped drops
+  it. Fixing the storage types is more valuable than fixing them one call site at a time.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

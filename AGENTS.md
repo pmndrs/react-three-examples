@@ -340,6 +340,11 @@ admits callback refs, which have no `.current` to read.
 - `useNodes`' returned wrapper has a fresh identity every render (members are
   store-stable, the spread isn't) — key downstream `useMemo`s on individual nodes.
 - Prefer TSL built-ins (`time`, `cameraPosition`) over hand-driven uniforms.
+- **`useUniforms` takes VALUES, not nodes.** Passing a TSL node
+  (`useUniforms({ tint: color('#f00') })`) throws `Uniform node not implemented` at
+  shader-build time — a node cannot be the `.value` of another uniform. Pass the plain
+  three object instead: `useUniforms({ tint: new Color('#f00') })`, which is what
+  `UniformValue` already documents. Easy trap, and it fails late.
 - `uniform(someObject.vector3)` wraps the LIVE object — mutate it in `useFrame` and
   the shader sees it, zero sync code (pattern: `lights-pointlights`).
 - A mesh whose `positionNode` relocates its geometry needs **`frustumCulled = false`**
@@ -383,6 +388,12 @@ admits callback refs, which have no `.current` to read.
   Related: a `color`-typed uniform will not unify as a `vec3()` ARGUMENT. Dropping the
   `vec3()` wrapper beats casting — a color node already behaves like a vec3 downstream.
 - `.assign()` is typed `Node | number` — a raw JS boolean fails; use `bool(true)`.
+- **A field declared as a bare `Node` has no fluent surface.** `add`/`mul`/`addAssign`/
+  `context` are declared on the typed extension interfaces, so they resolve for
+  `Node<'vec3'>` but not for a plain `Node`. `LightingModelReflectedLight.directDiffuse`
+  is a bare `Node`, so `reflectedLight.directDiffuse.addAssign(…)` — the canonical custom
+  lighting line — needs a `Node<'vec3'>` cast, or use the standalone `context()` function
+  instead of the chain method (`lights-custom`, UPSTREAM B35).
 - **Never type anything as `ReturnType<typeof uniform>`** — `uniform` is overloaded
   and `ReturnType` resolves only the last overload, discarding what your call
   inferred. Write the concrete type.
@@ -471,6 +482,13 @@ set samples 0.
   reflexively split boundaries — two independently-suspending resources in ONE boundary
   can be _protective_, because the boundary delays first render until both resolve
   (B28).
+  **B15 also bites at scale, in a shape that looks unrelated**: `loader-materialx` renders
+  28 independently-suspending samples, each in its own boundary, beside an `<Environment>`
+  in a SEPARATE boundary. Some samples built their `MeshPhysicalNodeMaterial` graph before
+  `scene.environment` existed and permanently baked in "no IBL" — rendering solid black,
+  with no error. Fix: nest the per-item boundaries INSIDE the same outer `<Suspense>` as
+  the `<Environment>`, so the environment gates first while each item still pops in
+  individually. Many-small-boundaries is the risky shape, not just one.
 - StrictMode double-invokes effects: never `dispose()` a `useMemo`'d instance in an
   effect cleanup. Use symmetric connect/disconnect (see `src/utils/CameraControls.tsx`).
 - **Never mutate a Suspense-CACHED scene graph from `useMemo`.** `useGLTF`/`useLoader`
@@ -585,6 +603,13 @@ Run for YOUR example only — `pnpm test:changed <slug>` (smoke + animates).
    `browser.close()`.
 5. Look at the screenshot. Both test tiers passed `shadowmap-csm`'s tone-mapping bug;
    only the screenshot caught it.
+
+**Multi-`<Canvas>`: `renderer.domElement` is the PRIMARY canvas.** In fiber's
+multi-canvas mode every root shares one `WebGPURenderer`, whose `domElement` is fixed at
+construction — so on a secondary canvas `state.renderer.domElement` resolves to the
+primary's element, not its own. Anything that attaches DOM listeners (camera-controls,
+custom pointer handling) needs an explicit per-canvas target; the shared
+`src/utils/CameraControls.tsx` cannot be reused as-is there. Pattern: `scene/multiple-canvas`.
 
 **Multi-`<Canvas>` examples are only partly covered.** `tests/smoke.spec.ts` and
 `scripts/contact-sheet.mjs` both capture `locator('canvas').first()`, so a second root is

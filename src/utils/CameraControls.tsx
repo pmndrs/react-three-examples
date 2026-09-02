@@ -21,6 +21,10 @@ export interface CameraControlsProps {
    * ground plane like OrbitControls' maxPolarAngle. */
   minPolarAngle?: number;
   maxPolarAngle?: number;
+  /** Horizontal orbit clamp, radians. Defaults to unbounded (-Infinity / Infinity) —
+   * camera-controls treats those as "free spin", so leaving them unset must NOT clamp. */
+  minAzimuthAngle?: number;
+  maxAzimuthAngle?: number;
   /** Orthographic zoom limits (camera-controls maps wheel dolly to `camera.zoom`
    * for ortho cameras) — OrbitControls' minZoom/maxZoom. Added after two ortho
    * ports (materials-displacementmap, postprocessing-pixel) needed the
@@ -47,6 +51,8 @@ export function CameraControls({
   maxDistance,
   minPolarAngle,
   maxPolarAngle,
+  minAzimuthAngle,
+  maxAzimuthAngle,
   minZoom,
   maxZoom,
   pan = true,
@@ -79,9 +85,21 @@ export function CameraControls({
     controls.maxDistance = maxDistance ?? Infinity;
     controls.minPolarAngle = minPolarAngle ?? 0;
     controls.maxPolarAngle = maxPolarAngle ?? Math.PI;
+    controls.minAzimuthAngle = minAzimuthAngle ?? -Infinity;
+    controls.maxAzimuthAngle = maxAzimuthAngle ?? Infinity;
     controls.minZoom = minZoom ?? 0.01;
     controls.maxZoom = maxZoom ?? Infinity;
-  }, [controls, minDistance, maxDistance, minPolarAngle, maxPolarAngle, minZoom, maxZoom]);
+  }, [
+    controls,
+    minDistance,
+    maxDistance,
+    minPolarAngle,
+    maxPolarAngle,
+    minAzimuthAngle,
+    maxAzimuthAngle,
+    minZoom,
+    maxZoom,
+  ]);
 
   // camera-controls has no enablePan boolean — panning is the TRUCK action on the
   // right button / multi-touch gestures, so locking = remapping those actions.

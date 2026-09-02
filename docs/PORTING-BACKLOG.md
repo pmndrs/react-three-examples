@@ -51,13 +51,13 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## scene (10)
 
-- [ ] `custom-fog-background`
-- [ ] `custom-fog-scattering`
-- [ ] `generator-building`
-- [ ] `generator-city`
-- [ ] `hdr`
-- [ ] `multiple-canvas`
-- [ ] `multiple-elements`
+- [x] ~~`custom-fog-background`~~ — ported
+- [x] ~~`custom-fog-scattering`~~ — ported
+- [x] ~~`generator-building`~~ — ported
+- [x] ~~`generator-city`~~ — ported
+- [x] ~~`hdr`~~ — ported
+- [x] ~~`multiple-canvas`~~ — ported
+- [x] ~~`multiple-elements`~~ — ported
 - [x] ~~`xr-cubes`~~ — deferred (WebXR — SPEC §4 out of scope for now)
 - [x] ~~`xr-native-layers`~~ — deferred (WebXR — SPEC §4 out of scope for now)
 - [x] ~~`xr-rollercoaster`~~ — deferred (WebXR — SPEC §4 out of scope for now)
@@ -74,12 +74,12 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## lights (6)
 
-- [ ] `lightprobe`
-- [ ] `lightprobe-cubecamera`
-- [ ] `lights-clustered`
-- [ ] `lights-custom`
-- [ ] `lights-dynamic`
-- [ ] `volume-lighting-traa`
+- [x] ~~`lightprobe`~~ — ported
+- [x] ~~`lightprobe-cubecamera`~~ — ported
+- [x] ~~`lights-clustered`~~ — ported
+- [x] ~~`lights-custom`~~ — ported
+- [x] ~~`lights-dynamic`~~ — ported
+- [x] ~~`volume-lighting-traa`~~ — ported
 
 ## reflections (5)
 
@@ -99,11 +99,11 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## materials (5)
 
-- [ ] `loader-materialx`
-- [ ] `materials`
-- [ ] `materials-envmaps-bpcem`
-- [ ] `materials-texture-html`
-- [ ] `materialx-noise`
+- [x] ~~`loader-materialx`~~ — ported
+- [x] ~~`materials`~~ — ported
+- [x] ~~`materials-envmaps-bpcem`~~ — ported
+- [x] ~~`materials-texture-html`~~ — ported
+- [x] ~~`materialx-noise`~~ — ported
 
 ## tsl (5)
 
@@ -122,9 +122,9 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## animation (3)
 
-- [ ] `animation-retargeting-readyplayer`
-- [ ] `morphtargets-face`
-- [ ] `skinning`
+- [x] ~~`animation-retargeting-readyplayer`~~ — ported
+- [x] ~~`morphtargets-face`~~ — ported
+- [x] ~~`skinning`~~ — ported
 
 ## camera (2)
 

@@ -1,5 +1,121 @@
 [
   {
+    "slug": "materials-texture-html",
+    "title": "Materials / Texture HTML",
+    "category": "materials",
+    "tags": [
+      "environment",
+      "interaction",
+      "materials",
+      "pmrem",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_materials_texture_html",
+    "credits": "Canestra di frutta (Caravaggio) image from the three.js examples"
+  },
+  {
+    "slug": "loader-materialx",
+    "title": "Loader / MaterialX",
+    "category": "loaders",
+    "tags": [
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "loader",
+      "node-material",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_loader_materialx",
+    "credits": "ShaderBall model from the three.js examples; MaterialX Standard Surface samples from the MaterialX project"
+  },
+  {
+    "slug": "materials-envmaps-bpcem",
+    "title": "Materials / Envmaps / BPCEM",
+    "category": "materials",
+    "tags": [
+      "cube-camera",
+      "cubemap",
+      "environment",
+      "leva",
+      "node-material",
+      "pmrem",
+      "rectarea-light",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_materials_envmaps_bpcem"
+  },
+  {
+    "slug": "materials",
+    "title": "Materials",
+    "category": "materials",
+    "tags": [
+      "materials",
+      "node-material",
+      "tsl",
+      "wgsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_materials"
+  },
+  {
+    "slug": "animation-retargeting-readyplayer",
+    "title": "Animation / Retargeting / Ready Player Me",
+    "category": "animation",
+    "tags": [
+      "animation",
+      "fbx",
+      "gltf",
+      "leva",
+      "reflection",
+      "retargeting",
+      "skinning",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_animation_retargeting_readyplayer",
+    "credits": "Mixamo animation and readyplayer.me avatar, via the three.js examples"
+  },
+  {
+    "slug": "materialx-noise",
+    "title": "MaterialX Noise",
+    "category": "tsl",
+    "tags": [
+      "cubemap",
+      "hdr",
+      "noise",
+      "pmrem",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_materialx_noise"
+  },
+  {
+    "slug": "skinning",
+    "title": "Skinning",
+    "category": "animation",
+    "tags": [
+      "animation",
+      "gltf",
+      "skinning"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_skinning",
+    "credits": "Michelle model from the three.js examples"
+  },
+  {
+    "slug": "morphtargets-face",
+    "title": "Morph Targets / Face",
+    "category": "animation",
+    "tags": [
+      "animation",
+      "environment",
+      "gltf",
+      "ktx2",
+      "leva",
+      "meshopt",
+      "morphtargets"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_morphtargets_face",
+    "credits": "Facecap model by Face Cap (https://www.bannaflak.com/face-cap), via the three.js examples"
+  },
+  {
     "slug": "animation-skinning-blending",
     "title": "Animation / Skinning / Blending",
     "category": "animation",
@@ -2237,5 +2353,193 @@
       "node-material"
     ],
     "original": "https://threejs.org/examples/#webgpu_camera_logarithmicdepthbuffer"
+  },
+  {
+    "slug": "custom-fog-background",
+    "title": "Custom Fog Background",
+    "category": "scene",
+    "tags": [
+      "environment",
+      "fog",
+      "gltf",
+      "hdr",
+      "postprocessing",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_custom_fog_background",
+    "credits": "DamagedHelmet model and royal_esplanade HDR from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "custom-fog-scattering",
+    "title": "Custom Fog Scattering",
+    "category": "scene",
+    "tags": [
+      "fog",
+      "gaussian-blur",
+      "leva",
+      "postprocessing",
+      "trees",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_custom_fog_scattering",
+    "credits": "TreeGenerator addon from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "lights-custom",
+    "title": "Lights / Custom",
+    "category": "lights",
+    "tags": [
+      "custom-node",
+      "lights",
+      "node-material",
+      "point-light",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_lights_custom"
+  },
+  {
+    "slug": "hdr",
+    "title": "HDR",
+    "category": "scene",
+    "tags": [
+      "hdr",
+      "leva",
+      "pointer",
+      "postprocessing",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_hdr",
+    "static": true
+  },
+  {
+    "slug": "lights-dynamic",
+    "title": "Lights / Dynamic",
+    "category": "lights",
+    "tags": [
+      "leva",
+      "lights",
+      "point-light"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_lights_dynamic"
+  },
+  {
+    "slug": "lights-clustered",
+    "title": "Lights / Clustered",
+    "category": "lights",
+    "tags": [
+      "environment",
+      "instancing",
+      "leva",
+      "lights",
+      "point-light",
+      "render-pipeline",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_lights_clustered"
+  },
+  {
+    "slug": "generator-building",
+    "title": "Generator / Building",
+    "category": "scene",
+    "tags": [
+      "environment",
+      "leva",
+      "procedural",
+      "shadows",
+      "sky",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_generator_building",
+    "credits": "SkyscraperGenerator and SkyMesh addons from the three.js examples"
+  },
+  {
+    "slug": "generator-city",
+    "title": "Generator / City",
+    "category": "scene",
+    "tags": [
+      "bloom",
+      "environment",
+      "leva",
+      "postprocessing",
+      "procedural",
+      "shadows",
+      "sky",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_generator_city",
+    "credits": "CityGenerator and SkyMesh addons from the three.js examples"
+  },
+  {
+    "slug": "lightprobe",
+    "title": "Light Probe",
+    "category": "lights",
+    "tags": [
+      "cubemap",
+      "environment",
+      "leva",
+      "lights",
+      "reflection"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_lightprobe",
+    "static": true
+  },
+  {
+    "slug": "multiple-canvas",
+    "title": "Multiple Canvas",
+    "category": "scene",
+    "tags": [
+      "multi-canvas"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_multiple_canvas",
+    "static": true
+  },
+  {
+    "slug": "lightprobe-cubecamera",
+    "title": "Light Probe from Cube Camera",
+    "category": "lights",
+    "tags": [
+      "cube-camera",
+      "cubemap",
+      "environment",
+      "lights",
+      "reflection"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_lightprobe_cubecamera",
+    "static": true
+  },
+  {
+    "slug": "volume-lighting-traa",
+    "title": "Volume / Lighting TRAA",
+    "category": "volume",
+    "tags": [
+      "3d-texture",
+      "leva",
+      "lights",
+      "node-material",
+      "noise",
+      "point-light",
+      "postprocessing",
+      "raymarching",
+      "render-pipeline",
+      "shadows",
+      "spot-light",
+      "tsl",
+      "volume"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_volume_lighting_traa",
+    "credits": "TeapotGeometry and colors.png light-cookie texture from the three.js examples"
+  },
+  {
+    "slug": "multiple-elements",
+    "title": "Multiple Elements",
+    "category": "scene",
+    "tags": [
+      "multi-canvas",
+      "scissor",
+      "viewport"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_multiple_elements"
   }
 ]

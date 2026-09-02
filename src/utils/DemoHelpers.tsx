@@ -22,6 +22,9 @@ export interface DemoHelpersProps {
   /** Polar (vertical orbit) limits in radians, forwarded to CameraControls. */
   minPolarAngle?: number;
   maxPolarAngle?: number;
+  /** Horizontal orbit clamp, radians — for demos the original locks to one axis. */
+  minAzimuthAngle?: number;
+  maxAzimuthAngle?: number;
   /** Orthographic zoom limits (OrbitControls' minZoom/maxZoom), forwarded. */
   minZoom?: number;
   maxZoom?: number;
@@ -50,6 +53,8 @@ export function DemoHelpers({
   maxDistance,
   minPolarAngle,
   maxPolarAngle,
+  minAzimuthAngle,
+  maxAzimuthAngle,
   minZoom,
   maxZoom,
   pan,
@@ -82,6 +87,8 @@ export function DemoHelpers({
           maxDistance={maxDistance}
           minPolarAngle={minPolarAngle}
           maxPolarAngle={maxPolarAngle}
+          minAzimuthAngle={minAzimuthAngle}
+          maxAzimuthAngle={maxAzimuthAngle}
           minZoom={minZoom}
           maxZoom={maxZoom}
           pan={pan}

@@ -1,3 +1,4 @@
+import type { LightProbeHelper } from 'three/addons/helpers/LightProbeHelperGPU.js';
 import type { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import type { TeapotGeometry } from 'three/addons/geometries/TeapotGeometry.js';
 import type { SkyMesh } from 'three/addons/objects/SkyMesh.js';
@@ -8,5 +9,6 @@ declare module '@react-three/fiber' {
     roundedBoxGeometry: ThreeElement<typeof RoundedBoxGeometry>;
     teapotGeometry: ThreeElement<typeof TeapotGeometry>;
     skyMesh: ThreeElement<typeof SkyMesh>;
+    lightProbeHelper: ThreeElement<typeof LightProbeHelper>;
   }
 }

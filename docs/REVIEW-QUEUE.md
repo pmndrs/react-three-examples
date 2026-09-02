@@ -53,6 +53,24 @@ for a constant the demo is _about_" — otherwise the clause keeps getting stret
 
 ## 🟡 Worth a look
 
+### 3b. 🔴 `materials-texture-html` loads EXECUTABLE JS from a CDN at runtime
+
+`src/examples/materials/materials-texture-html.tsx` dynamically imports
+`three-html-render@0.1.2` from jsdelivr (pinned, `/* @vite-ignore */`). The original does
+exactly this — real browser support for `HTMLCanvasElement.prototype.requestPaint` is
+still unshipped, so the polyfill is feature-detected and fetched at runtime.
+
+**This is a new category of dependency.** AGENTS.md § Assets covers hotlinking _data_
+(textures, models, HDRs) pinned to the three.js release. Executable third-party JS,
+fetched at runtime, from a package that is not in our lockfile, is a different thing —
+supply-chain-wise and offline-wise.
+
+**Options:** (a) allow it, amend § Assets to say runtime JS must be version-pinned and
+named in the header; (b) add `three-html-render` as a real dependency and import it
+normally; (c) drop the example. **What I'd do:** (b) if the package is sane, else (a) —
+the demo is genuinely about HTML-as-texture and there is no way to show it without the
+polyfill. Flagging rather than setting tacit precedent.
+
 ### 4. Shared-instance markers — is `<Instances>` the real answer?
 
 Rule 3's carve-out (performance beats declarative when sharing is real) is working, but
@@ -113,6 +131,12 @@ unaffected. Arguably it should filter too. Small change, purely a taste call.
 - **B28 flakes**: `tsl-wood` (~1 in 5) and `loader-gltf-dispersion` (~3 in 5) fail smoke on
   `PMREM.cubeUv`. Console-only — the canvas renders. 27 examples use drei `<Environment>`,
   so any of them can hit it.
+- **`loader-materialx` ships 28 of 31 upstream samples.** Three
+  (`standard_surface_brass_tiled`, `_brick_procedural`, `_wood_tiled`) reference sibling
+  texture files that don't exist at that path in the upstream `materialx/MaterialX` repo —
+  the images live under `resources/Images/`. Verified via the GitHub API; the official
+  three.js demo points at the same raw path and 404s identically today. Dropped rather
+  than fabricating a corrected path.
 - **Deferred follow-ups** (recorded, not lost): `tsl-vfx-flames/Flames.tsx` and
   `tsl-vfx-tornado/Tornado.tsx` still build materials with `new SpriteNodeMaterial()` +
   post-construction `.colorNode =` (the rule-3 pattern fixed in `Terrain.tsx`);
