@@ -15,18 +15,18 @@
  * - Pause implemented via `mixer.timeScale = 0`
  * - DemoHelpers baseline (grid + camera controls) added; original had a fixed camera
  */
-import { Suspense, useEffect } from 'react'
-import { Mesh } from 'three'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect } from 'react';
+import { Mesh } from 'three';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const SOLDIER_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Soldier.glb'
+const SOLDIER_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Soldier.glb';
 
 function Soldier() {
-  const { scene, animations } = useGLTF(SOLDIER_URL)
-  const { actions, mixer } = useAnimations(animations, scene)
+  const { scene, animations } = useGLTF(SOLDIER_URL);
+  const { actions, mixer } = useAnimations(animations, scene);
 
   const { idle, walk, run, timeScale, paused, skeleton } = useControls('animation', {
     idle: { value: 0, min: 0, max: 1 },
@@ -35,41 +35,41 @@ function Soldier() {
     timeScale: { value: 1, min: 0, max: 1.5 },
     paused: false,
     skeleton: false,
-  })
+  });
 
   useEffect(() => {
     scene.traverse((object) => {
-      if ((object as Mesh).isMesh) object.castShadow = true
-    })
-  }, [scene])
+      if ((object as Mesh).isMesh) object.castShadow = true;
+    });
+  }, [scene]);
 
   useEffect(() => {
     // Soldier.glb also ships a TPose clip — playing it (even at weight 1 default)
     // blends the rest pose into everything. Play only the three blendable clips.
-    for (const name of ['Idle', 'Walk', 'Run']) actions[name]?.play()
-  }, [actions])
+    for (const name of ['Idle', 'Walk', 'Run']) actions[name]?.play();
+  }, [actions]);
 
   useEffect(() => {
-    const weights: Record<string, number> = { Idle: idle, Walk: walk, Run: run }
+    const weights: Record<string, number> = { Idle: idle, Walk: walk, Run: run };
     for (const [name, weight] of Object.entries(weights)) {
-      const action = actions[name]
-      if (!action) continue
-      action.enabled = true
-      action.setEffectiveTimeScale(1)
-      action.setEffectiveWeight(weight)
+      const action = actions[name];
+      if (!action) continue;
+      action.enabled = true;
+      action.setEffectiveTimeScale(1);
+      action.setEffectiveWeight(weight);
     }
-  }, [actions, idle, walk, run])
+  }, [actions, idle, walk, run]);
 
   useEffect(() => {
-    mixer.timeScale = paused ? 0 : timeScale
-  }, [mixer, paused, timeScale])
+    mixer.timeScale = paused ? 0 : timeScale;
+  }, [mixer, paused, timeScale]);
 
   return (
     <>
       <primitive object={scene} />
       {skeleton && <skeletonHelper args={[scene]} />}
     </>
-  )
+  );
 }
 
 export default function AnimationSkinningBlending() {
@@ -97,5 +97,5 @@ export default function AnimationSkinningBlending() {
       </Suspense>
       <DemoHelpers target={[0, 1, 0]} />
     </Canvas>
-  )
+  );
 }

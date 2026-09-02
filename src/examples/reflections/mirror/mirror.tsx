@@ -33,12 +33,12 @@
  *   runs the WebGPURenderer default — fiber's Canvas would otherwise silently apply
  *   ACESFilmic and mute the emissive Phong palette (AGENTS.md v0.9 rule)
  */
-import { Suspense } from 'react'
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Room } from './Room'
-import { Spheres } from './Spheres'
+import { Suspense } from 'react';
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Room } from './Room';
+import { Spheres } from './Spheres';
 
 export default function Mirror() {
   return (
@@ -62,5 +62,5 @@ export default function Mirror() {
 
       <DemoHelpers grid={false} target={[0, 40, 0]} minDistance={10} maxDistance={400} />
     </Canvas>
-  )
+  );
 }

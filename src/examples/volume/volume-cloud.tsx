@@ -37,8 +37,8 @@
  *   in a sky void); dolly-out capped at 9 so the camera stays inside the radius-10
  *   sky sphere (the original lets you dolly through it into the void)
  */
-import { useMemo, useRef } from 'react'
-import { Break, Fn, If, float, smoothstep, texture3D, vec3, vec4 } from 'three/tsl'
+import { useMemo, useRef } from 'react';
+import { Break, Fn, If, float, smoothstep, texture3D, vec3, vec4 } from 'three/tsl';
 import {
   BackSide,
   CanvasTexture,
@@ -50,12 +50,12 @@ import {
   RedFormat,
   SRGBColorSpace,
   Vector3,
-} from 'three/webgpu'
-import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js'
-import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js'
-import { Canvas, useFrame, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/webgpu';
+import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
+import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+import { Canvas, useFrame, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 function Cloud() {
   const { threshold, opacity, range, steps, baseColor, rotationSpeed } = useControls('volume-cloud', {
@@ -65,9 +65,9 @@ function Cloud() {
     steps: { value: 100, min: 0, max: 200, step: 1 },
     baseColor: '#798aa0',
     rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
+  });
 
-  const meshRef = useRef<Mesh>(null)
+  const meshRef = useRef<Mesh>(null);
 
   const {
     uThreshold: uThresholdNode,
@@ -84,19 +84,19 @@ function Cloud() {
       uBaseColor: baseColor,
     },
     'volumeCloud',
-  )
+  );
 
   // 128^3 perlin field with a radial falloff, ported verbatim from the original's
   // init() — CPU-side generation is the showcased technique (compare compute-texture
   // for the GPU-written path).
   const cloudTexture = useMemo(() => {
-    const size = 128
-    const data = new Uint8Array(size * size * size)
+    const size = 128;
+    const data = new Uint8Array(size * size * size);
 
-    let i = 0
-    const scale = 0.05
-    const perlin = new ImprovedNoise()
-    const vector = new Vector3()
+    let i = 0;
+    const scale = 0.05;
+    const perlin = new ImprovedNoise();
+    const vector = new Vector3();
 
     for (let z = 0; z < size; z++) {
       for (let y = 0; y < size; y++) {
@@ -107,106 +107,106 @@ function Cloud() {
               .set(x, y, z)
               .subScalar(size / 2)
               .divideScalar(size)
-              .length()
-          data[i] = (128 + 128 * perlin.noise((x * scale) / 1.5, y * scale, (z * scale) / 1.5)) * d * d
-          i++
+              .length();
+          data[i] = (128 + 128 * perlin.noise((x * scale) / 1.5, y * scale, (z * scale) / 1.5)) * d * d;
+          i++;
         }
       }
     }
 
-    const texture = new Data3DTexture(data, size, size, size)
-    texture.format = RedFormat
-    texture.minFilter = LinearFilter
-    texture.magFilter = LinearFilter
-    texture.unpackAlignment = 1
-    texture.needsUpdate = true
-    return texture
-  }, [])
+    const texture = new Data3DTexture(data, size, size, size);
+    texture.format = RedFormat;
+    texture.minFilter = LinearFilter;
+    texture.magFilter = LinearFilter;
+    texture.unpackAlignment = 1;
+    texture.needsUpdate = true;
+    return texture;
+  }, []);
 
   // Node graph builds once — uniform node identities are stable across re-renders
   // (leva changes mutate `.value` in place through useUniforms).
   const material = useMemo(() => {
-    const map = texture3D(cloudTexture, null, 0)
+    const map = texture3D(cloudTexture, null, 0);
 
     // Front-to-back compositing along the ray, early-out at ~full opacity — the
     // original's `transparentRaymarchingTexture`, as a zero-arg Fn closing over the
     // uniforms (header DIVERGENCE). The Fn wrapper is load-bearing: RaymarchingBox's
     // internal `.toVar()`/`.assign()` need the active TSL stack an Fn provides.
     const raymarchCloud = Fn(() => {
-      const finalColor = vec4(0).toVar()
+      const finalColor = vec4(0).toVar();
 
       RaymarchingBox(uStepsNode, ({ positionRay }) => {
-        const mapValue = float(map.sample(positionRay.add(0.5)).r).toVar()
+        const mapValue = float(map.sample(positionRay.add(0.5)).r).toVar();
 
         mapValue.assign(
           smoothstep(uThresholdNode.sub(uRangeNode), uThresholdNode.add(uRangeNode), mapValue).mul(uOpacityNode),
-        )
+        );
 
         // Cheap directional-derivative shading: density difference across the ray point.
-        const shading = map.sample(positionRay.add(vec3(-0.01))).r.sub(map.sample(positionRay.add(vec3(0.01))).r)
+        const shading = map.sample(positionRay.add(vec3(-0.01))).r.sub(map.sample(positionRay.add(vec3(0.01))).r);
 
-        const col = shading.mul(3.0).add(positionRay.x.add(positionRay.y).mul(0.25)).add(0.2)
+        const col = shading.mul(3.0).add(positionRay.x.add(positionRay.y).mul(0.25)).add(0.2);
 
-        finalColor.rgb.addAssign(finalColor.a.oneMinus().mul(mapValue).mul(col))
-        finalColor.a.addAssign(finalColor.a.oneMinus().mul(mapValue))
+        finalColor.rgb.addAssign(finalColor.a.oneMinus().mul(mapValue).mul(col));
+        finalColor.a.addAssign(finalColor.a.oneMinus().mul(mapValue));
 
         If(finalColor.a.greaterThanEqual(0.95), () => {
-          Break()
-        })
-      })
+          Break();
+        });
+      });
 
-      return vec4(finalColor.rgb.add(uBaseColorNode), finalColor.a)
-    })
+      return vec4(finalColor.rgb.add(uBaseColorNode), finalColor.a);
+    });
 
-    const mat = new NodeMaterial()
-    mat.colorNode = raymarchCloud()
-    mat.side = BackSide // inside faces — volume survives the camera entering the box
-    mat.transparent = true
-    return mat
-  }, [cloudTexture, uThresholdNode, uOpacityNode, uRangeNode, uStepsNode, uBaseColorNode])
+    const mat = new NodeMaterial();
+    mat.colorNode = raymarchCloud();
+    mat.side = BackSide; // inside faces — volume survives the camera entering the box
+    mat.transparent = true;
+    return mat;
+  }, [cloudTexture, uThresholdNode, uOpacityNode, uRangeNode, uStepsNode, uBaseColorNode]);
 
   // Original: `mesh.rotation.y = -performance.now() / 7500` — accumulated here so the
   // added rotationSpeed knob rescales without a phase jump.
   useFrame(({ delta }) => {
-    if (meshRef.current) meshRef.current.rotation.y -= (delta / 7.5) * rotationSpeed
-  })
+    if (meshRef.current) meshRef.current.rotation.y -= (delta / 7.5) * rotationSpeed;
+  });
 
   return (
     <mesh ref={meshRef}>
       <boxGeometry args={[1, 1, 1]} />
       <primitive object={material} attach="material" />
     </mesh>
-  )
+  );
 }
 
 function Sky() {
   // 1x32 vertical gradient painted on a 2D canvas — ported verbatim.
   const skyMap = useMemo(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 1
-    canvas.height = 32
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 32;
 
-    const context = canvas.getContext('2d')
+    const context = canvas.getContext('2d');
     if (context) {
-      const gradient = context.createLinearGradient(0, 0, 0, 32)
-      gradient.addColorStop(0.0, '#014a84')
-      gradient.addColorStop(0.5, '#0561a0')
-      gradient.addColorStop(1.0, '#437ab6')
-      context.fillStyle = gradient
-      context.fillRect(0, 0, 1, 32)
+      const gradient = context.createLinearGradient(0, 0, 0, 32);
+      gradient.addColorStop(0.0, '#014a84');
+      gradient.addColorStop(0.5, '#0561a0');
+      gradient.addColorStop(1.0, '#437ab6');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 1, 32);
     }
 
-    const map = new CanvasTexture(canvas)
-    map.colorSpace = SRGBColorSpace
-    return map
-  }, [])
+    const map = new CanvasTexture(canvas);
+    map.colorSpace = SRGBColorSpace;
+    return map;
+  }, []);
 
   return (
     <mesh>
       <sphereGeometry args={[10]} />
       <meshBasicNodeMaterial map={skyMap} side={BackSide} />
     </mesh>
-  )
+  );
 }
 
 export default function VolumeCloud() {
@@ -220,5 +220,5 @@ export default function VolumeCloud() {
       <Cloud />
       <DemoHelpers grid={false} maxDistance={9} />
     </Canvas>
-  )
+  );
 }

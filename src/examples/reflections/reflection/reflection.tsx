@@ -46,32 +46,32 @@
  *   (`grid={false}`) — the floor box + its reflection IS the ground plane this example
  *   is about, and an infinite world-space grid at a different height would clash with it
  */
-import { Suspense, useEffect } from 'react'
-import { color, normalWorldGeometry } from 'three/tsl'
-import { ACESFilmicToneMapping } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { PostFX } from './PostFX'
-import { ReflectiveFloor } from './ReflectiveFloor'
-import { Tree } from './Tree'
+import { Suspense, useEffect } from 'react';
+import { color, normalWorldGeometry } from 'three/tsl';
+import { ACESFilmicToneMapping } from 'three/webgpu';
+import type { Node } from 'three/webgpu';
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { PostFX } from './PostFX';
+import { ReflectiveFloor } from './ReflectiveFloor';
+import { Tree } from './Tree';
 
 // Scene-level TSL background gradient (up-facing world normal → horizon color mix).
 // Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
 // webgpu renderer reads it directly off the live scene instance (same duck-typed gap
 // as `sprites.tsx`'s `fogNode` cast).
 function SceneBackground() {
-  const scene = useThree((s) => s.scene)
+  const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    withBackgroundNode.backgroundNode = normalWorldGeometry.y.mix(color('#4195a4'), color('#0066ff'))
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    withBackgroundNode.backgroundNode = normalWorldGeometry.y.mix(color('#4195a4'), color('#0066ff'));
     return () => {
-      withBackgroundNode.backgroundNode = null
-    }
-  }, [scene])
+      withBackgroundNode.backgroundNode = null;
+    };
+  }, [scene]);
 
-  return null
+  return null;
 }
 
 export default function Reflection() {
@@ -100,5 +100,5 @@ export default function Reflection() {
       <PostFX />
       <DemoHelpers grid={false} target={[0, 1, 0]} minDistance={1} maxDistance={10} autoRotate autoRotateSpeed={1} />
     </Canvas>
-  )
+  );
 }

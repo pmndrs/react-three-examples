@@ -40,7 +40,7 @@
  *   (`grid={false}`) — the room's own floor (y = -5) is a shadow receiver and an
  *   infinite grid would float 5 units above it, mid-room
  */
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef } from 'react';
 import {
   BackSide,
   CanvasTexture,
@@ -50,69 +50,69 @@ import {
   NoToneMapping,
   RepeatWrapping,
   SphereGeometry,
-} from 'three/webgpu'
-import type { PointLight } from 'three/webgpu'
+} from 'three/webgpu';
+import type { PointLight } from 'three/webgpu';
 
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // Constant shared assets (not mutable state — same module-scope rationale as
 // lights-pointlights' markerGeometry). The original rebuilds all three per light.
-const bulbGeometry = new SphereGeometry(0.3, 12, 6)
-const shellGeometry = new SphereGeometry(2, 32, 8)
+const bulbGeometry = new SphereGeometry(0.3, 12, 6);
+const shellGeometry = new SphereGeometry(2, 32, 8);
 
 // Ported from the original's `generateTexture()`: a 2x2 canvas, bottom row white,
 // top row transparent — tiled 4.5x vertically it becomes the shell's stripe cutouts.
 function createStripeTexture() {
-  const canvas = document.createElement('canvas')
-  canvas.width = 2
-  canvas.height = 2
-  const context = canvas.getContext('2d')!
-  context.fillStyle = 'white'
-  context.fillRect(0, 1, 2, 1)
+  const canvas = document.createElement('canvas');
+  canvas.width = 2;
+  canvas.height = 2;
+  const context = canvas.getContext('2d')!;
+  context.fillStyle = 'white';
+  context.fillRect(0, 1, 2, 1);
 
-  const texture = new CanvasTexture(canvas)
-  texture.magFilter = NearestFilter
-  texture.wrapS = RepeatWrapping
-  texture.wrapT = RepeatWrapping
-  texture.repeat.set(1, 4.5)
-  return texture
+  const texture = new CanvasTexture(canvas);
+  texture.magFilter = NearestFilter;
+  texture.wrapS = RepeatWrapping;
+  texture.wrapT = RepeatWrapping;
+  texture.repeat.set(1, 4.5);
+  return texture;
 }
-const stripeTexture = createStripeTexture()
+const stripeTexture = createStripeTexture();
 
 interface ShadowLightProps {
-  color: string
-  intensity: number
-  speed: number
-  bias: number
-  radius: number
+  color: string;
+  intensity: number;
+  speed: number;
+  bias: number;
+  radius: number;
   /** Phase offset in seconds — the original runs light 2 at `time + 10000`. */
-  offset?: number
+  offset?: number;
 }
 
 // One orbiting point light: cube-shadow caster + over-driven bulb marker + the
 // perforated stripe shell that carves the raying shadows (see header DEMONSTRATES).
 function ShadowLight({ color, intensity, speed, bias, radius, offset = 0 }: ShadowLightProps) {
-  const lightRef = useRef<PointLight>(null)
-  const clockRef = useRef(offset)
+  const lightRef = useRef<PointLight>(null);
+  const clockRef = useRef(offset);
 
   // Original: `material.color.multiplyScalar(intensity)` — an unlit sphere driven far
   // past 1.0 so it reads as the glowing bulb under NoToneMapping.
-  const bulbColor = useMemo(() => new Color(color).multiplyScalar(intensity), [color, intensity])
+  const bulbColor = useMemo(() => new Color(color).multiplyScalar(intensity), [color, intensity]);
 
   useFrame(({ delta }) => {
-    const light = lightRef.current
-    if (!light) return
-    clockRef.current += delta * speed
-    const t = clockRef.current
+    const light = lightRef.current;
+    if (!light) return;
+    clockRef.current += delta * speed;
+    const t = clockRef.current;
 
     // Lissajous orbit + shell spin, ported verbatim from the original's animate().
-    light.position.set(Math.sin(t * 0.6) * 9, Math.sin(t * 0.7) * 9 + 6, Math.sin(t * 0.8) * 9)
-    light.rotation.x = t
-    light.rotation.z = t
-  })
+    light.position.set(Math.sin(t * 0.6) * 9, Math.sin(t * 0.7) * 9 + 6, Math.sin(t * 0.8) * 9);
+    light.rotation.x = t;
+    light.rotation.z = t;
+  });
 
   return (
     <pointLight
@@ -133,7 +133,7 @@ function ShadowLight({ color, intensity, speed, bias, radius, offset = 0 }: Shad
         <meshPhongNodeMaterial side={DoubleSide} alphaMap={stripeTexture} alphaTest={0.5} />
       </mesh>
     </pointLight>
-  )
+  );
 }
 
 // The 30x30x30 BackSide box everything happens inside — its inner faces are the
@@ -144,7 +144,7 @@ function Room() {
       <boxGeometry args={[30, 30, 30]} />
       <meshPhongNodeMaterial color="#a0adaf" shininess={10} specular="#111111" side={BackSide} />
     </mesh>
-  )
+  );
 }
 
 export default function ShadowmapPointlight() {
@@ -157,7 +157,7 @@ export default function ShadowmapPointlight() {
       bias: { value: -0.005, min: -0.02, max: 0.02, step: 0.0005 },
       radius: { value: 10, min: 0, max: 25, step: 0.5 },
     }),
-  })
+  });
 
   return (
     <Canvas
@@ -172,5 +172,5 @@ export default function ShadowmapPointlight() {
       <Room />
       <DemoHelpers grid={false} target={[0, 10, 0]} minDistance={5} maxDistance={120} />
     </Canvas>
-  )
+  );
 }

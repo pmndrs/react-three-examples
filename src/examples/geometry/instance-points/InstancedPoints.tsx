@@ -4,7 +4,7 @@
 // storage buffer that a per-frame compute kernel pulses with `time` — the render
 // graph reads it back via `.toAttribute()` both as `sizeNode` and as the color-fade
 // factor (small point -> dark). Uses fiber hooks, so it lives inside <Canvas>.
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react';
 import {
   Fn,
   float,
@@ -16,41 +16,41 @@ import {
   sin,
   time,
   vec3,
-} from 'three/tsl'
-import { CatmullRomCurve3, Color, InstancedBufferAttribute, SRGBColorSpace, Vector3 } from 'three/webgpu'
-import type { PointsNodeMaterial } from 'three/webgpu'
-import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js'
-import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+} from 'three/tsl';
+import { CatmullRomCurve3, Color, InstancedBufferAttribute, SRGBColorSpace, Vector3 } from 'three/webgpu';
+import type { PointsNodeMaterial } from 'three/webgpu';
+import * as GeometryUtils from 'three/addons/utils/GeometryUtils.js';
+import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
 // Hilbert curve -> Catmull-Rom spline -> flat position/color/size arrays, ported
 // verbatim from the original's init(). Pure CPU data prep, runs once.
 function buildPointData() {
-  const points = GeometryUtils.hilbert3D(new Vector3(0, 0, 0), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7)
+  const points = GeometryUtils.hilbert3D(new Vector3(0, 0, 0), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7);
 
-  const spline = new CatmullRomCurve3(points)
-  const divisions = Math.round(4 * points.length)
-  const point = new Vector3()
-  const pointColor = new Color()
+  const spline = new CatmullRomCurve3(points);
+  const divisions = Math.round(4 * points.length);
+  const point = new Vector3();
+  const pointColor = new Color();
 
-  const positions = new Float32Array(divisions * 3)
-  const colors = new Float32Array(divisions * 3)
-  const sizes = new Float32Array(divisions)
+  const positions = new Float32Array(divisions * 3);
+  const colors = new Float32Array(divisions * 3);
+  const sizes = new Float32Array(divisions);
 
   for (let i = 0; i < divisions; i++) {
-    const t = i / divisions
+    const t = i / divisions;
 
-    spline.getPoint(t, point)
-    positions[i * 3 + 0] = point.x
-    positions[i * 3 + 1] = point.y
-    positions[i * 3 + 2] = point.z
+    spline.getPoint(t, point);
+    positions[i * 3 + 0] = point.x;
+    positions[i * 3 + 1] = point.y;
+    positions[i * 3 + 2] = point.z;
 
-    pointColor.setHSL(t, 1.0, 0.5, SRGBColorSpace)
-    colors[i * 3 + 0] = pointColor.r
-    colors[i * 3 + 1] = pointColor.g
-    colors[i * 3 + 2] = pointColor.b
+    pointColor.setHSL(t, 1.0, 0.5, SRGBColorSpace);
+    colors[i * 3 + 0] = pointColor.r;
+    colors[i * 3 + 1] = pointColor.g;
+    colors[i * 3 + 2] = pointColor.b;
 
-    sizes[i] = 10.0 // seed value; the compute kernel overwrites it every frame
+    sizes[i] = 10.0; // seed value; the compute kernel overwrites it every frame
   }
 
   return {
@@ -58,7 +58,7 @@ function buildPointData() {
     positionAttribute: new InstancedBufferAttribute(positions, 3),
     colorsAttribute: new InstancedBufferAttribute(colors, 3),
     sizes,
-  }
+  };
 }
 
 export function InstancedPoints() {
@@ -67,21 +67,21 @@ export function InstancedPoints() {
     minWidth: { value: 6, min: 1, max: 30, step: 1, label: 'min width (px)' },
     maxWidth: { value: 20, min: 2, max: 30, step: 1, label: 'max width (px)' },
     pulseSpeed: { value: 6, min: 1, max: 20, step: 0.1, label: 'pulse speed' },
-  })
+  });
 
-  const renderer = useThree((state) => state.renderer)
+  const renderer = useThree((state) => state.renderer);
 
   // Leva knobs → live uniforms: create-or-update semantics sync new values on every
   // re-render; the compute kernel and render graph reference the stable node instances.
   const { uPulseSpeed, uMinWidth, uMaxWidth } = useUniforms(
     { uPulseSpeed: pulseSpeed, uMinWidth: minWidth, uMaxWidth: maxWidth },
     'instancePoints', // WGSL-identifier rule: camelCase scope, never kebab-case
-  )
-  const uPulseSpeedNode = uPulseSpeed
-  const uMinWidthNode = uMinWidth
-  const uMaxWidthNode = uMaxWidth
+  );
+  const uPulseSpeedNode = uPulseSpeed;
+  const uMinWidthNode = uMinWidth;
+  const uMaxWidthNode = uMaxWidth;
 
-  const { divisions, positionAttribute, colorsAttribute, sizes } = useMemo(buildPointData, [])
+  const { divisions, positionAttribute, colorsAttribute, sizes } = useMemo(buildPointData, []);
 
   // Per-instance size storage, GPU-resident after the seed upload. UNSCOPED on
   // purpose: scoped useBuffers names the buffer `${scope}.${name}` and the dot lands
@@ -89,7 +89,7 @@ export function InstancedPoints() {
   // B16). Root-level keys are bare identifiers; prefix instead.
   const { ipPointSizes } = useBuffers(() => ({
     ipPointSizes: instancedArray(sizes, 'float'),
-  }))
+  }));
 
   // All node graphs built exactly once; we close over the TYPED hook return above
   // (creator-state reads widen to fiber's BufferLike, losing `.element()`/
@@ -97,16 +97,16 @@ export function InstancedPoints() {
   const { ipComputeSize, ipPositionNode, ipColorNode, ipSizeNode, ipOpacityNode } = useNodes(() => {
     // One storage read shared by the render graph: per-instance size as a vertex
     // attribute — the quad's pixel size AND the color-fade factor below.
-    const sizeAttrib = ipPointSizes.toAttribute()
+    const sizeAttrib = ipPointSizes.toAttribute();
 
     // Pulse kernel, ported verbatim: phase-offset each instance by its index so the
     // pulse travels along the curve; sin -> [0,1] -> lerp minWidth..maxWidth.
     const ipComputeSize = Fn(() => {
-      const relativeTime = time.add(float(instanceIndex))
-      const sizeFactor = sin(relativeTime.mul(uPulseSpeedNode)).add(1).div(2)
+      const relativeTime = time.add(float(instanceIndex));
+      const sizeFactor = sin(relativeTime.mul(uPulseSpeedNode)).add(1).div(2);
 
-      ipPointSizes.element(instanceIndex).assign(sizeFactor.mul(uMaxWidthNode.sub(uMinWidthNode)).add(uMinWidthNode))
-    })().compute(divisions)
+      ipPointSizes.element(instanceIndex).assign(sizeFactor.mul(uMaxWidthNode.sub(uMinWidthNode)).add(uMinWidthNode));
+    })().compute(divisions);
 
     return {
       ipComputeSize,
@@ -121,28 +121,28 @@ export function InstancedPoints() {
       ),
       ipSizeNode: sizeAttrib,
       ipOpacityNode: shapeCircle(),
-    }
-  })
+    };
+  });
 
   // EVERY FRAME: pulse the sizes before the render phase draws them (compute is not
   // a render takeover — never `phase: 'render'`).
   useFrame(
     () => {
-      renderer.compute(ipComputeSize)
+      renderer.compute(ipComputeSize);
     },
     { phase: 'update' },
-  )
+  );
 
   // alphaToCoverage is baked into shapeCircle()'s build-time branch AND the pipeline's
   // multisample state — a bare property write (all the original's GUI does) can't
   // rebuild the shader, so the toggle bumps needsUpdate explicitly (see header).
-  const materialRef = useRef<PointsNodeMaterial>(null)
+  const materialRef = useRef<PointsNodeMaterial>(null);
   useEffect(() => {
-    const material = materialRef.current
-    if (!material) return
-    material.alphaToCoverage = alphaToCoverage
-    material.needsUpdate = true
-  }, [alphaToCoverage])
+    const material = materialRef.current;
+    if (!material) return;
+    material.alphaToCoverage = alphaToCoverage;
+    material.needsUpdate = true;
+  }, [alphaToCoverage]);
 
   return (
     // One Sprite drawing `divisions` instances; positionNode fully relocates the unit
@@ -159,5 +159,5 @@ export function InstancedPoints() {
         alphaToCoverage
       />
     </sprite>
-  )
+  );
 }

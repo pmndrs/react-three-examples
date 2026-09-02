@@ -1,7 +1,7 @@
-import { useLayoutEffect, useRef } from 'react'
-import { Fn, Loop, float, mul, mx_noise_float, positionLocal, sin, time, transformNormalToView, vec3 } from 'three/tsl'
-import type { Node, PlaneGeometry } from 'three/webgpu'
-import { folder } from 'leva'
+import { useLayoutEffect, useRef } from 'react';
+import { Fn, Loop, float, mul, mx_noise_float, positionLocal, sin, time, transformNormalToView, vec3 } from 'three/tsl';
+import type { Node, PlaneGeometry } from 'three/webgpu';
+import { folder } from 'leva';
 
 //* Controls ======================================================
 
@@ -28,7 +28,7 @@ export const seaControls = {
     smallWavesMultiplier: { value: 0.18, min: 0, max: 1, label: 'multiplier' },
   }),
   normalComputeShift: { value: 0.01, min: 0, max: 0.1, step: 0.0001, label: 'normal shift' },
-}
+};
 
 //* Shader graph ==================================================
 
@@ -46,7 +46,7 @@ type SeaUniforms = Record<
   | 'smallWavesMultiplier'
   | 'normalComputeShift',
   Node<'float'>
-> & { emissiveColor: Node<'color'> }
+> & { emissiveColor: Node<'color'> };
 
 /**
  * Builds the sea's position / normal / emissive nodes from live uniforms.
@@ -59,7 +59,7 @@ export function makeSeaNodes(u: SeaUniforms) {
       sin(position.x.mul(u.largeWavesFrequencyX).add(time.mul(u.largeWavesSpeed))),
       sin(position.z.mul(u.largeWavesFrequencyY).add(time.mul(u.largeWavesSpeed))),
       u.largeWavesMultiplier,
-    ).toVar()
+    ).toVar();
 
     // A TSL Loop runs in WGSL, so the octave count stays live off the uniform.
     Loop({ start: float(1), end: u.smallWavesIterations.add(1) }, ({ i }) => {
@@ -69,35 +69,35 @@ export function makeSeaNodes(u: SeaUniforms) {
           .mul(u.smallWavesFrequency)
           .mul(i),
         time.mul(u.smallWavesSpeed),
-      )
+      );
 
-      elevation.subAssign(mx_noise_float(noiseInput, 1, 0).mul(u.smallWavesMultiplier).div(i).abs())
-    })
+      elevation.subAssign(mx_noise_float(noiseInput, 1, 0).mul(u.smallWavesMultiplier).div(i).abs());
+    });
 
-    return elevation
-  })
+    return elevation;
+  });
 
-  const elevation = wavesElevation(positionLocal)
-  const positionNode = positionLocal.add(vec3(0, elevation, 0))
+  const elevation = wavesElevation(positionLocal);
+  const positionNode = positionLocal.add(vec3(0, elevation, 0));
 
   // Normals by finite difference: sample two neighbours and cross the directions.
   const normalNode = Fn(() => {
-    const a = positionLocal.add(vec3(u.normalComputeShift, 0, 0))
-    const b = positionLocal.add(vec3(0, 0, u.normalComputeShift.negate()))
+    const a = positionLocal.add(vec3(u.normalComputeShift, 0, 0));
+    const b = positionLocal.add(vec3(0, 0, u.normalComputeShift.negate()));
 
-    const positionA = a.add(vec3(0, wavesElevation(a), 0))
-    const positionB = b.add(vec3(0, wavesElevation(b), 0))
+    const positionA = a.add(vec3(0, wavesElevation(a), 0));
+    const positionB = b.add(vec3(0, wavesElevation(b), 0));
 
-    const toA = positionA.sub(positionNode).normalize()
-    const toB = positionB.sub(positionNode).normalize()
+    const toA = positionA.sub(positionNode).normalize();
+    const toB = positionB.sub(positionNode).normalize();
 
-    return transformNormalToView(toA.cross(toB))
-  })
+    return transformNormalToView(toA.cross(toB));
+  });
 
   // Reversing the elevation range lights the troughs instead of the crests.
-  const emissiveNode = u.emissiveColor.mul(elevation.remap(u.emissiveHigh, u.emissiveLow).pow(u.emissivePower))
+  const emissiveNode = u.emissiveColor.mul(elevation.remap(u.emissiveHigh, u.emissiveLow).pow(u.emissivePower));
 
-  return { positionNode, normalNode: normalNode(), emissiveNode }
+  return { positionNode, normalNode: normalNode(), emissiveNode };
 }
 
 //* Geometry ======================================================
@@ -107,16 +107,16 @@ export function makeSeaNodes(u: SeaUniforms) {
  * displace `positionLocal.y`. Rotating the mesh would turn the displacement with it.
  */
 export function TerrainGeometry() {
-  const ref = useRef<PlaneGeometry>(null)
+  const ref = useRef<PlaneGeometry>(null);
 
   useLayoutEffect(() => {
-    const geometry = ref.current
+    const geometry = ref.current;
     // Fast Refresh keeps the geometry but reruns the effect — rotate only once.
-    if (!geometry || geometry.userData.rotatedToHorizontal) return
+    if (!geometry || geometry.userData.rotatedToHorizontal) return;
 
-    geometry.userData.rotatedToHorizontal = true
-    geometry.rotateX(-Math.PI / 2)
-  }, [])
+    geometry.userData.rotatedToHorizontal = true;
+    geometry.rotateX(-Math.PI / 2);
+  }, []);
 
-  return <planeGeometry args={[2, 2, 256, 256]} ref={ref} />
+  return <planeGeometry args={[2, 2, 256, 256]} ref={ref} />;
 }

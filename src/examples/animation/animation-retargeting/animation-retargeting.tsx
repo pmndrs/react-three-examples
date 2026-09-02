@@ -38,30 +38,30 @@
  * - No shadows enabled: the original never sets `castShadow` on its directional light
  *   despite `floor.receiveShadow = true` — matched as-is (nothing would render either way)
  */
-import { Suspense, useEffect } from 'react'
-import { NeutralToneMapping } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { retargetingBackground } from './background'
-import { Floor } from './Floor'
-import { RetargetedModels } from './RetargetedModels'
+import { Suspense, useEffect } from 'react';
+import { NeutralToneMapping } from 'three/webgpu';
+import type { Node } from 'three/webgpu';
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { retargetingBackground } from './background';
+import { Floor } from './Floor';
+import { RetargetedModels } from './RetargetedModels';
 
 // Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
 // webgpu renderer reads it directly off the live scene instance (documented duck-typed
 // gap, see reflection.tsx/portal.tsx/sprites.tsx headers).
 function SceneBackground() {
-  const scene = useThree((s) => s.scene)
+  const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    withBackgroundNode.backgroundNode = retargetingBackground
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    withBackgroundNode.backgroundNode = retargetingBackground;
     return () => {
-      withBackgroundNode.backgroundNode = null
-    }
-  }, [scene])
+      withBackgroundNode.backgroundNode = null;
+    };
+  }, [scene]);
 
-  return null
+  return null;
 }
 
 export default function AnimationRetargeting() {
@@ -78,5 +78,5 @@ export default function AnimationRetargeting() {
       <Floor />
       <DemoHelpers target={[0, 1, 0]} minDistance={3} maxDistance={12} maxPolarAngle={Math.PI / 2} />
     </Canvas>
-  )
+  );
 }

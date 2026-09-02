@@ -2,7 +2,7 @@
 // heightmap rig, plus the two particle meshes (drops and impact ripples). Uses
 // fiber hooks (`useBuffers`/`useNodes`/`useFrame`/`useThree`), so it lives inside
 // <Canvas>, not in the page shell.
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react';
 import {
   billboarding,
   deltaTime,
@@ -18,8 +18,8 @@ import {
   uint,
   uv,
   vec2,
-} from 'three/tsl'
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
+} from 'three/tsl';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import {
   DoubleSide,
   HalfFloatType,
@@ -29,20 +29,20 @@ import {
   PlaneGeometry,
   RenderTarget,
   type Node,
-} from 'three/webgpu'
-import { useBuffers, useFrame, useNodes, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+} from 'three/webgpu';
+import { useBuffers, useFrame, useNodes, useThree } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-export const MAX_PARTICLE_COUNT = 50_000
+export const MAX_PARTICLE_COUNT = 50_000;
 
 export function Rain() {
-  const scene = useThree((state) => state.scene)
-  const renderer = useThree((state) => state.renderer)
+  const scene = useThree((state) => state.scene);
+  const renderer = useThree((state) => state.renderer);
 
   //* Controls =====================================================
   const { dropCount } = useControls('compute-particles-rain', {
     dropCount: { value: MAX_PARTICLE_COUNT / 2, min: 200, max: MAX_PARTICLE_COUNT, step: 1 },
-  })
+  });
 
   //* Collision Rig + Geometry ======================================
   // The collision rig: a top-down orthographic camera that sees ONLY layer 1 (the
@@ -53,37 +53,37 @@ export function Rain() {
   // stable — lazy useState, not useMemo (AGENTS.md). Never disposed in a cleanup:
   // StrictMode would kill the instance for good.
   const [rig] = useState(() => {
-    const collisionCamera = new OrthographicCamera(-50, 50, 50, -50, 0.1, 50)
-    collisionCamera.position.y = 50
-    collisionCamera.lookAt(0, 0, 0)
-    collisionCamera.layers.disableAll()
-    collisionCamera.layers.enable(1)
+    const collisionCamera = new OrthographicCamera(-50, 50, 50, -50, 0.1, 50);
+    collisionCamera.position.y = 50;
+    collisionCamera.lookAt(0, 0, 0);
+    collisionCamera.layers.disableAll();
+    collisionCamera.layers.enable(1);
 
-    const collisionPosRT = new RenderTarget(1024, 1024)
-    collisionPosRT.texture.type = HalfFloatType
-    collisionPosRT.texture.magFilter = NearestFilter
-    collisionPosRT.texture.minFilter = NearestFilter
-    collisionPosRT.texture.generateMipmaps = false
+    const collisionPosRT = new RenderTarget(1024, 1024);
+    collisionPosRT.texture.type = HalfFloatType;
+    collisionPosRT.texture.magFilter = NearestFilter;
+    collisionPosRT.texture.minFilter = NearestFilter;
+    collisionPosRT.texture.generateMipmaps = false;
 
-    const collisionPosMaterial = new MeshBasicNodeMaterial()
-    collisionPosMaterial.colorNode = positionWorld
+    const collisionPosMaterial = new MeshBasicNodeMaterial();
+    collisionPosMaterial.colorNode = positionWorld;
 
-    return { collisionCamera, collisionPosRT, collisionPosMaterial }
-  })
+    return { collisionCamera, collisionPosRT, collisionPosMaterial };
+  });
 
   // Ripple geometry: one flat quad + two crossed vertical quads merged into a single
   // instanced draw, exactly as the original builds it with BufferGeometryUtils.
   const rippleGeometry = useMemo(() => {
-    const surfaceGeometry = new PlaneGeometry(2.5, 2.5)
-    surfaceGeometry.rotateX(-Math.PI / 2)
+    const surfaceGeometry = new PlaneGeometry(2.5, 2.5);
+    surfaceGeometry.rotateX(-Math.PI / 2);
 
-    const xGeometry = new PlaneGeometry(1, 2)
-    xGeometry.rotateY(-Math.PI / 2)
+    const xGeometry = new PlaneGeometry(1, 2);
+    xGeometry.rotateY(-Math.PI / 2);
 
-    const zGeometry = new PlaneGeometry(1, 2)
+    const zGeometry = new PlaneGeometry(1, 2);
 
-    return mergeGeometries([surfaceGeometry, xGeometry, zGeometry])
-  }, [])
+    return mergeGeometries([surfaceGeometry, xGeometry, zGeometry]);
+  }, []);
 
   //* GPU State =====================================================
   // Particle state, GPU-only. UNSCOPED on purpose: scoped useBuffers names each
@@ -94,7 +94,7 @@ export function Rain() {
     rainVelocities: instancedArray(MAX_PARTICLE_COUNT, 'vec3'),
     ripplePositions: instancedArray(MAX_PARTICLE_COUNT, 'vec3'),
     rippleTimes: instancedArray(MAX_PARTICLE_COUNT, 'vec3'),
-  }))
+  }));
 
   //* Compute Graph =================================================
   // All node graphs built exactly once, closing over the TYPED hook returns above
@@ -113,31 +113,31 @@ export function Rain() {
   } = useNodes(() => {
     // Build-time random salts (JS runs once when the graph is built — that is
     // exactly what the original's module-scope randUint() does too).
-    const randUint = () => uint(Math.floor(Math.random() * 0xffffff))
+    const randUint = () => uint(Math.floor(Math.random() * 0xffffff));
 
     // World XZ (-50..50) → collision texture UV (0..1).
-    const getCoord = (pos: Node<'vec2'>) => pos.add(50).div(100)
+    const getCoord = (pos: Node<'vec2'>) => pos.add(50).div(100);
 
     // (1) Init kernel: scatter drops over the 100x100 field, randomize fall speed,
     // park every ripple far past its lifetime. Runs once, from the effect below;
     // StrictMode's double-run writes the same values (hash is deterministic).
     const rainComputeInit = Fn(() => {
-      const position = rainPositions.element(instanceIndex)
-      const velocity = rainVelocities.element(instanceIndex)
-      const rippleTime = rippleTimes.element(instanceIndex)
+      const position = rainPositions.element(instanceIndex);
+      const velocity = rainVelocities.element(instanceIndex);
+      const rippleTime = rippleTimes.element(instanceIndex);
 
-      const randX = hash(instanceIndex)
-      const randY = hash(instanceIndex.add(randUint()))
-      const randZ = hash(instanceIndex.add(randUint()))
+      const randX = hash(instanceIndex);
+      const randY = hash(instanceIndex.add(randUint()));
+      const randZ = hash(instanceIndex.add(randUint()));
 
-      position.x.assign(randX.mul(100).add(-50))
-      position.y.assign(randY.mul(25))
-      position.z.assign(randZ.mul(100).add(-50))
+      position.x.assign(randX.mul(100).add(-50));
+      position.y.assign(randY.mul(25));
+      position.z.assign(randZ.mul(100).add(-50));
 
-      velocity.y.assign(randX.mul(-0.04).add(-0.2))
+      velocity.y.assign(randX.mul(-0.04).add(-0.2));
 
-      rippleTime.x.assign(1000)
-    })().compute(MAX_PARTICLE_COUNT)
+      rippleTime.x.assign(1000);
+    })().compute(MAX_PARTICLE_COUNT);
 
     // (2) Simulation kernel: integrate, then test each drop against the collision
     // heightmap sampled at its XZ. On impact: respawn the drop at the top in a new
@@ -147,68 +147,68 @@ export function Rain() {
     // animated collision box / rotating monkey). GPU-side `If()`s — a JS `if`
     // here would run once at graph build (AGENTS.md).
     const rainComputeUpdate = Fn(() => {
-      const position = rainPositions.element(instanceIndex)
-      const velocity = rainVelocities.element(instanceIndex)
-      const ripplePosition = ripplePositions.element(instanceIndex)
-      const rippleTime = rippleTimes.element(instanceIndex)
+      const position = rainPositions.element(instanceIndex);
+      const velocity = rainVelocities.element(instanceIndex);
+      const ripplePosition = ripplePositions.element(instanceIndex);
+      const rippleTime = rippleTimes.element(instanceIndex);
 
-      position.addAssign(velocity)
+      position.addAssign(velocity);
 
-      rippleTime.x.addAssign(deltaTime.mul(4))
+      rippleTime.x.addAssign(deltaTime.mul(4));
 
-      const collisionArea = texture(rig.collisionPosRT.texture, getCoord(position.xz))
+      const collisionArea = texture(rig.collisionPosRT.texture, getCoord(position.xz));
 
-      const surfaceOffset = 0.05
-      const floorPosition = collisionArea.y.add(surfaceOffset)
+      const surfaceOffset = 0.05;
+      const floorPosition = collisionArea.y.add(surfaceOffset);
 
       // The drop sprite is 2 units tall with its pivot at the center — the visual
       // tip sits 0.9 below, so collide the tip, not the pivot.
-      const ripplePivotOffsetY = -0.9
+      const ripplePivotOffsetY = -0.9;
 
       If(position.y.add(ripplePivotOffsetY).lessThan(floorPosition), () => {
-        position.y.assign(25)
+        position.y.assign(25);
 
-        ripplePosition.xz.assign(position.xz)
-        ripplePosition.y.assign(floorPosition)
+        ripplePosition.xz.assign(position.xz);
+        ripplePosition.y.assign(floorPosition);
 
         // reset hit time: x = time
-        rippleTime.x.assign(1)
+        rippleTime.x.assign(1);
 
         // next drops will not fall in the same place. Casts: the typed uint
         // `.add()`/`hash()` surfaces reject float operands, but mixed-type math
         // is what the original writes and hash() itself starts with
         // `seed.toUint()` (three/src/nodes/math/Hash.js) — typed-TSL inference
         // gap (B10 cast family).
-        const timeSalt = time as unknown as Node<'uint'>
-        const timeSalt2 = time.add(randUint()) as unknown as Node<'uint'>
-        position.x.assign(hash(instanceIndex.add(timeSalt)).mul(100).add(-50))
-        position.z.assign(hash(instanceIndex.add(timeSalt2)).mul(100).add(-50))
-      })
+        const timeSalt = time as unknown as Node<'uint'>;
+        const timeSalt2 = time.add(randUint()) as unknown as Node<'uint'>;
+        position.x.assign(hash(instanceIndex.add(timeSalt)).mul(100).add(-50));
+        position.z.assign(hash(instanceIndex.add(timeSalt2)).mul(100).add(-50));
+      });
 
-      const rippleOnSurface = texture(rig.collisionPosRT.texture, getCoord(ripplePosition.xz))
-      const rippleFloorArea = rippleOnSurface.y.add(surfaceOffset)
+      const rippleOnSurface = texture(rig.collisionPosRT.texture, getCoord(ripplePosition.xz));
+      const rippleFloorArea = rippleOnSurface.y.add(surfaceOffset);
 
       If(ripplePosition.y.greaterThan(rippleFloorArea), () => {
-        rippleTime.x.assign(1000)
-      })
-    })().compute(MAX_PARTICLE_COUNT)
+        rippleTime.x.assign(1000);
+      });
+    })().compute(MAX_PARTICLE_COUNT);
 
     // Drop sprite graphs: a soft vertical streak (bright near the falling tip) on a
     // camera-facing quad; `billboarding()` replaces the whole vertex transform,
     // placing each instance at its storage-buffer position.
-    const rainColorNode = uv().distance(vec2(0.5, 0)).oneMinus().mul(3).exp().mul(0.1)
-    const rainVertexNode = billboarding({ position: rainPositions.toAttribute() })
+    const rainColorNode = uv().distance(vec2(0.5, 0)).oneMinus().mul(3).exp().mul(0.1);
+    const rainVertexNode = billboarding({ position: rainPositions.toAttribute() });
 
     // Ripple graphs: an expanding ring driven by the ripple's age. The storage read
     // is per-INSTANCE (instanceIndex), shared by all three merged quads of one ripple.
-    const rippleAge = rippleTimes.element(instanceIndex).x
+    const rippleAge = rippleTimes.element(instanceIndex).x;
 
     const ring = Fn(() => {
-      const center = uv().add(vec2(-0.5)).length().mul(7)
-      const distanceFromWave = rippleAge.sub(center)
+      const center = uv().add(vec2(-0.5)).length().mul(7);
+      const distanceFromWave = rippleAge.sub(center);
 
-      return distanceFromWave.min(1).sub(distanceFromWave.max(1).sub(1))
-    })
+      return distanceFromWave.min(1).sub(distanceFromWave.max(1).sub(1));
+    });
 
     return {
       rainComputeInit,
@@ -218,15 +218,15 @@ export function Rain() {
       rippleColorNode: ring(),
       ripplePositionNode: positionGeometry.add(ripplePositions.toAttribute()),
       rippleOpacityNode: rippleAge.mul(0.3).oneMinus().max(0).mul(0.5),
-    }
-  })
+    };
+  });
 
   //* Dispatch ======================================================
   // ONCE: seed the buffers. Sync compute() is safe in an effect — fiber awaits
   // renderer.init() before children render (AGENTS.md compute pattern).
   useEffect(() => {
-    renderer.compute(rainComputeInit)
-  }, [renderer, rainComputeInit])
+    renderer.compute(rainComputeInit);
+  }, [renderer, rainComputeInit]);
 
   // EVERY FRAME, ordered before the default render job (NOT phase:'render' — that
   // would take over rendering): 1) re-render the colliders' world positions into
@@ -235,17 +235,17 @@ export function Rain() {
   // heightmap. Mirrors the original's animate() ordering exactly.
   useFrame(
     () => {
-      scene.overrideMaterial = rig.collisionPosMaterial
-      renderer.setRenderTarget(rig.collisionPosRT)
-      renderer.render(scene, rig.collisionCamera)
+      scene.overrideMaterial = rig.collisionPosMaterial;
+      renderer.setRenderTarget(rig.collisionPosRT);
+      renderer.render(scene, rig.collisionCamera);
 
-      scene.overrideMaterial = null
-      renderer.setRenderTarget(null)
+      scene.overrideMaterial = null;
+      renderer.setRenderTarget(null);
 
-      renderer.compute(rainComputeUpdate)
+      renderer.compute(rainComputeUpdate);
     },
     { before: 'render' },
-  )
+  );
 
   //* Scene =========================================================
   return (
@@ -279,5 +279,5 @@ export function Rain() {
         />
       </mesh>
     </>
-  )
+  );
 }

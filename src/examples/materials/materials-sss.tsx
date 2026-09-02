@@ -35,36 +35,36 @@
  * - DemoHelpers grid disabled — the original is a floating bunny in a black void,
  *   and at this scene scale (~500-unit model) the 0.5-unit grid would be moiré noise
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { NoToneMapping, TextureLoader } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
-import { texture, uniform, vec3 } from 'three/tsl'
-import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu'
-import { useFBX } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect, useMemo } from 'react';
+import { NoToneMapping, TextureLoader } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
+import { texture, uniform, vec3 } from 'three/tsl';
+import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu';
+import { useFBX } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const ASSETS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples'
-const MODEL_URL = `${ASSETS}/models/fbx/stanford-bunny.fbx`
-const THICKNESS_URL = `${ASSETS}/models/fbx/bunny_thickness.jpg`
+const ASSETS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples';
+const MODEL_URL = `${ASSETS}/models/fbx/stanford-bunny.fbx`;
+const THICKNESS_URL = `${ASSETS}/models/fbx/bunny_thickness.jpg`;
 
 interface ThicknessControls {
-  color: string
-  distortion: number
-  ambient: number
-  attenuation: number
-  power: number
-  scale: number
+  color: string;
+  distortion: number;
+  ambient: number;
+  attenuation: number;
+  power: number;
+  scale: number;
 }
 
 function Bunny({ color, distortion, ambient, attenuation, power, scale }: ThicknessControls) {
-  const fbx = useFBX(MODEL_URL)
-  const thicknessMap = useLoader(TextureLoader, THICKNESS_URL)
+  const fbx = useFBX(MODEL_URL);
+  const thicknessMap = useLoader(TextureLoader, THICKNESS_URL);
 
   // The original takes `object.children[0]`, overrides its position/scale and swaps
   // its material — keep the mesh itself (baked FBX transform intact) and do the same
   // declaratively via <primitive> below.
-  const bunny = useMemo(() => fbx.children[0] as Mesh, [fbx])
+  const bunny = useMemo(() => fbx.children[0] as Mesh, [fbx]);
 
   // The five SSS knobs, as the same three-side `uniform()` nodes the original
   // assigns — stable node identities, live-updated via `.value` in the effect below.
@@ -77,24 +77,24 @@ function Bunny({ color, distortion, ambient, attenuation, power, scale }: Thickn
       scale: uniform(16.0),
     }),
     [],
-  )
+  );
 
   useEffect(() => {
-    uniforms.distortion.value = distortion
-    uniforms.ambient.value = ambient
-    uniforms.attenuation.value = attenuation
-    uniforms.power.value = power
-    uniforms.scale.value = scale
-  }, [uniforms, distortion, ambient, attenuation, power, scale])
+    uniforms.distortion.value = distortion;
+    uniforms.ambient.value = ambient;
+    uniforms.attenuation.value = attenuation;
+    uniforms.power.value = power;
+    uniforms.scale.value = scale;
+  }, [uniforms, distortion, ambient, attenuation, power, scale]);
 
   // Baked thickness map times the original's ochre tint — thin regions (ears) read
   // bright in the map, so they transmit the most light.
-  const thicknessColorNode = useMemo(() => texture(thicknessMap).mul(vec3(0.5, 0.3, 0.0)), [thicknessMap])
+  const thicknessColorNode = useMemo(() => texture(thicknessMap).mul(vec3(0.5, 0.3, 0.0)), [thicknessMap]);
 
   // Original: `model.rotation.y = performance.now() / 5000` — state.elapsed is seconds.
   useFrame((state) => {
-    bunny.rotation.y = state.elapsed / 5
-  })
+    bunny.rotation.y = state.elapsed / 5;
+  });
 
   return (
     <primitive object={bunny} position={[0, 0, 10]} scale={1}>
@@ -110,7 +110,7 @@ function Bunny({ color, distortion, ambient, attenuation, power, scale }: Thickn
         thicknessScaleNode={uniforms.scale}
       />
     </primitive>
-  )
+  );
 }
 
 export default function MaterialsSSS() {
@@ -121,7 +121,7 @@ export default function MaterialsSSS() {
     attenuation: { value: 0.8, min: 0.01, max: 5, step: 0.05 },
     power: { value: 2.0, min: 0.01, max: 16, step: 0.1 },
     scale: { value: 16.0, min: 0.01, max: 50, step: 0.1 },
-  })
+  });
 
   return (
     <Canvas
@@ -149,5 +149,5 @@ export default function MaterialsSSS() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={500} maxDistance={3000} />
     </Canvas>
-  )
+  );
 }

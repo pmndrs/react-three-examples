@@ -30,68 +30,68 @@
  * - DemoHelpers grid disabled — the model ships its own baked-lit stone floor at a
  *   ~800-unit world scale; the 0.5-unit demo grid would be sub-pixel noise inside it
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { BackSide, Color, NoToneMapping, ObjectLoader } from 'three/webgpu'
-import type { Mesh, MeshPhongMaterial } from 'three/webgpu'
-import { color, mix, positionLocal, vec4 } from 'three/tsl'
-import { Canvas, useLoader } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect, useMemo } from 'react';
+import { BackSide, Color, NoToneMapping, ObjectLoader } from 'three/webgpu';
+import type { Mesh, MeshPhongMaterial } from 'three/webgpu';
+import { color, mix, positionLocal, vec4 } from 'three/tsl';
+import { Canvas, useLoader } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // ObjectLoader resolves the JSON's relative image URLs (lightmap-ao-shadow.png,
 // rocks.jpg, stone.jpg) against the JSON's own directory — hotlinking the .json is
 // enough to pull the whole texture set from the pinned CDN.
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/json/lightmap/lightmap.json'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/json/lightmap/lightmap.json';
 
 // The original's DirectionalLight color; the skydome's top color copies it.
-const LIGHT_COLOR = '#d5deff'
+const LIGHT_COLOR = '#d5deff';
 
 // BackSide gradient dome, straight port of the original's TSL graph — see header
 // DEMONSTRATES. positionLocal.add(400) broadcasts the scalar offset to xyz, exactly
 // like the GLSL `normalize(vWorldPosition + offset)` this shader descends from.
 function Skydome() {
   const colorNode = useMemo(() => {
-    const topColor = new Color(LIGHT_COLOR)
-    const bottomColor = new Color(0xffffff)
-    const offset = 400
-    const exponent = 0.6
-    const h = positionLocal.add(offset).normalize().y
-    return vec4(mix(color(bottomColor), color(topColor), h.max(0.0).pow(exponent)), 1.0)
-  }, [])
+    const topColor = new Color(LIGHT_COLOR);
+    const bottomColor = new Color(0xffffff);
+    const offset = 400;
+    const exponent = 0.6;
+    const h = positionLocal.add(offset).normalize().y;
+    return vec4(mix(color(bottomColor), color(topColor), h.max(0.0).pow(exponent)), 1.0);
+  }, []);
 
   return (
     <mesh>
       <sphereGeometry args={[4000, 32, 15]} />
       <meshBasicNodeMaterial colorNode={colorNode} side={BackSide} />
     </mesh>
-  )
+  );
 }
 
 // Suspends on the JSON fetch (B17: gated by the Suspense boundary in the page
 // component). The single mesh carries a 3-material array; the slider drives every
 // material's lightMapIntensity live — see header DEMONSTRATES.
 function LightmapModel({ intensity }: { intensity: number }) {
-  const object = useLoader(ObjectLoader, MODEL_URL)
+  const object = useLoader(ObjectLoader, MODEL_URL);
 
   useEffect(() => {
     object.traverse((child) => {
-      const mesh = child as Mesh
-      if (!mesh.isMesh) return
-      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      const mesh = child as Mesh;
+      if (!mesh.isMesh) return;
+      const materials = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
       for (const material of materials) {
         // The JSON ships MeshPhongMaterial entries — truthful narrowing, not a hack.
-        ;(material as MeshPhongMaterial).lightMapIntensity = intensity
+        (material as MeshPhongMaterial).lightMapIntensity = intensity;
       }
-    })
-  }, [object, intensity])
+    });
+  }, [object, intensity]);
 
-  return <primitive object={object} />
+  return <primitive object={object} />;
 }
 
 export default function MaterialsLightmap() {
   const { lightMapIntensity } = useControls('materials-lightmap', {
     lightMapIntensity: { value: 2.5, min: 0, max: 4, step: 0.05 },
-  })
+  });
 
   return (
     <Canvas
@@ -106,5 +106,5 @@ export default function MaterialsLightmap() {
       </Suspense>
       <DemoHelpers grid={false} maxPolarAngle={0.9 * (Math.PI / 2)} minDistance={100} maxDistance={2500} />
     </Canvas>
-  )
+  );
 }

@@ -44,11 +44,11 @@
  *   WebGPURenderer default and the fully-saturated HSL rainbow is the point —
  *   fiber's ACESFilmic default would mute it (tone-mapping parity rule)
  */
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { InsetView } from './InsetView'
-import { InstancedPoints } from './InstancedPoints'
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { InsetView } from './InsetView';
+import { InstancedPoints } from './InstancedPoints';
 
 export default function InstancePoints() {
   return (
@@ -60,5 +60,5 @@ export default function InstancePoints() {
       <InsetView />
       <DemoHelpers grid={false} minDistance={10} maxDistance={500} />
     </Canvas>
-  )
+  );
 }

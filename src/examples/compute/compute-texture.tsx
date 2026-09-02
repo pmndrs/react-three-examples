@@ -37,79 +37,79 @@
  * - `MeshBasicNodeMaterial({ color: 0x00ff00 })` fallback color dropped — `colorNode`
  *   fully overrides it, it never renders
  */
-import { useEffect } from 'react'
-import { Fn, float, instanceIndex, texture, textureStore, uvec2, vec4 } from 'three/tsl'
-import { StorageTexture } from 'three/webgpu'
-import { Canvas, useGPUStorage, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { useEffect } from 'react';
+import { Fn, float, instanceIndex, texture, textureStore, uvec2, vec4 } from 'three/tsl';
+import { StorageTexture } from 'three/webgpu';
+import { Canvas, useGPUStorage, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const WIDTH = 512
-const HEIGHT = 512
+const WIDTH = 512;
+const HEIGHT = 512;
 
 function ComputedPlane() {
   //* Controls =====================================================
   const { scale } = useControls('compute-texture', {
     scale: { value: 50, min: 10, max: 150, step: 1, label: 'pattern scale' },
-  })
-  const { uScale } = useUniforms({ uScale: scale }, 'computeTexture')
+  });
+  const { uScale } = useUniforms({ uScale: scale }, 'computeTexture');
 
-  const renderer = useThree((state) => state.renderer)
+  const renderer = useThree((state) => state.renderer);
 
   // The compute target. useGPUStorage is create-once (StrictMode-safe) and owns
   // disposal; the instance is stable across re-renders, so closing over it below is safe.
   const { patternTexture } = useGPUStorage(
     () => ({ patternTexture: new StorageTexture(WIDTH, HEIGHT) }),
     'computeTexture', // WGSL-identifier rule: camelCase scope, never kebab-case
-  )
+  );
 
   //* Compute Graph =================================================
   const { computeNode, colorNode } = useNodes(() => {
     const computeTexture = Fn(() => {
       // One invocation per texel: unravel the flat dispatch index into x/y.
-      const posX = instanceIndex.mod(WIDTH)
-      const posY = instanceIndex.div(WIDTH)
-      const indexUV = uvec2(posX, posY)
+      const posX = instanceIndex.mod(WIDTH);
+      const posY = instanceIndex.div(WIDTH);
+      const indexUV = uvec2(posX, posY);
 
       // Sine interference pattern — https://www.shadertoy.com/view/Xst3zN
-      const x = float(posX).div(uScale)
-      const y = float(posY).div(uScale)
+      const x = float(posX).div(uScale);
+      const y = float(posY).div(uScale);
 
-      const v1 = x.sin()
-      const v2 = y.sin()
-      const v3 = x.add(y).sin()
-      const v4 = x.mul(x).add(y.mul(y)).sqrt().add(5.0).sin()
-      const v = v1.add(v2, v3, v4)
+      const v1 = x.sin();
+      const v2 = y.sin();
+      const v3 = x.add(y).sin();
+      const v4 = x.mul(x).add(y.mul(y)).sqrt().add(5.0).sin();
+      const v = v1.add(v2, v3, v4);
 
-      const r = v.sin()
-      const g = v.add(Math.PI).sin()
-      const b = v.add(Math.PI).sub(0.5).sin()
+      const r = v.sin();
+      const g = v.add(Math.PI).sin();
+      const b = v.add(Math.PI).sub(0.5).sin();
 
-      textureStore(patternTexture, indexUV, vec4(r, g, b, 1)).toWriteOnly()
-    })
+      textureStore(patternTexture, indexUV, vec4(r, g, b, 1)).toWriteOnly();
+    });
 
     return {
       // .compute(count) wraps the kernel in a ComputeNode sized to the texture.
       computeNode: computeTexture().compute(WIDTH * HEIGHT),
       // The very texture the kernel writes, sampled as a regular texture node.
       colorNode: texture(patternTexture),
-    }
-  }, 'computeTexture')
+    };
+  }, 'computeTexture');
 
   // Explicit dispatch — the ONLY thing that ever runs the kernel. Runs at mount and
   // once per scale change. Safe to call the sync `compute()` from an effect: fiber
   // awaits `renderer.init()` before children render, so the backend exists. StrictMode's
   // double-invoke just writes the same pixels twice — idempotent.
   useEffect(() => {
-    renderer.compute(computeNode)
-  }, [renderer, computeNode, scale])
+    renderer.compute(computeNode);
+  }, [renderer, computeNode, scale]);
 
   return (
     <mesh>
       <planeGeometry args={[2, 2]} />
       <meshBasicNodeMaterial colorNode={colorNode} />
     </mesh>
-  )
+  );
 }
 
 export default function ComputeTexture() {
@@ -118,5 +118,5 @@ export default function ComputeTexture() {
       <ComputedPlane />
       <DemoHelpers />
     </Canvas>
-  )
+  );
 }

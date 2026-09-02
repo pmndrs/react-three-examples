@@ -53,21 +53,21 @@
  *   split by scene role (background fixture / loaded character / water+ice diorama /
  *   post-processing / inlined addon math), same rationale as `backdrop`'s split
  */
-import { Suspense } from 'react'
+import { Suspense } from 'react';
 
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { SceneBackground } from './SceneSetup'
-import { Michelle } from './Michelle'
-import { WaterScene } from './WaterScene'
-import { RenderPipelineFX } from './RenderPipelineFX'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { SceneBackground } from './SceneSetup';
+import { Michelle } from './Michelle';
+import { WaterScene } from './WaterScene';
+import { RenderPipelineFX } from './RenderPipelineFX';
 
 export default function BackdropWater() {
   const { floorY } = useControls('backdrop-water', {
     floorY: { value: 0.2, min: -1, max: 1, step: 0.001, label: 'floor position' },
-  })
+  });
 
   return (
     <Canvas renderer shadows camera={{ position: [3, 2, 4], fov: 50, near: 0.25, far: 30 }}>
@@ -108,5 +108,5 @@ export default function BackdropWater() {
         autoRotateSpeed={1}
       />
     </Canvas>
-  )
+  );
 }

@@ -16,12 +16,12 @@ Research for building R3F ports of the official three.js examples, WebGPU-first,
 Drei v11 is explicitly the WebGPU-compatibility major version, developed in lockstep with react-three-fiber v10 (see §6). It restructures the package into **renderer-specific entry points** so WebGL-only code (GLSL materials, `WebGLRenderTarget`) doesn't get bundled into WebGPU/TSL apps and vice versa. From the v11 README (`https://github.com/pmndrs/drei/blob/v11.0.0-alpha.5/README.md`):
 
 ```jsx
-import { OrbitControls, Environment } from '@react-three/drei' // All, renderer-agnostic
-import { OrbitControls } from '@react-three/drei/core' // Core only, smallest bundle
-import { Bvh } from '@react-three/drei/external' // External lib wrappers
-import { MarchingCubes } from '@react-three/drei/experimental' // Rough/experimental
-import { MeshDistortMaterial, Fbo } from '@react-three/drei/legacy' // WebGL-only (GLSL)
-import { MeshDistortMaterial, Fbo } from '@react-three/drei/webgpu' // WebGPU-only (TSL)
+import { OrbitControls, Environment } from '@react-three/drei'; // All, renderer-agnostic
+import { OrbitControls } from '@react-three/drei/core'; // Core only, smallest bundle
+import { Bvh } from '@react-three/drei/external'; // External lib wrappers
+import { MarchingCubes } from '@react-three/drei/experimental'; // Rough/experimental
+import { MeshDistortMaterial, Fbo } from '@react-three/drei/legacy'; // WebGL-only (GLSL)
+import { MeshDistortMaterial, Fbo } from '@react-three/drei/webgpu'; // WebGPU-only (TSL)
 ```
 
 Confirmed via the package.json `exports` map at tag `v11.0.0-alpha.5`:

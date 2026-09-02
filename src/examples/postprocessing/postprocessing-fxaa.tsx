@@ -15,17 +15,17 @@
  * - `<instancedMesh>` with matrices written once in `useLayoutEffect` — a static
  *   field, unlike `instance-mesh`'s per-frame version
  */
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { Group, MeshStandardMaterial, NoToneMapping, Object3D, TetrahedronGeometry } from 'three/webgpu'
-import type { InstancedMesh } from 'three/webgpu'
-import { renderOutput } from 'three/tsl'
-import { fxaa } from 'three/addons/tsl/display/FXAANode.js'
-import { Canvas, useFrame, useRenderPipeline } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { Group, MeshStandardMaterial, NoToneMapping, Object3D, TetrahedronGeometry } from 'three/webgpu';
+import type { InstancedMesh } from 'three/webgpu';
+import { renderOutput } from 'three/tsl';
+import { fxaa } from 'three/addons/tsl/display/FXAANode.js';
+import { Canvas, useFrame, useRenderPipeline } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const COUNT = 100
+const COUNT = 100;
 
 //* Scene =========================================================
 
@@ -33,67 +33,67 @@ const COUNT = 100
 // to smooth. Matrices are written once (a static field), so the imperative loop runs
 // in useLayoutEffect, before the first bounding-sphere computation.
 function TetrahedronField() {
-  const { animated } = useControls('FXAA', { animated: false })
-  const groupRef = useRef<Group>(null)
-  const meshRef = useRef<InstancedMesh>(null)
+  const { animated } = useControls('FXAA', { animated: false });
+  const groupRef = useRef<Group>(null);
+  const meshRef = useRef<InstancedMesh>(null);
 
-  const geometry = useMemo(() => new TetrahedronGeometry(), [])
-  const material = useMemo(() => new MeshStandardMaterial({ color: 0xf73232, flatShading: true }), [])
+  const geometry = useMemo(() => new TetrahedronGeometry(), []);
+  const material = useMemo(() => new MeshStandardMaterial({ color: 0xf73232, flatShading: true }), []);
 
   useLayoutEffect(() => {
-    const mesh = meshRef.current
-    if (!mesh) return
-    const dummy = new Object3D()
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    const dummy = new Object3D();
     for (let i = 0; i < COUNT; i++) {
-      dummy.position.set(Math.random() * 50 - 25, Math.random() * 50 - 25, Math.random() * 50 - 25)
-      dummy.scale.setScalar(Math.random() * 2 + 1)
-      dummy.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI)
-      dummy.updateMatrix()
-      mesh.setMatrixAt(i, dummy.matrix)
+      dummy.position.set(Math.random() * 50 - 25, Math.random() * 50 - 25, Math.random() * 50 - 25);
+      dummy.scale.setScalar(Math.random() * 2 + 1);
+      dummy.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
     }
-    mesh.instanceMatrix.needsUpdate = true
-  }, [geometry, material])
+    mesh.instanceMatrix.needsUpdate = true;
+  }, [geometry, material]);
 
   useFrame(({ delta }) => {
-    if (!animated) return
-    const group = groupRef.current
-    if (!group) return
-    group.rotation.y += delta * 0.1
-  })
+    if (!animated) return;
+    const group = groupRef.current;
+    if (!group) return;
+    group.rotation.y += delta * 0.1;
+  });
 
   return (
     <group ref={groupRef}>
       <instancedMesh ref={meshRef} args={[geometry, material, COUNT]} />
     </group>
-  )
+  );
 }
 
 //* Post-processing ===============================================
 
 function FXAAPipeline() {
-  const { enabled } = useControls('FXAA', { enabled: true })
+  const { enabled } = useControls('FXAA', { enabled: true });
   const { renderPipeline, passes } = useRenderPipeline(({ renderPipeline, passes }) => {
     // FXAA needs its input already tone-mapped and color-space converted — disable
     // the pipeline's own automatic pass and apply renderOutput() manually below.
-    renderPipeline.outputColorTransform = false
+    renderPipeline.outputColorTransform = false;
 
-    const scenePassColor = passes.scenePass.getTextureNode()
-    const outputPass = renderOutput(scenePassColor)
-    const fxaaPass = fxaa(outputPass)
-    renderPipeline.outputNode = fxaaPass
+    const scenePassColor = passes.scenePass.getTextureNode();
+    const outputPass = renderOutput(scenePassColor);
+    const fxaaPass = fxaa(outputPass);
+    renderPipeline.outputNode = fxaaPass;
 
-    return { outputPass, fxaaPass }
-  })
+    return { outputPass, fxaaPass };
+  });
 
   useEffect(() => {
-    const outputPass = passes.outputPass as ReturnType<typeof renderOutput> | undefined
-    const fxaaPass = passes.fxaaPass as ReturnType<typeof fxaa> | undefined
-    if (!renderPipeline || !outputPass || !fxaaPass) return
-    renderPipeline.outputNode = enabled ? fxaaPass : outputPass
-    renderPipeline.needsUpdate = true
-  }, [renderPipeline, passes, enabled])
+    const outputPass = passes.outputPass as ReturnType<typeof renderOutput> | undefined;
+    const fxaaPass = passes.fxaaPass as ReturnType<typeof fxaa> | undefined;
+    if (!renderPipeline || !outputPass || !fxaaPass) return;
+    renderPipeline.outputNode = enabled ? fxaaPass : outputPass;
+    renderPipeline.needsUpdate = true;
+  }, [renderPipeline, passes, enabled]);
 
-  return null
+  return null;
 }
 
 export default function PostprocessingFxaa() {
@@ -110,5 +110,5 @@ export default function PostprocessingFxaa() {
       <FXAAPipeline />
       <DemoHelpers grid={false} maxDistance={150} />
     </Canvas>
-  )
+  );
 }

@@ -2,41 +2,41 @@
 // never part of the visible scene (the fog gradient is the background) — it lives in
 // a bare env scene and is baked into `scene.environment` via PMREMGenerator on every
 // sun move, the original's updateSun() dance.
-import { useLayoutEffect, useMemo } from 'react'
-import type { RefObject } from 'react'
-import { SkyMesh } from 'three/addons/objects/SkyMesh.js'
-import { Color, MathUtils, PMREMGenerator, Scene, Vector3 } from 'three/webgpu'
-import type { DirectionalLight, RenderTarget } from 'three/webgpu'
+import { useLayoutEffect, useMemo } from 'react';
+import type { RefObject } from 'react';
+import { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+import { Color, MathUtils, PMREMGenerator, Scene, Vector3 } from 'three/webgpu';
+import type { DirectionalLight, RenderTarget } from 'three/webgpu';
 
-import { useThree } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
+import { useThree } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
 
 export interface SunSkyProps {
   /** Shared handle to the key light, so the terrain rebuild can refresh its shadow map. */
-  sunRef: RefObject<DirectionalLight | null>
+  sunRef: RefObject<DirectionalLight | null>;
 }
 
 export function SunSky({ sunRef }: SunSkyProps) {
-  const scene = useThree((s) => s.scene)
-  const renderer = useThree((s) => s.renderer)
+  const scene = useThree((s) => s.scene);
+  const renderer = useThree((s) => s.renderer);
 
   const { elevation, azimuth } = useControls('custom-fog', {
     sun: folder({
       elevation: { value: 11, min: 1, max: 40, step: 0.5 }, // low = golden hour
       azimuth: { value: 150, min: 0, max: 360, step: 1 },
     }),
-  })
+  });
 
   const sky = useMemo(() => {
-    const mesh = new SkyMesh()
-    mesh.scale.setScalar(10000)
-    mesh.turbidity.value = 12
-    mesh.rayleigh.value = 2
-    mesh.mieCoefficient.value = 0.005
-    mesh.mieDirectionalG.value = 0.88
-    mesh.showSunDisc.value = false // bake the sky without the sun disc
-    return mesh
-  }, [])
+    const mesh = new SkyMesh();
+    mesh.scale.setScalar(10000);
+    mesh.turbidity.value = 12;
+    mesh.rayleigh.value = 2;
+    mesh.mieCoefficient.value = 0.005;
+    mesh.mieDirectionalG.value = 0.88;
+    mesh.showSunDisc.value = false; // bake the sky without the sun disc
+    return mesh;
+  }, []);
 
   // Env-bake plumbing, one instance per renderer (never disposed in cleanup —
   // StrictMode would kill the memoized generator for good).
@@ -47,47 +47,47 @@ export function SunSky({ sunRef }: SunSkyProps) {
       renderTarget: undefined as RenderTarget | undefined,
     }),
     [renderer],
-  )
+  );
 
   // Unit sun direction from the two angles — feeds the sky uniform, the light
   // position and the env bake alike.
   const sunDir = useMemo(
     () => new Vector3().setFromSphericalCoords(1, MathUtils.degToRad(90 - elevation), MathUtils.degToRad(azimuth)),
     [elevation, azimuth],
-  )
+  );
 
   // A dim, cool sky fill so the warm sun stays the key and shadows read.
   useLayoutEffect(() => {
-    scene.environmentIntensity = 0.16
+    scene.environmentIntensity = 0.16;
     return () => {
-      scene.environmentIntensity = 1
-    }
-  }, [scene])
+      scene.environmentIntensity = 1;
+    };
+  }, [scene]);
 
   // updateSun(): aim the sky's sun, refresh the on-demand shadow map, and re-bake the
   // sky into scene.environment. Layout effect, not passive: the terrain/forest's first
   // shader build must already see the environment (AGENTS.md B15/useLayoutEffect).
   useLayoutEffect(() => {
-    const { pmremGenerator, envScene } = env
-    sky.sunPosition.value.copy(sunDir)
+    const { pmremGenerator, envScene } = env;
+    sky.sunPosition.value.copy(sunDir);
 
     // The sun moved, so the on-demand shadow map needs one refresh (the light's own
     // props were committed just before this effect ran).
-    if (sunRef.current) sunRef.current.shadow.needsUpdate = true
+    if (sunRef.current) sunRef.current.shadow.needsUpdate = true;
 
-    envScene.add(sky) // the sky lives only here — it is never added to the visible scene
-    env.renderTarget?.dispose()
-    env.renderTarget = pmremGenerator.fromScene(envScene)
-    scene.environment = env.renderTarget.texture
-  }, [env, scene, sky, sunRef, sunDir])
+    envScene.add(sky); // the sky lives only here — it is never added to the visible scene
+    env.renderTarget?.dispose();
+    env.renderTarget = pmremGenerator.fromScene(envScene);
+    scene.environment = env.renderTarget.texture;
+  }, [env, scene, sky, sunRef, sunDir]);
 
   // The longer air path near the horizon dims and warms the sun. It stays far
   // brighter than the sky fill, so it reads as the key and casts firm shadows.
-  const transmittance = Math.sqrt(Math.max(Math.sin(MathUtils.degToRad(elevation)), 0))
+  const transmittance = Math.sqrt(Math.max(Math.sin(MathUtils.degToRad(elevation)), 0));
   const sunColor = useMemo(
     () => new Color(0xff7a2f).lerp(new Color(0xfff2e0), transmittance), // deep orange → warm white
     [transmittance],
-  )
+  );
 
   return (
     <directionalLight
@@ -110,5 +110,5 @@ export function SunSky({ sunRef }: SunSkyProps) {
       // terrain regenerates (imperative shadow.needsUpdate), not every frame.
       shadow-autoUpdate={false}
     />
-  )
+  );
 }

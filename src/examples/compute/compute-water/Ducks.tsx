@@ -3,36 +3,36 @@
 // sim's creator hooks have already run (AGENTS.md B18 ordering). One InstancedMesh
 // whose `positionNode` (built in Water's useNodes, passed down) offsets each
 // instance by the duck struct storage buffer — placement lives on the GPU only.
-import { useEffect, useRef } from 'react'
-import type { Mesh, MeshStandardMaterial, MeshStandardNodeMaterial, Node } from 'three/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
+import { useEffect, useRef } from 'react';
+import type { Mesh, MeshStandardMaterial, MeshStandardNodeMaterial, Node } from 'three/webgpu';
+import { useGLTF } from '@react-three/drei/webgpu';
 
-export const NUM_DUCKS = 100
+export const NUM_DUCKS = 100;
 
-const DUCK_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/duck.glb'
+const DUCK_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/duck.glb';
 
 export interface DucksProps {
   /** Instance placement graph (positionLocal + struct-buffer position), built in Water. */
-  positionNode: Node
-  visible: boolean
-  wireframe: boolean
+  positionNode: Node;
+  visible: boolean;
+  wireframe: boolean;
 }
 
 export function Ducks({ positionNode, visible, wireframe }: DucksProps) {
-  const gltf = useGLTF(DUCK_URL, { draco: true })
-  const duck = gltf.nodes.duck as Mesh
+  const gltf = useGLTF(DUCK_URL, { draco: true });
+  const duck = gltf.nodes.duck as Mesh;
   // The loaded material is a core-three MeshStandardMaterial — NOT a node material,
   // so the original's `material.positionNode = ...` mutation has nothing to land on
   // here. Rebuild it as an explicit node material from the same maps/params instead
   // (see header DIVERGENCE).
-  const sourceMaterial = duck.material as MeshStandardMaterial
+  const sourceMaterial = duck.material as MeshStandardMaterial;
 
-  const materialRef = useRef<MeshStandardNodeMaterial>(null)
+  const materialRef = useRef<MeshStandardNodeMaterial>(null);
   useEffect(() => {
     // wireframe changes the pipeline topology — the property write alone doesn't
     // re-key the WebGPU pipeline (same family as instance-points' alphaToCoverage).
-    if (materialRef.current) materialRef.current.needsUpdate = true
-  }, [wireframe])
+    if (materialRef.current) materialRef.current.needsUpdate = true;
+  }, [wireframe]);
 
   return (
     // Instance positions exist only in the storage buffer — three's culling sphere is
@@ -52,5 +52,5 @@ export function Ducks({ positionNode, visible, wireframe }: DucksProps) {
         wireframe={wireframe}
       />
     </instancedMesh>
-  )
+  );
 }

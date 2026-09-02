@@ -30,78 +30,78 @@
  * - DemoHelpers grid disabled — the original has no ground plane and a grid at y=0
  *   would slice through the fog bank the example is about
  */
-import { useEffect, useLayoutEffect, useRef } from 'react'
-import { exponentialHeightFogFactor, fog } from 'three/tsl'
-import { NoToneMapping, Object3D } from 'three/webgpu'
-import type { InstancedMesh, Node } from 'three/webgpu'
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { exponentialHeightFogFactor, fog } from 'three/tsl';
+import { NoToneMapping, Object3D } from 'three/webgpu';
+import type { InstancedMesh, Node } from 'three/webgpu';
 
-import { Canvas, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // Custom scene-level TSL fog. The graph is built once from live useUniforms nodes;
 // leva changes only mutate `.value`, no rebuild. Cast: `@types/three`'s `Scene`
 // doesn't declare `fogNode` — see header DIVERGENCE.
 function HeightFog({ fogColor }: { fogColor: string }) {
-  const scene = useThree((s) => s.scene)
+  const scene = useThree((s) => s.scene);
 
   const { density, height } = useControls('height-fog', {
     density: { value: 0.04, min: 0.001, max: 0.1, step: 0.0001 },
     height: { value: 2, min: -5, max: 5 },
-  })
+  });
 
   // The same three/tsl uniform nodes the original feeds its GUI — useUniforms keeps
   // `.value` synced.
-  const { uDensity, uHeight, uColor } = useUniforms({ uDensity: density, uHeight: height, uColor: fogColor })
+  const { uDensity, uHeight, uColor } = useUniforms({ uDensity: density, uHeight: height, uColor: fogColor });
 
   useEffect(() => {
-    const fogged = scene as unknown as { fogNode: Node | null }
-    fogged.fogNode = fog(uColor, exponentialHeightFogFactor(uDensity, uHeight))
+    const fogged = scene as unknown as { fogNode: Node | null };
+    fogged.fogNode = fog(uColor, exponentialHeightFogFactor(uDensity, uHeight));
     return () => {
-      fogged.fogNode = null
-    }
-  }, [scene, uColor, uDensity, uHeight])
+      fogged.fogNode = null;
+    };
+  }, [scene, uColor, uDensity, uHeight]);
 
-  return null
+  return null;
 }
 
 // 10x10 grid of tall boxes sunk into the fog bank, matching the original's
 // InstancedMesh layout (one-time imperative setMatrixAt — Layer 1 useLayoutEffect rule).
 function BoxField() {
-  const meshRef = useRef<InstancedMesh>(null)
+  const meshRef = useRef<InstancedMesh>(null);
 
   useLayoutEffect(() => {
-    const mesh = meshRef.current
-    if (!mesh) return
+    const mesh = meshRef.current;
+    if (!mesh) return;
 
-    const dummy = new Object3D()
-    let index = 0
+    const dummy = new Object3D();
+    let index = 0;
 
     for (let i = 0; i < 10; i++) {
       for (let j = 0; j < 10; j++) {
-        dummy.position.set(-18 + i * 4, 0, -18 + j * 4)
-        dummy.updateMatrix()
-        mesh.setMatrixAt(index++, dummy.matrix)
+        dummy.position.set(-18 + i * 4, 0, -18 + j * 4);
+        dummy.updateMatrix();
+        mesh.setMatrixAt(index++, dummy.matrix);
       }
     }
 
-    mesh.instanceMatrix.needsUpdate = true
-  }, [])
+    mesh.instanceMatrix.needsUpdate = true;
+  }, []);
 
   return (
     <instancedMesh ref={meshRef} args={[undefined, undefined, 100]} position={[0, -10, 0]}>
       <boxGeometry args={[1, 25, 1]} />
       <meshPhongNodeMaterial color="#cd959a" />
     </instancedMesh>
-  )
+  );
 }
 
 export default function FogHeight() {
   // fogColor lives here, not in HeightFog — Canvas's own `background` prop needs it too.
   const { fogColor } = useControls('height-fog', {
     fogColor: '#ffdfc1',
-  })
+  });
 
   return (
     <Canvas
@@ -116,5 +116,5 @@ export default function FogHeight() {
       <ambientLight color="#cccccc" />
       <DemoHelpers grid={false} minDistance={7} maxDistance={100} maxPolarAngle={Math.PI / 2} />
     </Canvas>
-  )
+  );
 }

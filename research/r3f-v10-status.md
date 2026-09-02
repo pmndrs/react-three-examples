@@ -109,8 +109,8 @@ Source: `docs/webgpu/overview.mdx`, `docs/webgpu/tsl-hooks.mdx`, `docs/webgpu/re
 ### Canonical Canvas pattern
 
 ```tsx
-import { Canvas } from '@react-three/fiber/webgpu' // auto-extends node materials into JSX
-import { positionLocal, normalLocal } from 'three/tsl'
+import { Canvas } from '@react-three/fiber/webgpu'; // auto-extends node materials into JSX
+import { positionLocal, normalLocal } from 'three/tsl';
 
 function App() {
   return (
@@ -122,7 +122,7 @@ function App() {
         <meshStandardNodeMaterial positionNode={positionLocal.add(normalLocal.mul(0.1))} />
       </mesh>
     </Canvas>
-  )
+  );
 }
 ```
 

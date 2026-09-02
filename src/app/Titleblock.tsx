@@ -1,4 +1,4 @@
-import type { ExampleMeta } from './manifest'
+import type { ExampleMeta } from './manifest';
 
 // Standard per-example titleblock — shell-level DOM overlay, not in-canvas furniture.
 // Driven entirely by examples.json so ports get it for free; grows into the M2
@@ -27,5 +27,5 @@ export function Titleblock({ meta }: { meta: ExampleMeta }) {
         </p>
       </div>
     </div>
-  )
+  );
 }

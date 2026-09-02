@@ -32,60 +32,60 @@
  *   camera orbit and leva-driven uniforms — matches the original's `animate()`, which
  *   just calls `renderer.render()` every frame with no per-frame mutation
  */
-import { useMemo } from 'react'
-import { Break, Fn, If, Loop, bool, select, texture3D, vec3, vec4 } from 'three/tsl'
-import { BackSide, Data3DTexture, LinearFilter, NodeMaterial, NoToneMapping, RedFormat, Vector3 } from 'three/webgpu'
-import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js'
-import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js'
-import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { useMemo } from 'react';
+import { Break, Fn, If, Loop, bool, select, texture3D, vec3, vec4 } from 'three/tsl';
+import { BackSide, Data3DTexture, LinearFilter, NodeMaterial, NoToneMapping, RedFormat, Vector3 } from 'three/webgpu';
+import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
+import { ImprovedNoise } from 'three/addons/math/ImprovedNoise.js';
+import { Canvas, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const REFINEMENT_STEPS = 4
+const REFINEMENT_STEPS = 4;
 
 function PerlinBox() {
   const { threshold, steps, refine } = useControls('volume-perlin', {
     threshold: { value: 0.6, min: 0, max: 1, step: 0.01 },
     steps: { value: 200, min: 0, max: 300, step: 1 },
     refine: true,
-  })
+  });
 
   const {
     uThreshold: uThresholdNode,
     uSteps: uStepsNode,
     uRefine: uRefineNode,
-  } = useUniforms({ uThreshold: threshold, uSteps: steps, uRefine: refine }, 'volumePerlin')
+  } = useUniforms({ uThreshold: threshold, uSteps: steps, uRefine: refine }, 'volumePerlin');
 
   // 128^3 raw perlin field, ported verbatim from the original's init().
   const perlinTexture = useMemo(() => {
-    const size = 128
-    const data = new Uint8Array(size * size * size)
+    const size = 128;
+    const data = new Uint8Array(size * size * size);
 
-    let i = 0
-    const perlin = new ImprovedNoise()
-    const vector = new Vector3()
+    let i = 0;
+    const perlin = new ImprovedNoise();
+    const vector = new Vector3();
 
     for (let z = 0; z < size; z++) {
       for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
-          vector.set(x, y, z).divideScalar(size)
-          const d = perlin.noise(vector.x * 6.5, vector.y * 6.5, vector.z * 6.5)
-          data[i++] = d * 128 + 128
+          vector.set(x, y, z).divideScalar(size);
+          const d = perlin.noise(vector.x * 6.5, vector.y * 6.5, vector.z * 6.5);
+          data[i++] = d * 128 + 128;
         }
       }
     }
 
-    const texture = new Data3DTexture(data, size, size, size)
-    texture.format = RedFormat
-    texture.minFilter = LinearFilter
-    texture.magFilter = LinearFilter
-    texture.unpackAlignment = 1
-    texture.needsUpdate = true
-    return texture
-  }, [])
+    const texture = new Data3DTexture(data, size, size, size);
+    texture.format = RedFormat;
+    texture.minFilter = LinearFilter;
+    texture.magFilter = LinearFilter;
+    texture.unpackAlignment = 1;
+    texture.needsUpdate = true;
+    return texture;
+  }, []);
 
   const material = useMemo(() => {
-    const map = texture3D(perlinTexture, null, 0)
+    const map = texture3D(perlinTexture, null, 0);
 
     // Ported verbatim from the original's `opaqueRaymarchingTexture` — a zero-arg Fn
     // closing over the uniforms rather than object-destructured params (destructured
@@ -93,64 +93,64 @@ function PerlinBox() {
     // is load-bearing: RaymarchingBox's internal `.toVar()`/`.assign()` need the
     // active TSL stack it provides.
     const opaqueRaymarchingTexture = Fn(() => {
-      const finalColor = vec4(0).toVar()
+      const finalColor = vec4(0).toVar();
 
-      const positionPrev = vec3(0).toVar()
-      const hasPrev = bool(false).toVar()
+      const positionPrev = vec3(0).toVar();
+      const hasPrev = bool(false).toVar();
 
       RaymarchingBox(uStepsNode, ({ positionRay }) => {
-        const mapValue = map.sample(positionRay.add(0.5)).r.toVar()
+        const mapValue = map.sample(positionRay.add(0.5)).r.toVar();
 
         If(mapValue.greaterThan(uThresholdNode), () => {
-          const surfacePos = positionRay.toVar()
+          const surfacePos = positionRay.toVar();
 
           If(uRefineNode.and(hasPrev), () => {
             // The surface lies between the previous sample (below the threshold) and
             // the current one (above it) — bisect that interval to localize the
             // crossing precisely.
-            const p0 = positionPrev.toVar()
-            const p1 = positionRay.toVar()
+            const p0 = positionPrev.toVar();
+            const p1 = positionRay.toVar();
 
             Loop(REFINEMENT_STEPS, () => {
-              const pm = p0.add(p1).mul(0.5).toConst()
-              const dm = map.sample(pm.add(0.5)).r.toConst()
+              const pm = p0.add(p1).mul(0.5).toConst();
+              const dm = map.sample(pm.add(0.5)).r.toConst();
 
-              const isGreater = dm.greaterThan(uThresholdNode)
+              const isGreater = dm.greaterThan(uThresholdNode);
 
-              p1.assign(select(isGreater, pm, p1).uniformFlow())
-              p0.assign(select(isGreater, p0, pm).uniformFlow())
-            })
+              p1.assign(select(isGreater, pm, p1).uniformFlow());
+              p0.assign(select(isGreater, p0, pm).uniformFlow());
+            });
 
-            surfacePos.assign(p1)
-          })
+            surfacePos.assign(p1);
+          });
 
-          const p = vec3(surfacePos).add(0.5)
+          const p = vec3(surfacePos).add(0.5);
 
-          finalColor.rgb.assign(map.normal(p).mul(0.5).add(surfacePos.mul(1.5).add(0.25)))
-          finalColor.a.assign(1)
-          Break()
-        })
+          finalColor.rgb.assign(map.normal(p).mul(0.5).add(surfacePos.mul(1.5).add(0.25)));
+          finalColor.a.assign(1);
+          Break();
+        });
 
-        positionPrev.assign(positionRay)
-        hasPrev.assign(bool(true))
-      })
+        positionPrev.assign(positionRay);
+        hasPrev.assign(bool(true));
+      });
 
-      return finalColor
-    })
+      return finalColor;
+    });
 
-    const mat = new NodeMaterial()
-    mat.colorNode = opaqueRaymarchingTexture()
-    mat.side = BackSide // inside faces — the raymarch survives the camera entering the box
-    mat.transparent = true
-    return mat
-  }, [perlinTexture, uThresholdNode, uStepsNode, uRefineNode])
+    const mat = new NodeMaterial();
+    mat.colorNode = opaqueRaymarchingTexture();
+    mat.side = BackSide; // inside faces — the raymarch survives the camera entering the box
+    mat.transparent = true;
+    return mat;
+  }, [perlinTexture, uThresholdNode, uStepsNode, uRefineNode]);
 
   return (
     <mesh>
       <boxGeometry args={[1, 1, 1]} />
       <primitive object={material} attach="material" />
     </mesh>
-  )
+  );
 }
 
 export default function VolumePerlin() {
@@ -163,5 +163,5 @@ export default function VolumePerlin() {
       <PerlinBox />
       <DemoHelpers grid={false} maxDistance={9} />
     </Canvas>
-  )
+  );
 }

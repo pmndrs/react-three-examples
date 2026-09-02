@@ -25,33 +25,33 @@
  * - Texture wrap/colorSpace setup happens in `useLayoutEffect` (must land before the
  *   first shader-graph build reads the textures), not awaited loader calls
  */
-import { Suspense, useLayoutEffect } from 'react'
-import { blendOverlay, normalMap, parallaxUV, texture, uv } from 'three/tsl'
-import { NoColorSpace, ReinhardToneMapping, RepeatWrapping, SRGBColorSpace } from 'three/webgpu'
-import { Canvas, useLocalNodes, useUniforms } from '@react-three/fiber/webgpu'
-import { Environment, useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useLayoutEffect } from 'react';
+import { blendOverlay, normalMap, parallaxUV, texture, uv } from 'three/tsl';
+import { NoColorSpace, ReinhardToneMapping, RepeatWrapping, SRGBColorSpace } from 'three/webgpu';
+import { Canvas, useLocalNodes, useUniforms } from '@react-three/fiber/webgpu';
+import { Environment, useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures'
-const HDR_URL = `${TEXTURE_BASE}/equirectangular/752-hdri-skies-com_1k.hdr`
-const TOP_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_Color.jpg`
-const ROUGHNESS_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_Roughness.jpg`
-const NORMAL_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_NormalGL.jpg`
-const DISPLACE_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_Displacement.jpg`
-const BOTTOM_URL = `${TEXTURE_BASE}/ambientcg/Ice003_1K-JPG_Color.jpg`
+const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures';
+const HDR_URL = `${TEXTURE_BASE}/equirectangular/752-hdri-skies-com_1k.hdr`;
+const TOP_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_Color.jpg`;
+const ROUGHNESS_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_Roughness.jpg`;
+const NORMAL_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_NormalGL.jpg`;
+const DISPLACE_URL = `${TEXTURE_BASE}/ambientcg/Ice002_1K-JPG_Displacement.jpg`;
+const BOTTOM_URL = `${TEXTURE_BASE}/ambientcg/Ice003_1K-JPG_Color.jpg`;
 
 function IceGround() {
   //* Controls =====================================================
   const { parallaxScale, uvScale } = useControls('parallax-uv', {
     parallaxScale: { value: 0.5, min: 0.2, max: 0.5, step: 0.01 },
     uvScale: { value: 3, min: 1, max: 5, step: 0.1 },
-  })
+  });
 
   // Creator hook BEFORE the suspending hook (AGENTS.md / UPSTREAM B18): deferred to
   // the post-suspense re-render, useUniforms' store write would land after siblings
   // have subscribed and trip React's setState-during-render warning.
-  const { uParallaxScale, uUvScale } = useUniforms({ uParallaxScale: parallaxScale, uUvScale: uvScale }, 'parallaxIce')
+  const { uParallaxScale, uUvScale } = useUniforms({ uParallaxScale: parallaxScale, uUvScale: uvScale }, 'parallaxIce');
 
   const textures = useTexture({
     top: TOP_URL,
@@ -59,7 +59,7 @@ function IceGround() {
     normal: NORMAL_URL,
     displace: DISPLACE_URL,
     bottom: BOTTOM_URL,
-  })
+  });
 
   // Wrap mode and colorSpace must be set before the first shader-graph build reads
   // the textures (samplers/decode are baked at first RAF render) — layout effect,
@@ -67,35 +67,35 @@ function IceGround() {
   // sRGB; roughness/normal/displacement are data, exactly as in the original.
   useLayoutEffect(() => {
     for (const tex of Object.values(textures)) {
-      tex.wrapS = RepeatWrapping
-      tex.wrapT = RepeatWrapping
+      tex.wrapS = RepeatWrapping;
+      tex.wrapT = RepeatWrapping;
     }
-    textures.top.colorSpace = SRGBColorSpace
-    textures.bottom.colorSpace = SRGBColorSpace
-    textures.roughness.colorSpace = NoColorSpace
-    textures.normal.colorSpace = NoColorSpace
-    textures.displace.colorSpace = NoColorSpace
-  }, [textures])
+    textures.top.colorSpace = SRGBColorSpace;
+    textures.bottom.colorSpace = SRGBColorSpace;
+    textures.roughness.colorSpace = NoColorSpace;
+    textures.normal.colorSpace = NoColorSpace;
+    textures.displace.colorSpace = NoColorSpace;
+  }, [textures]);
 
   // Create-once — uniform values mutate in place via `.value`, so leva edits reach
   // the shader without a graph rebuild.
   const nodes = useLocalNodes(() => {
-    const scaledUV = uv().mul(uUvScale)
+    const scaledUV = uv().mul(uUvScale);
 
     // Displacement sample drives how far the bottom layer's UVs slide along the
     // view direction — the whole "depth" of the ice is this one offset.
-    const offsetUV = texture(textures.displace, scaledUV).mul(uParallaxScale)
-    const parallaxUVOffset = parallaxUV(scaledUV, offsetUV)
-    const parallaxResult = texture(textures.bottom, parallaxUVOffset)
+    const offsetUV = texture(textures.displace, scaledUV).mul(uParallaxScale);
+    const parallaxUVOffset = parallaxUV(scaledUV, offsetUV);
+    const parallaxResult = texture(textures.bottom, parallaxUVOffset);
 
-    const iceNode = blendOverlay(texture(textures.top, scaledUV), parallaxResult)
+    const iceNode = blendOverlay(texture(textures.top, scaledUV), parallaxResult);
 
     return {
       colorNode: iceNode.mul(5), // increase the color intensity to 5 (contrast)
       roughnessNode: texture(textures.roughness, scaledUV),
       normalNode: normalMap(texture(textures.normal, scaledUV)),
-    }
-  })
+    };
+  });
 
   return (
     <mesh rotation-x={-Math.PI / 2}>
@@ -107,13 +107,13 @@ function IceGround() {
         metalness={0}
       />
     </mesh>
-  )
+  );
 }
 
 export default function ParallaxUv() {
   const { backgroundBlurriness } = useControls('parallax-uv', {
     backgroundBlurriness: { value: 0.4, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   return (
     <Canvas
@@ -129,5 +129,5 @@ export default function ParallaxUv() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 0, 0]} minDistance={10} maxDistance={40} autoRotate autoRotateSpeed={-1} />
     </Canvas>
-  )
+  );
 }

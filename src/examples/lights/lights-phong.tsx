@@ -21,16 +21,16 @@
  *   constant, so controls would only add machinery.
  * - OrbitControls -> this repo's CameraControls, same 3/25 dolly limits
  */
-import { useLayoutEffect, useMemo, useRef } from 'react'
-import { checker, color, lights, mix, normalMap, texture, uv } from 'three/tsl'
-import type { PointLight } from 'three/webgpu'
+import { useLayoutEffect, useMemo, useRef } from 'react';
+import { checker, color, lights, mix, normalMap, texture, uv } from 'three/tsl';
+import type { PointLight } from 'three/webgpu';
 
-import { Canvas, useFrame, useNodes, useTexture, type ThreeElements } from '@react-three/fiber/webgpu'
+import { Canvas, useFrame, useNodes, useTexture, type ThreeElements } from '@react-three/fiber/webgpu';
 
-import '../../assets/TeapotGeometry'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import '../../assets/TeapotGeometry';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const TEXTURES = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
+const TEXTURES = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/';
 
 //* Lights ========================================================
 
@@ -39,22 +39,22 @@ const TEXTURES = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/text
  * The parent can supply the ref to hand this light to another object; if it does
  * not, the local one still drives the orbit.
  */
-type Orbit = readonly ({ s: number } | { c: number })[]
+type Orbit = readonly ({ s: number } | { c: number })[];
 
 /** `ref` is optional — supply it only when another object needs this light. */
-type OrbitLightProps = { color: string; orbit: Orbit; ref?: React.RefObject<PointLight | null> }
+type OrbitLightProps = { color: string; orbit: Orbit; ref?: React.RefObject<PointLight | null> };
 
 function OrbitLight({ color, orbit, ref }: OrbitLightProps) {
   // Hooks can't be conditional, so always make a local ref and then pick. Every
   // light ends up with a readable ref whether or not the parent supplied one.
-  const localRef = useRef<PointLight>(null)
-  const lightRef = ref ?? localRef
+  const localRef = useRef<PointLight>(null);
+  const lightRef = ref ?? localRef;
 
   useFrame(({ elapsed }) => {
-    const t = elapsed * 0.5
-    const position = orbit.map((a) => ('s' in a ? Math.sin(t * a.s) : Math.cos(t * a.c)))
-    lightRef.current?.position.set(position[0] * 3, position[1] * 4, position[2] * 3)
-  })
+    const t = elapsed * 0.5;
+    const position = orbit.map((a) => ('s' in a ? Math.sin(t * a.s) : Math.cos(t * a.c)));
+    lightRef.current?.position.set(position[0] * 3, position[1] * 4, position[2] * 3);
+  });
 
   return (
     <pointLight ref={lightRef} color={color} power={1700} distance={100}>
@@ -64,7 +64,7 @@ function OrbitLight({ color, orbit, ref }: OrbitLightProps) {
         <meshPhongNodeMaterial color="#000000" emissive={color} />
       </mesh>
     </pointLight>
-  )
+  );
 }
 
 //* Teapots =======================================================
@@ -77,17 +77,17 @@ function OrbitLight({ color, orbit, ref }: OrbitLightProps) {
 type TeapotProps = ThreeElements['mesh'] &
   Pick<ThreeElements['meshPhongNodeMaterial'], 'shininess' | 'specularNode' | 'normalNode'> &
   /** Restrict this teapot's lighting to just this one light. */
-  { light?: React.RefObject<PointLight | null> }
+  { light?: React.RefObject<PointLight | null> };
 
 function Teapot({ shininess, light, specularNode, normalNode, ...props }: TeapotProps) {
   // LightsNode holds its array BY REFERENCE and only reads it when the shader
   // builds — which is the first frame, after mount. So hand it an empty array now
   // and fill it in a layout effect, by which time the sibling light's ref is set.
-  const lightsNode = useMemo(() => (light ? lights([]) : undefined), [light])
+  const lightsNode = useMemo(() => (light ? lights([]) : undefined), [light]);
 
   useLayoutEffect(() => {
-    if (light?.current) lightsNode?.setLights([light.current])
-  }, [light, lightsNode])
+    if (light?.current) lightsNode?.setLights([light.current]);
+  }, [light, lightsNode]);
 
   return (
     <mesh rotation-y={-Math.PI * 0.5} {...props}>
@@ -100,25 +100,25 @@ function Teapot({ shininess, light, specularNode, normalNode, ...props }: Teapot
         normalNode={normalNode}
       />
     </mesh>
-  )
+  );
 }
 
 //* Scene =========================================================
 
 function Experience() {
-  const blueLightRef = useRef<PointLight>(null)
-  const whiteLightRef = useRef<PointLight>(null)
+  const blueLightRef = useRef<PointLight>(null);
+  const whiteLightRef = useRef<PointLight>(null);
 
   const { waterNormal, roughness } = useTexture({
     waterNormal: `${TEXTURES}water/Water_1_M_Normal.jpg`,
     roughness: `${TEXTURES}roughness_map.jpg`,
-  })
+  });
 
   const { checkerSpecular, waterNormalNode, roughnessSpecular } = useNodes(() => ({
     checkerSpecular: mix(color('#0000ff'), color('#ff0000'), checker(uv().mul(5))),
     waterNormalNode: normalMap(texture(waterNormal)),
     roughnessSpecular: texture(roughness),
-  }))
+  }));
 
   return (
     <>
@@ -131,7 +131,7 @@ function Experience() {
       <Teapot position={[0, -1, 0]} shininess={80} normalNode={waterNormalNode} />
       <Teapot position={[3, -1, 0]} shininess={90} light={whiteLightRef} specularNode={checkerSpecular} />
     </>
-  )
+  );
 }
 
 export default function LightsPhong() {
@@ -141,5 +141,5 @@ export default function LightsPhong() {
       <Experience />
       <DemoHelpers grid={false} minDistance={3} maxDistance={25} />
     </Canvas>
-  )
+  );
 }

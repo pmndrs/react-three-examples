@@ -43,44 +43,44 @@
  *   nothing sensible to attach to (same rationale as `camera/camera.tsx`).
  *   DemoHelpers stays mounted for the readiness signal.
  */
-import { useEffect, useMemo, useRef } from 'react'
-import { ArrayCamera, PerspectiveCamera, Vector4 } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
+import { useEffect, useMemo, useRef } from 'react';
+import { ArrayCamera, PerspectiveCamera, Vector4 } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
 
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const BACKGROUND_SIZE = 100
+const BACKGROUND_SIZE = 100;
 
 // fiber's `ThreeCamera` union types `.manual` on Orthographic/PerspectiveCamera; ArrayCamera
 // (a PerspectiveCamera subclass, `reference/three.js/src/cameras/ArrayCamera.js`) inherits the
 // runtime behavior but isn't itself in that union — same duck-typed-property cast family as
 // AGENTS.md's `*Node` field casts (UPSTREAM.md B11), local to this file.
-type ManualArrayCamera = ArrayCamera & { manual?: boolean }
+type ManualArrayCamera = ArrayCamera & { manual?: boolean };
 
 // Builds the ArrayCamera + its `amount * amount` sub-cameras (original's `init()`). Each
 // sub-camera gets its own `.viewport` — a plain bolt-on `Vector4`, exactly like the original;
 // `@types/three`'s base `Camera` declares `viewport?: Vector4` for it. Positions/aspect are
 // filled in reactively by `CameraArrayRig`'s size effect below.
 function createArrayCamera(amount: number): ManualArrayCamera {
-  const subCameras: PerspectiveCamera[] = []
+  const subCameras: PerspectiveCamera[] = [];
   for (let i = 0; i < amount * amount; i++) {
-    const subCamera = new PerspectiveCamera(40, 1, 0.1, 10)
-    subCamera.viewport = new Vector4()
-    subCameras.push(subCamera)
+    const subCamera = new PerspectiveCamera(40, 1, 0.1, 10);
+    subCamera.viewport = new Vector4();
+    subCameras.push(subCamera);
   }
 
-  const arrayCamera = new ArrayCamera(subCameras) as ManualArrayCamera
-  arrayCamera.position.z = 3
-  arrayCamera.manual = true
+  const arrayCamera = new ArrayCamera(subCameras) as ManualArrayCamera;
+  arrayCamera.position.z = 3;
+  arrayCamera.manual = true;
 
-  return arrayCamera
+  return arrayCamera;
 }
 
 interface CameraArrayRigProps {
-  amount: number
+  amount: number;
 }
 
 // Owns the two things the original's `updateCameras()`/`animate()` mutate every frame or
@@ -89,11 +89,11 @@ function CameraArrayRig({ amount }: CameraArrayRigProps) {
   const { rotationSpeed, cylinderColor } = useControls('camera-array', {
     rotationSpeed: { value: 1, min: 0, max: 3, step: 0.1 },
     cylinderColor: { value: '#ff0000', label: 'cylinder color' },
-  })
+  });
 
-  const camera = useThree((state) => state.camera) as ManualArrayCamera
-  const size = useThree((state) => state.size)
-  const meshRef = useRef<Mesh>(null)
+  const camera = useThree((state) => state.camera) as ManualArrayCamera;
+  const size = useThree((state) => state.size);
+  const meshRef = useRef<Mesh>(null);
 
   // Sub-camera viewport + aspect follow the CANVAS size — fiber's reactive `size` replaces
   // the original's manual `window.addEventListener('resize', ...)` handler. Positions/lookAt
@@ -101,59 +101,59 @@ function CameraArrayRig({ amount }: CameraArrayRigProps) {
   // `updateCameras()` too (init AND resize) — cheap, and keeps this the single source of
   // truth for the whole rig instead of splitting it across a one-time effect and a resize one.
   useEffect(() => {
-    const aspect = size.width / size.height
-    const width = size.width / amount
-    const height = size.height / amount
+    const aspect = size.width / size.height;
+    const width = size.width / amount;
+    const height = size.height / amount;
 
-    camera.aspect = aspect
-    camera.updateProjectionMatrix()
+    camera.aspect = aspect;
+    camera.updateProjectionMatrix();
 
     for (let y = 0; y < amount; y++) {
       for (let x = 0; x < amount; x++) {
-        const subCamera = camera.cameras[amount * y + x]
-        subCamera.copy(camera) // fov/aspect/near/far from the root camera
+        const subCamera = camera.cameras[amount * y + x];
+        subCamera.copy(camera); // fov/aspect/near/far from the root camera
 
         // Non-null: every sub-camera got a `.viewport` in `createArrayCamera` above.
-        subCamera.viewport!.set(Math.floor(x * width), Math.floor(y * height), Math.ceil(width), Math.ceil(height))
-        subCamera.updateProjectionMatrix()
+        subCamera.viewport!.set(Math.floor(x * width), Math.floor(y * height), Math.ceil(width), Math.ceil(height));
+        subCamera.updateProjectionMatrix();
 
-        subCamera.position.x = x / amount - 0.5
-        subCamera.position.y = 0.5 - y / amount
-        subCamera.position.z = 1.5 + (x + y) * 0.5
-        subCamera.position.multiplyScalar(2)
+        subCamera.position.x = x / amount - 0.5;
+        subCamera.position.y = 0.5 - y / amount;
+        subCamera.position.z = 1.5 + (x + y) * 0.5;
+        subCamera.position.multiplyScalar(2);
 
-        subCamera.lookAt(0, 0, 0)
-        subCamera.updateMatrixWorld()
+        subCamera.lookAt(0, 0, 0);
+        subCamera.updateMatrixWorld();
       }
     }
-  }, [camera, amount, size.width, size.height])
+  }, [camera, amount, size.width, size.height]);
 
   useFrame(({ delta }) => {
-    const mesh = meshRef.current
-    if (!mesh) return
+    const mesh = meshRef.current;
+    if (!mesh) return;
     // 0.3/0.6 rad/s reproduces the original's fixed `+= 0.005`/`+= 0.01` per-frame pace at
     // 60fps, now frame-rate independent via `delta`.
-    mesh.rotation.x += delta * rotationSpeed * 0.3
-    mesh.rotation.z += delta * rotationSpeed * 0.6
-  })
+    mesh.rotation.x += delta * rotationSpeed * 0.3;
+    mesh.rotation.z += delta * rotationSpeed * 0.6;
+  });
 
   return (
     <mesh ref={meshRef} castShadow receiveShadow>
       <cylinderGeometry args={[0.5, 0.5, 1, 32]} />
       <meshPhongNodeMaterial color={cylinderColor} />
     </mesh>
-  )
+  );
 }
 
 export default function CameraArrayExample() {
   const { amount, backgroundColor } = useControls('camera-array', {
     amount: { value: 6, min: 2, max: 8, step: 1, label: 'Grid size (N×N)' },
     backgroundColor: { value: '#000066', label: 'background color' },
-  })
+  });
 
   // Rebuilt whenever `amount` changes — see DIVERGENCE for why the Canvas remounts
   // (`key={amount}`) alongside it rather than hot-swapping fiber's default camera.
-  const camera = useMemo(() => createArrayCamera(amount), [amount])
+  const camera = useMemo(() => createArrayCamera(amount), [amount]);
 
   return (
     <Canvas key={amount} renderer shadows background="#000000" camera={camera}>
@@ -166,5 +166,5 @@ export default function CameraArrayExample() {
       <CameraArrayRig amount={amount} />
       <DemoHelpers grid={false} controls={false} />
     </Canvas>
-  )
+  );
 }

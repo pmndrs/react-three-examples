@@ -45,8 +45,8 @@
  *   member"). `sceneMRT` is one shared node config used against BOTH render targets,
  *   so both need matching names for either to compile
  */
-import { Suspense, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { mix, mrt, normalWorld, output, screenUV, step, texture, uv, vec2 } from 'three/tsl'
+import { Suspense, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { mix, mrt, normalWorld, output, screenUV, step, texture, uv, vec2 } from 'three/tsl';
 import {
   DataTexture,
   MeshBasicNodeMaterial,
@@ -59,74 +59,74 @@ import {
   SRGBColorSpace,
   TorusKnotGeometry,
   UnsignedByteType,
-} from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
+import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/hardwood2_diffuse.jpg'
+const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/hardwood2_diffuse.jpg';
 // Readback size is intentionally small — GPU→CPU pixel reads are expensive, per the
 // original's own comment ("Be careful with the size! 512 is already big").
-const READBACK_SIZE = 512
+const READBACK_SIZE = 512;
 
-type Selection = 'mrt' | 'diffuse' | 'normal'
+type Selection = 'mrt' | 'diffuse' | 'normal';
 
 // Same bare-NodeMaterial TorusKnot as `multiple-rendertargets` — this port keeps its
 // own copy (each example file is self-contained, per this repo's convention).
 function TorusKnot() {
-  const map = useTexture(DIFFUSE_URL)
-  const geometry = useMemo(() => new TorusKnotGeometry(1, 0.3, 128, 32), [])
-  const ref = useRef<Mesh>(null)
+  const map = useTexture(DIFFUSE_URL);
+  const geometry = useMemo(() => new TorusKnotGeometry(1, 0.3, 128, 32), []);
+  const ref = useRef<Mesh>(null);
 
   useLayoutEffect(() => {
-    map.colorSpace = SRGBColorSpace
-    map.wrapS = map.wrapT = RepeatWrapping
-  }, [map])
+    map.colorSpace = SRGBColorSpace;
+    map.wrapS = map.wrapT = RepeatWrapping;
+  }, [map]);
 
   useFrame((state) => {
-    if (ref.current) ref.current.rotation.y = state.elapsed * 0.4
-  })
+    if (ref.current) ref.current.rotation.y = state.elapsed * 0.4;
+  });
 
   return (
     <mesh ref={ref} geometry={geometry}>
       <nodeMaterial colorNode={texture(map, uv().mul(vec2(10, 4)))} />
     </mesh>
-  )
+  );
 }
 
 // The entire custom render loop: G-buffer pass into either the full-res display
 // target or the low-res readback target, an optional GPU→CPU pixel readback, and a
 // raw QuadMesh composite as the final frame — see header DEMONSTRATES.
 function ReadbackPipeline({ selection }: { selection: Selection }) {
-  const renderer = useThree((s) => s.renderer)
-  const scene = useThree((s) => s.scene)
-  const camera = useThree((s) => s.camera)
-  const size = useThree((s) => s.size)
+  const renderer = useThree((s) => s.renderer);
+  const scene = useThree((s) => s.scene);
+  const camera = useThree((s) => s.camera);
+  const size = useThree((s) => s.size);
 
   // Non-node instances captured by a create-once render loop must stay identity
   // -stable across StrictMode re-renders — lazy useState, not useMemo (AGENTS.md:
   // pattern from compute-particles-snow).
   const [renderTarget] = useState(
     () => new RenderTarget(1, 1, { count: 2, minFilter: NearestFilter, magFilter: NearestFilter }),
-  )
-  const [readbackTarget] = useState(() => new RenderTarget(READBACK_SIZE, READBACK_SIZE, { count: 2 }))
+  );
+  const [readbackTarget] = useState(() => new RenderTarget(READBACK_SIZE, READBACK_SIZE, { count: 2 }));
   const [pixelBufferTexture] = useState(() => {
-    const buffer = new Uint8Array(READBACK_SIZE ** 2 * 4).fill(0)
-    const dataTexture = new DataTexture(buffer, READBACK_SIZE, READBACK_SIZE)
-    dataTexture.type = UnsignedByteType
-    dataTexture.format = RGBAFormat
-    return dataTexture
-  })
+    const buffer = new Uint8Array(READBACK_SIZE ** 2 * 4).fill(0);
+    const dataTexture = new DataTexture(buffer, READBACK_SIZE, READBACK_SIZE);
+    dataTexture.type = UnsignedByteType;
+    dataTexture.format = RGBAFormat;
+    return dataTexture;
+  });
   const [readbackMaterial] = useState(() => {
-    const material = new MeshBasicNodeMaterial()
-    material.colorNode = texture(pixelBufferTexture)
-    return material
-  })
-  const [displayMaterial] = useState(() => new NodeMaterial())
-  const [quadMesh] = useState(() => new QuadMesh(displayMaterial))
-  const [sceneMRT] = useState(() => mrt({ output, normal: normalWorld }))
+    const material = new MeshBasicNodeMaterial();
+    material.colorNode = texture(pixelBufferTexture);
+    return material;
+  });
+  const [displayMaterial] = useState(() => new NodeMaterial());
+  const [quadMesh] = useState(() => new QuadMesh(displayMaterial));
+  const [sceneMRT] = useState(() => mrt({ output, normal: normalWorld }));
 
   useLayoutEffect(() => {
     // MRTNode.setup() resolves each named output by matching `texture.name` against
@@ -137,39 +137,39 @@ function ReadbackPipeline({ selection }: { selection: Selection }) {
     // names, not just the full-res one (found via a real WGSL compile error switching
     // to the readback path — not present in the original's naming, which is why this
     // is a fix, not just a divergence).
-    renderTarget.textures[0].name = 'output'
-    renderTarget.textures[1].name = 'normal'
-    readbackTarget.textures[0].name = 'output'
-    readbackTarget.textures[1].name = 'normal'
+    renderTarget.textures[0].name = 'output';
+    renderTarget.textures[1].name = 'normal';
+    readbackTarget.textures[0].name = 'output';
+    readbackTarget.textures[1].name = 'normal';
     displayMaterial.colorNode = mix(
       texture(renderTarget.textures[0]),
       texture(renderTarget.textures[1]),
       step(0.5, screenUV.x),
-    )
-  }, [renderTarget, readbackTarget, displayMaterial])
+    );
+  }, [renderTarget, readbackTarget, displayMaterial]);
 
   useLayoutEffect(() => {
-    const dpr = renderer.getPixelRatio()
-    renderTarget.setSize(Math.floor(size.width * dpr), Math.floor(size.height * dpr))
-  }, [renderer, renderTarget, size])
+    const dpr = renderer.getPixelRatio();
+    renderTarget.setSize(Math.floor(size.width * dpr), Math.floor(size.height * dpr));
+  }, [renderer, renderTarget, size]);
 
   // Tracks whether a readback is currently in flight, so at most one is ever
   // outstanding at a time.
-  const readbackInFlight = useRef(false)
+  const readbackInFlight = useRef(false);
 
   useFrame(
     () => {
-      const isReadback = selection !== 'mrt'
+      const isReadback = selection !== 'mrt';
 
-      renderer.setMRT(sceneMRT)
-      renderer.setRenderTarget(isReadback ? readbackTarget : renderTarget)
-      renderer.render(scene, camera)
+      renderer.setMRT(sceneMRT);
+      renderer.setRenderTarget(isReadback ? readbackTarget : renderTarget);
+      renderer.render(scene, camera);
 
-      renderer.setMRT(null)
-      renderer.setRenderTarget(null)
+      renderer.setMRT(null);
+      renderer.setRenderTarget(null);
 
       if (isReadback) {
-        quadMesh.material = readbackMaterial
+        quadMesh.material = readbackMaterial;
 
         // The callback itself stays SYNCHRONOUS — fiber's frame scheduler never
         // awaits a useFrame callback's return value, so an `async` callback here
@@ -183,36 +183,36 @@ function ReadbackPipeline({ selection }: { selection: Selection }) {
         // synchronously with whatever pixel data is currently in the texture
         // (visually one frame stale at most).
         if (!readbackInFlight.current) {
-          readbackInFlight.current = true
-          const { width, height } = readbackTarget
-          const textureIndex = selection === 'diffuse' ? 0 : 1
+          readbackInFlight.current = true;
+          const { width, height } = readbackTarget;
+          const textureIndex = selection === 'diffuse' ? 0 : 1;
 
           renderer
             .readRenderTargetPixelsAsync(readbackTarget, 0, 0, width, height, textureIndex)
             .then((pixels) => {
-              pixelBufferTexture.image.data = pixels
-              pixelBufferTexture.needsUpdate = true
+              pixelBufferTexture.image.data = pixels;
+              pixelBufferTexture.needsUpdate = true;
             })
             .finally(() => {
-              readbackInFlight.current = false
-            })
+              readbackInFlight.current = false;
+            });
         }
       } else {
-        quadMesh.material = displayMaterial
+        quadMesh.material = displayMaterial;
       }
 
-      quadMesh.render(renderer)
+      quadMesh.render(renderer);
     },
     { phase: 'render' },
-  )
+  );
 
-  return null
+  return null;
 }
 
 export default function MultipleRendertargetsReadback() {
   const { selection } = useControls('multiple-rendertargets-readback', {
     selection: { value: 'mrt' as Selection, options: ['mrt', 'diffuse', 'normal'] as Selection[] },
-  })
+  });
 
   return (
     <Canvas background="#222222" camera={{ position: [0, 0, 4], fov: 70, near: 0.1, far: 50 }}>
@@ -224,5 +224,5 @@ export default function MultipleRendertargetsReadback() {
       <ReadbackPipeline selection={selection} />
       <DemoHelpers grid={false} minDistance={2} maxDistance={20} />
     </Canvas>
-  )
+  );
 }

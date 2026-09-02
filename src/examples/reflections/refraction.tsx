@@ -38,17 +38,17 @@
  *   this example is staged on, and DemoHelpers' world-space grid sits at y=0.002,
  *   coincident with (and visually clashing against) the room's bottom plane
  */
-import { Suspense, useMemo, useRef } from 'react'
-import { screenUV, texture, uv, viewportSafeUV, viewportSharedTexture } from 'three/tsl'
-import { RepeatWrapping } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useMemo, useRef } from 'react';
+import { screenUV, texture, uv, viewportSafeUV, viewportSharedTexture } from 'three/tsl';
+import { RepeatWrapping } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 const FLOOR_NORMAL_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/floors/FloorsCheckerboard_S_Normal.jpg'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/floors/FloorsCheckerboard_S_Normal.jpg';
 
 // The "window" plane: backdropNode samples the frame already being rendered (the room
 // behind it), distorted by a tiled normal map — see header DEMONSTRATES.
@@ -58,24 +58,24 @@ function RefractorPlane() {
       normalScale: { value: 0.1, min: 0, max: 0.5, step: 0.01 },
       uvTile: { value: 5, min: 1, max: 20, step: 1 },
     }),
-  })
-  const floorNormal = useTexture(FLOOR_NORMAL_URL)
+  });
+  const floorNormal = useTexture(FLOOR_NORMAL_URL);
 
   const backdropNode = useMemo(() => {
-    floorNormal.wrapS = RepeatWrapping
-    floorNormal.wrapT = RepeatWrapping
+    floorNormal.wrapS = RepeatWrapping;
+    floorNormal.wrapT = RepeatWrapping;
 
-    const uvOffset = texture(floorNormal, uv().mul(uvTile)).xy.mul(2).sub(1).mul(normalScale)
-    const refractorUV = screenUV.add(uvOffset)
-    return viewportSharedTexture(viewportSafeUV(refractorUV))
-  }, [floorNormal, normalScale, uvTile])
+    const uvOffset = texture(floorNormal, uv().mul(uvTile)).xy.mul(2).sub(1).mul(normalScale);
+    const refractorUV = screenUV.add(uvOffset);
+    return viewportSharedTexture(viewportSafeUV(refractorUV));
+  }, [floorNormal, normalScale, uvTile]);
 
   return (
     <mesh position={[0, 50, 0]}>
       <planeGeometry args={[100.1, 100.1]} />
       <meshBasicNodeMaterial backdropNode={backdropNode} transparent />
     </mesh>
-  )
+  );
 }
 
 // Plain THREE.Mesh orbited imperatively in useFrame — no node material required, this
@@ -85,25 +85,25 @@ function OrbitingSphere() {
     Sphere: folder({
       orbitSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
     }),
-  })
-  const sphereRef = useRef<Mesh>(null)
+  });
+  const sphereRef = useRef<Mesh>(null);
 
   useFrame((state) => {
-    const mesh = sphereRef.current
-    if (!mesh) return
+    const mesh = sphereRef.current;
+    if (!mesh) return;
 
-    const t = state.elapsed * orbitSpeed
-    mesh.position.set(Math.cos(t) * 30, Math.abs(Math.cos(t * 2)) * 20 + 5, Math.sin(t) * 30)
-    mesh.rotation.y = Math.PI / 2 - t
-    mesh.rotation.z = t * 8
-  })
+    const t = state.elapsed * orbitSpeed;
+    mesh.position.set(Math.cos(t) * 30, Math.abs(Math.cos(t * 2)) * 20 + 5, Math.sin(t) * 30);
+    mesh.rotation.y = Math.PI / 2 - t;
+    mesh.rotation.z = t * 8;
+  });
 
   return (
     <mesh ref={sphereRef}>
       <icosahedronGeometry args={[5, 0]} />
       <meshPhongMaterial color="#ffffff" emissive="#7b7b7b" flatShading />
     </mesh>
-  )
+  );
 }
 
 export default function Refraction() {
@@ -146,5 +146,5 @@ export default function Refraction() {
 
       <DemoHelpers grid={false} target={[0, 50, 0]} minDistance={10} maxDistance={400} />
     </Canvas>
-  )
+  );
 }

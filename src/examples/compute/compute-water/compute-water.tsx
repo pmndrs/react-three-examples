@@ -41,17 +41,17 @@
  *   the GLTF material in place, but loader materials here are core-three classes,
  *   not node materials (see Ducks.tsx)
  */
-import { Suspense, useRef } from 'react'
-import { ACESFilmicToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import type CameraControlsImpl from 'camera-controls'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Water } from './Water'
+import { Suspense, useRef } from 'react';
+import { ACESFilmicToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import type CameraControlsImpl from 'camera-controls';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Water } from './Water';
 
 export default function ComputeWater() {
   // Escape hatch to the live camera-controls instance — Water disables orbiting for
   // the duration of a disturb-drag, like the original's `controls.enabled = false`.
-  const controlsRef = useRef<CameraControlsImpl>(null)
+  const controlsRef = useRef<CameraControlsImpl>(null);
 
   return (
     <Canvas
@@ -74,5 +74,5 @@ export default function ComputeWater() {
 
       <DemoHelpers grid={false} controlsRef={controlsRef} />
     </Canvas>
-  )
+  );
 }

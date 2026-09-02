@@ -46,35 +46,35 @@
  * - `renderer.inspector = new Inspector()` dropped (this repo doesn't wire the
  *   Inspector RootState slot, same gap noted across the corpus's other ports).
  */
-import { Suspense, useLayoutEffect } from 'react'
-import { color, Fn, mix } from 'three/tsl'
-import { AgXToneMapping, Color } from 'three/webgpu'
-import type { Mesh, MeshPhysicalNodeMaterial } from 'three/webgpu'
+import { Suspense, useLayoutEffect } from 'react';
+import { color, Fn, mix } from 'three/tsl';
+import { AgXToneMapping, Color } from 'three/webgpu';
+import type { Mesh, MeshPhysicalNodeMaterial } from 'three/webgpu';
 
-import { Canvas, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DragonAttenuation.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DragonAttenuation.glb';
 
 // toneMappingExposure + shadowMap.transmitted are WebGPURenderer properties with no
 // Canvas prop — set imperatively (pattern: materials-transmission, volume-fire).
 // useLayoutEffect because it must land before the first shadow render.
 function RendererSetup() {
-  const { exposure } = useControls('shadowmap-opacity', { exposure: { value: 1.5, min: 0.1, max: 3, step: 0.05 } })
-  const renderer = useThree((s) => s.renderer)
+  const { exposure } = useControls('shadowmap-opacity', { exposure: { value: 1.5, min: 0.1, max: 3, step: 0.05 } });
+  const renderer = useThree((s) => s.renderer);
 
   useLayoutEffect(() => {
-    renderer.shadowMap.transmitted = true
-  }, [renderer])
+    renderer.shadowMap.transmitted = true;
+  }, [renderer]);
 
   useLayoutEffect(() => {
-    renderer.toneMappingExposure = exposure
-  }, [renderer, exposure])
+    renderer.toneMappingExposure = exposure;
+  }, [renderer, exposure]);
 
-  return null
+  return null;
 }
 
 // Loads the dragon-in-glass glTF once, clones a second dragon with a different
@@ -85,64 +85,64 @@ function RendererSetup() {
 function DragonScene() {
   const { shadowOpacity } = useControls('shadowmap-opacity', {
     shadowOpacity: { value: 1, min: 0, max: 1, step: 0.01, label: 'shadow opacity' },
-  })
-  const { scene } = useGLTF(MODEL_URL)
-  const { uOpacity } = useUniforms(() => ({ uOpacity: 1 }))
+  });
+  const { scene } = useGLTF(MODEL_URL);
+  const { uOpacity } = useUniforms(() => ({ uOpacity: 1 }));
 
   useLayoutEffect(() => {
-    uOpacity.value = shadowOpacity
-  }, [uOpacity, shadowOpacity])
+    uOpacity.value = shadowOpacity;
+  }, [uOpacity, shadowOpacity]);
 
   useLayoutEffect(() => {
-    if (scene.userData.shadowmapOpacitySetup) return
-    scene.userData.shadowmapOpacitySetup = true
+    if (scene.userData.shadowmapOpacitySetup) return;
+    scene.userData.shadowmapOpacitySetup = true;
 
-    const floor = scene.children[0] as Mesh
-    floor.scale.x += 4
-    floor.scale.y += 4
-    floor.receiveShadow = true
+    const floor = scene.children[0] as Mesh;
+    floor.scale.x += 4;
+    floor.scale.y += 4;
+    floor.receiveShadow = true;
 
-    const dragon = scene.children[1] as Mesh
-    dragon.position.set(-1.5, -0.8, 1)
-    dragon.castShadow = true
-    dragon.receiveShadow = true
+    const dragon = scene.children[1] as Mesh;
+    dragon.position.set(-1.5, -0.8, 1);
+    dragon.castShadow = true;
+    dragon.receiveShadow = true;
 
     // Duck-typed cast (AGENTS.md B11 family): GLTFLoader hands back a classic
     // MeshPhysicalMaterial, but attenuationColor/castShadowNode both read fine at
     // runtime regardless of the material's declared TS type.
-    const dragonMaterial = dragon.material as unknown as MeshPhysicalNodeMaterial
+    const dragonMaterial = dragon.material as unknown as MeshPhysicalNodeMaterial;
 
-    const dragon2 = dragon.clone()
-    dragon2.material = dragonMaterial.clone()
-    dragon2.position.x += 4
-    dragon2.castShadow = true
-    dragon2.receiveShadow = true
-    const dragon2Material = dragon2.material as MeshPhysicalNodeMaterial
-    dragon2Material.attenuationColor = new Color('#ff0000')
-    scene.add(dragon2)
+    const dragon2 = dragon.clone();
+    dragon2.material = dragonMaterial.clone();
+    dragon2.position.x += 4;
+    dragon2.castShadow = true;
+    dragon2.receiveShadow = true;
+    const dragon2Material = dragon2.material as MeshPhysicalNodeMaterial;
+    dragon2Material.attenuationColor = new Color('#ff0000');
+    scene.add(dragon2);
 
     // opacity by color (mix(1, color, opacity)) — opacity by blending (mix into the
     // alpha channel instead) is the original's commented-out alternative.
-    const opacityNode = uOpacity
+    const opacityNode = uOpacity;
     const customShadow = Fn(([shadowColorIn]) => {
       // Fn's destructured params come back as bare `ShaderNodeObject<Node>` (AGENTS.md
       // B10) — cast to the concrete vec3 type mix() needs.
-      const shadowColor = shadowColorIn
-      return mix(1, shadowColor, opacityNode)
-    })
+      const shadowColor = shadowColorIn;
+      return mix(1, shadowColor, opacityNode);
+    });
 
-    dragonMaterial.castShadowNode = customShadow(color(dragonMaterial.attenuationColor))
-    dragon2Material.castShadowNode = customShadow(color(dragon2Material.attenuationColor))
-  }, [scene, uOpacity])
+    dragonMaterial.castShadowNode = customShadow(color(dragonMaterial.attenuationColor));
+    dragon2Material.castShadowNode = customShadow(color(dragon2Material.attenuationColor));
+  }, [scene, uOpacity]);
 
-  return <primitive object={scene} position={[0, 0, -0.5]} />
+  return <primitive object={scene} position={[0, 0, -0.5]} />;
 }
 
 export default function ShadowmapOpacity() {
   // Consumed directly below, by the directionalLight in this same component.
   const { shadowRadius } = useControls('shadowmap-opacity', {
     shadowRadius: { value: 4, min: 0, max: 12, step: 0.5, label: 'shadow radius' },
-  })
+  });
 
   return (
     <Canvas
@@ -174,5 +174,5 @@ export default function ShadowmapOpacity() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 0, 0]} minDistance={0.1} maxDistance={10} />
     </Canvas>
-  )
+  );
 }

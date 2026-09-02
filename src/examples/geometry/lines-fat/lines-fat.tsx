@@ -47,11 +47,11 @@
  *   WebGPURenderer default and the fully-saturated HSL rainbow is the whole point —
  *   fiber's ACESFilmic default would mute it (tone-mapping parity rule)
  */
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { HilbertLines } from './HilbertLines'
-import { InsetView } from './InsetView'
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { HilbertLines } from './HilbertLines';
+import { InsetView } from './InsetView';
 
 export default function LinesFat() {
   return (
@@ -63,5 +63,5 @@ export default function LinesFat() {
       <InsetView />
       <DemoHelpers grid={false} minDistance={10} maxDistance={500} />
     </Canvas>
-  )
+  );
 }

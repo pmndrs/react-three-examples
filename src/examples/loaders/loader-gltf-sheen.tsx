@@ -33,32 +33,32 @@
  *   plane, and the infinite grid moiré-aliases across it, competing with the fabric study
  *   (same call as the other two loader-gltf-* ports).
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { ACESFilmicToneMapping, type Mesh, type MeshPhysicalNodeMaterial } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { Environment, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect, useMemo } from 'react';
+import { ACESFilmicToneMapping, type Mesh, type MeshPhysicalNodeMaterial } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { Environment, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/SheenChair.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/SheenChair.glb';
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/monochrome_studio_02_1k.hdr'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/monochrome_studio_02_1k.hdr';
 
 // Writes the leva `sheen` value straight onto the fabric mesh's material — `sheen` is a
 // plain number accessor that TSL's `materialSheen` reference node re-reads every frame,
 // so no useUniforms/build-graph plumbing is needed (see header DEMONSTRATES).
 function SheenChair({ sheen }: { sheen: number }) {
-  const { scene } = useGLTF(MODEL_URL)
+  const { scene } = useGLTF(MODEL_URL);
   const material = useMemo(() => {
-    const fabric = scene.getObjectByName('SheenChair_fabric') as Mesh | undefined
-    return fabric?.material as MeshPhysicalNodeMaterial | undefined
-  }, [scene])
+    const fabric = scene.getObjectByName('SheenChair_fabric') as Mesh | undefined;
+    return fabric?.material as MeshPhysicalNodeMaterial | undefined;
+  }, [scene]);
 
   useEffect(() => {
-    if (material) material.sheen = sheen
-  }, [material, sheen])
+    if (material) material.sheen = sheen;
+  }, [material, sheen]);
 
-  return <primitive object={scene} />
+  return <primitive object={scene} />;
 }
 
 export default function LoaderGltfSheen() {
@@ -68,7 +68,7 @@ export default function LoaderGltfSheen() {
     // matches the original's un-set dat.gui default (it only wires the slider, never
     // overrides the loaded value).
     sheen: { value: 1, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   return (
     <Canvas
@@ -82,5 +82,5 @@ export default function LoaderGltfSheen() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 0.35, 0]} minDistance={1} maxDistance={10} />
     </Canvas>
-  )
+  );
 }

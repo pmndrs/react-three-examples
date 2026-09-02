@@ -32,23 +32,23 @@
  *   original's module-level `init()` loop; same distribution (50 knots scattered over
  *   a radius-5 sphere shell, random rotations)
  */
-import { useEffect, useLayoutEffect, useMemo } from 'react'
-import { select, vec3, vec4 } from 'three/tsl'
-import { MeshBasicNodeMaterial, TorusKnotGeometry } from 'three/webgpu'
-import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { useEffect, useLayoutEffect, useMemo } from 'react';
+import { select, vec3, vec4 } from 'three/tsl';
+import { MeshBasicNodeMaterial, TorusKnotGeometry } from 'three/webgpu';
+import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const KNOT_COUNT = 50
-const FIELD_RADIUS = 5
+const KNOT_COUNT = 50;
+const FIELD_RADIUS = 5;
 
 // Scatters `count` points over a sphere shell of the given radius — same distribution
 // as the original's inline loop (uniform z, random azimuth).
 function scatterOnSphere(count: number, radius: number) {
   return Array.from({ length: count }, () => {
-    const azimuth = Math.random() * 2 * Math.PI
-    const z = Math.random() * 2 - 1
-    const ringRadius = Math.sqrt(1 - z * z) * radius
+    const azimuth = Math.random() * 2 * Math.PI;
+    const z = Math.random() * 2 - 1;
+    const ringRadius = Math.sqrt(1 - z * z) * radius;
     return {
       position: [Math.cos(azimuth) * ringRadius, Math.sin(azimuth) * ringRadius, z * radius] as [
         number,
@@ -56,16 +56,16 @@ function scatterOnSphere(count: number, radius: number) {
         number,
       ],
       rotation: [Math.random(), Math.random(), Math.random()] as [number, number, number],
-    }
-  })
+    };
+  });
 }
 
 // The knot field. Materials are irrelevant here: `scene.overrideMaterial` (below)
 // replaces whatever each mesh is assigned before the scene pass renders, so every knot
 // shares one geometry and the JSX omits a material entirely.
 function TorusKnotField() {
-  const geometry = useMemo(() => new TorusKnotGeometry(1, 0.3, 128, 64), [])
-  const knots = useMemo(() => scatterOnSphere(KNOT_COUNT, FIELD_RADIUS), [])
+  const geometry = useMemo(() => new TorusKnotGeometry(1, 0.3, 128, 64), []);
+  const knots = useMemo(() => scatterOnSphere(KNOT_COUNT, FIELD_RADIUS), []);
 
   return (
     <>
@@ -73,7 +73,7 @@ function TorusKnotField() {
         <mesh key={i} geometry={geometry} position={knot.position} rotation={knot.rotation} />
       ))}
     </>
-  )
+  );
 }
 
 // Forces every object in the scene through one material for the depth pass — the
@@ -81,49 +81,49 @@ function TorusKnotField() {
 // `useLayoutEffect`: this is scene-graph state the render pipeline reads every frame,
 // so it must be attached before the first RAF render, not after a passive effect.
 function DepthOverride() {
-  const scene = useThree((state) => state.scene)
-  const material = useMemo(() => new MeshBasicNodeMaterial(), [])
+  const scene = useThree((state) => state.scene);
+  const material = useMemo(() => new MeshBasicNodeMaterial(), []);
 
   useLayoutEffect(() => {
-    scene.overrideMaterial = material
+    scene.overrideMaterial = material;
     return () => {
-      scene.overrideMaterial = null
-    }
-  }, [scene, material])
+      scene.overrideMaterial = null;
+    };
+  }, [scene, material]);
 
-  return null
+  return null;
 }
 
 interface DepthPipelineProps {
-  linearDepth: boolean
+  linearDepth: boolean;
 }
 
 // Renders the scene pass's depth texture directly to the screen. `select()` picks
 // between the raw (nonlinear) depth node and `getLinearDepthNode()`'s camera-space
 // version every frame, driven by a uniform.
 function DepthPipeline({ linearDepth }: DepthPipelineProps) {
-  const { uLinear } = useUniforms(() => ({ uLinear: 0 }))
+  const { uLinear } = useUniforms(() => ({ uLinear: 0 }));
 
   useEffect(() => {
-    uLinear.value = linearDepth ? 1 : 0
-  }, [uLinear, linearDepth])
+    uLinear.value = linearDepth ? 1 : 0;
+  }, [uLinear, linearDepth]);
 
   useRenderPipeline(({ renderPipeline, passes }) => {
-    if (!renderPipeline) return
+    if (!renderPipeline) return;
 
-    const rawDepth = passes.scenePass.getTextureNode('depth')
-    const linearOut = vec4(vec3(passes.scenePass.getLinearDepthNode('depth')), 1)
+    const rawDepth = passes.scenePass.getTextureNode('depth');
+    const linearOut = vec4(vec3(passes.scenePass.getLinearDepthNode('depth')), 1);
 
-    renderPipeline.outputNode = select(uLinear.greaterThan(0.5), linearOut, rawDepth)
-  })
+    renderPipeline.outputNode = select(uLinear.greaterThan(0.5), linearOut, rawDepth);
+  });
 
-  return null
+  return null;
 }
 
 export default function DepthTexture() {
   const { linearDepth } = useControls('depth-texture', {
     linearDepth: false,
-  })
+  });
 
   return (
     <Canvas renderer background="#222222" camera={{ position: [0, 0, 4], fov: 70, near: 1, far: 20 }}>
@@ -132,5 +132,5 @@ export default function DepthTexture() {
       <DepthPipeline linearDepth={linearDepth} />
       <DemoHelpers grid={false} minDistance={1} maxDistance={15} />
     </Canvas>
-  )
+  );
 }

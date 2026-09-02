@@ -35,12 +35,12 @@
  *   dot separator is WGSL-illegal, UPSTREAM.md B16); the original's
  *   `.setName('Particles')` label is dropped — fiber re-labels stored nodes by key
  */
-import { Suspense } from 'react'
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { CollisionBox, Monkey } from './Colliders'
-import { Rain } from './Rain'
+import { Suspense } from 'react';
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { CollisionBox, Monkey } from './Colliders';
+import { Rain } from './Rain';
 
 export default function ComputeParticlesRain() {
   return (
@@ -74,5 +74,5 @@ export default function ComputeParticlesRain() {
 
       <DemoHelpers grid={false} minDistance={5} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

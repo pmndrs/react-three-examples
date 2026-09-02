@@ -29,40 +29,40 @@
  * - No leva controls — the original has none, nothing dynamic to expose beyond the
  *   fixed `screenUV.x` split
  */
-import { Suspense, useLayoutEffect, useMemo, useRef } from 'react'
-import { mix, mrt, normalWorld, output, screenUV, step, texture, uv, vec2 } from 'three/tsl'
-import { RepeatWrapping, SRGBColorSpace, TorusKnotGeometry } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
-import { Canvas, useFrame, useRenderPipeline } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useLayoutEffect, useMemo, useRef } from 'react';
+import { mix, mrt, normalWorld, output, screenUV, step, texture, uv, vec2 } from 'three/tsl';
+import { RepeatWrapping, SRGBColorSpace, TorusKnotGeometry } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
+import { Canvas, useFrame, useRenderPipeline } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/hardwood2_diffuse.jpg'
+const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/hardwood2_diffuse.jpg';
 
 // A bare NodeMaterial (no lighting model) tiling the diffuse texture 10x4 over the
 // TorusKnot's UVs, matching the original's `texture(diffuse, uv().mul(vec2(10,4)))`.
 function TorusKnot() {
-  const map = useTexture(DIFFUSE_URL)
-  const geometry = useMemo(() => new TorusKnotGeometry(1, 0.3, 128, 32), [])
-  const ref = useRef<Mesh>(null)
+  const map = useTexture(DIFFUSE_URL);
+  const geometry = useMemo(() => new TorusKnotGeometry(1, 0.3, 128, 32), []);
+  const ref = useRef<Mesh>(null);
 
   // `.colorSpace`/`.wrapS`/`.wrapT` are read at shader-graph build time (first RAF
   // render), same race as `.mapping` elsewhere in this repo — land them before that
   // (AGENTS.md imperative-setup rule).
   useLayoutEffect(() => {
-    map.colorSpace = SRGBColorSpace
-    map.wrapS = map.wrapT = RepeatWrapping
-  }, [map])
+    map.colorSpace = SRGBColorSpace;
+    map.wrapS = map.wrapT = RepeatWrapping;
+  }, [map]);
 
   useFrame((state) => {
-    if (ref.current) ref.current.rotation.y = state.elapsed * 0.4
-  })
+    if (ref.current) ref.current.rotation.y = state.elapsed * 0.4;
+  });
 
   return (
     <mesh ref={ref} geometry={geometry}>
       <nodeMaterial colorNode={texture(map, uv().mul(vec2(10, 4)))} />
     </mesh>
-  )
+  );
 }
 
 // Scene-pass MRT: beauty ('output') + world-space normal, split down the middle of
@@ -70,17 +70,17 @@ function TorusKnot() {
 function MrtPipeline() {
   useRenderPipeline(
     ({ renderPipeline, passes }) => {
-      if (!renderPipeline) return
-      const outputTexture = passes.scenePass.getTextureNode('output')
-      const normalTexture = passes.scenePass.getTextureNode('normal')
-      renderPipeline.outputNode = mix(outputTexture, normalTexture, step(0.5, screenUV.x))
+      if (!renderPipeline) return;
+      const outputTexture = passes.scenePass.getTextureNode('output');
+      const normalTexture = passes.scenePass.getTextureNode('normal');
+      renderPipeline.outputNode = mix(outputTexture, normalTexture, step(0.5, screenUV.x));
     },
     ({ passes }) => {
-      passes.scenePass.setMRT(mrt({ output, normal: normalWorld }))
+      passes.scenePass.setMRT(mrt({ output, normal: normalWorld }));
     },
-  )
+  );
 
-  return null
+  return null;
 }
 
 export default function MultipleRendertargets() {
@@ -94,5 +94,5 @@ export default function MultipleRendertargets() {
       <MrtPipeline />
       <DemoHelpers grid={false} minDistance={2} maxDistance={20} />
     </Canvas>
-  )
+  );
 }

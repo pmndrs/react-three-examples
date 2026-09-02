@@ -35,42 +35,42 @@
  * - No leva controls — the original has none either; the four-way split is a fixed
  *   `screenUV.x` layout, not a parameter
  */
-import { Suspense, useLayoutEffect } from 'react'
-import { diffuseColor, emissive, mix, mrt, normalView, output, pass, packNormalToRGB, screenUV, step } from 'three/tsl'
-import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js'
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping, NearestFilter, UnsignedByteType } from 'three/webgpu'
-import { Canvas, useLoader, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useLayoutEffect } from 'react';
+import { diffuseColor, emissive, mix, mrt, normalView, output, pass, packNormalToRGB, screenUV, step } from 'three/tsl';
+import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
+import { ACESFilmicToneMapping, EquirectangularReflectionMapping, NearestFilter, UnsignedByteType } from 'three/webgpu';
+import { Canvas, useLoader, useRenderPipeline, useThree } from '@react-three/fiber/webgpu';
+import { useGLTF } from '@react-three/drei/webgpu';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg';
 const HELMET_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/DamagedHelmet/glTF/DamagedHelmet.gltf';
 
 // Equirect HDR as both background and IBL environment — `.mapping` is read at
 // shader-graph build time by every material's envMap, so it must land in a layout
 // effect (AGENTS.md imperative-setup rule), before the first RAF render.
 function HdrEnvironment() {
-  const scene = useThree((s) => s.scene)
-  const map = useLoader(UltraHDRLoader, HDR_URL)
+  const scene = useThree((s) => s.scene);
+  const map = useLoader(UltraHDRLoader, HDR_URL);
 
   useLayoutEffect(() => {
-    map.mapping = EquirectangularReflectionMapping
-    scene.background = map
-    scene.environment = map
+    map.mapping = EquirectangularReflectionMapping;
+    scene.background = map;
+    scene.environment = map;
     return () => {
-      scene.background = null
-      scene.environment = null
-    }
-  }, [scene, map])
+      scene.background = null;
+      scene.environment = null;
+    };
+  }, [scene, map]);
 
-  return null
+  return null;
 }
 
 function Helmet() {
-  const { scene } = useGLTF(HELMET_URL)
-  return <primitive object={scene} />
+  const { scene } = useGLTF(HELMET_URL);
+  return <primitive object={scene} />;
 }
 
 // Scene-pass MRT: final color + packed normal + diffuse albedo + emissive, split
@@ -78,37 +78,37 @@ function Helmet() {
 function MrtPipeline() {
   useRenderPipeline(
     ({ renderPipeline, passes }) => {
-      if (!renderPipeline) return
+      if (!renderPipeline) return;
 
-      const scenePass = passes.scenePass
+      const scenePass = passes.scenePass;
 
-      const outputTexture = scenePass.getTextureNode('output')
-      const normalTexture = scenePass.getTextureNode('normal')
-      const diffuseTexture = scenePass.getTextureNode('diffuse')
-      const emissiveTexture = scenePass.getTextureNode('emissive')
+      const outputTexture = scenePass.getTextureNode('output');
+      const normalTexture = scenePass.getTextureNode('normal');
+      const diffuseTexture = scenePass.getTextureNode('diffuse');
+      const emissiveTexture = scenePass.getTextureNode('emissive');
 
       // Bandwidth optimization: these G-buffer channels don't need float precision.
-      scenePass.getTexture('normal').type = UnsignedByteType
-      scenePass.getTexture('diffuse').type = UnsignedByteType
-      scenePass.getTexture('emissive').type = UnsignedByteType
+      scenePass.getTexture('normal').type = UnsignedByteType;
+      scenePass.getTexture('diffuse').type = UnsignedByteType;
+      scenePass.getTexture('emissive').type = UnsignedByteType;
 
       // Only the beauty quadrant should carry tone mapping/color-space transform —
       // the raw G-buffer quadrants must stay untouched, so the pipeline's automatic
       // transform is disabled and reapplied by hand via `.renderOutput()`.
-      renderPipeline.outputColorTransform = false
+      renderPipeline.outputColorTransform = false;
 
-      const withOutput = mix(outputTexture.renderOutput(), outputTexture, step(0.2, screenUV.x))
-      const withNormal = mix(withOutput, normalTexture, step(0.4, screenUV.x))
-      const withEmissive = mix(withNormal, emissiveTexture, step(0.6, screenUV.x))
-      const withDiffuse = mix(withEmissive, diffuseTexture, step(0.8, screenUV.x))
+      const withOutput = mix(outputTexture.renderOutput(), outputTexture, step(0.2, screenUV.x));
+      const withNormal = mix(withOutput, normalTexture, step(0.4, screenUV.x));
+      const withEmissive = mix(withNormal, emissiveTexture, step(0.6, screenUV.x));
+      const withDiffuse = mix(withEmissive, diffuseTexture, step(0.8, screenUV.x));
 
-      renderPipeline.outputNode = withDiffuse
+      renderPipeline.outputNode = withDiffuse;
     },
     ({ scene, camera }) => {
       // Register-to-override: the hook's default scenePass takes no render-target
       // options, so a custom one is built here (Nearest filtering, matching the
       // original) and returned under the `scenePass` key.
-      const scenePass = pass(scene, camera, { minFilter: NearestFilter, magFilter: NearestFilter })
+      const scenePass = pass(scene, camera, { minFilter: NearestFilter, magFilter: NearestFilter });
       scenePass.setMRT(
         mrt({
           output,
@@ -116,12 +116,12 @@ function MrtPipeline() {
           diffuse: diffuseColor,
           emissive,
         }),
-      )
-      return { scenePass }
+      );
+      return { scenePass };
     },
-  )
+  );
 
-  return null
+  return null;
 }
 
 export default function Mrt() {
@@ -140,5 +140,5 @@ export default function Mrt() {
       <MrtPipeline />
       <DemoHelpers grid={false} target={[0, 0, -0.2]} minDistance={2} maxDistance={10} />
     </Canvas>
-  )
+  );
 }

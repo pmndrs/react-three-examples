@@ -44,35 +44,35 @@
  *   `(-100, 10, 0)` target and `maxPolarAngle` clamp as the original; grid disabled
  *   (`grid={false}`) — the original's own 10000×10000 floor plane is the receiver.
  */
-import { useMemo, useRef } from 'react'
-import { NoToneMapping } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
+import { useMemo, useRef } from 'react';
+import { NoToneMapping } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
 
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { OrthographicCamera, PerspectiveCamera } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { OrthographicCamera, PerspectiveCamera } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { CsmLight } from './CsmLight'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { CsmLight } from './CsmLight';
 
-const CAMERA_POSITION: [number, number, number] = [60, 60, 0]
-const CAMERA_TARGET: [number, number, number] = [-100, 10, 0]
+const CAMERA_POSITION: [number, number, number] = [60, 60, 0];
+const CAMERA_TARGET: [number, number, number] = [-100, 10, 0];
 const ORTHO_DISTANCE = Math.hypot(
   CAMERA_POSITION[0] - CAMERA_TARGET[0],
   CAMERA_POSITION[1] - CAMERA_TARGET[1],
   CAMERA_POSITION[2] - CAMERA_TARGET[2],
-)
+);
 
 // Two rows of 40 boxes flanking the corridor the camera flies down — the scale CSM's
 // cascades are built to handle (a single shadow map over this whole span would be
 // unusably blurry up close).
 function BoxRows() {
   return Array.from({ length: 40 }, (_, i) => {
-    const x = -i * 25
-    const color1 = i % 2 === 0 ? '#08d9d6' : '#ff2e63'
-    const color2 = i % 2 === 0 ? '#ff2e63' : '#08d9d6'
-    const scaleY1 = Math.random() * 2 + 6
-    const scaleY2 = Math.random() * 2 + 6
+    const x = -i * 25;
+    const color1 = i % 2 === 0 ? '#08d9d6' : '#ff2e63';
+    const color2 = i % 2 === 0 ? '#ff2e63' : '#08d9d6';
+    const scaleY1 = Math.random() * 2 + 6;
+    const scaleY2 = Math.random() * 2 + 6;
     return (
       <group key={i}>
         <mesh position={[x, 20, 30]} scale-y={scaleY1} castShadow receiveShadow>
@@ -84,18 +84,18 @@ function BoxRows() {
           <meshPhongMaterial color={color2} />
         </mesh>
       </group>
-    )
-  })
+    );
+  });
 }
 
 function Floor() {
-  const floorRef = useRef<Mesh>(null)
+  const floorRef = useRef<Mesh>(null);
   return (
     <mesh ref={floorRef} rotation-x={-Math.PI / 2} castShadow receiveShadow>
       <planeGeometry args={[10000, 10000, 8, 8]} />
       <meshPhongMaterial color="#252a34" />
     </mesh>
-  )
+  );
 }
 
 // A dim rim/fill light shining from the SAME direction as the CSM sun (the original
@@ -103,19 +103,19 @@ function Floor() {
 // blue counter-light rather than a second key light).
 function FillLight({ direction }: { direction: [number, number, number] }) {
   const position = useMemo(() => {
-    const [x, y, z] = direction
-    const len = Math.hypot(x, y, z) || 1
-    return [(x / len) * -200, (y / len) * -200, (z / len) * -200] as [number, number, number]
-  }, [direction])
+    const [x, y, z] = direction;
+    const len = Math.hypot(x, y, z) || 1;
+    return [(x / len) * -200, (y / len) * -200, (z / len) * -200] as [number, number, number];
+  }, [direction]);
 
-  return <directionalLight color="#000020" intensity={1.5} position={position} />
+  return <directionalLight color="#000020" intensity={1.5} position={position} />;
 }
 
 function Cameras() {
-  const { orthographic } = useControls('shadowmap-csm', { orthographic: false })
-  const aspect = useThree((s) => s.size.width / s.size.height)
-  const halfHeight = ORTHO_DISTANCE / 2
-  const halfWidth = halfHeight * aspect
+  const { orthographic } = useControls('shadowmap-csm', { orthographic: false });
+  const aspect = useThree((s) => s.size.width / s.size.height);
+  const halfHeight = ORTHO_DISTANCE / 2;
+  const halfWidth = halfHeight * aspect;
 
   return (
     <>
@@ -126,7 +126,7 @@ function Cameras() {
         args={[-halfWidth, halfWidth, halfHeight, -halfHeight, 0.1, 5000]}
       />
     </>
-  )
+  );
 }
 
 export default function ShadowmapCsm() {
@@ -138,7 +138,7 @@ export default function ShadowmapCsm() {
       lightY: { value: -1, min: -1, max: 1, label: 'y' },
       lightZ: { value: -1, min: -1, max: 1, label: 'z' },
     }),
-  })
+  });
 
   return (
     <Canvas
@@ -160,5 +160,5 @@ export default function ShadowmapCsm() {
       <BoxRows />
       <DemoHelpers grid={false} target={CAMERA_TARGET} maxPolarAngle={Math.PI / 2} minZoom={0.1} maxZoom={10} />
     </Canvas>
-  )
+  );
 }

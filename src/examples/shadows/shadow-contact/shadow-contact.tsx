@@ -48,11 +48,11 @@
  *   world-space grid at a different height would clash with the shadow catcher plane
  *   that IS the subject of this example
  */
-import { Canvas } from '@react-three/fiber/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { ContactShadowCatcher } from './ContactShadowCatcher'
-import { Shapes } from './Shapes'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { ContactShadowCatcher } from './ContactShadowCatcher';
+import { Shapes } from './Shapes';
 
 export default function ShadowContact() {
   return (
@@ -61,5 +61,5 @@ export default function ShadowContact() {
       <ContactShadowCatcher />
       <DemoHelpers grid={false} />
     </Canvas>
-  )
+  );
 }

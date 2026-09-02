@@ -1,10 +1,10 @@
 // Furnishings of the gallery scene: pedestals (central + two small), torus knot,
 // lathe-profile vase, rounded-box armchair, side table with cup, and a layered rug.
 // Lots of tight geometry contacts — exactly where ambient occlusion earns its keep.
-import { useMemo } from 'react'
-import { MeshStandardMaterial, Vector2 } from 'three/webgpu'
+import { useMemo } from 'react';
+import { MeshStandardMaterial, Vector2 } from 'three/webgpu';
 
-import '../../../assets/RoundedBoxGeometry'
+import '../../../assets/RoundedBoxGeometry';
 
 // Lathe wants Vector2s, and <latheGeometry args> is compared by identity — so build the
 // profile once at module scope rather than mapping it inside render.
@@ -21,14 +21,14 @@ const VASE_PROFILE = (
     [0.22, 1.25],
     [0, 1.25],
   ] as const
-).map(([x, y]) => new Vector2(x, y))
+).map(([x, y]) => new Vector2(x, y));
 
 const CHAIR_LEGS: [number, number][] = [
   [-0.38, -0.32],
   [-0.38, 0.32],
   [0.38, -0.32],
   [0.38, 0.32],
-]
+];
 
 // Small display pedestal (used for the vase and the Tennyson bust).
 function SmallPedestal({ x, z, material }: { x: number; z: number; material: MeshStandardMaterial }) {
@@ -44,7 +44,7 @@ function SmallPedestal({ x, z, material }: { x: number; z: number; material: Mes
         <cylinderGeometry args={[0.55, 0.48, 0.15, 32]} />
       </mesh>
     </>
-  )
+  );
 }
 
 export function Furniture() {
@@ -59,7 +59,7 @@ export function Furniture() {
       fabricMaterial: new MeshStandardMaterial({ color: '#8b3a3a', roughness: 0.9, metalness: 0 }),
     }),
     [],
-  )
+  );
 
   return (
     <>
@@ -142,5 +142,5 @@ export function Furniture() {
         <meshStandardMaterial color="#d4b880" roughness={0.95} metalness={0} />
       </mesh>
     </>
-  )
+  );
 }

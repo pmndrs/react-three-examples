@@ -21,42 +21,42 @@
  *   unreachable dead code (every top-level child already has children.length > 0);
  *   this port keeps the actual effective behavior instead of the dead branch
  */
-import { useEffect } from 'react'
-import { NoToneMapping, PMREMGenerator } from 'three/webgpu'
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { useEffect } from 'react';
+import { NoToneMapping, PMREMGenerator } from 'three/webgpu';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { CAPipeline } from './CAPipeline'
-import { Shapes } from './Shapes'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { CAPipeline } from './CAPipeline';
+import { Shapes } from './Shapes';
 
 //* Scene ==========================================================
 
 // RoomEnvironment PMREM lighting — same imperative escape-hatch pattern as
 // postprocessing-ao's RoomEnv and postprocessing-sobel's RoomEnv.
 function RoomEnv() {
-  const renderer = useThree((s) => s.renderer)
-  const scene = useThree((s) => s.scene)
+  const renderer = useThree((s) => s.renderer);
+  const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const environment = new RoomEnvironment()
-    const pmremGenerator = new PMREMGenerator(renderer)
-    const envRT = pmremGenerator.fromScene(environment, 0.04)
-    scene.environment = envRT.texture
-    environment.dispose()
-    pmremGenerator.dispose()
+    const environment = new RoomEnvironment();
+    const pmremGenerator = new PMREMGenerator(renderer);
+    const envRT = pmremGenerator.fromScene(environment, 0.04);
+    scene.environment = envRT.texture;
+    environment.dispose();
+    pmremGenerator.dispose();
     return () => {
-      scene.environment = null
-      envRT.dispose()
-    }
-  }, [renderer, scene])
+      scene.environment = null;
+      envRT.dispose();
+    };
+  }, [renderer, scene]);
 
-  return null
+  return null;
 }
 
 export default function PostprocessingCa() {
-  const { autoRotate } = useControls('Camera', { autoRotate: true })
+  const { autoRotate } = useControls('Camera', { autoRotate: true });
 
   return (
     <Canvas
@@ -71,5 +71,5 @@ export default function PostprocessingCa() {
       <gridHelper args={[40, 20, '#444444', '#222222']} position={[0, -10, 0]} />
       <DemoHelpers grid={false} target={[0, 0.5, 0]} maxDistance={150} autoRotate={autoRotate} autoRotateSpeed={-0.1} />
     </Canvas>
-  )
+  );
 }

@@ -43,29 +43,29 @@
  * - `renderer.setPixelRatio(devicePixelRatio)` dropped (fiber manages dpr);
  *   `renderer.inspector` integration dropped (repo doesn't wire it)
  */
-import { useEffect, useRef } from 'react'
-import { ACESFilmicToneMapping } from 'three/webgpu'
-import type { DirectionalLight } from 'three/webgpu'
+import { useEffect, useRef } from 'react';
+import { ACESFilmicToneMapping } from 'three/webgpu';
+import type { DirectionalLight } from 'three/webgpu';
 
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { SunSky } from './SunSky'
-import { TerrainForest } from './TerrainForest'
-import { ValleyFog } from './ValleyFog'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { SunSky } from './SunSky';
+import { TerrainForest } from './TerrainForest';
+import { ValleyFog } from './ValleyFog';
 
 // renderer.toneMappingExposure is a WebGPURenderer property, not a TSL uniform —
 // mutated imperatively (same escape hatch as `sky`/`ocean`).
 function ToneMappingExposure({ exposure }: { exposure: number }) {
-  const renderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer);
   useEffect(() => {
-    renderer.toneMappingExposure = exposure
-  }, [renderer, exposure])
-  return null
+    renderer.toneMappingExposure = exposure;
+  }, [renderer, exposure]);
+  return null;
 }
 
 export default function CustomFog() {
-  const sunRef = useRef<DirectionalLight>(null)
+  const sunRef = useRef<DirectionalLight>(null);
 
   return (
     <Canvas
@@ -78,5 +78,5 @@ export default function CustomFog() {
       <ToneMappingExposure exposure={0.62} />
       <DemoHelpers grid={false} target={[0, 5, -120]} minDistance={5} maxDistance={2000} />
     </Canvas>
-  )
+  );
 }

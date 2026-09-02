@@ -19,8 +19,16 @@ example fix OR an amendment here (with a changelog entry) — never silent.
 - Package manager: **pnpm only**
 - `pnpm dev` — Vite dev server, port 5173
 - `npx tsc --noEmit` / `pnpm lint` / `pnpm build` — typecheck / lint / build
+  (`pnpm lint` runs eslint **and** `prettier --check`)
+- `pnpm format` — prettier `--write`. Formatting is not a review topic; run it.
 - `pnpm test:changed <slug>` — smoke + animates for one example
 - `pnpm shot <slug>` — screenshot to `screenshots/`
+
+**Formatting is prettier's job, and the config is deliberate.** `.prettierrc` is r3f's
+own, with one intentional divergence: **`semi: true`** — Dennis writes semicolons and
+`semi: false` was silently deleting them. **Write semicolons.** Everything else
+(single quotes, 120 cols, trailing commas, `bracketSameLine`) matches r3f upstream.
+Never hand-format to match; `pnpm format` is the source of truth.
 
 Definition of done: typechecks, lints, builds, renders on WebGPU (real `webgpu`
 canvas context, console clean), registered in the manifest, header block present.
@@ -57,15 +65,15 @@ Put the controls in the component that consumes them and feed `useUniforms` dire
 ```tsx
 // GOOD — one component owns the knobs, the uniforms and the mesh
 function SeaSurface() {
-  const { color, roughness, ...waveValues } = useControls('Raging Sea', seaControls)
-  const uniforms = useUniforms(waveValues)
-  const matNodes = useNodes(() => makeSeaNodes(uniforms))
+  const { color, roughness, ...waveValues } = useControls('Raging Sea', seaControls);
+  const uniforms = useUniforms(waveValues);
+  const matNodes = useNodes(() => makeSeaNodes(uniforms));
   return (
     <mesh>
       <TerrainGeometry />
       <meshStandardNodeMaterial color={color} {...matNodes} />
     </mesh>
-  )
+  );
 }
 
 // BAD — controls at the page root, values drilled down as props
@@ -117,7 +125,7 @@ over drilled props.
 const { checkerSpecular, waterNormalNode } = useNodes(() => ({
   checkerSpecular: mix(color('#00f'), color('#f00'), checker(uv().mul(5))),
   waterNormalNode: normalMap(texture(waterNormal)),
-}))
+}));
 
 // BAD — three separate useMemos doing the same thing
 ```
@@ -150,7 +158,7 @@ performant way AND flag it for a human:
 ```tsx
 // REVIEW(shared-instance): one MeshStandardMaterial across ~20 meshes; a JSX child
 // would create 20. Worth checking whether this wants <Instances> instead.
-const woodMaterial = useMemo(() => new MeshStandardMaterial({ color: '#8b5a2b' }), [])
+const woodMaterial = useMemo(() => new MeshStandardMaterial({ color: '#8b5a2b' }), []);
 ```
 
 `REVIEW(<topic>):` is the repo's flag-for-human marker (cf. `TODO(drei-gap):` in
@@ -179,7 +187,7 @@ prop types from the JSX element that will receive them:
 
 ```tsx
 type TeapotProps = ThreeElements['mesh'] &
-  Pick<ThreeElements['meshPhongNodeMaterial'], 'shininess' | 'specularNode' | 'normalNode'>
+  Pick<ThreeElements['meshPhongNodeMaterial'], 'shininess' | 'specularNode' | 'normalNode'>;
 ```
 
 Real node classes (`LightsNode`, `TextureNode`, `NormalMapNode`) do **not** satisfy a
@@ -254,8 +262,8 @@ still have a local one to work with:
 
 ```tsx
 // Hooks can't be conditional — always make the local ref, then pick.
-const localRef = useRef<PointLight>(null)
-const lightRef = ref ?? localRef
+const localRef = useRef<PointLight>(null);
+const lightRef = ref ?? localRef;
 ```
 
 Type the exposed prop `React.RefObject<T | null>`, not `React.Ref<T>` — `React.Ref`

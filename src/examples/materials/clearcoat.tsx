@@ -33,28 +33,28 @@
  * - `renderer.inspector = new Inspector()` dropped — this repo doesn't wire the
  *   Inspector RootState slot yet (same gap noted in `lights-phong` / `reflection`)
  */
-import { Suspense, useLayoutEffect, useRef } from 'react'
-import { ACESFilmicToneMapping, CanvasTexture, RepeatWrapping, SphereGeometry, SRGBColorSpace } from 'three/webgpu'
-import type { Group, Mesh } from 'three/webgpu'
-import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js'
-import { FlakesTexture } from 'three/addons/textures/FlakesTexture.js'
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useLayoutEffect, useRef } from 'react';
+import { ACESFilmicToneMapping, CanvasTexture, RepeatWrapping, SphereGeometry, SRGBColorSpace } from 'three/webgpu';
+import type { Group, Mesh } from 'three/webgpu';
+import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
+import { FlakesTexture } from 'three/addons/textures/FlakesTexture.js';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
-const PISA_HDR_FILES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map((face) => `${TEXTURE_BASE}cube/pisaHDR/${face}.hdr`)
+const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/';
+const PISA_HDR_FILES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map((face) => `${TEXTURE_BASE}cube/pisaHDR/${face}.hdr`);
 
 // Shared static assets — constants, not mutable state, so module-scope THREE instances
 // are the idiomatic call (same rationale as lights-phong's teapotGeometry). The flakes
 // canvas is procedural (FlakesTexture draws random flake normals once); building it at
 // module scope also sidesteps a StrictMode double-create.
-const sphereGeometry = new SphereGeometry(0.8, 64, 32)
-const flakesNormalMap = new CanvasTexture(new FlakesTexture())
-flakesNormalMap.wrapS = flakesNormalMap.wrapT = RepeatWrapping
-flakesNormalMap.repeat.set(10, 6)
-flakesNormalMap.anisotropy = 16
+const sphereGeometry = new SphereGeometry(0.8, 64, 32);
+const flakesNormalMap = new CanvasTexture(new FlakesTexture());
+flakesNormalMap.wrapS = flakesNormalMap.wrapT = RepeatWrapping;
+flakesNormalMap.repeat.set(10, 6);
+flakesNormalMap.anisotropy = 16;
 
 // Loads the six Radiance .hdr cube faces in one HDRCubeTextureLoader call (nested-array
 // useLoader input) and wires the result as both skybox and IBL source, matching the
@@ -62,25 +62,25 @@ flakesNormalMap.anisotropy = 16
 // assignment lands before the sibling spheres' first shader build reads
 // `scene.environment` (AGENTS.md B15 family).
 function PisaEnvironment() {
-  const scene = useThree((s) => s.scene)
-  const [envCube] = useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES])
+  const scene = useThree((s) => s.scene);
+  const [envCube] = useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES]);
 
   useLayoutEffect(() => {
-    scene.background = envCube
-    scene.environment = envCube
+    scene.background = envCube;
+    scene.environment = envCube;
     return () => {
-      scene.background = null
-      scene.environment = null
-    }
-  }, [scene, envCube])
+      scene.background = null;
+      scene.environment = null;
+    };
+  }, [scene, envCube]);
 
-  return null
+  return null;
 }
 
 // The four clearcoat spheres and the orbiting point light — see header DEMONSTRATES.
 function ClearcoatSpheres({ clearcoat }: { clearcoat: number }) {
-  const groupRef = useRef<Group>(null)
-  const lightRef = useRef<Mesh>(null)
+  const groupRef = useRef<Group>(null);
+  const lightRef = useRef<Mesh>(null);
 
   const { carbonDiffuse, carbonNormal, waterNormal, golfballNormal, scratchedGoldNormal } = useTexture({
     carbonDiffuse: `${TEXTURE_BASE}carbon/Carbon.png`,
@@ -88,26 +88,26 @@ function ClearcoatSpheres({ clearcoat }: { clearcoat: number }) {
     waterNormal: `${TEXTURE_BASE}water/Water_1_M_Normal.jpg`,
     golfballNormal: `${TEXTURE_BASE}golfball.jpg`,
     scratchedGoldNormal: `${TEXTURE_BASE}pbr/Scratched_gold/Scratched_gold_01_1K_Normal.png`,
-  })
+  });
 
   // Wrap/repeat/colorSpace must be applied (and re-uploaded via needsUpdate) before the
   // first RAF render reads the textures — layout effect, not passive (AGENTS.md).
   useLayoutEffect(() => {
-    carbonDiffuse.colorSpace = SRGBColorSpace
+    carbonDiffuse.colorSpace = SRGBColorSpace;
     for (const map of [carbonDiffuse, carbonNormal]) {
-      map.wrapS = map.wrapT = RepeatWrapping
-      map.repeat.set(10, 10)
-      map.needsUpdate = true
+      map.wrapS = map.wrapT = RepeatWrapping;
+      map.repeat.set(10, 10);
+      map.needsUpdate = true;
     }
-  }, [carbonDiffuse, carbonNormal])
+  }, [carbonDiffuse, carbonNormal]);
 
   useFrame(({ elapsed, delta }) => {
-    const timer = elapsed * 0.25
-    lightRef.current?.position.set(Math.sin(timer * 7) * 3, Math.cos(timer * 5) * 4, Math.cos(timer * 3) * 3)
+    const timer = elapsed * 0.25;
+    lightRef.current?.position.set(Math.sin(timer * 7) * 3, Math.cos(timer * 5) * 4, Math.cos(timer * 3) * 3);
     if (groupRef.current) {
-      for (const child of groupRef.current.children) child.rotation.y += delta * 0.3
+      for (const child of groupRef.current.children) child.rotation.y += delta * 0.3;
     }
-  })
+  });
 
   return (
     <>
@@ -170,13 +170,13 @@ function ClearcoatSpheres({ clearcoat }: { clearcoat: number }) {
         <pointLight color={0xffffff} intensity={30} />
       </mesh>
     </>
-  )
+  );
 }
 
 export default function Clearcoat() {
   const { clearcoat } = useControls('clearcoat', {
     clearcoat: { value: 1, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   return (
     <Canvas
@@ -190,5 +190,5 @@ export default function Clearcoat() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={3} maxDistance={30} />
     </Canvas>
-  )
+  );
 }

@@ -29,76 +29,76 @@
  * - DemoHelpers grid disabled (`grid={false}`) — the original's own 200x200 floor
  *   plane IS the shadow receiver this example is about
  */
-import { Suspense, useEffect, useRef } from 'react'
-import { MathUtils, NoToneMapping, SpotLightHelper } from 'three/webgpu'
-import type { IESSpotLight as IESSpotLightImpl, Texture } from 'three/webgpu'
-import { IESLoader } from 'three/addons/loaders/IESLoader.js'
+import { Suspense, useEffect, useRef } from 'react';
+import { MathUtils, NoToneMapping, SpotLightHelper } from 'three/webgpu';
+import type { IESSpotLight as IESSpotLightImpl, Texture } from 'three/webgpu';
+import { IESLoader } from 'three/addons/loaders/IESLoader.js';
 
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const IES_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/ies/'
+const IES_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/ies/';
 const IES_URLS = [
   `${IES_BASE}007cfb11e343e2f42e3b476be4ab684e.ies`,
   `${IES_BASE}06b4cfdc8805709e767b5e2e904be8ad.ies`,
   `${IES_BASE}02a7562c650498ebb301153dbbf59207.ies`,
   `${IES_BASE}1a936937a49c63374e6d4fbed9252b29.ies`,
-]
+];
 
 interface IESLightRigProps {
-  index: number
-  position: [number, number, number]
-  color: string
-  intensity: number
-  iesMap: Texture
-  helpers: boolean
+  index: number;
+  position: [number, number, number];
+  color: string;
+  intensity: number;
+  iesMap: Texture;
+  helpers: boolean;
 }
 
 // One IES spotlight: carries a SpotLightHelper as a real child (see header
 // DEMONSTRATES, same pattern as lights-spotlight) and independently animates its own
 // `target` — a plain Object3D the renderer reads every frame, not a fiber concept.
 function IESLightRig({ index, position, color, intensity, iesMap, helpers }: IESLightRigProps) {
-  const lightRef = useRef<IESSpotLightImpl>(null)
-  const helperRef = useRef<SpotLightHelper | null>(null)
-  const scene = useThree((s) => s.scene)
+  const lightRef = useRef<IESSpotLightImpl>(null);
+  const helperRef = useRef<SpotLightHelper | null>(null);
+  const scene = useThree((s) => s.scene);
 
   // Mount once: add the light's target to the scene (matches the original's explicit
   // `scene.add(spotLight.target)`) and attach the helper as the light's own child so it
   // inherits the light's transform for free.
   useEffect(() => {
-    const light = lightRef.current
-    if (!light) return
-    scene.add(light.target)
+    const light = lightRef.current;
+    if (!light) return;
+    scene.add(light.target);
 
-    const helper = new SpotLightHelper(light)
-    light.add(helper)
-    helperRef.current = helper
+    const helper = new SpotLightHelper(light);
+    light.add(helper);
+    helperRef.current = helper;
 
     return () => {
-      scene.remove(light.target)
-      light.remove(helper)
-      helper.dispose()
-      helperRef.current = null
-    }
-  }, [scene])
+      scene.remove(light.target);
+      light.remove(helper);
+      helper.dispose();
+      helperRef.current = null;
+    };
+  }, [scene]);
 
   useEffect(() => {
-    const helper = helperRef.current
-    if (helper) helper.visible = helpers
-  }, [helpers])
+    const helper = helperRef.current;
+    if (helper) helper.visible = helpers;
+  }, [helpers]);
 
   // Ported from the original's `render()`: the target sweeps between the light's own
   // (fixed) footprint and the room's center, phase-offset per light by `index`.
   useFrame(({ elapsed }) => {
-    const light = lightRef.current
-    if (!light) return
-    const t = (Math.sin((elapsed + index) * (Math.PI / 2)) + 1) / 2
-    light.target.position.x = MathUtils.lerp(light.position.x, 0, t)
-    light.target.position.z = MathUtils.lerp(light.position.z, 0, t)
-    helperRef.current?.update()
-  })
+    const light = lightRef.current;
+    if (!light) return;
+    const t = (Math.sin((elapsed + index) * (Math.PI / 2)) + 1) / 2;
+    light.target.position.x = MathUtils.lerp(light.position.x, 0, t);
+    light.target.position.z = MathUtils.lerp(light.position.z, 0, t);
+    helperRef.current?.update();
+  });
 
   return (
     <iESSpotLight
@@ -112,7 +112,7 @@ function IESLightRig({ index, position, color, intensity, iesMap, helpers }: IES
       iesMap={iesMap}
       castShadow
     />
-  )
+  );
 }
 
 const POSITIONS: [number, number, number][] = [
@@ -120,7 +120,7 @@ const POSITIONS: [number, number, number][] = [
   [-6.5, 3, 6.5],
   [-6.5, 3, -6.5],
   [6.5, 3, -6.5],
-]
+];
 
 function Scene() {
   const { helpers, color1, intensity1, color2, intensity2, color3, intensity3, color4, intensity4 } = useControls(
@@ -144,11 +144,11 @@ function Scene() {
         intensity4: { value: 500, min: 0, max: 2000, step: 10, label: 'intensity' },
       }),
     },
-  )
+  );
 
-  const iesTextures = useLoader(IESLoader, IES_URLS)
-  const colors = [color1, color2, color3, color4]
-  const intensities = [intensity1, intensity2, intensity3, intensity4]
+  const iesTextures = useLoader(IESLoader, IES_URLS);
+  const colors = [color1, color2, color3, color4];
+  const intensities = [intensity1, intensity2, intensity3, intensity4];
 
   return (
     <>
@@ -172,7 +172,7 @@ function Scene() {
         <meshPhongMaterial color="#999999" />
       </mesh>
     </>
-  )
+  );
 }
 
 export default function LightsIesSpotlight() {
@@ -188,5 +188,5 @@ export default function LightsIesSpotlight() {
       </Suspense>
       <DemoHelpers grid={false} pan={false} minDistance={2} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

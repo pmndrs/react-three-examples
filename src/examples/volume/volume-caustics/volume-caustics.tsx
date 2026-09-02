@@ -40,15 +40,15 @@
  * - `Inspector`/`.toInspector()` wiring dropped (not ported); DRACOLoader wiring
  *   becomes drei `useGLTF`'s second argument
  */
-import { Suspense, useRef } from 'react'
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import type CameraControlsImpl from 'camera-controls'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { VolumeCaustics } from './VolumeCaustics'
+import { Suspense, useRef } from 'react';
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import type CameraControlsImpl from 'camera-controls';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { VolumeCaustics } from './VolumeCaustics';
 
 export default function VolumeCausticsExample() {
-  const cameraControlsRef = useRef<CameraControlsImpl | null>(null)
+  const cameraControlsRef = useRef<CameraControlsImpl | null>(null);
 
   return (
     <Canvas
@@ -63,5 +63,5 @@ export default function VolumeCausticsExample() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 0.02, -0.05]} maxDistance={1} controlsRef={cameraControlsRef} />
     </Canvas>
-  )
+  );
 }

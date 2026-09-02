@@ -14,15 +14,15 @@
  * - drei's `Instances`/`Instance`: 100 sphere transforms stay React objects while
  *   rendering in ONE instanced draw call, tumbling together as a single parent group
  */
-import { useMemo, useRef } from 'react'
-import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js'
-import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js'
-import { Group, NoToneMapping, Vector3 } from 'three/webgpu'
-import { Canvas, useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
-import { Instance, Instances } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { useMemo, useRef } from 'react';
+import { dotScreen } from 'three/addons/tsl/display/DotScreenNode.js';
+import { rgbShift } from 'three/addons/tsl/display/RGBShiftNode.js';
+import { Group, NoToneMapping, Vector3 } from 'three/webgpu';
+import { Canvas, useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu';
+import { Instance, Instances } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 //* Scene =========================================================
 
@@ -31,7 +31,7 @@ import { DemoHelpers } from '../../utils/DemoHelpers'
 // call; the transforms are static, only the parent group rotates.
 
 function SphereField({ count = 100 }: { count?: number }) {
-  const groupRef = useRef<Group>(null)
+  const groupRef = useRef<Group>(null);
 
   const spheres = useMemo(
     () =>
@@ -43,14 +43,14 @@ function SphereField({ count = 100 }: { count?: number }) {
         scale: Math.random() * 50,
       })),
     [count],
-  )
+  );
 
   useFrame(({ delta }) => {
-    const group = groupRef.current
-    if (!group) return
-    group.rotation.x += 0.3 * delta
-    group.rotation.y += 0.6 * delta
-  })
+    const group = groupRef.current;
+    if (!group) return;
+    group.rotation.x += 0.3 * delta;
+    group.rotation.y += 0.6 * delta;
+  });
 
   return (
     <group ref={groupRef}>
@@ -62,7 +62,7 @@ function SphereField({ count = 100 }: { count?: number }) {
         ))}
       </Instances>
     </group>
-  )
+  );
 }
 
 //* Post-processing ===============================================
@@ -75,23 +75,23 @@ function PostFX() {
     dotAngle: { value: 1.57, min: 0, max: Math.PI, step: 0.01 },
     shiftAmount: { value: 0.001, min: 0, max: 0.02, step: 0.0005 },
     shiftAngle: { value: 0, min: 0, max: Math.PI * 2, step: 0.01 },
-  })
-  const uniforms = useUniforms(values, 'postprocessing')
+  });
+  const uniforms = useUniforms(values, 'postprocessing');
 
   useRenderPipeline(({ renderPipeline, passes }) => {
-    const scenePassColor = passes.scenePass.getTextureNode()
-    const dotScreenPass = dotScreen(scenePassColor)
-    dotScreenPass.scale = uniforms.dotScale
-    dotScreenPass.angle = uniforms.dotAngle
+    const scenePassColor = passes.scenePass.getTextureNode();
+    const dotScreenPass = dotScreen(scenePassColor);
+    dotScreenPass.scale = uniforms.dotScale;
+    dotScreenPass.angle = uniforms.dotAngle;
 
-    const rgbShiftPass = rgbShift(dotScreenPass)
-    rgbShiftPass.amount = uniforms.shiftAmount
-    rgbShiftPass.angle = uniforms.shiftAngle
+    const rgbShiftPass = rgbShift(dotScreenPass);
+    rgbShiftPass.amount = uniforms.shiftAmount;
+    rgbShiftPass.angle = uniforms.shiftAngle;
 
-    renderPipeline.outputNode = rgbShiftPass
-  })
+    renderPipeline.outputNode = rgbShiftPass;
+  });
 
-  return null
+  return null;
 }
 
 export default function Postprocessing() {
@@ -109,5 +109,5 @@ export default function Postprocessing() {
       <PostFX />
       <DemoHelpers grid={false} maxDistance={900} />
     </Canvas>
-  )
+  );
 }

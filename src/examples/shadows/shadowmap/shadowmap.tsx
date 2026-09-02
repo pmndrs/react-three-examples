@@ -53,34 +53,34 @@
  * - `renderer.toneMappingExposure` driven from leva (same escape hatch as
  *   `sky`/`postprocessing-bloom-emissive`: a WebGPURenderer property, not a TSL uniform)
  */
-import { useEffect } from 'react'
-import { ACESFilmicToneMapping } from 'three/webgpu'
+import { useEffect } from 'react';
+import { ACESFilmicToneMapping } from 'three/webgpu';
 
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Ground } from './Ground'
-import { Lights } from './Lights'
-import { Pillars, TorusKnot } from './Shapes'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Ground } from './Ground';
+import { Lights } from './Lights';
+import { Pillars, TorusKnot } from './Shapes';
 
 // renderer.toneMappingExposure is a WebGPURenderer property, not a TSL uniform — set
 // imperatively (same pattern as sky.tsx / postprocessing-bloom-emissive.tsx).
 function ToneMappingExposure() {
-  const { exposure } = useControls('shadowmap', { exposure: { value: 1, min: 0, max: 2, step: 0.01 } })
-  const renderer = useThree((s) => s.renderer)
+  const { exposure } = useControls('shadowmap', { exposure: { value: 1, min: 0, max: 2, step: 0.01 } });
+  const renderer = useThree((s) => s.renderer);
 
   useEffect(() => {
-    renderer.toneMappingExposure = exposure
-  }, [renderer, exposure])
+    renderer.toneMappingExposure = exposure;
+  }, [renderer, exposure]);
 
-  return null
+  return null;
 }
 
 export default function Shadowmap() {
   // spinSpeed is shared by Lights (light orbit) and TorusKnot (spin rate) — stays here
   // rather than duplicating the leva row in both.
-  const { spinSpeed } = useControls('shadowmap', { spinSpeed: { value: 1, min: 0, max: 3, step: 0.05 } })
+  const { spinSpeed } = useControls('shadowmap', { spinSpeed: { value: 1, min: 0, max: 3, step: 0.05 } });
 
   return (
     <Canvas
@@ -96,5 +96,5 @@ export default function Shadowmap() {
       <ToneMappingExposure />
       <DemoHelpers grid={false} target={[0, 2, 0]} minDistance={7} maxDistance={40} />
     </Canvas>
-  )
+  );
 }

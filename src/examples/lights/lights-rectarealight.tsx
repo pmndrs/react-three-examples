@@ -30,24 +30,24 @@
  *   floor slab as ground, and DemoHelpers' grid plane (y = 0.002) would render
  *   underneath/inside it, invisible and pointless
  */
-import { useEffect, useMemo, useRef } from 'react'
-import { RectAreaLightNode } from 'three/webgpu'
-import type { RectAreaLight } from 'three/webgpu'
-import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js'
-import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js'
-import { checker, uv } from 'three/tsl'
+import { useEffect, useMemo, useRef } from 'react';
+import { RectAreaLightNode } from 'three/webgpu';
+import type { RectAreaLight } from 'three/webgpu';
+import { RectAreaLightHelper } from 'three/addons/helpers/RectAreaLightHelper.js';
+import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';
+import { checker, uv } from 'three/tsl';
 
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // One-time, global BRDF texture registration for RectAreaLight on the WebGPU backend —
 // see header DEMONSTRATES. Idempotent (just assigns a static field), so running it at
 // module load (rather than gating it behind an effect) is safe and simplest.
-RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init())
+RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init());
 
-const KNOT_POSITION: [number, number, number] = [0, 5.5, 0]
+const KNOT_POSITION: [number, number, number] = [0, 5.5, 0];
 
 // Three spinning RectAreaLights, each with a RectAreaLightHelper nested as a real
 // scene-graph child (see header DEMONSTRATES) so the wireframe rectangle tracks the
@@ -61,40 +61,40 @@ function RectAreaLights() {
       height: { value: 10, min: 1, max: 20, step: 0.5 },
       helpers: true,
     }),
-  })
+  });
 
-  const light1Ref = useRef<RectAreaLight>(null)
-  const light2Ref = useRef<RectAreaLight>(null)
-  const light3Ref = useRef<RectAreaLight>(null)
+  const light1Ref = useRef<RectAreaLight>(null);
+  const light2Ref = useRef<RectAreaLight>(null);
+  const light3Ref = useRef<RectAreaLight>(null);
 
   useEffect(() => {
-    if (!helpers) return
-    const lights = [light1Ref.current, light2Ref.current, light3Ref.current]
+    if (!helpers) return;
+    const lights = [light1Ref.current, light2Ref.current, light3Ref.current];
     const attached = lights.map((light) => {
-      if (!light) return null
-      const helper = new RectAreaLightHelper(light)
-      light.add(helper)
-      return helper
-    })
+      if (!light) return null;
+      const helper = new RectAreaLightHelper(light);
+      light.add(helper);
+      return helper;
+    });
     return () => {
       attached.forEach((helper, i) => {
-        const light = lights[i]
-        if (!light || !helper) return
-        light.remove(helper)
-        helper.dispose()
-      })
-    }
-  }, [helpers])
+        const light = lights[i];
+        if (!light || !helper) return;
+        light.remove(helper);
+        helper.dispose();
+      });
+    };
+  }, [helpers]);
 
   useFrame(({ delta }) => {
-    const l1 = light1Ref.current
-    const l2 = light2Ref.current
-    const l3 = light3Ref.current
-    if (!l1 || !l2 || !l3) return
-    l1.rotation.y -= delta * speed
-    l2.rotation.y += delta * 0.5 * speed
-    l3.rotation.y += delta * speed
-  })
+    const l1 = light1Ref.current;
+    const l2 = light2Ref.current;
+    const l3 = light3Ref.current;
+    if (!l1 || !l2 || !l3) return;
+    l1.rotation.y -= delta * speed;
+    l2.rotation.y += delta * 0.5 * speed;
+    l3.rotation.y += delta * speed;
+  });
 
   return (
     <>
@@ -123,7 +123,7 @@ function RectAreaLights() {
         position={[5, 6, 5]}
       />
     </>
-  )
+  );
 }
 
 // Huge floor slab; roughness driven per-fragment by a TSL checker pattern instead of a
@@ -133,18 +133,18 @@ function Floor() {
     floor: folder({
       checkerScale: { value: 400, min: 50, max: 800, step: 10 },
     }),
-  })
+  });
 
   // checkerScale is baked into the graph as a JS constant (not a live uniform), so the
   // node must be REBUILT on change — useMemo, not useNodes (which is create-once).
-  const roughnessNode = useMemo(() => checker(uv().mul(checkerScale)), [checkerScale])
+  const roughnessNode = useMemo(() => checker(uv().mul(checkerScale)), [checkerScale]);
 
   return (
     <mesh position={[0, -0.05, 0]}>
       <boxGeometry args={[2000, 0.1, 2000]} />
       <meshStandardNodeMaterial color="#444444" roughnessNode={roughnessNode} />
     </mesh>
-  )
+  );
 }
 
 // Glossy torus knot — the RectAreaLight showcase surface.
@@ -154,14 +154,14 @@ function Knot() {
       roughness: { value: 0, min: 0, max: 1, step: 0.05 },
       metalness: { value: 0, min: 0, max: 1, step: 0.05 },
     }),
-  })
+  });
 
   return (
     <mesh position={KNOT_POSITION}>
       <torusKnotGeometry args={[1.5, 0.5, 200, 16]} />
       <meshStandardMaterial color="#ffffff" roughness={roughness} metalness={metalness} />
     </mesh>
-  )
+  );
 }
 
 export default function LightsRectAreaLight() {
@@ -172,5 +172,5 @@ export default function LightsRectAreaLight() {
       <Knot />
       <DemoHelpers grid={false} target={KNOT_POSITION} />
     </Canvas>
-  )
+  );
 }

@@ -2,42 +2,42 @@
 // plays the SAME clip retargeted onto its differently-named, differently-rotated rig
 // via `SkeletonUtils.retargetClip`. See animation-retargeting.tsx header
 // DEMONSTRATES/DIVERGENCE for why the retarget bake lives in a `useMemo`.
-import { useEffect, useMemo } from 'react'
-import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js'
-import type { RetargetClipOptions } from 'three/addons/utils/SkeletonUtils.js'
-import { Euler, MathUtils, Matrix4, Skeleton, SkeletonHelper } from 'three/webgpu'
-import type { Mesh, Object3D, SkinnedMesh } from 'three/webgpu'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { useEffect, useMemo } from 'react';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
+import type { RetargetClipOptions } from 'three/addons/utils/SkeletonUtils.js';
+import { Euler, MathUtils, Matrix4, Skeleton, SkeletonHelper } from 'three/webgpu';
+import type { Mesh, Object3D, SkinnedMesh } from 'three/webgpu';
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
 
-const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
-const SOLDIER_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Soldier.glb'
+const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb';
+const SOLDIER_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Soldier.glb';
 
 // Soldier.glb is authored ~100x too large relative to Michelle. Set declaratively via
 // the `scale` prop below (instead of the original's imperative `scale.setScalar`) —
 // the retarget `scale` option (which compensates the baked hip translation for this
 // same factor) must stay the reciprocal of this constant.
-const TARGET_SCALE = 0.01
+const TARGET_SCALE = 0.01;
 
 // Traverse for the first SkinnedMesh rather than the original's hardcoded
 // `scene.children[0].children[0]` — Soldier.glb's structure happens to match, but
 // traversal doesn't depend on knowing it (same divergence as portal/PortalModels.tsx).
 function findSkinnedMesh(root: Object3D): SkinnedMesh {
-  let found: SkinnedMesh | undefined
+  let found: SkinnedMesh | undefined;
   root.traverse((child) => {
     if (!found && (child as Mesh).isMesh && (child as SkinnedMesh).isSkinnedMesh) {
-      found = child as SkinnedMesh
+      found = child as SkinnedMesh;
     }
-  })
-  if (!found) throw new Error('animation-retargeting: no SkinnedMesh found in target model')
-  return found
+  });
+  if (!found) throw new Error('animation-retargeting: no SkinnedMesh found in target model');
+  return found;
 }
 
 export function RetargetedModels() {
-  const { showHelpers } = useControls('animation-retargeting', { showHelpers: false })
+  const { showHelpers } = useControls('animation-retargeting', { showHelpers: false });
 
-  const { scene: sourceScene, animations: sourceAnimations } = useGLTF(MICHELLE_URL)
-  const { scene: targetScene } = useGLTF(SOLDIER_URL)
+  const { scene: sourceScene, animations: sourceAnimations } = useGLTF(MICHELLE_URL);
+  const { scene: targetScene } = useGLTF(SOLDIER_URL);
 
   // The one-time, expensive retargeting bake. `sourceSkeleton` is built from a
   // `SkeletonHelper` (every bone in the scene graph) rather than the SkinnedMesh's own
@@ -46,20 +46,20 @@ export function RetargetedModels() {
   // Runs once per model pair (AGENTS.md useMemo-for-imperative-setup pattern, same as
   // reflection/ReflectiveFloor.tsx).
   const { sourceHelper, targetHelper, targetSkin, retargetedClip } = useMemo(() => {
-    const sourceClip = sourceAnimations[0]
+    const sourceClip = sourceAnimations[0];
 
-    const sourceHelper = new SkeletonHelper(sourceScene)
-    const sourceSkeleton = new Skeleton(sourceHelper.bones)
+    const sourceHelper = new SkeletonHelper(sourceScene);
+    const sourceSkeleton = new Skeleton(sourceHelper.bones);
 
-    const targetHelper = new SkeletonHelper(targetScene)
-    const targetSkin = findSkinnedMesh(targetScene)
+    const targetHelper = new SkeletonHelper(targetScene);
+    const targetSkin = findSkinnedMesh(targetScene);
 
-    const rotateCW45 = new Matrix4().makeRotationY(MathUtils.degToRad(45))
-    const rotateCCW180 = new Matrix4().makeRotationY(MathUtils.degToRad(-180))
-    const rotateCW180 = new Matrix4().makeRotationY(MathUtils.degToRad(180))
+    const rotateCW45 = new Matrix4().makeRotationY(MathUtils.degToRad(45));
+    const rotateCCW180 = new Matrix4().makeRotationY(MathUtils.degToRad(-180));
+    const rotateCW180 = new Matrix4().makeRotationY(MathUtils.degToRad(180));
     const rotateFoot = new Matrix4().makeRotationFromEuler(
       new Euler(MathUtils.degToRad(45), MathUtils.degToRad(180), MathUtils.degToRad(0)),
-    )
+    );
 
     // `localOffsets` isn't declared on @types/three's `RetargetClipOptions` even
     // though the runtime reads `options.localOffsets[boneName]` (checked against
@@ -113,28 +113,28 @@ export function RetargetedModels() {
         mixamorigLeftToeBase: 'mixamorigLeftToeBase',
         mixamorigRightToeBase: 'mixamorigRightToeBase',
       },
-    }
+    };
 
-    const retargetedClip = SkeletonUtils.retargetClip(targetSkin, sourceSkeleton, sourceClip, retargetOptions)
+    const retargetedClip = SkeletonUtils.retargetClip(targetSkin, sourceSkeleton, sourceClip, retargetOptions);
 
-    return { sourceHelper, targetHelper, targetSkin, retargetedClip }
-  }, [sourceScene, targetScene, sourceAnimations])
+    return { sourceHelper, targetHelper, targetSkin, retargetedClip };
+  }, [sourceScene, targetScene, sourceAnimations]);
 
   // Source plays its own native clip. Michelle.glb ships exactly one clip — same
   // no-ambiguity `Object.values` idiom as skinning-instancing.tsx/backdrop/Michelle.tsx
   // (contrast with Soldier.glb, which ships a rest-pose clip and must be played by name).
-  const { actions: sourceActions } = useAnimations(sourceAnimations, sourceScene)
+  const { actions: sourceActions } = useAnimations(sourceAnimations, sourceScene);
   useEffect(() => {
-    Object.values(sourceActions)[0]?.play()
-  }, [sourceActions])
+    Object.values(sourceActions)[0]?.play();
+  }, [sourceActions]);
 
   // Target plays the retargeted clip, applied directly to the SkinnedMesh (not the
   // scene root) — required, since `retargetClip` writes track paths relative to
   // `targetSkin.skeleton.bones`, matching the original's explicit comment on this.
-  const { actions: targetActions } = useAnimations([retargetedClip], targetSkin)
+  const { actions: targetActions } = useAnimations([retargetedClip], targetSkin);
   useEffect(() => {
-    targetActions[retargetedClip.name]?.play()
-  }, [targetActions, retargetedClip])
+    targetActions[retargetedClip.name]?.play();
+  }, [targetActions, retargetedClip]);
 
   return (
     <>
@@ -147,5 +147,5 @@ export function RetargetedModels() {
         </>
       )}
     </>
-  )
+  );
 }

@@ -32,17 +32,17 @@
  * - DemoHelpers grid disabled (`grid={false}`) — the original's own 20x20 wood floor
  *   IS the shadow receiver this example is about
  */
-import { Suspense, useEffect, useMemo, useRef } from 'react'
-import { MeshStandardMaterial, ReinhardToneMapping, RepeatWrapping, SRGBColorSpace } from 'three/webgpu'
-import type { PointLight } from 'three/webgpu'
+import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { MeshStandardMaterial, ReinhardToneMapping, RepeatWrapping, SRGBColorSpace } from 'three/webgpu';
+import type { PointLight } from 'three/webgpu';
 
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
+const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/';
 
 // ref: http://www.power-sure.com/lumens.htm
 const BULB_POWERS: Record<string, number> = {
@@ -54,7 +54,7 @@ const BULB_POWERS: Record<string, number> = {
   '180 lm (25W)': 180,
   '20 lm (4W)': 20,
   Off: 0,
-}
+};
 
 // ref: https://en.wikipedia.org/wiki/Lux
 const HEMI_IRRADIANCES: Record<string, number> = {
@@ -69,23 +69,23 @@ const HEMI_IRRADIANCES: Record<string, number> = {
   '1000 lx (Overcast)': 1000,
   '18000 lx (Daylight)': 18000,
   '50000 lx (Direct Sun)': 50000,
-}
+};
 
 // Syncs renderer-level state that has no fiber Canvas-prop live-toggle equivalent —
 // see header DIVERGENCE.
 function RendererSync({ shadows }: { shadows: boolean }) {
-  const { exposure } = useControls('lights-physical', { exposure: { value: 0.68, min: 0, max: 1, step: 0.01 } })
-  const renderer = useThree((s) => s.renderer)
+  const { exposure } = useControls('lights-physical', { exposure: { value: 0.68, min: 0, max: 1, step: 0.01 } });
+  const renderer = useThree((s) => s.renderer);
 
   useEffect(() => {
-    renderer.toneMappingExposure = Math.pow(exposure, 5.0)
-  }, [renderer, exposure])
+    renderer.toneMappingExposure = Math.pow(exposure, 5.0);
+  }, [renderer, exposure]);
 
   useEffect(() => {
-    renderer.shadowMap.enabled = shadows
-  }, [renderer, shadows])
+    renderer.shadowMap.enabled = shadows;
+  }, [renderer, shadows]);
 
-  return null
+  return null;
 }
 
 // The incandescent bulb: a PointLight driven by photometric power, plus its own
@@ -94,20 +94,20 @@ function RendererSync({ shadows }: { shadows: boolean }) {
 function Bulb({ shadows }: { shadows: boolean }) {
   const { bulbPower } = useControls('lights-physical', {
     bulbPower: { value: '400 lm (40W)', options: Object.keys(BULB_POWERS) },
-  })
+  });
 
-  const lightRef = useRef<PointLight>(null)
-  const matRef = useRef<MeshStandardMaterial>(null)
+  const lightRef = useRef<PointLight>(null);
+  const matRef = useRef<MeshStandardMaterial>(null);
 
   useFrame(({ time }) => {
-    const light = lightRef.current
-    const mat = matRef.current
-    if (!light || !mat) return
+    const light = lightRef.current;
+    const mat = matRef.current;
+    if (!light || !mat) return;
     // Convert emitted intensity to irradiance at the 2cm bulb surface (original's
     // own comment/formula).
-    mat.emissiveIntensity = light.intensity / Math.pow(0.02, 2.0)
-    light.position.y = Math.cos(time * 0.0005) * 0.75 + 1.25
-  })
+    mat.emissiveIntensity = light.intensity / Math.pow(0.02, 2.0);
+    light.position.y = Math.cos(time * 0.0005) * 0.75 + 1.25;
+  });
 
   return (
     <pointLight
@@ -123,7 +123,7 @@ function Bulb({ shadows }: { shadows: boolean }) {
         <meshStandardMaterial ref={matRef} emissive="#ffffee" emissiveIntensity={1} color="#000000" />
       </mesh>
     </pointLight>
-  )
+  );
 }
 
 function Room({ shadows }: { shadows: boolean }) {
@@ -135,50 +135,50 @@ function Room({ shadows }: { shadows: boolean }) {
     cubeBump: `${TEXTURE_BASE}brick_bump.jpg`,
     earthDiffuse: `${TEXTURE_BASE}planets/earth_atmos_2048.jpg`,
     earthSpecular: `${TEXTURE_BASE}planets/earth_specular_2048.jpg`,
-  })
+  });
 
   const floorMat = useMemo(
     () => new MeshStandardMaterial({ roughness: 0.8, color: 0xffffff, metalness: 0.2, bumpScale: 1 }),
     [],
-  )
+  );
   const cubeMat = useMemo(
     () => new MeshStandardMaterial({ roughness: 0.7, color: 0xffffff, metalness: 0.2, bumpScale: 1 }),
     [],
-  )
-  const ballMat = useMemo(() => new MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 1.0 }), [])
+  );
+  const ballMat = useMemo(() => new MeshStandardMaterial({ color: 0xffffff, roughness: 0.5, metalness: 1.0 }), []);
 
   useEffect(() => {
-    floorDiffuse.wrapS = floorDiffuse.wrapT = RepeatWrapping
-    floorDiffuse.repeat.set(10, 24)
-    floorDiffuse.anisotropy = 4
-    floorDiffuse.colorSpace = SRGBColorSpace
-    floorBump.wrapS = floorBump.wrapT = RepeatWrapping
-    floorBump.repeat.set(10, 24)
-    floorBump.anisotropy = 4
-    floorRoughness.wrapS = floorRoughness.wrapT = RepeatWrapping
-    floorRoughness.repeat.set(10, 24)
-    floorRoughness.anisotropy = 4
-    floorMat.map = floorDiffuse
-    floorMat.bumpMap = floorBump
-    floorMat.roughnessMap = floorRoughness
-    floorMat.needsUpdate = true
+    floorDiffuse.wrapS = floorDiffuse.wrapT = RepeatWrapping;
+    floorDiffuse.repeat.set(10, 24);
+    floorDiffuse.anisotropy = 4;
+    floorDiffuse.colorSpace = SRGBColorSpace;
+    floorBump.wrapS = floorBump.wrapT = RepeatWrapping;
+    floorBump.repeat.set(10, 24);
+    floorBump.anisotropy = 4;
+    floorRoughness.wrapS = floorRoughness.wrapT = RepeatWrapping;
+    floorRoughness.repeat.set(10, 24);
+    floorRoughness.anisotropy = 4;
+    floorMat.map = floorDiffuse;
+    floorMat.bumpMap = floorBump;
+    floorMat.roughnessMap = floorRoughness;
+    floorMat.needsUpdate = true;
 
-    cubeDiffuse.wrapS = cubeDiffuse.wrapT = RepeatWrapping
-    cubeDiffuse.anisotropy = 4
-    cubeDiffuse.colorSpace = SRGBColorSpace
-    cubeBump.wrapS = cubeBump.wrapT = RepeatWrapping
-    cubeBump.anisotropy = 4
-    cubeMat.map = cubeDiffuse
-    cubeMat.bumpMap = cubeBump
-    cubeMat.needsUpdate = true
+    cubeDiffuse.wrapS = cubeDiffuse.wrapT = RepeatWrapping;
+    cubeDiffuse.anisotropy = 4;
+    cubeDiffuse.colorSpace = SRGBColorSpace;
+    cubeBump.wrapS = cubeBump.wrapT = RepeatWrapping;
+    cubeBump.anisotropy = 4;
+    cubeMat.map = cubeDiffuse;
+    cubeMat.bumpMap = cubeBump;
+    cubeMat.needsUpdate = true;
 
-    earthDiffuse.anisotropy = 4
-    earthDiffuse.colorSpace = SRGBColorSpace
-    earthSpecular.anisotropy = 4
-    earthSpecular.colorSpace = SRGBColorSpace
-    ballMat.map = earthDiffuse
-    ballMat.metalnessMap = earthSpecular
-    ballMat.needsUpdate = true
+    earthDiffuse.anisotropy = 4;
+    earthDiffuse.colorSpace = SRGBColorSpace;
+    earthSpecular.anisotropy = 4;
+    earthSpecular.colorSpace = SRGBColorSpace;
+    ballMat.map = earthDiffuse;
+    ballMat.metalnessMap = earthSpecular;
+    ballMat.needsUpdate = true;
   }, [
     floorDiffuse,
     floorBump,
@@ -190,15 +190,15 @@ function Room({ shadows }: { shadows: boolean }) {
     floorMat,
     cubeMat,
     ballMat,
-  ])
+  ]);
 
   // Forces shader recompilation on the shadow toggle — matches the original's
   // `previousShadowMap` diff (see header DIVERGENCE).
   useEffect(() => {
-    floorMat.needsUpdate = true
-    cubeMat.needsUpdate = true
-    ballMat.needsUpdate = true
-  }, [shadows, floorMat, cubeMat, ballMat])
+    floorMat.needsUpdate = true;
+    cubeMat.needsUpdate = true;
+    ballMat.needsUpdate = true;
+  }, [shadows, floorMat, cubeMat, ballMat]);
 
   return (
     <>
@@ -218,7 +218,7 @@ function Room({ shadows }: { shadows: boolean }) {
         <boxGeometry args={[0.5, 0.5, 0.5]} />
       </mesh>
     </>
-  )
+  );
 }
 
 export default function LightsPhysical() {
@@ -231,7 +231,7 @@ export default function LightsPhysical() {
         label: 'irradiance',
       },
     }),
-  })
+  });
 
   return (
     <Canvas
@@ -248,5 +248,5 @@ export default function LightsPhysical() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={1} maxDistance={20} />
     </Canvas>
-  )
+  );
 }

@@ -39,8 +39,8 @@
  *   with the WebGPURenderer default (NoToneMapping); fiber's Canvas would otherwise
  *   default to ACESFilmic and mute the pastel palette
  */
-import { Suspense, useLayoutEffect, useMemo } from 'react'
-import { color, instancedBufferAttribute, mix, mod, positionLocal, rotate, screenUV, time, vec2 } from 'three/tsl'
+import { Suspense, useLayoutEffect, useMemo } from 'react';
+import { color, instancedBufferAttribute, mix, mod, positionLocal, rotate, screenUV, time, vec2 } from 'three/tsl';
 import {
   DoubleSide,
   InstancedBufferAttribute,
@@ -49,45 +49,45 @@ import {
   PlaneGeometry,
   SRGBColorSpace,
   Vector3,
-} from 'three/webgpu'
-import type { Node, Texture } from 'three/webgpu'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { PerspectiveCamera, useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/webgpu';
+import type { Node, Texture } from 'three/webgpu';
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { PerspectiveCamera, useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const SPRITE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sprites/blossom.png'
+const SPRITE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sprites/blossom.png';
 
-const COUNT = 2500
+const COUNT = 2500;
 
 // Layer index === array index: red on 0, yellow on 1, green on 2 (as the original).
-const LAYER_COLORS = [0xd70654, 0xffd95f, 0xb8d576]
+const LAYER_COLORS = [0xd70654, 0xffd95f, 0xb8d576];
 
 // The original's screen-space sky: a horizontal pink→cream gradient plus a lavender
 // glow radiating from the top-center of the screen.
 function Background() {
-  const scene = useThree((state) => state.scene)
+  const scene = useThree((state) => state.scene);
 
   useLayoutEffect(() => {
-    const horizontalEffect = mix(color(0xf996ae), color(0xf6f0a3), screenUV.x)
-    const lightEffect = screenUV.distance(vec2(0.5, 1.0)).oneMinus().mul(color(0xd9b6fd))
+    const horizontalEffect = mix(color(0xf996ae), color(0xf6f0a3), screenUV.x);
+    const lightEffect = screenUV.distance(vec2(0.5, 1.0)).oneMinus().mul(color(0xd9b6fd));
     // Cast: @types/three's Scene doesn't declare `backgroundNode` even though the
     // WebGPU renderer reads it generically (documented duck-typing gap, AGENTS.md B11).
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    withBackgroundNode.backgroundNode = horizontalEffect.add(lightEffect)
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    withBackgroundNode.backgroundNode = horizontalEffect.add(lightEffect);
     return () => {
-      withBackgroundNode.backgroundNode = null
-    }
-  }, [scene])
+      withBackgroundNode.backgroundNode = null;
+    };
+  }, [scene]);
 
-  return null
+  return null;
 }
 
 interface BlossomsProps {
-  layer: number
-  tint: number
-  map: Texture
-  geometry: PlaneGeometry
+  layer: number;
+  tint: number;
+  map: Texture;
+  geometry: PlaneGeometry;
 }
 
 // One instanced blossom storm on a single layer: 2500 copies of the shared quad,
@@ -96,18 +96,18 @@ function Blossoms({ layer, tint, map, geometry }: BlossomsProps) {
   // Random instance data rolled once per mount, exactly like the original's loop:
   // spawn off-screen left, drift right-and-down along a normalized direction.
   const { positionAttribute, rotationAttribute, directionAttribute, timeAttribute } = useMemo(() => {
-    const positions: number[] = []
-    const rotations: number[] = []
-    const directions: number[] = []
-    const timeOffsets: number[] = []
-    const v = new Vector3()
+    const positions: number[] = [];
+    const rotations: number[] = [];
+    const directions: number[] = [];
+    const timeOffsets: number[] = [];
+    const v = new Vector3();
 
     for (let i = 0; i < COUNT; i++) {
-      positions.push(MathUtils.randFloat(-25, -20), MathUtils.randFloat(-10, 50), MathUtils.randFloat(-5, 5))
-      v.set(MathUtils.randFloat(0.7, 0.9), MathUtils.randFloat(-0.3, -0.15), 0).normalize()
-      rotations.push(Math.random(), Math.random(), Math.random())
-      directions.push(v.x, v.y, v.z)
-      timeOffsets.push(i / COUNT)
+      positions.push(MathUtils.randFloat(-25, -20), MathUtils.randFloat(-10, 50), MathUtils.randFloat(-5, 5));
+      v.set(MathUtils.randFloat(0.7, 0.9), MathUtils.randFloat(-0.3, -0.15), 0).normalize();
+      rotations.push(Math.random(), Math.random(), Math.random());
+      directions.push(v.x, v.y, v.z);
+      timeOffsets.push(i / COUNT);
     }
 
     return {
@@ -115,24 +115,24 @@ function Blossoms({ layer, tint, map, geometry }: BlossomsProps) {
       rotationAttribute: new InstancedBufferAttribute(new Float32Array(rotations), 3),
       directionAttribute: new InstancedBufferAttribute(new Float32Array(directions), 3),
       timeAttribute: new InstancedBufferAttribute(new Float32Array(timeOffsets), 1),
-    }
-  }, [])
+    };
+  }, []);
 
   // Explicit type params: typed-TSL creators don't infer from their args (AGENTS.md).
   const positionNode = useMemo(() => {
-    const instancePosition = instancedBufferAttribute<'vec3'>(positionAttribute, 'vec3')
-    const instanceRotation = instancedBufferAttribute<'vec3'>(rotationAttribute, 'vec3')
-    const instanceDirection = instancedBufferAttribute<'vec3'>(directionAttribute, 'vec3')
+    const instancePosition = instancedBufferAttribute<'vec3'>(positionAttribute, 'vec3');
+    const instanceRotation = instancedBufferAttribute<'vec3'>(rotationAttribute, 'vec3');
+    const instanceDirection = instancedBufferAttribute<'vec3'>(directionAttribute, 'vec3');
 
     // Staggered, looping local clock per instance: offset + slow global time, mod 1.
-    const localTime = instancedBufferAttribute<'float'>(timeAttribute, 'float').add(time.mul(0.02))
-    const modTime = mod(localTime, 1.0)
+    const localTime = instancedBufferAttribute<'float'>(timeAttribute, 'float').add(time.mul(0.02));
+    const modTime = mod(localTime, 1.0);
 
     // Tumble the quad around its per-instance axis, then translate: spawn point plus
     // up to 50 units of drift along the per-instance direction over one loop.
-    const rotatedPosition = rotate(positionLocal, instanceRotation.mul(modTime.mul(20)))
-    return rotatedPosition.add(instancePosition).add(instanceDirection.mul(modTime.mul(50)))
-  }, [positionAttribute, rotationAttribute, directionAttribute, timeAttribute])
+    const rotatedPosition = rotate(positionLocal, instanceRotation.mul(modTime.mul(20)));
+    return rotatedPosition.add(instancePosition).add(instanceDirection.mul(modTime.mul(50)));
+  }, [positionAttribute, rotationAttribute, directionAttribute, timeAttribute]);
 
   return (
     <mesh geometry={geometry} count={COUNT} frustumCulled={false} layers-mask={1 << layer}>
@@ -146,18 +146,18 @@ function Blossoms({ layer, tint, map, geometry }: BlossomsProps) {
         positionNode={positionNode}
       />
     </mesh>
-  )
+  );
 }
 
 // Suspends on the sprite fetch (B17 gate in the page component below); the quad
 // geometry and the sRGB-tagged sprite are shared by all three layer materials.
 function BlossomStorms() {
-  const sprite = useTexture(SPRITE_URL)
+  const sprite = useTexture(SPRITE_URL);
   const map = useMemo(() => {
-    sprite.colorSpace = SRGBColorSpace
-    return sprite
-  }, [sprite])
-  const geometry = useMemo(() => new PlaneGeometry(0.25, 0.25), [])
+    sprite.colorSpace = SRGBColorSpace;
+    return sprite;
+  }, [sprite]);
+  const geometry = useMemo(() => new PlaneGeometry(0.25, 0.25), []);
 
   return (
     <>
@@ -165,7 +165,7 @@ function BlossomStorms() {
         <Blossoms key={layer} layer={layer} tint={tint} map={map} geometry={geometry} />
       ))}
     </>
-  )
+  );
 }
 
 export default function Layers() {
@@ -173,11 +173,11 @@ export default function Layers() {
     red: { value: true, label: 'Red' },
     yellow: { value: true, label: 'Yellow' },
     green: { value: true, label: 'Green' },
-  })
+  });
 
   // Compose the mask bit-by-bit from the three checkboxes — the camera starts with
   // only layer 0 enabled (three's own default), same as the original's initial state.
-  const layerMask = (red ? 1 : 0) | (yellow ? 2 : 0) | (green ? 4 : 0)
+  const layerMask = (red ? 1 : 0) | (yellow ? 2 : 0) | (green ? 4 : 0);
 
   return (
     <Canvas
@@ -192,5 +192,5 @@ export default function Layers() {
       </Suspense>
       <DemoHelpers grid={false} maxDistance={60} />
     </Canvas>
-  )
+  );
 }

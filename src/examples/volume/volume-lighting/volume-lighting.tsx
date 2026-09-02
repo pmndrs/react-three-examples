@@ -36,11 +36,11 @@
  *   original's own 100x100 floor is the shadow/god-ray receiver)
  * - `Inspector`/`.toInspector()` wiring dropped (not ported)
  */
-import { Suspense } from 'react'
-import { NeutralToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { VolumeLighting } from './VolumeLighting'
+import { Suspense } from 'react';
+import { NeutralToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { VolumeLighting } from './VolumeLighting';
 
 export default function VolumeLightingExample() {
   return (
@@ -56,5 +56,5 @@ export default function VolumeLightingExample() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={2} maxDistance={40} />
     </Canvas>
-  )
+  );
 }

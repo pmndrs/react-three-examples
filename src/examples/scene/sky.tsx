@@ -28,26 +28,26 @@
  * - DemoHelpers grid disabled (`grid={false}`) — the sky dome fills the frame edge to
  *   edge; a ground grid would cut across open sky where the original has none
  */
-import { useEffect, useLayoutEffect, useRef } from 'react'
-import type { SkyMesh } from 'three/addons/objects/SkyMesh.js'
-import { ACESFilmicToneMapping, MathUtils, Vector3 } from 'three/webgpu'
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import type { SkyMesh } from 'three/addons/objects/SkyMesh.js';
+import { ACESFilmicToneMapping, MathUtils, Vector3 } from 'three/webgpu';
 
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { CubeCamera } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { CubeCamera } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
 
-import '../../assets/SkyMesh'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import '../../assets/SkyMesh';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // Initial camera distance from the origin — reused to lock CameraControls' dolly range
 // (see DIVERGENCE: the wrapper has no enableZoom/enablePan passthrough).
-const CAMERA_POSITION: [number, number, number] = [0, 100, 2000]
-const CAMERA_DISTANCE = Math.hypot(...CAMERA_POSITION)
+const CAMERA_POSITION: [number, number, number] = [0, 100, 2000];
+const CAMERA_DISTANCE = Math.hypot(...CAMERA_POSITION);
 
 // SkyMesh's parameters are all `uniform()`-backed fields on the instance (three.js TSL),
 // mutated directly here — no fiber uniform/rebuild machinery needed.
 function Sky() {
-  const skyRef = useRef<SkyMesh>(null)
+  const skyRef = useRef<SkyMesh>(null);
 
   const {
     turbidity,
@@ -73,24 +73,24 @@ function Sky() {
       cloudDensity: { value: 0.4, min: 0, max: 1, step: 0.01 },
       cloudElevation: { value: 0.5, min: 0, max: 1, step: 0.01 },
     }),
-  })
+  });
 
   useLayoutEffect(() => {
-    const sky = skyRef.current
-    if (!sky) return
+    const sky = skyRef.current;
+    if (!sky) return;
 
-    sky.turbidity.value = turbidity
-    sky.rayleigh.value = rayleigh
-    sky.mieCoefficient.value = mieCoefficient
-    sky.mieDirectionalG.value = mieDirectionalG
-    sky.cloudCoverage.value = cloudCoverage
-    sky.cloudDensity.value = cloudDensity
-    sky.cloudElevation.value = cloudElevation
-    sky.showSunDisc.value = showSunDisc ? 1 : 0
+    sky.turbidity.value = turbidity;
+    sky.rayleigh.value = rayleigh;
+    sky.mieCoefficient.value = mieCoefficient;
+    sky.mieDirectionalG.value = mieDirectionalG;
+    sky.cloudCoverage.value = cloudCoverage;
+    sky.cloudDensity.value = cloudDensity;
+    sky.cloudElevation.value = cloudElevation;
+    sky.showSunDisc.value = showSunDisc ? 1 : 0;
 
-    const phi = MathUtils.degToRad(90 - elevation)
-    const theta = MathUtils.degToRad(azimuth)
-    sky.sunPosition.value.copy(new Vector3().setFromSphericalCoords(1, phi, theta))
+    const phi = MathUtils.degToRad(90 - elevation);
+    const theta = MathUtils.degToRad(azimuth);
+    sky.sunPosition.value.copy(new Vector3().setFromSphericalCoords(1, phi, theta));
   }, [
     turbidity,
     rayleigh,
@@ -102,9 +102,9 @@ function Sky() {
     cloudCoverage,
     cloudDensity,
     cloudElevation,
-  ])
+  ]);
 
-  return <skyMesh ref={skyRef} scale={450000} />
+  return <skyMesh ref={skyRef} scale={450000} />;
 }
 
 // Reflective sphere: drei's <CubeCamera> hides its children, captures the surrounding
@@ -121,23 +121,23 @@ function ReflectiveSphere() {
         </mesh>
       )}
     </CubeCamera>
-  )
+  );
 }
 
 // renderer.toneMappingExposure is a WebGPURenderer property, not a TSL uniform — has no
 // place in a node graph, so it's set imperatively (same pattern as
 // postprocessing-bloom-emissive's ToneMappingExposure).
 function ToneMappingExposure() {
-  const renderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer);
   const { exposure } = useControls('webgpu-sky', {
     exposure: { value: 0.05, min: 0, max: 1, step: 0.0001 },
-  })
+  });
 
   useEffect(() => {
-    renderer.toneMappingExposure = exposure
-  }, [renderer, exposure])
+    renderer.toneMappingExposure = exposure;
+  }, [renderer, exposure]);
 
-  return null
+  return null;
 }
 
 export default function WebgpuSky() {
@@ -150,5 +150,5 @@ export default function WebgpuSky() {
       <ToneMappingExposure />
       <DemoHelpers grid={false} minDistance={CAMERA_DISTANCE} maxDistance={CAMERA_DISTANCE} pan={false} />
     </Canvas>
-  )
+  );
 }

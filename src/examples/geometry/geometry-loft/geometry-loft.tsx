@@ -50,30 +50,30 @@
  *   pedestals stand on, and a world-space grid at a different height would clash
  *   with the theater curtain's 58-unit-radius footprint
  */
-import { useEffect } from 'react'
-import { color, screenUV } from 'three/tsl'
-import { NeutralToneMapping } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { Environment } from '@react-three/drei/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Exhibits } from './Exhibits'
+import { useEffect } from 'react';
+import { color, screenUV } from 'three/tsl';
+import { NeutralToneMapping } from 'three/webgpu';
+import type { Node } from 'three/webgpu';
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { Environment } from '@react-three/drei/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Exhibits } from './Exhibits';
 
 // A vignette in the background. Cast: `@types/three`'s `Scene` doesn't declare
 // `backgroundNode` even though the webgpu renderer reads it directly off the live
 // scene instance (same documented duck-typed gap as `reflection.tsx`/`sprites.tsx`).
 function SceneBackground() {
-  const scene = useThree((s) => s.scene)
+  const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    withBackgroundNode.backgroundNode = screenUV.distance(0.5).mix(color(0x5d5d84), color(0x2e2e44))
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    withBackgroundNode.backgroundNode = screenUV.distance(0.5).mix(color(0x5d5d84), color(0x2e2e44));
     return () => {
-      withBackgroundNode.backgroundNode = null
-    }
-  }, [scene])
+      withBackgroundNode.backgroundNode = null;
+    };
+  }, [scene]);
 
-  return null
+  return null;
 }
 
 export default function GeometryLoft() {
@@ -101,5 +101,5 @@ export default function GeometryLoft() {
       <Exhibits />
       <DemoHelpers grid={false} target={[0, -3, 0]} minDistance={15} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

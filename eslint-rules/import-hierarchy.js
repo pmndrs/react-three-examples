@@ -19,17 +19,17 @@ const TIERS = [
   [2, (s) => s === '@react-three/fiber' || s.startsWith('@react-three/fiber/')],
   // Everything else non-relative: drei, leva, camera-controls, react-router, …
   [3, (s) => !s.startsWith('.')],
-]
+];
 
 /** Rank an import source. Lower sorts earlier. */
 function rank(source) {
-  for (const [tier, test] of TIERS) if (test(source)) return [tier, 0]
+  for (const [tier, test] of TIERS) if (test(source)) return [tier, 0];
   // Relative: more `../` means more global, so it comes first. `./` is last.
-  const ups = (source.match(/\.\.\//g) ?? []).length
-  return [4, -ups]
+  const ups = (source.match(/\.\.\//g) ?? []).length;
+  return [4, -ups];
 }
 
-const TIER_LABEL = ['react', 'three', '@react-three/fiber', 'third-party', 'local']
+const TIER_LABEL = ['react', 'three', '@react-three/fiber', 'third-party', 'local'];
 
 export default {
   meta: {
@@ -48,12 +48,12 @@ export default {
         const imports = program.body.filter(
           // Type-only imports interleave freely; they read as part of their tier.
           (node) => node.type === 'ImportDeclaration',
-        )
-        let prev = null
+        );
+        let prev = null;
         for (const node of imports) {
-          const source = node.source.value
-          if (typeof source !== 'string') continue
-          const key = rank(source)
+          const source = node.source.value;
+          if (typeof source !== 'string') continue;
+          const key = rank(source);
           if (prev && (key[0] < prev.key[0] || (key[0] === prev.key[0] && key[1] < prev.key[1]))) {
             context.report({
               node,
@@ -64,11 +64,11 @@ export default {
                 tier: TIER_LABEL[key[0]],
                 prevTier: TIER_LABEL[prev.key[0]],
               },
-            })
+            });
           }
-          prev = { key, source }
+          prev = { key, source };
         }
       },
-    }
+    };
   },
-}
+};

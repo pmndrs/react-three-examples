@@ -32,33 +32,33 @@
  * - Box bobbing driven by `useFrame`'s `state.elapsed` instead of `performance.now()`
  * - `renderer.inspector` / `Inspector` integration dropped (repo doesn't wire it)
  */
-import { Suspense, useRef } from 'react'
-import { ACESFilmicToneMapping, type Mesh } from 'three/webgpu'
+import { Suspense, useRef } from 'react';
+import { ACESFilmicToneMapping, type Mesh } from 'three/webgpu';
 
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { OceanSky } from './OceanSky'
-import { PostFX, ToneMappingExposure } from './PostFX'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { OceanSky } from './OceanSky';
+import { PostFX, ToneMappingExposure } from './PostFX';
 
 // The mirror-finish box bobbing in the swell — lit purely by the PMREM'd sky.
 function BobbingBox() {
-  const meshRef = useRef<Mesh>(null)
+  const meshRef = useRef<Mesh>(null);
 
   useFrame((state) => {
-    const mesh = meshRef.current
-    if (!mesh) return
-    mesh.position.y = Math.sin(state.elapsed) * 20 + 5
-    mesh.rotation.x = state.elapsed * 0.5
-    mesh.rotation.z = state.elapsed * 0.51
-  })
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    mesh.position.y = Math.sin(state.elapsed) * 20 + 5;
+    mesh.rotation.x = state.elapsed * 0.5;
+    mesh.rotation.z = state.elapsed * 0.51;
+  });
 
   return (
     <mesh ref={meshRef}>
       <boxGeometry args={[30, 30, 30]} />
       <meshStandardMaterial roughness={0} />
     </mesh>
-  )
+  );
 }
 
 export default function Ocean() {
@@ -81,5 +81,5 @@ export default function Ocean() {
         maxPolarAngle={Math.PI * 0.495}
       />
     </Canvas>
-  )
+  );
 }

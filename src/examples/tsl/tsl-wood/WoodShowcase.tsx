@@ -1,21 +1,21 @@
 // The swatch grid: every WoodNodeMaterial genus/finish preset as a rounded
 // block, TextGeometry row/column labels, and the leva-driven "custom" block.
 // Suspends on the label font — mounted inside the page's one Suspense gate.
-import { useMemo } from 'react'
-import { Matrix4, MeshStandardNodeMaterial, type MeshPhysicalNodeMaterial } from 'three/webgpu'
-import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js'
-import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js'
-import { Finishes, WoodGenuses, WoodNodeMaterial } from 'three/addons/materials/WoodNodeMaterial.js'
+import { useMemo } from 'react';
+import { Matrix4, MeshStandardNodeMaterial, type MeshPhysicalNodeMaterial } from 'three/webgpu';
+import { FontLoader, type Font } from 'three/addons/loaders/FontLoader.js';
+import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { Finishes, WoodGenuses, WoodNodeMaterial } from 'three/addons/materials/WoodNodeMaterial.js';
 
-import { useLoader } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { useLoader } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-const FONT_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/fonts/helvetiker_regular.typeface.json'
+const FONT_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/fonts/helvetiker_regular.typeface.json';
 
 // Original's getGridPosition — coordinates are local to the rotated base group.
 function gridPosition(woodIndex: number, finishIndex: number): [number, number, number] {
-  return [0, (finishIndex - Finishes.length / 2) * 1.0, (woodIndex - WoodGenuses.length / 2 + 0.45) * 1.0]
+  return [0, (finishIndex - Finishes.length / 2) * 1.0, (woodIndex - WoodGenuses.length / 2 + 0.45) * 1.0];
 }
 
 // A bbox-centered TextGeometry label, rotated to face up through the base
@@ -26,10 +26,10 @@ function Label({
   material,
   position,
 }: {
-  text: string
-  font: Font
-  material: MeshStandardNodeMaterial
-  position: [number, number, number]
+  text: string;
+  font: Font;
+  material: MeshStandardNodeMaterial;
+  position: [number, number, number];
 }) {
   const geometry = useMemo(() => {
     const geo = new TextGeometry(text, {
@@ -38,18 +38,18 @@ function Label({
       depth: 0.001,
       curveSegments: 12,
       bevelEnabled: false,
-    })
-    geo.computeBoundingBox()
-    const bb = geo.boundingBox!
-    geo.translate(-0.5 * (bb.max.x - bb.min.x), -0.5 * (bb.max.y - bb.min.y), -0.5 * (bb.max.z - bb.min.z))
-    return geo
-  }, [text, font])
+    });
+    geo.computeBoundingBox();
+    const bb = geo.boundingBox!;
+    geo.translate(-0.5 * (bb.max.x - bb.min.x), -0.5 * (bb.max.y - bb.min.y), -0.5 * (bb.max.z - bb.min.z));
+    return geo;
+  }, [text, font]);
 
   return (
     <group position={position} rotation-y={-Math.PI / 2}>
       <mesh geometry={geometry} material={material} />
     </group>
-  )
+  );
 }
 
 export function WoodShowcase() {
@@ -79,13 +79,13 @@ export function WoodShowcase() {
     lightGrainColor: '#926c50',
     clearcoat: { value: 1, min: 0, max: 1, step: 0.01 },
     clearcoatRoughness: { value: 0.2, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
-  const font = useLoader(FontLoader, FONT_URL)
+  const font = useLoader(FontLoader, FONT_URL);
 
   // One shared rounded slab, one shared black label material (like the original).
-  const blockGeometry = useMemo(() => new RoundedBoxGeometry(0.125, 0.9, 0.9, 10, 0.02), [])
-  const labelMaterial = useMemo(() => new MeshStandardNodeMaterial({ color: '#000000' }), [])
+  const blockGeometry = useMemo(() => new RoundedBoxGeometry(0.125, 0.9, 0.9, 10, 0.02), []);
+  const labelMaterial = useMemo(() => new MeshStandardNodeMaterial({ color: '#000000' }), []);
 
   // 10 genuses x 4 finishes. Each material samples a different slice of the
   // procedural log via its transformationMatrix uniform (random z, like the
@@ -94,13 +94,13 @@ export function WoodShowcase() {
     () =>
       WoodGenuses.flatMap((genus, x) =>
         Finishes.map((finish, y) => {
-          const material = WoodNodeMaterial.fromPreset(genus, finish)
-          material.transformationMatrix = new Matrix4().setPosition(-0.1, 0, Math.random())
-          return { key: `${genus}-${finish}`, material, position: gridPosition(x, y) }
+          const material = WoodNodeMaterial.fromPreset(genus, finish);
+          material.transformationMatrix = new Matrix4().setPosition(-0.1, 0, Math.random());
+          return { key: `${genus}-${finish}`, material, position: gridPosition(x, y) };
         }),
       ),
     [],
-  )
+  );
 
   const customMaterial = useMemo(() => {
     // Constructed with the leva defaults so the first shader build matches the
@@ -126,16 +126,16 @@ export function WoodShowcase() {
       lightGrainColor: '#926c50',
       clearcoat: 1,
       clearcoatRoughness: 0.2,
-    })
-    material.transformationMatrix = new Matrix4().setPosition(-0.1, 0, Math.random())
+    });
+    material.transformationMatrix = new Matrix4().setPosition(-0.1, 0, Math.random());
     // The r185 constructor bakes clearcoatNode to a CONSTANT, which overrides
     // the live `clearcoat` property (the original's GUI slider is inert because
     // of this). Null it before the first build so the reference-backed property
     // drives the coat instead. Cast: @types declares WoodNodeMaterial as the
     // classic MeshPhysicalMaterial, which omits the *Node fields (B11 family).
-    ;(material as unknown as MeshPhysicalNodeMaterial).clearcoatNode = null
-    return material
-  }, [])
+    (material as unknown as MeshPhysicalNodeMaterial).clearcoatNode = null;
+    return material;
+  }, []);
 
   return (
     // The original's `base` group: rotated so the slab grid lies flat under the
@@ -167,5 +167,5 @@ export function WoodShowcase() {
         <primitive object={customMaterial} attach="material" {...custom} />
       </mesh>
     </group>
-  )
+  );
 }

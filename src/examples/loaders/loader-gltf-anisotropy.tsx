@@ -40,30 +40,30 @@
  *   y = -0.08) so the world-origin grid plane would slice straight through the subject
  *   of a macro shot (same call as the other loader-gltf-* ports).
  */
-import { Suspense } from 'react'
-import { ACESFilmicToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { Environment, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense } from 'react';
+import { ACESFilmicToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { Environment, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/AnisotropyBarnLamp.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/AnisotropyBarnLamp.glb';
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/pedestrian_overpass_1k.hdr'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/pedestrian_overpass_1k.hdr';
 
 // `useGLTF` runs the model through GLTFLoader's built-in
 // `GLTFMaterialsAnisotropyExtension`, which sets `anisotropy`/`anisotropyRotation` (and
 // the anisotropy direction texture) directly on the resulting `MeshPhysicalNodeMaterial`
 // — nothing left to wire up here, matching the original's plain `scene.add(gltf.scene)`.
 function BarnLamp() {
-  const { scene } = useGLTF(MODEL_URL)
-  return <primitive object={scene} />
+  const { scene } = useGLTF(MODEL_URL);
+  return <primitive object={scene} />;
 }
 
 export default function LoaderGltfAnisotropy() {
   const { blurriness } = useControls('loader-gltf-anisotropy', {
     blurriness: { value: 0.5, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   return (
     <Canvas
@@ -84,5 +84,5 @@ export default function LoaderGltfAnisotropy() {
         autoRotateSpeed={-0.5}
       />
     </Canvas>
-  )
+  );
 }

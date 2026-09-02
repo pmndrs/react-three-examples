@@ -39,7 +39,7 @@
  *   (`grid={false}`) — the scene is a single sphere against a full skybox background
  *   with no ground plane in the original
  */
-import { Suspense, useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react';
 import {
   CubeReflectionMapping,
   CubeRefractionMapping,
@@ -47,67 +47,67 @@ import {
   EquirectangularRefractionMapping,
   MeshBasicNodeMaterial,
   SRGBColorSpace,
-} from 'three/webgpu'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useCubeTexture, useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/webgpu';
+import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu';
+import { useCubeTexture, useTexture } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/Bridge2/'
-const CUBE_FILES = ['posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg']
-const EQUIREC_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/2294472375_24a3b8ef46_o.jpg'
+const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/Bridge2/';
+const CUBE_FILES = ['posx.jpg', 'negx.jpg', 'posy.jpg', 'negy.jpg', 'posz.jpg', 'negz.jpg'];
+const EQUIREC_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/2294472375_24a3b8ef46_o.jpg';
 
 // Radians/second applied to whichever `scene.backgroundRotation` axes are toggled on —
 // see header DIVERGENCE (delta-scaled replacement for the original's per-frame `+=0.001`).
-const ROTATION_SPEED = 0.06
+const ROTATION_SPEED = 0.06;
 
-type EnvMapType = 'Cube' | 'Equirectangular'
+type EnvMapType = 'Cube' | 'Equirectangular';
 
 interface EnvMapSphereProps {
-  type: EnvMapType
-  refraction: boolean
-  rotateX: boolean
-  rotateY: boolean
-  rotateZ: boolean
-  syncMaterial: boolean
+  type: EnvMapType;
+  refraction: boolean;
+  rotateX: boolean;
+  rotateY: boolean;
+  rotateZ: boolean;
+  syncMaterial: boolean;
 }
 
 // Loads both env maps once, toggles which one backs `scene.background` + the sphere's
 // `envMap`, and switches Reflection<->Refraction mapping on both — see header
 // DEMONSTRATES for why `needsUpdate` is required here but not for rotation.
 function EnvMapSphere({ type, refraction, rotateX, rotateY, rotateZ, syncMaterial }: EnvMapSphereProps) {
-  const scene = useThree((s) => s.scene)
-  const textureCube = useCubeTexture(CUBE_FILES, { path: CUBE_PATH })
-  const textureEquirec = useTexture(EQUIREC_URL)
+  const scene = useThree((s) => s.scene);
+  const textureCube = useCubeTexture(CUBE_FILES, { path: CUBE_PATH });
+  const textureEquirec = useTexture(EQUIREC_URL);
 
-  const material = useMemo(() => new MeshBasicNodeMaterial(), [])
-
-  useEffect(() => {
-    textureEquirec.colorSpace = SRGBColorSpace
-  }, [textureEquirec])
+  const material = useMemo(() => new MeshBasicNodeMaterial(), []);
 
   useEffect(() => {
-    textureCube.mapping = refraction ? CubeRefractionMapping : CubeReflectionMapping
-    textureEquirec.mapping = refraction ? EquirectangularRefractionMapping : EquirectangularReflectionMapping
+    textureEquirec.colorSpace = SRGBColorSpace;
+  }, [textureEquirec]);
 
-    const activeTexture = type === 'Cube' ? textureCube : textureEquirec
-    scene.background = activeTexture
-    material.envMap = activeTexture
-    material.needsUpdate = true
-  }, [scene, material, type, refraction, textureCube, textureEquirec])
+  useEffect(() => {
+    textureCube.mapping = refraction ? CubeRefractionMapping : CubeReflectionMapping;
+    textureEquirec.mapping = refraction ? EquirectangularRefractionMapping : EquirectangularReflectionMapping;
+
+    const activeTexture = type === 'Cube' ? textureCube : textureEquirec;
+    scene.background = activeTexture;
+    material.envMap = activeTexture;
+    material.needsUpdate = true;
+  }, [scene, material, type, refraction, textureCube, textureEquirec]);
 
   useFrame(({ delta }) => {
-    if (rotateX) scene.backgroundRotation.x += ROTATION_SPEED * delta
-    if (rotateY) scene.backgroundRotation.y += ROTATION_SPEED * delta
-    if (rotateZ) scene.backgroundRotation.z += ROTATION_SPEED * delta
-    if (syncMaterial) material.envMapRotation.copy(scene.backgroundRotation)
-  })
+    if (rotateX) scene.backgroundRotation.x += ROTATION_SPEED * delta;
+    if (rotateY) scene.backgroundRotation.y += ROTATION_SPEED * delta;
+    if (rotateZ) scene.backgroundRotation.z += ROTATION_SPEED * delta;
+    if (syncMaterial) material.envMapRotation.copy(scene.backgroundRotation);
+  });
 
   return (
     <mesh material={material}>
       <icosahedronGeometry args={[1, 15]} />
     </mesh>
-  )
+  );
 }
 
 export default function MaterialsEnvmaps() {
@@ -120,7 +120,7 @@ export default function MaterialsEnvmaps() {
       rotateY: false,
       rotateZ: false,
     }),
-  })
+  });
 
   return (
     <Canvas renderer camera={{ position: [0, 0, 2.5], fov: 70, near: 0.1, far: 100 }}>
@@ -138,5 +138,5 @@ export default function MaterialsEnvmaps() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={1.5} maxDistance={6} />
     </Canvas>
-  )
+  );
 }

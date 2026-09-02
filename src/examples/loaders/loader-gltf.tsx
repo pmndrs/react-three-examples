@@ -55,30 +55,31 @@
  *   pattern (`instance-mesh`) — repeatedly swapping through many large models in one
  *   session grows GPU memory faster than the original; a real tradeoff, not a bug.
  */
-import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import { AnimationMixer, ACESFilmicToneMapping } from 'three/webgpu'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { Environment, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { AnimationMixer, ACESFilmicToneMapping } from 'three/webgpu';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { Environment, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MODEL_INDEX_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json'
-const MODEL_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models'
-const DEFAULT_MODEL_URL = `${MODEL_BASE_URL}/DamagedHelmet/glTF-Binary/DamagedHelmet.glb`
-const HDR_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/quarry_01_1k.hdr'
+const MODEL_INDEX_URL =
+  'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models/model-index.json';
+const MODEL_BASE_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Assets/main/Models';
+const DEFAULT_MODEL_URL = `${MODEL_BASE_URL}/DamagedHelmet/glTF-Binary/DamagedHelmet.glb`;
+const HDR_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/quarry_01_1k.hdr';
 
 interface GltfSampleModel {
-  name: string
-  variants: Record<string, string>
+  name: string;
+  variants: Record<string, string>;
 }
 
 // Mirrors the original's `loadModel`: prefer the single-file glTF-Binary variant,
 // fall back to the multi-file glTF variant; the variant's own extension picks the
 // KhronosGroup repo folder ('glTF-Binary' vs 'glTF').
 function resolveModelUrl(model: GltfSampleModel): string {
-  const variant = model.variants['glTF-Binary'] ?? model.variants['glTF']
-  const folder = variant.endsWith('.glb') ? 'glTF-Binary' : 'glTF'
-  return `${MODEL_BASE_URL}/${model.name}/${folder}/${variant}`
+  const variant = model.variants['glTF-Binary'] ?? model.variants['glTF'];
+  const folder = variant.endsWith('.glb') ? 'glTF-Binary' : 'glTF';
+  return `${MODEL_BASE_URL}/${model.name}/${folder}/${variant}`;
 }
 
 // Plays every animation clip on the loaded model via a raw AnimationMixer — the
@@ -86,43 +87,43 @@ function resolveModelUrl(model: GltfSampleModel): string {
 // Not drei's `useAnimations`: clip names are unknown ahead of time for an arbitrary,
 // user-picked community model, so there's no "by name" list to play selectively.
 function Model({ url }: { url: string }) {
-  const { scene, animations } = useGLTF(url)
-  const mixerRef = useRef<AnimationMixer | null>(null)
+  const { scene, animations } = useGLTF(url);
+  const mixerRef = useRef<AnimationMixer | null>(null);
 
   useLayoutEffect(() => {
-    if (animations.length === 0) return
-    const mixer = new AnimationMixer(scene)
-    for (const clip of animations) mixer.clipAction(clip).play()
-    mixerRef.current = mixer
+    if (animations.length === 0) return;
+    const mixer = new AnimationMixer(scene);
+    for (const clip of animations) mixer.clipAction(clip).play();
+    mixerRef.current = mixer;
     return () => {
-      mixer.stopAllAction()
-      mixerRef.current = null
-    }
-  }, [scene, animations])
+      mixer.stopAllAction();
+      mixerRef.current = null;
+    };
+  }, [scene, animations]);
 
   useFrame(({ delta }) => {
-    mixerRef.current?.update(delta)
-  })
+    mixerRef.current?.update(delta);
+  });
 
-  return <primitive object={scene} />
+  return <primitive object={scene} />;
 }
 
 export default function LoaderGltf() {
-  const [modelIndex, setModelIndex] = useState<GltfSampleModel[]>([])
+  const [modelIndex, setModelIndex] = useState<GltfSampleModel[]>([]);
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
     fetch(MODEL_INDEX_URL)
       .then((res) => res.json())
       .then((models: GltfSampleModel[]) => {
-        if (!cancelled) setModelIndex(models)
-      })
+        if (!cancelled) setModelIndex(models);
+      });
     return () => {
-      cancelled = true
-    }
-  }, [])
+      cancelled = true;
+    };
+  }, []);
 
-  const modelNames = useMemo(() => modelIndex.map((m) => m.name), [modelIndex])
+  const modelNames = useMemo(() => modelIndex.map((m) => m.name), [modelIndex]);
 
   const { model, blurriness } = useControls(
     'loader-gltf',
@@ -131,10 +132,10 @@ export default function LoaderGltf() {
       blurriness: { value: 0, min: 0, max: 1, step: 0.01 },
     },
     [modelNames],
-  )
+  );
 
-  const modelInfo = modelIndex.find((m) => m.name === model)
-  const modelUrl = modelInfo ? resolveModelUrl(modelInfo) : DEFAULT_MODEL_URL
+  const modelInfo = modelIndex.find((m) => m.name === model);
+  const modelUrl = modelInfo ? resolveModelUrl(modelInfo) : DEFAULT_MODEL_URL;
 
   return (
     <Canvas
@@ -148,5 +149,5 @@ export default function LoaderGltf() {
           the infinite grid renders through both (same call as tonemapping/bloom). */}
       <DemoHelpers grid={false} target={[0, 0, -0.2]} minDistance={2} maxDistance={10} />
     </Canvas>
-  )
+  );
 }

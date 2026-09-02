@@ -36,51 +36,51 @@
  *   (@types/three doesn't declare either duck-typed field; runtime reads verified —
  *   same B11-family gap as the `reflection` cousin)
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { color, hue, mix, normalWorld, time, vec3 } from 'three/tsl'
-import { DoubleSide, NeutralToneMapping, SRGBColorSpace } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { BlurredFloor } from './BlurredFloor'
-import { Michelle } from './Michelle'
+import { Suspense, useEffect, useMemo } from 'react';
+import { color, hue, mix, normalWorld, time, vec3 } from 'three/tsl';
+import { DoubleSide, NeutralToneMapping, SRGBColorSpace } from 'three/webgpu';
+import type { Node } from 'three/webgpu';
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { BlurredFloor } from './BlurredFloor';
+import { Michelle } from './Michelle';
 
-const UV_GRID_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/uv_grid_directx.jpg'
+const UV_GRID_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/uv_grid_directx.jpg';
 
 // Scene-level TSL background: an up-facing world-normal gradient toward deep blue,
 // continuously hue-cycled with `time`. Cast: `@types/three`'s `Scene` doesn't declare
 // `backgroundNode` even though the WebGPU renderer reads it off the live scene
 // instance (same documented gap as the `reflection` cousin and `sprites.tsx`).
 function SceneBackground() {
-  const scene = useThree((s) => s.scene)
+  const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    withBackgroundNode.backgroundNode = hue(mix(vec3(0), color(0x0066ff), normalWorld.y).mul(0.1), time)
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    withBackgroundNode.backgroundNode = hue(mix(vec3(0), color(0x0066ff), normalWorld.y).mul(0.1), time);
     return () => {
-      withBackgroundNode.backgroundNode = null
-    }
-  }, [scene])
+      withBackgroundNode.backgroundNode = null;
+    };
+  }, [scene]);
 
-  return null
+  return null;
 }
 
 // The original's debug UV plane behind the dancer — handy for judging how the blur
 // smears a high-frequency texture in the reflection.
 function UvPlane() {
-  const uvMap = useTexture(UV_GRID_URL)
+  const uvMap = useTexture(UV_GRID_URL);
 
   useMemo(() => {
-    uvMap.colorSpace = SRGBColorSpace
-  }, [uvMap])
+    uvMap.colorSpace = SRGBColorSpace;
+  }, [uvMap]);
 
   return (
     <mesh position={[0, 1, -3]}>
       <planeGeometry args={[2, 2]} />
       <meshStandardNodeMaterial map={uvMap} side={DoubleSide} />
     </mesh>
-  )
+  );
 }
 
 export default function ReflectionBlurred() {
@@ -99,5 +99,5 @@ export default function ReflectionBlurred() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 0.5, 0]} minDistance={1} maxDistance={10} maxPolarAngle={Math.PI / 2} />
     </Canvas>
-  )
+  );
 }

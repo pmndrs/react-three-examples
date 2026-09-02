@@ -36,95 +36,95 @@
  *   with the WebGPURenderer default; fiber's Canvas would otherwise default to
  *   ACESFilmic and mute the random instance palette
  */
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { Color, IcosahedronGeometry, Matrix4, MeshStandardMaterial, NoToneMapping, PMREMGenerator } from 'three/webgpu'
-import type { InstancedMesh } from 'three/webgpu'
-import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js'
-import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js'
-import { Canvas, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { Color, IcosahedronGeometry, Matrix4, MeshStandardMaterial, NoToneMapping, PMREMGenerator } from 'three/webgpu';
+import type { InstancedMesh } from 'three/webgpu';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { ssaaPass } from 'three/addons/tsl/display/SSAAPassNode.js';
+import { Canvas, useRenderPipeline, useThree } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // RoomEnvironment → PMREM → scene.environment: the scene's only light source
 // (matches the original — no analytical lights, full intensity).
 function RoomEnv() {
-  const renderer = useThree((s) => s.renderer)
-  const scene = useThree((s) => s.scene)
+  const renderer = useThree((s) => s.renderer);
+  const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const environment = new RoomEnvironment()
-    const pmremGenerator = new PMREMGenerator(renderer)
-    const envRT = pmremGenerator.fromScene(environment, 0.04)
-    scene.environment = envRT.texture
-    environment.dispose()
-    pmremGenerator.dispose()
+    const environment = new RoomEnvironment();
+    const pmremGenerator = new PMREMGenerator(renderer);
+    const envRT = pmremGenerator.fromScene(environment, 0.04);
+    scene.environment = envRT.texture;
+    environment.dispose();
+    pmremGenerator.dispose();
     return () => {
-      scene.environment = null
-      envRT.dispose()
-    }
-  }, [renderer, scene])
+      scene.environment = null;
+      envRT.dispose();
+    };
+  }, [renderer, scene]);
 
-  return null
+  return null;
 }
 
 interface SphereGridProps {
-  amount: number
-  alpha: number
-  alphaHash: boolean
+  amount: number;
+  alpha: number;
+  alphaHash: boolean;
 }
 
 // amount³ icosahedra in a centered grid, one InstancedMesh, random color per
 // instance. Remounted by the parent when `amount` changes (fixed buffer size).
 function SphereGrid({ amount, alpha, alphaHash }: SphereGridProps) {
-  const count = amount ** 3
-  const meshRef = useRef<InstancedMesh>(null)
+  const count = amount ** 3;
+  const meshRef = useRef<InstancedMesh>(null);
 
-  const geometry = useMemo(() => new IcosahedronGeometry(0.5, 3), [])
-  const material = useMemo(() => new MeshStandardMaterial({ color: 0xffffff, alphaHash: true, opacity: 0.5 }), [])
+  const geometry = useMemo(() => new IcosahedronGeometry(0.5, 3), []);
+  const material = useMemo(() => new MeshStandardMaterial({ color: 0xffffff, alphaHash: true, opacity: 0.5 }), []);
 
   // Static transforms + per-instance colors, written BEFORE the first RAF render:
   // the WebGPU shader-graph build reads the mesh once — setColorAt must have created
   // the instanceColor buffer by then (useLayoutEffect, not useEffect — AGENTS.md).
   useLayoutEffect(() => {
-    const mesh = meshRef.current
-    if (!mesh) return
-    const matrix = new Matrix4()
-    const color = new Color()
-    const offset = (amount - 1) / 2
-    let i = 0
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    const matrix = new Matrix4();
+    const color = new Color();
+    const offset = (amount - 1) / 2;
+    let i = 0;
     for (let x = 0; x < amount; x++) {
       for (let y = 0; y < amount; y++) {
         for (let z = 0; z < amount; z++) {
-          matrix.setPosition(offset - x, offset - y, offset - z)
-          mesh.setMatrixAt(i, matrix)
-          mesh.setColorAt(i, color.setHex(Math.random() * 0xffffff))
-          i++
+          matrix.setPosition(offset - x, offset - y, offset - z);
+          mesh.setMatrixAt(i, matrix);
+          mesh.setColorAt(i, color.setHex(Math.random() * 0xffffff));
+          i++;
         }
       }
     }
-  }, [amount])
+  }, [amount]);
 
   // Port of the original's onMaterialUpdate: alphaHash renders as dithered-OPAQUE
   // geometry, so `transparent` and `depthWrite` flip opposite to the toggle. The
   // shader path changes either way — commit with needsUpdate.
   useEffect(() => {
-    material.opacity = alpha
-    material.alphaHash = alphaHash
-    material.transparent = !alphaHash
-    material.depthWrite = alphaHash
-    material.needsUpdate = true
-  }, [material, alpha, alphaHash])
+    material.opacity = alpha;
+    material.alphaHash = alphaHash;
+    material.transparent = !alphaHash;
+    material.depthWrite = alphaHash;
+    material.needsUpdate = true;
+  }, [material, alpha, alphaHash]);
 
-  return <instancedMesh ref={meshRef} args={[geometry, material, count]} />
+  return <instancedMesh ref={meshRef} args={[geometry, material, count]} />;
 }
 
 // The whole pipeline IS the SSAA pass: it re-renders the scene 2^sampleLevel times
 // with sub-pixel camera jitter and accumulates — resolving alphaHash's dither noise.
 function SSAAPipeline({ sampleLevel }: { sampleLevel: number }) {
   const { passes } = useRenderPipeline(({ renderPipeline, scene, camera }) => {
-    if (!renderPipeline) return
+    if (!renderPipeline) return;
 
-    const ssaa = ssaaPass(scene, camera)
+    const ssaa = ssaaPass(scene, camera);
     // SSAA supersedes MSAA, and the pass's accumulation target inherits the
     // renderer's sample count (fiber Canvas defaults to MSAA 4x) while its internal
     // per-sample clone stays single-sampled — the end-of-frame depth
@@ -132,23 +132,23 @@ function SSAAPipeline({ sampleLevel }: { sampleLevel: number }) {
     // Same rule as TRAA/depth-copy passes (AGENTS.md; pattern: postprocessing-ao).
     // Cast: PassNode's constructor stores `options` at runtime but @types/three's
     // PassNode declaration omits the field (UPSTREAM.md B11 cast family).
-    ;(ssaa as unknown as { options: { samples?: number } }).options.samples = 0
-    ssaa.sampleLevel = 3
-    renderPipeline.outputNode = ssaa
+    (ssaa as unknown as { options: { samples?: number } }).options.samples = 0;
+    ssaa.sampleLevel = 3;
+    renderPipeline.outputNode = ssaa;
 
     // Return to register — the effect below mutates sampleLevel without a rebuild.
-    return { ssaa }
-  })
+    return { ssaa };
+  });
 
   // sampleLevel is a plain property the pass re-reads every frame in updateBefore —
   // pattern (b)'s cousin with no uniform involved at all.
   useEffect(() => {
-    const ssaa = passes.ssaa as ReturnType<typeof ssaaPass> | undefined
-    if (!ssaa) return
-    ssaa.sampleLevel = sampleLevel
-  }, [passes, sampleLevel])
+    const ssaa = passes.ssaa as ReturnType<typeof ssaaPass> | undefined;
+    if (!ssaa) return;
+    ssaa.sampleLevel = sampleLevel;
+  }, [passes, sampleLevel]);
 
-  return null
+  return null;
 }
 
 export default function MaterialsAlphaHash() {
@@ -157,7 +157,7 @@ export default function MaterialsAlphaHash() {
     alpha: { value: 0.5, min: 0, max: 1, step: 0.01 },
     alphaHash: true,
     sampleLevel: { value: 3, min: 0, max: 4, step: 1 },
-  })
+  });
 
   return (
     <Canvas
@@ -171,5 +171,5 @@ export default function MaterialsAlphaHash() {
       <SSAAPipeline sampleLevel={sampleLevel} />
       <DemoHelpers grid={false} pan={false} minDistance={1.5} maxDistance={20} />
     </Canvas>
-  )
+  );
 }

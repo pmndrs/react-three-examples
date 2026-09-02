@@ -2,7 +2,7 @@
 // update kernels, the top-down collision height-map pre-pass, and the two instanced
 // flake meshes (falling + settled). Uses fiber hooks throughout, so it lives inside
 // <Canvas>, not in the page shell.
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   Fn,
   hash,
@@ -15,7 +15,7 @@ import {
   time,
   uint,
   vec3,
-} from 'three/tsl'
+} from 'three/tsl';
 import {
   HalfFloatType,
   MeshBasicNodeMaterial,
@@ -25,45 +25,45 @@ import {
   RedFormat,
   RenderTarget,
   SphereGeometry,
-} from 'three/webgpu'
-import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { button, useControls } from 'leva'
+} from 'three/webgpu';
+import { useBuffers, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { button, useControls } from 'leva';
 
-const PARTICLE_COUNT = 100_000
+const PARTICLE_COUNT = 100_000;
 // Flake radius — also the per-flake surface clearance in the landing test.
-const SURFACE_OFFSET = 0.2
+const SURFACE_OFFSET = 0.2;
 
 // Layer wiring (as the original): scenery on 0 (both cameras), settled snow on 1
 // (collision camera only — it exists to raise the height map), falling snow on 2
 // (main camera only — it must never pollute the height map while airborne).
-const STATIC_LAYER_MASK = 1 << 1
-const DYNAMIC_LAYER_MASK = 1 << 2
+const STATIC_LAYER_MASK = 1 << 1;
+const DYNAMIC_LAYER_MASK = 1 << 2;
 
 export function SnowParticles() {
-  const scene = useThree((state) => state.scene)
-  const camera = useThree((state) => state.camera)
-  const renderer = useThree((state) => state.renderer)
+  const scene = useThree((state) => state.scene);
+  const camera = useThree((state) => state.camera);
+  const renderer = useThree((state) => state.renderer);
 
   // The main camera must also see layer 2, where the falling flakes live.
   useLayoutEffect(() => {
-    camera.layers.enable(2)
-    return () => camera.layers.disable(2)
-  }, [camera])
+    camera.layers.enable(2);
+    return () => camera.layers.disable(2);
+  }, [camera]);
 
   //* Controls =====================================================
-  const [resetNonce, setResetNonce] = useState(0)
+  const [resetNonce, setResetNonce] = useState(0);
   const { driftSpeed, fallSpeed } = useControls('compute-particles-snow', {
     driftSpeed: { value: 0.4, min: 0, max: 2, step: 0.01 },
     fallSpeed: { value: 1, min: 0, max: 5, step: 0.05 },
     'reset snow': button(() => setResetNonce((nonce) => nonce + 1)),
-  })
+  });
   // Leva knobs → live uniforms (create-or-update semantics sync values on re-render).
   const { uDriftSpeed, uFallSpeed } = useUniforms(
     { uDriftSpeed: driftSpeed, uFallSpeed: fallSpeed },
     'snowParticles', // WGSL-identifier rule: camelCase scope, never kebab-case
-  )
-  const uDriftSpeedNode = uDriftSpeed
-  const uFallSpeedNode = uFallSpeed
+  );
+  const uDriftSpeedNode = uDriftSpeed;
+  const uFallSpeedNode = uFallSpeed;
 
   //* Collision Rig =================================================
   // The collision rig: top-down ortho camera + height RenderTarget + the override
@@ -73,26 +73,26 @@ export function SnowParticles() {
   // (a re-run useMemo would hand the component a different RT than the one the
   // create-once kernel captured).
   const [collision] = useState(() => {
-    const orthoCamera = new OrthographicCamera(-50, 50, 50, -50, 0.1, 50)
-    orthoCamera.position.y = 50
-    orthoCamera.lookAt(0, 0, 0)
-    orthoCamera.layers.enable(1) // sees scenery (0) + settled snow (1)
+    const orthoCamera = new OrthographicCamera(-50, 50, 50, -50, 0.1, 50);
+    orthoCamera.position.y = 50;
+    orthoCamera.lookAt(0, 0, 0);
+    orthoCamera.layers.enable(1); // sees scenery (0) + settled snow (1)
 
-    const rt = new RenderTarget(1024, 1024)
-    rt.texture.format = RedFormat
-    rt.texture.type = HalfFloatType
-    rt.texture.magFilter = NearestFilter
-    rt.texture.minFilter = NearestFilter
-    rt.texture.generateMipmaps = false
+    const rt = new RenderTarget(1024, 1024);
+    rt.texture.format = RedFormat;
+    rt.texture.type = HalfFloatType;
+    rt.texture.magFilter = NearestFilter;
+    rt.texture.minFilter = NearestFilter;
+    rt.texture.generateMipmaps = false;
 
-    const heightMaterial = new MeshBasicNodeMaterial()
-    heightMaterial.blending = NoBlending
-    heightMaterial.fog = false
-    heightMaterial.toneMapped = false
-    heightMaterial.colorNode = positionWorld.y
+    const heightMaterial = new MeshBasicNodeMaterial();
+    heightMaterial.blending = NoBlending;
+    heightMaterial.fog = false;
+    heightMaterial.toneMapped = false;
+    heightMaterial.colorNode = positionWorld.y;
 
-    return { orthoCamera, rt, heightMaterial }
-  })
+    return { orthoCamera, rt, heightMaterial };
+  });
 
   //* GPU State ======================================================
   // Flake state, GPU-only. UNSCOPED with prefixed keys on purpose: scoped useBuffers
@@ -104,7 +104,7 @@ export function SnowParticles() {
     snowStaticPositions: instancedArray(PARTICLE_COUNT, 'vec3'),
     // x/z: spawn column, y: fall velocity, w: per-flake random seed
     snowData: instancedArray(PARTICLE_COUNT, 'vec4'),
-  }))
+  }));
 
   //* Compute Graph ==================================================
   // Kernels + render position nodes, built once. Closing over the TYPED hook returns
@@ -113,75 +113,75 @@ export function SnowParticles() {
   const { snowComputeInit, snowComputeUpdate, snowDynamicPositionNode, snowStaticPositionNode } = useNodes(() => {
     // Build-time random offsets (the original's `randUint()` helper) — evaluated
     // once when the graph is built, constant thereafter.
-    const randUint = () => uint(Math.random() * 0xffffff)
+    const randUint = () => uint(Math.random() * 0xffffff);
 
     const snowComputeInit = Fn(() => {
-      const position = snowPositions.element(instanceIndex)
-      const scale = snowScales.element(instanceIndex)
-      const particleData = snowData.element(instanceIndex)
+      const position = snowPositions.element(instanceIndex);
+      const scale = snowScales.element(instanceIndex);
+      const particleData = snowData.element(instanceIndex);
 
-      const randX = hash(instanceIndex)
-      const randY = hash(instanceIndex.add(randUint()))
-      const randZ = hash(instanceIndex.add(randUint()))
+      const randX = hash(instanceIndex);
+      const randY = hash(instanceIndex.add(randUint()));
+      const randZ = hash(instanceIndex.add(randUint()));
 
-      position.x.assign(randX.mul(100).add(-50))
-      position.y.assign(randY.mul(500).add(3))
-      position.z.assign(randZ.mul(100).add(-50))
+      position.x.assign(randX.mul(100).add(-50));
+      position.y.assign(randY.mul(500).add(3));
+      position.z.assign(randZ.mul(100).add(-50));
 
-      scale.assign(vec3(hash(instanceIndex.add(Math.random())).mul(0.8).add(0.2)))
+      scale.assign(vec3(hash(instanceIndex.add(Math.random())).mul(0.8).add(0.2)));
 
       // Park the settled copies far outside both frusta until a flake lands.
-      snowStaticPositions.element(instanceIndex).assign(vec3(1000, 10000, 1000))
+      snowStaticPositions.element(instanceIndex).assign(vec3(1000, 10000, 1000));
 
-      particleData.y.assign(randY.mul(-0.1).add(-0.02)) // fall velocity
-      particleData.x.assign(position.x)
-      particleData.z.assign(position.z)
-      particleData.w.assign(randX)
-    })().compute(PARTICLE_COUNT)
+      particleData.y.assign(randY.mul(-0.1).add(-0.02)); // fall velocity
+      particleData.x.assign(position.x);
+      particleData.z.assign(position.z);
+      particleData.w.assign(randX);
+    })().compute(PARTICLE_COUNT);
 
     const snowComputeUpdate = Fn(() => {
-      const position = snowPositions.element(instanceIndex)
-      const scale = snowScales.element(instanceIndex)
-      const particleData = snowData.element(instanceIndex)
+      const position = snowPositions.element(instanceIndex);
+      const scale = snowScales.element(instanceIndex);
+      const particleData = snowData.element(instanceIndex);
 
-      const velocity = particleData.y
-      const random = particleData.w
+      const velocity = particleData.y;
+      const random = particleData.w;
 
       // World xz → height-map uv (the collision camera frames x/z −50..50).
-      const coord = position.xz.add(50).div(100)
+      const coord = position.xz.add(50).div(100);
       // `.x`: the RedFormat texel's single channel (see header DIVERGENCE).
-      const surfaceHeight = texture(collision.rt.texture, coord).x
-      const landingHeight = surfaceHeight.add(scale.x.mul(SURFACE_OFFSET))
+      const surfaceHeight = texture(collision.rt.texture, coord).x;
+      const landingHeight = surfaceHeight.add(scale.x.mul(SURFACE_OFFSET));
 
       // GPU-side branch (a JS `if` would run once at graph build, not per flake).
       If(position.y.greaterThan(landingHeight), () => {
         // Airborne: sinusoidal drift around the spawn column, constant fall.
-        position.x.assign(particleData.x.add(time.mul(random.mul(random)).mul(uDriftSpeedNode).sin().mul(3)))
-        position.z.assign(particleData.z.add(time.mul(random).mul(uDriftSpeedNode).cos().mul(random.mul(10))))
-        position.y.addAssign(velocity.mul(uFallSpeedNode))
+        position.x.assign(particleData.x.add(time.mul(random.mul(random)).mul(uDriftSpeedNode).sin().mul(3)));
+        position.z.assign(particleData.z.add(time.mul(random).mul(uDriftSpeedNode).cos().mul(random.mul(10))));
+        position.y.addAssign(velocity.mul(uFallSpeedNode));
       }).Else(() => {
         // Landed: the dynamic flake simply stops integrating (it stays drawn where
         // it froze); its copy in the static buffer is what the collision camera
         // sees, so later flakes stack on top of it.
-        snowStaticPositions.element(instanceIndex).assign(position)
-      })
-    })().compute(PARTICLE_COUNT)
+        snowStaticPositions.element(instanceIndex).assign(position);
+      });
+    })().compute(PARTICLE_COUNT);
 
     return {
       snowComputeInit,
       snowComputeUpdate,
       snowDynamicPositionNode: positionLocal.mul(snowScales.toAttribute()).add(snowPositions.toAttribute()),
       snowStaticPositionNode: positionLocal.mul(snowScales.toAttribute()).add(snowStaticPositions.toAttribute()),
-    }
-  })
+    };
+  });
 
   //* Dispatch =======================================================
   // ONCE at mount + ON DEMAND from the leva reset button (nonce-keyed): seed the
   // buffers. Sync compute() is safe here — fiber awaits renderer.init() before
   // children render; StrictMode's double run re-writes the same values (idempotent).
   useEffect(() => {
-    renderer.compute(snowComputeInit)
-  }, [renderer, snowComputeInit, resetNonce])
+    renderer.compute(snowComputeInit);
+  }, [renderer, snowComputeInit, resetNonce]);
 
   // EVERY FRAME, before the pipeline draws: (1) render the world-height map from
   // above with the override material — the WebGPU renderer transfers each object
@@ -191,23 +191,23 @@ export function SnowParticles() {
   // `phase: 'render'`; the default loop still draws the pipeline afterwards.
   useFrame(
     () => {
-      scene.overrideMaterial = collision.heightMaterial
-      renderer.setRenderTarget(collision.rt)
-      renderer.render(scene, collision.orthoCamera)
+      scene.overrideMaterial = collision.heightMaterial;
+      renderer.setRenderTarget(collision.rt);
+      renderer.render(scene, collision.orthoCamera);
 
-      scene.overrideMaterial = null
-      renderer.setRenderTarget(null)
+      scene.overrideMaterial = null;
+      renderer.setRenderTarget(null);
 
-      renderer.compute(snowComputeUpdate)
+      renderer.compute(snowComputeUpdate);
     },
     { phase: 'update' },
-  )
+  );
 
   //* Scene ==========================================================
   // REVIEW(shared-instance): one low-poly sphere shared by both instanced meshes
   // below (as the original) — a real perf win at 100k instances each, so it stays
   // imperative rather than two separate <sphereGeometry> elements.
-  const flakeGeometry = useMemo(() => new SphereGeometry(SURFACE_OFFSET, 5, 5), [])
+  const flakeGeometry = useMemo(() => new SphereGeometry(SURFACE_OFFSET, 5, 5), []);
 
   return (
     <>
@@ -232,5 +232,5 @@ export function SnowParticles() {
         />
       </mesh>
     </>
-  )
+  );
 }

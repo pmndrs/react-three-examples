@@ -16,26 +16,26 @@
  *   pipeline's automatic tone-map/color-space pass is disabled so the composited
  *   bloom result can apply it manually as the LAST step, matching the original
  */
-import { useEffect, useMemo } from 'react'
-import { bloom } from 'three/addons/tsl/display/BloomNode.js'
-import { float, mrt, output, uniform } from 'three/tsl'
-import { Color, NeutralToneMapping } from 'three/webgpu'
-import type { UniformNode } from 'three/webgpu'
-import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { useEffect, useMemo } from 'react';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+import { float, mrt, output, uniform } from 'three/tsl';
+import { Color, NeutralToneMapping } from 'three/webgpu';
+import type { UniformNode } from 'three/webgpu';
+import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 //* Scene =========================================================
 
-const SPHERE_COUNT = 50
+const SPHERE_COUNT = 50;
 
 interface SphereData {
-  key: number
-  color: Color
-  position: [number, number, number]
-  scale: number
-  uBloomIntensity: UniformNode<'float', number>
+  key: number;
+  color: Color;
+  position: [number, number, number];
+  scale: number;
+  uBloomIntensity: UniformNode<'float', number>;
 }
 
 // 50 icosahedra with random dim HSL colors, half tagged for bloom at mount — mirrors
@@ -45,10 +45,10 @@ function useSpheres(): SphereData[] {
   return useMemo(
     () =>
       Array.from({ length: SPHERE_COUNT }, (_, i) => {
-        const color = new Color().setHSL(Math.random(), 0.7, Math.random() * 0.2 + 0.05)
-        const position = [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5] as [number, number, number]
-        const len = Math.hypot(...position) || 1
-        const dist = Math.random() * 4.0 + 2.0
+        const color = new Color().setHSL(Math.random(), 0.7, Math.random() * 0.2 + 0.05);
+        const position = [Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5] as [number, number, number];
+        const len = Math.hypot(...position) || 1;
+        const dist = Math.random() * 4.0 + 2.0;
         return {
           key: i,
           color,
@@ -59,10 +59,10 @@ function useSpheres(): SphereData[] {
           ],
           scale: Math.random() * Math.random() + 0.5,
           uBloomIntensity: uniform(Math.random() > 0.5 ? 1 : 0),
-        }
+        };
       }),
     [],
-  )
+  );
 }
 
 function SphereCloud({ spheres }: { spheres: SphereData[] }) {
@@ -74,8 +74,8 @@ function SphereCloud({ spheres }: { spheres: SphereData[] }) {
           position={sphere.position}
           scale={sphere.scale}
           onClick={(e) => {
-            e.stopPropagation()
-            sphere.uBloomIntensity.value = sphere.uBloomIntensity.value === 0 ? 1 : 0
+            e.stopPropagation();
+            sphere.uBloomIntensity.value = sphere.uBloomIntensity.value === 0 ? 1 : 0;
           }}>
           <icosahedronGeometry args={[1, 15]} />
           {/* mrtNode is typed on NodeMaterial (@types/three) — plain JSX prop, applied
@@ -84,7 +84,7 @@ function SphereCloud({ spheres }: { spheres: SphereData[] }) {
         </mesh>
       ))}
     </>
-  )
+  );
 }
 
 //* Post-processing ===============================================
@@ -98,39 +98,39 @@ function PostFX() {
     strength: { value: 1, min: 0, max: 3, step: 0.01 },
     radius: { value: 0, min: 0, max: 1, step: 0.01 },
     exposure: { value: 1, min: 0.1, max: 3, step: 0.01 },
-  })
-  const uniforms = useUniforms(bloomValues)
-  const renderer = useThree((state) => state.renderer)
+  });
+  const uniforms = useUniforms(bloomValues);
+  const renderer = useThree((state) => state.renderer);
 
   useRenderPipeline(
     ({ renderPipeline, passes }) => {
-      const outputPass = passes.scenePass.getTextureNode()
-      const bloomIntensityPass = passes.scenePass.getTextureNode('bloomIntensity')
-      const bloomPass = bloom(outputPass.mul(bloomIntensityPass))
-      bloomPass.threshold = uniforms.threshold
-      bloomPass.strength = uniforms.strength
-      bloomPass.radius = uniforms.radius
+      const outputPass = passes.scenePass.getTextureNode();
+      const bloomIntensityPass = passes.scenePass.getTextureNode('bloomIntensity');
+      const bloomPass = bloom(outputPass.mul(bloomIntensityPass));
+      bloomPass.threshold = uniforms.threshold;
+      bloomPass.strength = uniforms.strength;
+      bloomPass.radius = uniforms.radius;
 
       // The original disables the pipeline's automatic output color transform so it
       // can apply `renderOutput()` itself as the final step of the composited node.
-      renderPipeline.outputColorTransform = false
-      renderPipeline.outputNode = outputPass.add(bloomPass).renderOutput()
+      renderPipeline.outputColorTransform = false;
+      renderPipeline.outputNode = outputPass.add(bloomPass).renderOutput();
     },
     ({ passes }) => {
-      passes.scenePass.setMRT(mrt({ output, bloomIntensity: float(0) }))
+      passes.scenePass.setMRT(mrt({ output, bloomIntensity: float(0) }));
     },
-  )
+  );
 
   // Exposure is a renderer property, not a node — no place in the graph.
   useEffect(() => {
-    renderer.toneMappingExposure = exposure
-  }, [renderer, exposure])
+    renderer.toneMappingExposure = exposure;
+  }, [renderer, exposure]);
 
-  return null
+  return null;
 }
 
 export default function PostprocessingBloomSelective() {
-  const spheres = useSpheres()
+  const spheres = useSpheres();
 
   return (
     <Canvas
@@ -141,5 +141,5 @@ export default function PostprocessingBloomSelective() {
       <PostFX />
       <DemoHelpers grid={false} minDistance={1} maxDistance={100} maxPolarAngle={Math.PI * 0.5} />
     </Canvas>
-  )
+  );
 }

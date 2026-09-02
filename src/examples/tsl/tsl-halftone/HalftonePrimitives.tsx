@@ -1,13 +1,13 @@
 // Two primitive shapes sharing the scene's stable halftone output graph.
-import type { Node } from 'three/webgpu'
-import { folder, useControls } from 'leva'
+import type { Node } from 'three/webgpu';
+import { folder, useControls } from 'leva';
 
 export function HalftonePrimitives({ outputNode }: { outputNode: Node }) {
   const { materialColor } = useControls('tsl-halftone', {
     material: folder({
       materialColor: { value: '#ff622e', label: 'color' },
     }),
-  })
+  });
 
   return (
     <>
@@ -20,5 +20,5 @@ export function HalftonePrimitives({ outputNode }: { outputNode: Node }) {
         <meshStandardNodeMaterial color={materialColor} outputNode={outputNode} />
       </mesh>
     </>
-  )
+  );
 }

@@ -31,7 +31,7 @@
  *   interactive; the filter pairing per pane is the fixed A/B comparison the example
  *   exists to teach, not a knob worth exposing
  */
-import { Suspense, useEffect, useMemo } from 'react'
+import { Suspense, useEffect, useMemo } from 'react';
 import {
   CanvasTexture,
   LinearFilter,
@@ -42,14 +42,14 @@ import {
   RepeatWrapping,
   Scene,
   SRGBColorSpace,
-} from 'three/webgpu'
-import type { Texture } from 'three/webgpu'
-import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/webgpu';
+import type { Texture } from 'three/webgpu';
+import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 const PAINTING_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/758px-Canestra_di_frutta_(Caravaggio).jpg'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/758px-Canestra_di_frutta_(Caravaggio).jpg';
 // Original: level size halves each step, one distinct color per level so the mip chain
 // is visually legible as the floor recedes.
 const MIPMAP_LEVELS: Array<[size: number, color: string]> = [
@@ -61,57 +61,57 @@ const MIPMAP_LEVELS: Array<[size: number, color: string]> = [
   [4, '#004'],
   [2, '#044'],
   [1, '#404'],
-]
-const PANE_SEAM_PX = 2
+];
+const PANE_SEAM_PX = 2;
 
 // One hand-drawn mip level — a mid-gray field with a colored two-square checker so
 // each level reads as a distinct pattern, not just a flat tint (original: `mipmap()`).
 function drawMipLevel(size: number, color: string): HTMLCanvasElement {
-  const canvas = document.createElement('canvas')
-  canvas.width = canvas.height = size
-  const ctx = canvas.getContext('2d')!
-  ctx.fillStyle = '#444'
-  ctx.fillRect(0, 0, size, size)
-  ctx.fillStyle = color
-  ctx.fillRect(0, 0, size / 2, size / 2)
-  ctx.fillRect(size / 2, size / 2, size / 2, size / 2)
-  return canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = size;
+  const ctx = canvas.getContext('2d')!;
+  ctx.fillStyle = '#444';
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, size / 2, size / 2);
+  ctx.fillRect(size / 2, size / 2, size / 2, size / 2);
+  return canvas;
 }
 
 // Builds the manually-mipmapped floor texture for one pane. `nearest` picks the
 // point-sampled filter pair; both panes share the identical 8-level mip chain.
 function buildFloorTexture(nearest: boolean): CanvasTexture {
-  const [level0Size, level0Color] = MIPMAP_LEVELS[0]
-  const level0 = drawMipLevel(level0Size, level0Color)
-  const texture = new CanvasTexture(level0)
-  texture.mipmaps[0] = level0
+  const [level0Size, level0Color] = MIPMAP_LEVELS[0];
+  const level0 = drawMipLevel(level0Size, level0Color);
+  const texture = new CanvasTexture(level0);
+  texture.mipmaps[0] = level0;
   for (let i = 1; i < MIPMAP_LEVELS.length; i++) {
-    const [size, color] = MIPMAP_LEVELS[i]
-    texture.mipmaps[i] = drawMipLevel(size, color)
+    const [size, color] = MIPMAP_LEVELS[i];
+    texture.mipmaps[i] = drawMipLevel(size, color);
   }
-  texture.colorSpace = SRGBColorSpace
-  texture.repeat.set(1000, 1000)
-  texture.wrapS = texture.wrapT = RepeatWrapping
+  texture.colorSpace = SRGBColorSpace;
+  texture.repeat.set(1000, 1000);
+  texture.wrapS = texture.wrapT = RepeatWrapping;
   if (nearest) {
-    texture.magFilter = NearestFilter
-    texture.minFilter = NearestMipmapNearestFilter
+    texture.magFilter = NearestFilter;
+    texture.minFilter = NearestMipmapNearestFilter;
   } else {
-    texture.minFilter = LinearMipmapLinearFilter
-    texture.magFilter = LinearFilter
+    texture.minFilter = LinearMipmapLinearFilter;
+    texture.magFilter = LinearFilter;
   }
-  texture.needsUpdate = true
-  return texture
+  texture.needsUpdate = true;
+  return texture;
 }
 
 // One pane's contents: the giant tiled mip-floor plus the framed painting, sized off
 // the painting's natural pixel dimensions (original: `addPainting`).
 function MipmapPane({ floorTexture, paintingTexture }: { floorTexture: Texture; paintingTexture: Texture }) {
-  const image = paintingTexture.image as HTMLImageElement
-  const paintingScaleX = image.width / 100
-  const paintingScaleY = image.height / 100
-  const frameScaleX = 1.1 * paintingScaleX
-  const frameScaleY = 1.1 * paintingScaleY
-  const floorHeight = -1.117 * (image.height / 2)
+  const image = paintingTexture.image as HTMLImageElement;
+  const paintingScaleX = image.width / 100;
+  const paintingScaleY = image.height / 100;
+  const frameScaleX = 1.1 * paintingScaleX;
+  const frameScaleY = 1.1 * paintingScaleY;
+  const floorHeight = -1.117 * (image.height / 2);
 
   return (
     <>
@@ -138,71 +138,71 @@ function MipmapPane({ floorTexture, paintingTexture }: { floorTexture: Texture; 
         <meshBasicNodeMaterial color="#000000" transparent opacity={0.75} />
       </mesh>
     </>
-  )
+  );
 }
 
 function ManualMipmapSplit() {
-  const renderer = useThree((state) => state.renderer)
+  const renderer = useThree((state) => state.renderer);
 
-  const paintingSource = useTexture(PAINTING_URL)
+  const paintingSource = useTexture(PAINTING_URL);
   const paintingLinear = useMemo(() => {
-    const t = paintingSource.clone()
-    t.colorSpace = SRGBColorSpace
-    t.minFilter = t.magFilter = LinearFilter
-    t.needsUpdate = true
-    return t
-  }, [paintingSource])
+    const t = paintingSource.clone();
+    t.colorSpace = SRGBColorSpace;
+    t.minFilter = t.magFilter = LinearFilter;
+    t.needsUpdate = true;
+    return t;
+  }, [paintingSource]);
   const paintingNearest = useMemo(() => {
-    const t = paintingSource.clone()
-    t.colorSpace = SRGBColorSpace
-    t.minFilter = t.magFilter = NearestFilter
-    t.needsUpdate = true
-    return t
-  }, [paintingSource])
+    const t = paintingSource.clone();
+    t.colorSpace = SRGBColorSpace;
+    t.minFilter = t.magFilter = NearestFilter;
+    t.needsUpdate = true;
+    return t;
+  }, [paintingSource]);
 
-  const floorLinear = useMemo(() => buildFloorTexture(false), [])
-  const floorNearest = useMemo(() => buildFloorTexture(true), [])
+  const floorLinear = useMemo(() => buildFloorTexture(false), []);
+  const floorNearest = useMemo(() => buildFloorTexture(true), []);
 
-  const scenes = useMemo(() => [new Scene(), new Scene()] as const, [])
+  const scenes = useMemo(() => [new Scene(), new Scene()] as const, []);
 
   useEffect(() => {
-    renderer.setClearColor(0x000000, 1)
-    return () => renderer.setScissorTest(false)
-  }, [renderer])
+    renderer.setClearColor(0x000000, 1);
+    return () => renderer.setScissorTest(false);
+  }, [renderer]);
 
   // Render takeover: mouse-sway camera + two scissored renders of the same camera into
   // the two half-canvas panes (original's hand-rolled `render()`; math shared with
   // `textures-anisotropy`).
   useFrame(
     (state) => {
-      const { width, height } = state.size
-      const camera = state.camera
+      const { width, height } = state.size;
+      const camera = state.camera;
 
-      const targetX = state.pointer.x * (width / 2)
-      const targetY = state.pointer.y * (height / 2) + 200
-      camera.position.x += (targetX - camera.position.x) * 0.05
-      camera.position.y = MathUtils.clamp(camera.position.y + (targetY - camera.position.y) * 0.05, 50, 1000)
-      camera.lookAt(0, 0, 0)
+      const targetX = state.pointer.x * (width / 2);
+      const targetY = state.pointer.y * (height / 2) + 200;
+      camera.position.x += (targetX - camera.position.x) * 0.05;
+      camera.position.y = MathUtils.clamp(camera.position.y + (targetY - camera.position.y) * 0.05, 50, 1000);
+      camera.lookAt(0, 0, 0);
 
-      renderer.setScissorTest(false)
-      renderer.clear()
-      renderer.setScissorTest(true)
+      renderer.setScissorTest(false);
+      renderer.clear();
+      renderer.setScissorTest(true);
 
-      const halfWidth = width / 2
-      renderer.setScissor(0, 0, halfWidth - PANE_SEAM_PX, height)
-      renderer.render(scenes[0], camera)
-      renderer.setScissor(halfWidth, 0, halfWidth - PANE_SEAM_PX, height)
-      renderer.render(scenes[1], camera)
+      const halfWidth = width / 2;
+      renderer.setScissor(0, 0, halfWidth - PANE_SEAM_PX, height);
+      renderer.render(scenes[0], camera);
+      renderer.setScissor(halfWidth, 0, halfWidth - PANE_SEAM_PX, height);
+      renderer.render(scenes[1], camera);
     },
     { phase: 'render' },
-  )
+  );
 
   return (
     <>
       {createPortal(<MipmapPane floorTexture={floorLinear} paintingTexture={paintingLinear} />, scenes[0])}
       {createPortal(<MipmapPane floorTexture={floorNearest} paintingTexture={paintingNearest} />, scenes[1])}
     </>
-  )
+  );
 }
 
 export default function MaterialsTextureManualMipmap() {
@@ -213,5 +213,5 @@ export default function MaterialsTextureManualMipmap() {
       </Suspense>
       <DemoHelpers grid={false} controls={false} />
     </Canvas>
-  )
+  );
 }

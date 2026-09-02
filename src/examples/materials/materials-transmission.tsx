@@ -39,15 +39,15 @@
  * - The original's unused `lightIntensity` param dropped (its scene has no lights —
  *   the param is declared but never wired to anything upstream).
  */
-import { Suspense, useEffect } from 'react'
-import { ACESFilmicToneMapping, CanvasTexture, DoubleSide, NearestFilter, RepeatWrapping } from 'three/webgpu'
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { Environment } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect } from 'react';
+import { ACESFilmicToneMapping, CanvasTexture, DoubleSide, NearestFilter, RepeatWrapping } from 'three/webgpu';
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { Environment } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/san_giuseppe_bridge_2k.hdr'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/san_giuseppe_bridge_2k.hdr';
 
 // Procedural stripe alpha map, matching the original's generateTexture(): a 2x2 canvas
 // with only the bottom row painted white — alphaMap reads it as opaque/transparent
@@ -55,43 +55,43 @@ const HDR_URL =
 // idempotent asset (same rationale as clearcoat's FlakesTexture canvas), which also
 // sidesteps a StrictMode double-create.
 function generateStripeCanvas() {
-  const canvas = document.createElement('canvas')
-  canvas.width = 2
-  canvas.height = 2
-  const context = canvas.getContext('2d')!
-  context.fillStyle = 'white'
-  context.fillRect(0, 1, 2, 1)
-  return canvas
+  const canvas = document.createElement('canvas');
+  canvas.width = 2;
+  canvas.height = 2;
+  const context = canvas.getContext('2d')!;
+  context.fillStyle = 'white';
+  context.fillRect(0, 1, 2, 1);
+  return canvas;
 }
-const stripeAlphaMap = new CanvasTexture(generateStripeCanvas())
-stripeAlphaMap.magFilter = NearestFilter
-stripeAlphaMap.wrapS = stripeAlphaMap.wrapT = RepeatWrapping
-stripeAlphaMap.repeat.set(1, 3.5)
+const stripeAlphaMap = new CanvasTexture(generateStripeCanvas());
+stripeAlphaMap.magFilter = NearestFilter;
+stripeAlphaMap.wrapS = stripeAlphaMap.wrapT = RepeatWrapping;
+stripeAlphaMap.repeat.set(1, 3.5);
 
 // Sets renderer.toneMappingExposure imperatively — a WebGPURenderer property, not
 // Canvas config, so a leva-driven change has to land on the live renderer (pattern:
 // tonemapping, postprocessing-bloom-emissive).
 function ToneMappingExposure({ exposure }: { exposure: number }) {
-  const renderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer);
 
   useEffect(() => {
-    renderer.toneMappingExposure = exposure
-  }, [renderer, exposure])
+    renderer.toneMappingExposure = exposure;
+  }, [renderer, exposure]);
 
-  return null
+  return null;
 }
 
 interface SphereParams {
-  color: string
-  transmission: number
-  opacity: number
-  metalness: number
-  roughness: number
-  ior: number
-  thickness: number
-  specularIntensity: number
-  specularColor: string
-  envMapIntensity: number
+  color: string;
+  transmission: number;
+  opacity: number;
+  metalness: number;
+  roughness: number;
+  ior: number;
+  thickness: number;
+  specularIntensity: number;
+  specularColor: string;
+  envMapIntensity: number;
 }
 
 // The transmissive sphere. Every material field here is reference-node-backed in the
@@ -117,7 +117,7 @@ function TransmissiveSphere(params: SphereParams) {
         transparent
       />
     </mesh>
-  )
+  );
 }
 
 export default function MaterialsTransmission() {
@@ -133,7 +133,7 @@ export default function MaterialsTransmission() {
     specularColor: '#ffffff',
     envMapIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
     exposure: { value: 1, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   return (
     <Canvas
@@ -148,5 +148,5 @@ export default function MaterialsTransmission() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={10} maxDistance={150} />
     </Canvas>
-  )
+  );
 }

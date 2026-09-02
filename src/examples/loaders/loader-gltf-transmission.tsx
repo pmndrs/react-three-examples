@@ -43,47 +43,47 @@
  *   ~0.5-1 unit camera distances with an HDR background filling the frame has no use
  *   for a ground grid at the default 0.5 unit cell size.
  */
-import { Suspense, useLayoutEffect, useRef } from 'react'
-import { AnimationMixer, ACESFilmicToneMapping } from 'three/webgpu'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { Environment, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useLayoutEffect, useRef } from 'react';
+import { AnimationMixer, ACESFilmicToneMapping } from 'three/webgpu';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { Environment, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/IridescentDishWithOlives.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/IridescentDishWithOlives.glb';
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/san_giuseppe_bridge_2k.hdr'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/san_giuseppe_bridge_2k.hdr';
 
 // Plays clip index 0 via a raw AnimationMixer, matching the original's
 // `mixer.clipAction( gltf.animations[ 0 ] ).play()` — the asset ships exactly one
 // (turntable) clip, so indexing it directly (rather than `loader-gltf`'s play-every-
 // clip-by-name approach for an arbitrary catalog) mirrors the original 1:1.
 function Dish() {
-  const { scene, animations } = useGLTF(MODEL_URL)
-  const mixerRef = useRef<AnimationMixer | null>(null)
+  const { scene, animations } = useGLTF(MODEL_URL);
+  const mixerRef = useRef<AnimationMixer | null>(null);
 
   useLayoutEffect(() => {
-    if (animations.length === 0) return
-    const mixer = new AnimationMixer(scene)
-    mixer.clipAction(animations[0]).play()
-    mixerRef.current = mixer
+    if (animations.length === 0) return;
+    const mixer = new AnimationMixer(scene);
+    mixer.clipAction(animations[0]).play();
+    mixerRef.current = mixer;
     return () => {
-      mixer.stopAllAction()
-      mixerRef.current = null
-    }
-  }, [scene, animations])
+      mixer.stopAllAction();
+      mixerRef.current = null;
+    };
+  }, [scene, animations]);
 
   useFrame(({ delta }) => {
-    mixerRef.current?.update(delta)
-  })
+    mixerRef.current?.update(delta);
+  });
 
-  return <primitive object={scene} />
+  return <primitive object={scene} />;
 }
 
 export default function LoaderGltfTransmission() {
   const { blurriness } = useControls('loader-gltf-transmission', {
     blurriness: { value: 0.35, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   return (
     <Canvas
@@ -104,5 +104,5 @@ export default function LoaderGltfTransmission() {
         autoRotateSpeed={-0.75}
       />
     </Canvas>
-  )
+  );
 }

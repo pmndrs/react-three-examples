@@ -3,20 +3,20 @@
 // for the main scene, remapped onto the plane's own screen-space UV via `.context()`.
 // No `useRenderPipeline`/render-target plumbing needed: the node graph owns the
 // sub-render, resolved automatically wherever this material gets drawn.
-import { useMemo } from 'react'
-import { pass, screenUV, uv } from 'three/tsl'
-import { DoubleSide } from 'three/webgpu'
-import type { Scene } from 'three/webgpu'
+import { useMemo } from 'react';
+import { pass, screenUV, uv } from 'three/tsl';
+import { DoubleSide } from 'three/webgpu';
+import type { Scene } from 'three/webgpu';
 
-import { useThree } from '@react-three/fiber/webgpu'
+import { useThree } from '@react-three/fiber/webgpu';
 
 export function PortalWindow({ portalScene }: { portalScene: Scene }) {
-  const camera = useThree((s) => s.camera)
+  const camera = useThree((s) => s.camera);
 
   // useMemo, not useNodes: this graph depends on runtime instances (the camera can
   // change identity) that a create-once hook can't express — same carve-out as
   // lights-phong's `lights([instance])`.
-  const colorNode = useMemo(() => pass(portalScene, camera).context({ getUV: () => screenUV }), [portalScene, camera])
+  const colorNode = useMemo(() => pass(portalScene, camera).context({ getUV: () => screenUV }), [portalScene, camera]);
 
   return (
     <mesh position={[0, 1, 0.8]}>
@@ -31,5 +31,5 @@ export function PortalWindow({ portalScene }: { portalScene: Scene }) {
         transparent
       />
     </mesh>
-  )
+  );
 }

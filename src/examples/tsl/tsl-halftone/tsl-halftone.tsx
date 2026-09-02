@@ -40,14 +40,14 @@
  *   HalftoneMichelle.tsx): the single-file port ran ~260 lines, over the corpus's
  *   ~200-line threshold — split by TSL graph / primitive shapes / loaded model
  */
-import { Suspense } from 'react'
-import { Vector3 } from 'three/webgpu'
-import { Canvas, useFrame, useNodes, useUniforms } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { createHalftoneOutput } from './halftoneEffect'
-import { HalftoneMichelle } from './HalftoneMichelle'
-import { HalftonePrimitives } from './HalftonePrimitives'
+import { Suspense } from 'react';
+import { Vector3 } from 'three/webgpu';
+import { Canvas, useFrame, useNodes, useUniforms } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { createHalftoneOutput } from './halftoneEffect';
+import { HalftoneMichelle } from './HalftoneMichelle';
+import { HalftonePrimitives } from './HalftonePrimitives';
 
 function HalftoneContent() {
   //* Controls =====================================================
@@ -56,7 +56,7 @@ function HalftoneContent() {
       ambientIntensity: { value: 3, min: 0, max: 10, step: 0.001 },
       directionalIntensity: { value: 8, min: 0, max: 20, step: 0.001 },
     }),
-  })
+  });
 
   const { direction: purpleDirection, ...purpleValues } = useControls('tsl-halftone-purple', {
     count: { value: 140, min: 1, max: 200, step: 1 },
@@ -67,7 +67,7 @@ function HalftoneContent() {
     mixLow: { value: 0, min: 0, max: 1, step: 0.01 },
     mixHigh: { value: 0.5, min: 0, max: 1, step: 0.01 },
     radius: { value: 0.8, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   const { directionZ, ...cyanValues } = useControls('tsl-halftone-cyan', {
     count: { value: 180, min: 1, max: 200, step: 1 },
@@ -78,7 +78,7 @@ function HalftoneContent() {
     mixLow: { value: 0.5, min: 0, max: 1, step: 0.01 },
     mixHigh: { value: 1, min: 0, max: 1, step: 0.01 },
     radius: { value: 0.8, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   //* Uniforms =====================================================
   const purple = useUniforms(
@@ -87,7 +87,7 @@ function HalftoneContent() {
       direction: new Vector3(purpleDirection.x, purpleDirection.y, purpleDirection.z),
     },
     'halftonePurple',
-  )
+  );
   const cyan = useUniforms(
     {
       ...cyanValues,
@@ -95,17 +95,17 @@ function HalftoneContent() {
       direction: new Vector3(0.5, 0.5, directionZ),
     },
     'halftoneCyan',
-  )
+  );
 
   useFrame(({ elapsed }) => {
-    cyan.direction.value.x = Math.cos(elapsed)
-    cyan.direction.value.y = Math.sin(elapsed)
-  })
+    cyan.direction.value.x = Math.cos(elapsed);
+    cyan.direction.value.y = Math.sin(elapsed);
+  });
 
   //* TSL Graph ====================================================
   const { halftoneOutput } = useNodes(() => ({
     halftoneOutput: createHalftoneOutput([purple, cyan]),
-  }))
+  }));
 
   return (
     <>
@@ -116,7 +116,7 @@ function HalftoneContent() {
         <HalftoneMichelle outputNode={halftoneOutput} />
       </Suspense>
     </>
-  )
+  );
 }
 
 export default function TslHalftone() {
@@ -125,5 +125,5 @@ export default function TslHalftone() {
       <HalftoneContent />
       <DemoHelpers minDistance={0.1} maxDistance={50} gridOffset={-2} />
     </Canvas>
-  )
+  );
 }

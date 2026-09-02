@@ -14,29 +14,29 @@
  * - Leva replaces the three.js Inspector panel
  * - The node graph is long, so it lives in `seaNodes.tsx`
  */
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas, useNodes, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas, useNodes, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { makeSeaNodes, seaControls, TerrainGeometry } from './seaNodes'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { makeSeaNodes, seaControls, TerrainGeometry } from './seaNodes';
 
 function SeaSurface() {
   //* Controls ====================================================
   // Leva works anywhere; fiber's hooks only work inside <Canvas>, so both live
   // here in the component that actually consumes them.
-  const { color, roughness, ...waveValues } = useControls('Raging Sea', seaControls)
+  const { color, roughness, ...waveValues } = useControls('Raging Sea', seaControls);
 
   //* Shader graph ================================================
-  const uniforms = useUniforms(waveValues)
-  const matNodes = useNodes(() => makeSeaNodes(uniforms))
+  const uniforms = useUniforms(waveValues);
+  const matNodes = useNodes(() => makeSeaNodes(uniforms));
 
   return (
     <mesh>
       <TerrainGeometry />
       <meshStandardNodeMaterial color={color} roughness={roughness} {...matNodes} />
     </mesh>
-  )
+  );
 }
 
 export default function TslRagingSea() {
@@ -49,5 +49,5 @@ export default function TslRagingSea() {
       <SeaSurface />
       <DemoHelpers grid={false} target={[0, -0.25, 0]} minDistance={0.1} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

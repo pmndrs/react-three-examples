@@ -41,7 +41,7 @@
  *   classes directly (the WebGPU renderer would auto-convert the classic classes the
  *   original constructs; the node classes are the same materials, named honestly).
  */
-import { Suspense, useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import {
   ACESFilmicToneMapping,
   CubeRenderTarget,
@@ -50,20 +50,20 @@ import {
   MeshPhysicalNodeMaterial,
   MeshStandardNodeMaterial,
   MultiplyBlending,
-} from 'three/webgpu'
-import type { Material, Mesh } from 'three/webgpu'
-import { cubeTexture } from 'three/tsl'
-import { HDRLoader } from 'three/addons/loaders/HDRLoader.js'
-import { getGroundProjectedNormal } from 'three/addons/tsl/utils/GroundedSkybox.js'
-import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useGLTF, useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/webgpu';
+import type { Material, Mesh } from 'three/webgpu';
+import { cubeTexture } from 'three/tsl';
+import { HDRLoader } from 'three/addons/loaders/HDRLoader.js';
+import { getGroundProjectedNormal } from 'three/addons/tsl/utils/GroundedSkybox.js';
+import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useGLTF, useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/'
-const HDR_URL = `${ASSET_BASE}textures/equirectangular/blouberg_sunrise_2_1k.hdr`
-const CAR_URL = `${ASSET_BASE}models/gltf/ferrari.glb`
-const AO_URL = `${ASSET_BASE}models/gltf/ferrari_ao.png`
+const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/';
+const HDR_URL = `${ASSET_BASE}textures/equirectangular/blouberg_sunrise_2_1k.hdr`;
+const CAR_URL = `${ASSET_BASE}models/gltf/ferrari.glb`;
+const AO_URL = `${ASSET_BASE}models/gltf/ferrari_ao.png`;
 
 // The HDR is both the scene's IBL environment (equirect, as loaded) and — converted
 // to a cube map to avoid visual artifacts at the skybox's poles — the source the
@@ -71,68 +71,68 @@ const AO_URL = `${ASSET_BASE}models/gltf/ferrari_ao.png`
 function GroundedEnvironment({ grounded, height, radius }: { grounded: boolean; height: number; radius: number }) {
   // Creator hook BEFORE the suspending hooks below (B18: deferred to the
   // post-suspense re-render, the store write would land after siblings subscribed).
-  const { uHeight, uRadius } = useUniforms(() => ({ uHeight: 15, uRadius: 100 }))
+  const { uHeight, uRadius } = useUniforms(() => ({ uHeight: 15, uRadius: 100 }));
 
-  const envMap = useLoader(HDRLoader, HDR_URL)
-  const scene = useThree((s) => s.scene)
-  const renderer = useThree((s) => s.renderer)
+  const envMap = useLoader(HDRLoader, HDR_URL);
+  const scene = useThree((s) => s.scene);
+  const renderer = useThree((s) => s.renderer);
 
   // HDRLoader leaves mapping at UVMapping; reflection mapping must be in place
   // before the first shader build reads scene.environment.
   const equirect = useMemo(() => {
-    envMap.mapping = EquirectangularReflectionMapping
-    return envMap
-  }, [envMap])
+    envMap.mapping = EquirectangularReflectionMapping;
+    return envMap;
+  }, [envMap]);
 
   // Grounded on: the sky dome mesh below is the background, scene.background stays
   // null. Grounded off: plain equirect skybox, exactly the original's toggle.
   useLayoutEffect(() => {
-    scene.environment = equirect
-    scene.background = grounded ? null : equirect
+    scene.environment = equirect;
+    scene.background = grounded ? null : equirect;
     return () => {
-      scene.environment = null
-      scene.background = null
-    }
-  }, [scene, equirect, grounded])
+      scene.environment = null;
+      scene.background = null;
+    };
+  }, [scene, equirect, grounded]);
 
   // Lazy state, not useMemo: the colorNode below captures this instance for good, and
   // a StrictMode memo re-run could hand the component a different one (AGENTS.md).
-  const [cubeRT] = useState(() => new CubeRenderTarget(equirect.image.height as number))
+  const [cubeRT] = useState(() => new CubeRenderTarget(equirect.image.height as number));
 
   // One-time equirect -> cube map bake on the live renderer (idempotent under
   // StrictMode; layout effect so it precedes the first RAF render).
   useLayoutEffect(() => {
-    cubeRT.fromEquirectangularTexture(renderer, equirect)
-  }, [cubeRT, renderer, equirect])
+    cubeRT.fromEquirectangularTexture(renderer, equirect);
+  }, [cubeRT, renderer, equirect]);
 
   const colorNode = useMemo(
     () => cubeTexture(cubeRT.texture, getGroundProjectedNormal(uRadius, uHeight)),
     [cubeRT, uRadius, uHeight],
-  )
+  );
 
   useEffect(() => {
-    uHeight.value = height
-    uRadius.value = radius
-  }, [uHeight, uRadius, height, radius])
+    uHeight.value = height;
+    uRadius.value = radius;
+  }, [uHeight, uRadius, height, radius]);
 
-  if (!grounded) return null
+  if (!grounded) return null;
   return (
     <mesh scale={radius}>
       <icosahedronGeometry args={[1, 16]} />
       <meshBasicNodeMaterial side={DoubleSide} colorNode={colorNode} />
     </mesh>
-  )
+  );
 }
 
 // Ferrari 458 with the original's showroom material swap: black clearcoat body,
 // bare-metal rims/trim, transmissive glass — all responding to the HDR environment
 // alone (no analytic light in the scene).
 function Ferrari() {
-  const gltf = useGLTF(CAR_URL) // Draco-compressed; drei wires the decoder itself
-  const aoMap = useTexture(AO_URL)
+  const gltf = useGLTF(CAR_URL); // Draco-compressed; drei wires the decoder itself
+  const aoMap = useTexture(AO_URL);
 
   const carModel = useMemo(() => {
-    const car = gltf.scene.children[0]
+    const car = gltf.scene.children[0];
 
     const bodyMaterial = new MeshPhysicalNodeMaterial({
       color: 0x000000,
@@ -140,28 +140,28 @@ function Ferrari() {
       roughness: 0.8,
       clearcoat: 1.0,
       clearcoatRoughness: 0.2,
-    })
+    });
     const detailsMaterial = new MeshStandardNodeMaterial({
       color: 0xffffff,
       metalness: 1.0,
       roughness: 0.5,
-    })
+    });
     const glassMaterial = new MeshPhysicalNodeMaterial({
       color: 0xffffff,
       metalness: 0.25,
       roughness: 0,
       transmission: 1.0,
-    })
+    });
 
     const setMaterial = (name: string, material: Material) => {
-      ;(car.getObjectByName(name) as Mesh).material = material
-    }
-    setMaterial('body', bodyMaterial)
-    for (const rim of ['rim_fl', 'rim_fr', 'rim_rr', 'rim_rl', 'trim']) setMaterial(rim, detailsMaterial)
-    setMaterial('glass', glassMaterial)
+      (car.getObjectByName(name) as Mesh).material = material;
+    };
+    setMaterial('body', bodyMaterial);
+    for (const rim of ['rim_fl', 'rim_fr', 'rim_rr', 'rim_rl', 'trim']) setMaterial(rim, detailsMaterial);
+    setMaterial('glass', glassMaterial);
 
-    return car
-  }, [gltf])
+    return car;
+  }, [gltf]);
 
   return (
     // Scale/rotation as props, not `scale.multiplyScalar(4)` in the memo — a
@@ -180,7 +180,7 @@ function Ferrari() {
         />
       </mesh>
     </primitive>
-  )
+  );
 }
 
 export default function MaterialsEnvmapsGroundprojected() {
@@ -188,7 +188,7 @@ export default function MaterialsEnvmapsGroundprojected() {
     grounded: true,
     height: { value: 15, min: 5, max: 50, step: 0.1 },
     radius: { value: 100, min: 100, max: 300, step: 1 },
-  })
+  });
 
   return (
     <Canvas
@@ -209,5 +209,5 @@ export default function MaterialsEnvmapsGroundprojected() {
         pan={false}
       />
     </Canvas>
-  )
+  );
 }

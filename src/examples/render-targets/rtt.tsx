@@ -30,60 +30,60 @@
  * - No leva controls: the only dynamic input in the original is the mouse position,
  *   already interactive via pointer movement — there's no extra parameter worth exposing
  */
-import { Suspense, useRef } from 'react'
-import { hue, saturation, texture } from 'three/tsl'
-import type { Mesh } from 'three/webgpu'
-import { Canvas, useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useRef } from 'react';
+import { hue, saturation, texture } from 'three/tsl';
+import type { Mesh } from 'three/webgpu';
+import { Canvas, useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const UV_GRID_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/uv_grid_opengl.jpg'
+const UV_GRID_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/uv_grid_opengl.jpg';
 
 // Spins at the original's fixed per-frame increment (not delta-scaled) to match its
 // visual speed as authored.
 function SpinningBox() {
-  const map = useTexture(UV_GRID_URL)
-  const ref = useRef<Mesh>(null)
+  const map = useTexture(UV_GRID_URL);
+  const ref = useRef<Mesh>(null);
 
   useFrame(() => {
-    const box = ref.current
-    if (!box) return
-    box.rotation.x += 0.01
-    box.rotation.y += 0.02
-  })
+    const box = ref.current;
+    if (!box) return;
+    box.rotation.x += 0.01;
+    box.rotation.y += 0.02;
+  });
 
   return (
     <mesh ref={ref}>
       <boxGeometry />
       <meshBasicNodeMaterial colorNode={texture(map)} />
     </mesh>
-  )
+  );
 }
 
 // Render-to-texture FX: modulates the scene-pass output's hue/saturation based on
 // pointer position, mirroring the original's `screenFXNode` uniform driven by mousemove.
 function PostFX() {
-  const { uMouseX, uMouseY } = useUniforms(() => ({ uMouseX: 0.5, uMouseY: 0.5 }))
+  const { uMouseX, uMouseY } = useUniforms(() => ({ uMouseX: 0.5, uMouseY: 0.5 }));
 
   useFrame((state) => {
     // fiber's pointer is NDC (-1..1, y-up); remap to the 0..1 (y-down) range the
     // original derives from `offsetX/offsetY`.
-    uMouseX.value = state.pointer.x * 0.5 + 0.5
-    uMouseY.value = 1 - (state.pointer.y * 0.5 + 0.5)
-  })
+    uMouseX.value = state.pointer.x * 0.5 + 0.5;
+    uMouseY.value = 1 - (state.pointer.y * 0.5 + 0.5);
+  });
 
   useRenderPipeline(({ renderPipeline, passes }) => {
     // NOTE not needed in the mainCB will be fixed in upstrem B7
-    if (!renderPipeline) return
+    if (!renderPipeline) return;
 
-    const sceneColor = passes.scenePass.getTextureNode()
-    const mouseX = uMouseX
-    const mouseY = uMouseY
+    const sceneColor = passes.scenePass.getTextureNode();
+    const mouseX = uMouseX;
+    const mouseY = uMouseY;
 
-    renderPipeline.outputNode = hue(saturation(sceneColor.rgb, mouseX.oneMinus()), mouseY)
-  })
+    renderPipeline.outputNode = hue(saturation(sceneColor.rgb, mouseX.oneMinus()), mouseY);
+  });
 
-  return null
+  return null;
 }
 
 export default function Rtt() {
@@ -97,5 +97,5 @@ export default function Rtt() {
       <PostFX />
       <DemoHelpers />
     </Canvas>
-  )
+  );
 }

@@ -2,44 +2,44 @@
 // sculpture and a small flat-shaded icosahedron orbiting the room. Transforms are
 // declarative; the original's imperative `rotateX(a); rotateZ(b)` chain maps to
 // `rotation={[a, 0, b]}` (Euler XYZ = intrinsic X-then-Z when Y is 0).
-import { useRef } from 'react'
-import type { Group, Mesh } from 'three/webgpu'
-import { useFrame } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { useRef } from 'react';
+import type { Group, Mesh } from 'three/webgpu';
+import { useFrame } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-const DEG = Math.PI / 180
+const DEG = Math.PI / 180;
 
 // Cap disk closing the open rim of the 120-degree half-sphere.
-const CAP_RADIUS = 15 * Math.cos(30 * DEG)
-const CAP_Y = -15 * Math.sin(30 * DEG) - 0.05
-const HALF_SPHERE_Y = 7.5 + 15 * Math.sin(30 * DEG)
+const CAP_RADIUS = 15 * Math.cos(30 * DEG);
+const CAP_Y = -15 * Math.sin(30 * DEG) - 0.05;
+const HALF_SPHERE_Y = 7.5 + 15 * Math.sin(30 * DEG);
 
 export function Spheres() {
   const { speed } = useControls('mirror', {
     speed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
-  const sphereGroupRef = useRef<Group>(null)
-  const smallSphereRef = useRef<Mesh>(null)
+  });
+  const sphereGroupRef = useRef<Group>(null);
+  const smallSphereRef = useRef<Mesh>(null);
   // Delta-accumulated clock so the leva speed control scales (and can pause) the
   // motion without snapping positions — see header DIVERGENCE (original uses
   // Date.now() and a per-frame rotation increment).
-  const clockRef = useRef(0)
+  const clockRef = useRef(0);
 
   useFrame(({ delta }) => {
-    clockRef.current += delta * speed
-    const t = clockRef.current
+    clockRef.current += delta * speed;
+    const t = clockRef.current;
 
-    const sphereGroup = sphereGroupRef.current
-    const smallSphere = smallSphereRef.current
-    if (!sphereGroup || !smallSphere) return
+    const sphereGroup = sphereGroupRef.current;
+    const smallSphere = smallSphereRef.current;
+    if (!sphereGroup || !smallSphere) return;
 
     // Original: -0.002 rad/frame at 60 fps.
-    sphereGroup.rotation.y -= 0.12 * delta * speed
+    sphereGroup.rotation.y -= 0.12 * delta * speed;
 
-    smallSphere.position.set(Math.cos(t) * 30, Math.abs(Math.cos(t * 2)) * 20 + 5, Math.sin(t) * 30)
-    smallSphere.rotation.y = Math.PI / 2 - t
-    smallSphere.rotation.z = t * 8
-  })
+    smallSphere.position.set(Math.cos(t) * 30, Math.abs(Math.cos(t * 2)) * 20 + 5, Math.sin(t) * 30);
+    smallSphere.rotation.y = Math.PI / 2 - t;
+    smallSphere.rotation.z = t * 8;
+  });
 
   return (
     <>
@@ -58,5 +58,5 @@ export function Spheres() {
         <meshPhongMaterial color="#ffffff" emissive="#7b7b7b" flatShading />
       </mesh>
     </>
-  )
+  );
 }

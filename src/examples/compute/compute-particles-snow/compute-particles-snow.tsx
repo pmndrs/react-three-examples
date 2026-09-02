@@ -45,14 +45,14 @@
  *   original compares `position.y` against the raw vec4 sample and lets TSL
  *   broadcasting resolve it — same value
  */
-import { useState } from 'react'
-import { ACESFilmicToneMapping, Mesh, MeshBasicNodeMaterial } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { TeapotGeometry } from '../../../assets/TeapotGeometry'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { SnowParticles } from './SnowParticles'
-import { SnowPostFX } from './SnowPostFX'
-import { SnowScenery } from './SnowScenery'
+import { useState } from 'react';
+import { ACESFilmicToneMapping, Mesh, MeshBasicNodeMaterial } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { TeapotGeometry } from '../../../assets/TeapotGeometry';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { SnowParticles } from './SnowParticles';
+import { SnowPostFX } from './SnowPostFX';
+import { SnowScenery } from './SnowScenery';
 
 export default function ComputeParticlesSnow() {
   // The glowing tree-topper. Created imperatively — lazy useState keeps ONE instance
@@ -60,10 +60,10 @@ export default function ComputeParticlesSnow() {
   // the scene mounts it via <primitive>, and SnowPostFX feeds it to pass() for the
   // standalone glow pass.
   const [teapot] = useState(() => {
-    const mesh = new Mesh(new TeapotGeometry(0.5, 18), new MeshBasicNodeMaterial({ color: 0xfcfb9e }))
-    mesh.position.y = 18
-    return mesh
-  })
+    const mesh = new Mesh(new TeapotGeometry(0.5, 18), new MeshBasicNodeMaterial({ color: 0xfcfb9e }));
+    mesh.position.y = 18;
+    return mesh;
+  });
 
   return (
     <Canvas
@@ -86,5 +86,5 @@ export default function ComputeParticlesSnow() {
         autoRotateSpeed={-0.7}
       />
     </Canvas>
-  )
+  );
 }

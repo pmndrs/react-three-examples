@@ -28,7 +28,7 @@
  *   false`; `minDistance`/`maxDistance` map directly to the original's OrbitControls
  *   values
  */
-import { Suspense, useEffect } from 'react'
+import { Suspense, useEffect } from 'react';
 import {
   ACESFilmicToneMapping,
   AgXToneMapping,
@@ -37,17 +37,17 @@ import {
   NeutralToneMapping,
   NoToneMapping,
   ReinhardToneMapping,
-} from 'three/webgpu'
+} from 'three/webgpu';
 
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { Environment, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { Environment, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MASK_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/venice_mask.glb'
+const MASK_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/venice_mask.glb';
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/venice_sunset_1k.hdr'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/venice_sunset_1k.hdr';
 
 const TONE_MAPPING_OPTIONS = {
   None: NoToneMapping,
@@ -57,11 +57,11 @@ const TONE_MAPPING_OPTIONS = {
   ACESFilmic: ACESFilmicToneMapping,
   AgX: AgXToneMapping,
   Neutral: NeutralToneMapping,
-} as const
+} as const;
 
 function VeniceMask() {
-  const { scene } = useGLTF(MASK_URL)
-  return <primitive object={scene} />
+  const { scene } = useGLTF(MASK_URL);
+  return <primitive object={scene} />;
 }
 
 // Blurriness/intensity are the leva knobs for this HDR — owned here, next to the
@@ -70,27 +70,27 @@ function HdrBackground() {
   const { blurriness, intensity } = useControls('background', {
     blurriness: { value: 0.3, min: 0, max: 1, step: 0.01 },
     intensity: { value: 1, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
-  return <Environment files={HDR_URL} background backgroundBlurriness={blurriness} backgroundIntensity={intensity} />
+  return <Environment files={HDR_URL} background backgroundBlurriness={blurriness} backgroundIntensity={intensity} />;
 }
 
 // renderer.toneMapping / renderer.toneMappingExposure are WebGPURenderer properties,
 // not TSL uniforms or Canvas-level config — mutated imperatively so the leva dropdown
 // and exposure slider take effect without a pipeline rebuild.
 function ToneMapping() {
-  const renderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer);
   const { toneMapping, exposure } = useControls('tonemapping', {
     toneMapping: { value: 'Neutral', options: Object.keys(TONE_MAPPING_OPTIONS) },
     exposure: { value: 1, min: 0, max: 2, step: 0.01 },
-  })
+  });
 
   useEffect(() => {
-    renderer.toneMapping = TONE_MAPPING_OPTIONS[toneMapping as keyof typeof TONE_MAPPING_OPTIONS]
-    renderer.toneMappingExposure = exposure
-  }, [renderer, toneMapping, exposure])
+    renderer.toneMapping = TONE_MAPPING_OPTIONS[toneMapping as keyof typeof TONE_MAPPING_OPTIONS];
+    renderer.toneMappingExposure = exposure;
+  }, [renderer, toneMapping, exposure]);
 
-  return null
+  return null;
 }
 
 export default function Tonemapping() {
@@ -106,5 +106,5 @@ export default function Tonemapping() {
       <ToneMapping />
       <DemoHelpers grid={false} target={[0, 0.03, 0]} minDistance={0.03} maxDistance={0.2} pan={false} />
     </Canvas>
-  )
+  );
 }

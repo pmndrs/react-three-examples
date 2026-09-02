@@ -31,22 +31,22 @@
  * - Tone mapping is NOT a divergence: the original sets ACESFilmic explicitly; set
  *   deliberately here via `renderer={{ toneMapping }}` (tone-mapping parity rule)
  */
-import { Suspense, useLayoutEffect } from 'react'
-import { ACESFilmicToneMapping, EquirectangularReflectionMapping, SphereGeometry } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
-import { normalWorldGeometry, pmremTexture } from 'three/tsl'
-import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js'
-import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useLayoutEffect } from 'react';
+import { ACESFilmicToneMapping, EquirectangularReflectionMapping, SphereGeometry } from 'three/webgpu';
+import type { Node } from 'three/webgpu';
+import { normalWorldGeometry, pmremTexture } from 'three/tsl';
+import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
+import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/royal_esplanade_2k.hdr.jpg';
 
 // Shared static geometry — a constant, not mutable state, so module scope is the
 // idiomatic call (clearcoat/lights-phong precedent); also matches the original's
 // single geometry shared by all 30 spheres.
-const sphereGeometry = new SphereGeometry(0.4, 64, 64)
+const sphereGeometry = new SphereGeometry(0.4, 64, 64);
 
 // 6 roughness columns × 5 metalness rows, same sweep and layout as the original.
 const SPHERES = Array.from({ length: 6 }, (_, i) =>
@@ -56,23 +56,23 @@ const SPHERES = Array.from({ length: 6 }, (_, i) =>
     roughness: i / 5,
     metalness: j / 4,
   })),
-).flat()
+).flat();
 
 // Loads the UltraHDR equirect, wires it as a PMREM-sampled `scene.backgroundNode`,
 // and lays out the roughness/metalness sphere grid — see header DEMONSTRATES.
 function PmremScene() {
   const { backgroundRoughness } = useControls('pmrem-equirectangular', {
     backgroundRoughness: { value: 0.5, min: 0, max: 1, step: 0.01 },
-  })
-  const scene = useThree((s) => s.scene)
+  });
+  const scene = useThree((s) => s.scene);
 
   // Live level node for the background PMREM lookup — the leva value flows straight
   // into the uniform, never rebuilding the graph. B18: this creator-mode hook must run
   // BEFORE the suspending useLoader below, or the deferred re-render becomes a
   // setState-during-render warning (same ordering rule as mirror's Room.tsx).
-  const { uBackgroundRoughness } = useUniforms({ uBackgroundRoughness: backgroundRoughness })
+  const { uBackgroundRoughness } = useUniforms({ uBackgroundRoughness: backgroundRoughness });
 
-  const map = useLoader(UltraHDRLoader, HDR_URL)
+  const map = useLoader(UltraHDRLoader, HDR_URL);
 
   // Layout effect: `.mapping` is read at shader-graph build time (first RAF render)
   // by both the backgroundNode and every sphere's envMap — it must land before that
@@ -80,13 +80,13 @@ function PmremScene() {
   // `backgroundNode` even though the WebGPU renderer reads it off the live scene
   // (duck-typed *Node gap, UPSTREAM B11 — same cast as `reflection`/`sprites`).
   useLayoutEffect(() => {
-    map.mapping = EquirectangularReflectionMapping
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    withBackgroundNode.backgroundNode = pmremTexture(map, normalWorldGeometry, uBackgroundRoughness)
+    map.mapping = EquirectangularReflectionMapping;
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    withBackgroundNode.backgroundNode = pmremTexture(map, normalWorldGeometry, uBackgroundRoughness);
     return () => {
-      withBackgroundNode.backgroundNode = null
-    }
-  }, [scene, map, uBackgroundRoughness])
+      withBackgroundNode.backgroundNode = null;
+    };
+  }, [scene, map, uBackgroundRoughness]);
 
   return (
     <>
@@ -96,7 +96,7 @@ function PmremScene() {
         </mesh>
       ))}
     </>
-  )
+  );
 }
 
 export default function PmremEquirectangular() {
@@ -112,5 +112,5 @@ export default function PmremEquirectangular() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={2} maxDistance={10} />
     </Canvas>
-  )
+  );
 }

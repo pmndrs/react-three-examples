@@ -32,22 +32,22 @@ export default {
     return {
       // `x as WebGPURenderer`
       TSAsExpression(node) {
-        const ann = node.typeAnnotation
+        const ann = node.typeAnnotation;
         if (ann?.type === 'TSTypeReference' && ann.typeName?.name === 'WebGPURenderer') {
-          context.report({ node, messageId: 'rendererCast' })
+          context.report({ node, messageId: 'rendererCast' });
         }
       },
       // useFrame((_, delta) => …) / useFrame((state, delta) => …)
       CallExpression(node) {
-        if (node.callee.type !== 'Identifier' || node.callee.name !== 'useFrame') return
-        const cb = node.arguments[0]
-        if (!cb || (cb.type !== 'ArrowFunctionExpression' && cb.type !== 'FunctionExpression')) return
+        if (node.callee.type !== 'Identifier' || node.callee.name !== 'useFrame') return;
+        const cb = node.arguments[0];
+        if (!cb || (cb.type !== 'ArrowFunctionExpression' && cb.type !== 'FunctionExpression')) return;
         // Two positional params means the state object was taken whole (or skipped)
         // rather than destructured.
         if (cb.params.length >= 2 && cb.params[0].type === 'Identifier') {
-          context.report({ node: cb.params[0], messageId: 'frameParams' })
+          context.report({ node: cb.params[0], messageId: 'frameParams' });
         }
       },
-    }
+    };
   },
-}
+};

@@ -1,45 +1,45 @@
 // The hover-selectable scene subjects from the original: a normalized OBJ tree,
 // a cloud of 20 random Lambert spheres, a shadow-catching floor, and a torus.
-import { useMemo } from 'react'
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
-import { Color, DoubleSide, Mesh, MeshPhongMaterial, SphereGeometry } from 'three/webgpu'
-import { useLoader } from '@react-three/fiber/webgpu'
+import { useMemo } from 'react';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { Color, DoubleSide, Mesh, MeshPhongMaterial, SphereGeometry } from 'three/webgpu';
+import { useLoader } from '@react-three/fiber/webgpu';
 
-const TREE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/obj/tree.obj'
+const TREE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/obj/tree.obj';
 
 // The OBJ tree, normalized so its bounding sphere lands at radius 5 (the original's
 // `scale = 0.2 * radius` divisor). Geometry centering + material swap happen on the
 // cached loader result (both idempotent); the derived scale/position stay in JSX.
 export function Tree() {
-  const object = useLoader(OBJLoader, TREE_URL)
+  const object = useLoader(OBJLoader, TREE_URL);
 
   const scale = useMemo(() => {
-    let s = 1.0
+    let s = 1.0;
     object.traverse((child) => {
       if (child instanceof Mesh) {
-        child.geometry.center()
-        child.geometry.computeBoundingSphere()
-        s = 0.2 * (child.geometry.boundingSphere?.radius ?? 5)
+        child.geometry.center();
+        child.geometry.computeBoundingSphere();
+        s = 0.2 * (child.geometry.boundingSphere?.radius ?? 5);
         child.material = new MeshPhongMaterial({
           color: 0xffffff,
           specular: 0x111111,
           shininess: 5,
-        })
-        child.castShadow = true
-        child.receiveShadow = true
+        });
+        child.castShadow = true;
+        child.receiveShadow = true;
       }
-    })
-    return s
-  }, [object])
+    });
+    return s;
+  }, [object]);
 
-  return <primitive object={object} position={[0, 1, 0]} scale={1 / scale} />
+  return <primitive object={object} position={[0, 1, 0]} scale={1 / scale} />;
 }
 
 // 20 spheres with random saturated HSL colors, positions and scales — one shared
 // geometry, per-mesh materials (each needs its own color), regenerated per mount
 // exactly like the original regenerates per page load.
 export function SphereCloud() {
-  const geometry = useMemo(() => new SphereGeometry(3, 48, 24), [])
+  const geometry = useMemo(() => new SphereGeometry(3, 48, 24), []);
   const spheres = useMemo(
     () =>
       Array.from({ length: 20 }, () => ({
@@ -48,7 +48,7 @@ export function SphereCloud() {
         scale: Math.random() * 0.3 + 0.1,
       })),
     [],
-  )
+  );
 
   return (
     <>
@@ -58,7 +58,7 @@ export function SphereCloud() {
         </mesh>
       ))}
     </>
-  )
+  );
 }
 
 export function Floor() {
@@ -67,7 +67,7 @@ export function Floor() {
       <planeGeometry args={[12, 12]} />
       <meshLambertMaterial side={DoubleSide} />
     </mesh>
-  )
+  );
 }
 
 export function Torus() {
@@ -76,5 +76,5 @@ export function Torus() {
       <torusGeometry args={[1, 0.3, 16, 100]} />
       <meshPhongMaterial color="#ffaaff" />
     </mesh>
-  )
+  );
 }

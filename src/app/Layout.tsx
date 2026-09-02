@@ -1,5 +1,5 @@
-import { NavLink, Outlet } from 'react-router'
-import { exampleMeta as exampleList } from './manifest'
+import { NavLink, Outlet } from 'react-router';
+import { exampleMeta as exampleList } from './manifest';
 
 export function Layout() {
   return (
@@ -38,5 +38,5 @@ export function Layout() {
         <Outlet />
       </main>
     </div>
-  )
+  );
 }

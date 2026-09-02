@@ -25,12 +25,12 @@
  * - `Date.now()`-based `startTime`/elapsed-time bookkeeping dropped; `useFrame`'s
  *   `state.elapsed` drives the knot's spin/bob/scale directly
  */
-import { useEffect, useMemo, useRef } from 'react'
-import { DoubleSide, Plane, Vector3 } from 'three/webgpu'
-import type { Mesh, MeshPhongNodeMaterial } from 'three/webgpu'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { useEffect, useMemo, useRef } from 'react';
+import { DoubleSide, Plane, Vector3 } from 'three/webgpu';
+import type { Mesh, MeshPhongNodeMaterial } from 'three/webgpu';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 function ClippingScene() {
   const { alphaToCoverage, knotEnabled, knotShadows, knotIntersection, knotPlane, globalEnabled, globalPlane } =
@@ -46,51 +46,51 @@ function ClippingScene() {
         globalEnabled: { value: true, label: 'Enabled' },
         globalPlane: { value: 0.1, min: -0.4, max: 3, step: 0.01, label: 'Plane' },
       }),
-    })
+    });
 
-  const knotRef = useRef<Mesh>(null)
-  const knotMaterialRef = useRef<MeshPhongNodeMaterial>(null)
-  const groundMaterialRef = useRef<MeshPhongNodeMaterial>(null)
+  const knotRef = useRef<Mesh>(null);
+  const knotMaterialRef = useRef<MeshPhongNodeMaterial>(null);
+  const groundMaterialRef = useRef<MeshPhongNodeMaterial>(null);
 
   // Plain three.js `Plane` instances, mutated in place — a `ClippingGroup` reads the
   // same Plane objects every frame, and Plane has no reactive JSX representation.
-  const globalPlaneObj = useMemo(() => new Plane(new Vector3(-1, 0, 0), 0.1), [])
-  const localPlane1 = useMemo(() => new Plane(new Vector3(0, -1, 0), 0.8), [])
-  const localPlane2 = useMemo(() => new Plane(new Vector3(0, 0, -1), 0.1), [])
+  const globalPlaneObj = useMemo(() => new Plane(new Vector3(-1, 0, 0), 0.1), []);
+  const localPlane1 = useMemo(() => new Plane(new Vector3(0, -1, 0), 0.8), []);
+  const localPlane2 = useMemo(() => new Plane(new Vector3(0, 0, -1), 0.1), []);
 
-  const globalClippingPlanes = useMemo(() => [globalPlaneObj], [globalPlaneObj])
-  const knotClippingPlanes = useMemo(() => [localPlane1, localPlane2], [localPlane1, localPlane2])
-
-  useEffect(() => {
-    globalPlaneObj.constant = globalPlane
-  }, [globalPlaneObj, globalPlane])
+  const globalClippingPlanes = useMemo(() => [globalPlaneObj], [globalPlaneObj]);
+  const knotClippingPlanes = useMemo(() => [localPlane1, localPlane2], [localPlane1, localPlane2]);
 
   useEffect(() => {
-    localPlane1.constant = knotPlane
-  }, [localPlane1, knotPlane])
+    globalPlaneObj.constant = globalPlane;
+  }, [globalPlaneObj, globalPlane]);
 
   useEffect(() => {
-    const knotMat = knotMaterialRef.current
-    const groundMat = groundMaterialRef.current
+    localPlane1.constant = knotPlane;
+  }, [localPlane1, knotPlane]);
+
+  useEffect(() => {
+    const knotMat = knotMaterialRef.current;
+    const groundMat = groundMaterialRef.current;
     if (knotMat) {
-      knotMat.alphaToCoverage = alphaToCoverage
-      knotMat.needsUpdate = true
+      knotMat.alphaToCoverage = alphaToCoverage;
+      knotMat.needsUpdate = true;
     }
     if (groundMat) {
-      groundMat.alphaToCoverage = alphaToCoverage
-      groundMat.needsUpdate = true
+      groundMat.alphaToCoverage = alphaToCoverage;
+      groundMat.needsUpdate = true;
     }
-  }, [alphaToCoverage])
+  }, [alphaToCoverage]);
 
   useFrame((state) => {
-    const knot = knotRef.current
-    if (!knot) return
-    const time = state.elapsed
-    knot.position.y = 0.8
-    knot.rotation.x = time * 0.5
-    knot.rotation.y = time * 0.2
-    knot.scale.setScalar(Math.cos(time) * 0.125 + 0.875)
-  })
+    const knot = knotRef.current;
+    if (!knot) return;
+    const time = state.elapsed;
+    knot.position.y = 0.8;
+    knot.rotation.x = time * 0.5;
+    knot.rotation.y = time * 0.2;
+    knot.scale.setScalar(Math.cos(time) * 0.125 + 0.875);
+  });
 
   return (
     <>
@@ -149,7 +149,7 @@ function ClippingScene() {
         </mesh>
       </clippingGroup>
     </>
-  )
+  );
 }
 
 export default function Clipping() {
@@ -158,5 +158,5 @@ export default function Clipping() {
       <ClippingScene />
       <DemoHelpers target={[0, 1, 0]} />
     </Canvas>
-  )
+  );
 }

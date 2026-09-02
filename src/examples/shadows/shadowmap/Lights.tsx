@@ -2,30 +2,30 @@
 // props (`shadow-camera-*`, `shadow-mapSize-*`, `shadow-radius`). The directional light
 // orbits inside `dirGroup` and bobs along z — the same two independent animations the
 // original drives from its bare `animate()` function, now a `useFrame` job.
-import { useRef } from 'react'
-import type { DirectionalLight, Group } from 'three/webgpu'
+import { useRef } from 'react';
+import type { DirectionalLight, Group } from 'three/webgpu';
 
-import { useFrame } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
+import { useFrame } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
 
 export interface LightsProps {
-  spinSpeed: number
+  spinSpeed: number;
 }
 
 export function Lights({ spinSpeed }: LightsProps) {
   const { shadowRadius } = useControls('shadowmap', {
     shadow: folder({ shadowRadius: { value: 4, min: 0, max: 10, step: 0.5 } }),
-  })
-  const dirGroupRef = useRef<Group>(null)
-  const dirLightRef = useRef<DirectionalLight>(null)
+  });
+  const dirGroupRef = useRef<Group>(null);
+  const dirLightRef = useRef<DirectionalLight>(null);
 
   useFrame(({ time, delta }) => {
-    const group = dirGroupRef.current
-    const light = dirLightRef.current
-    if (!group || !light) return
-    group.rotation.y += 0.7 * spinSpeed * delta
-    light.position.z = 17 + Math.sin(time * 0.001 * spinSpeed) * 5
-  })
+    const group = dirGroupRef.current;
+    const light = dirLightRef.current;
+    if (!group || !light) return;
+    group.rotation.y += 0.7 * spinSpeed * delta;
+    light.position.z = 17 + Math.sin(time * 0.001 * spinSpeed) * 5;
+  });
 
   return (
     <>
@@ -62,5 +62,5 @@ export function Lights({ spinSpeed }: LightsProps) {
         />
       </group>
     </>
-  )
+  );
 }

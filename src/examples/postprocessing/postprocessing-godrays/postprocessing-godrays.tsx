@@ -16,7 +16,7 @@
  * - An identity-stable `PointLight` in lazy `useState`, shared between the JSX
  *   scene graph and the create-once pipeline closure that `godrays()` captures
  */
-import { Suspense, useLayoutEffect, useMemo, useState } from 'react'
+import { Suspense, useLayoutEffect, useMemo, useState } from 'react';
 import {
   DoubleSide,
   Mesh,
@@ -25,23 +25,23 @@ import {
   NoToneMapping,
   PlaneGeometry,
   PointLight,
-} from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
+} from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { useGLTF } from '@react-three/drei/webgpu';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { GodraysPipeline } from './GodraysPipeline'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { GodraysPipeline } from './GodraysPipeline';
 
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/godrays_demo.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/godrays_demo.glb';
 
-const LIGHT_COLOR = 0xf6287d
-const LIGHT_POS: [number, number, number] = [0, 50, 0]
+const LIGHT_COLOR = 0xf6287d;
+const LIGHT_POS: [number, number, number] = [0, 50, 0];
 
 //* Scene =========================================================
 
 // Concrete pillar field the rays streak through.
 function PillarsModel() {
-  const { scene: model } = useGLTF(MODEL_URL)
+  const { scene: model } = useGLTF(MODEL_URL);
 
   const materials = useMemo(
     () => ({
@@ -49,43 +49,43 @@ function PillarsModel() {
       base: new MeshStandardMaterial({ color: 0x333333, side: DoubleSide }),
     }),
     [],
-  )
+  );
 
   // Material overrides + shadow flags must precede the first render (the shadow
   // setup is read by the first shader-graph build) — useLayoutEffect, idempotent.
   useLayoutEffect(() => {
-    const concrete = model.getObjectByName('concrete')
-    if (concrete instanceof Mesh) concrete.material = materials.concrete
-    const base = model.getObjectByName('base')
-    if (base instanceof Mesh) base.material = materials.base
+    const concrete = model.getObjectByName('concrete');
+    if (concrete instanceof Mesh) concrete.material = materials.concrete;
+    const base = model.getObjectByName('base');
+    if (base instanceof Mesh) base.material = materials.base;
     model.traverse((obj) => {
       if (obj instanceof Mesh) {
-        obj.castShadow = true
-        obj.receiveShadow = true
+        obj.castShadow = true;
+        obj.receiveShadow = true;
       }
-    })
-  }, [model, materials])
+    });
+  }, [model, materials]);
 
-  return <primitive object={model} />
+  return <primitive object={model} />;
 }
 
 // Five black walls boxing the scene 200 units out — they bound the raymarch so the
 // shafts read against pure darkness instead of open sky.
 const BACKDROP_WALLS: {
-  position: [number, number, number]
-  rotation?: [number, number, number]
-  scale?: [number, number, number]
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  scale?: [number, number, number];
 }[] = [
   { position: [-200, 100, 0], rotation: [0, Math.PI / 2, 0] },
   { position: [200, 100, 0], rotation: [0, Math.PI / 2, 0] },
   { position: [0, 100, -200] },
   { position: [0, 100, 200] },
   { position: [0, 200, 0], rotation: [Math.PI / 2, 0, 0], scale: [3, 6, 1] },
-]
+];
 
 function Backdrop() {
-  const geometry = useMemo(() => new PlaneGeometry(400, 200), [])
-  const material = useMemo(() => new MeshBasicMaterial({ color: 0x000000, side: DoubleSide }), [])
+  const geometry = useMemo(() => new PlaneGeometry(400, 200), []);
+  const material = useMemo(() => new MeshBasicMaterial({ color: 0x000000, side: DoubleSide }), []);
 
   return (
     <>
@@ -93,7 +93,7 @@ function Backdrop() {
         <mesh key={i} geometry={geometry} material={material} castShadow receiveShadow {...wall} />
       ))}
     </>
-  )
+  );
 }
 
 //* Main ===========================================================
@@ -103,12 +103,12 @@ export default function PostprocessingGodrays() {
   // captures this exact instance (godrays() reads its shadow camera), so hold it in
   // lazy useState — never useMemo. Shadow config precedes the first render.
   const [pointLight] = useState(() => {
-    const light = new PointLight(LIGHT_COLOR, 10000)
-    light.castShadow = true
-    light.shadow.bias = -0.00001
-    light.shadow.mapSize.set(2048, 2048)
-    return light
-  })
+    const light = new PointLight(LIGHT_COLOR, 10000);
+    light.castShadow = true;
+    light.shadow.bias = -0.00001;
+    light.shadow.mapSize.set(2048, 2048);
+    return light;
+  });
 
   return (
     <Canvas
@@ -133,5 +133,5 @@ export default function PostprocessingGodrays() {
       <Backdrop />
       <DemoHelpers grid={false} target={[0, 0.5, 0]} maxDistance={200} />
     </Canvas>
-  )
+  );
 }

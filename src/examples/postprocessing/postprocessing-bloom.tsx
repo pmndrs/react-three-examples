@@ -12,31 +12,31 @@
  * - A point light attached to the camera, declaratively
  * - `useAnimations` playing the model's single clip by name
  */
-import { Suspense, useEffect } from 'react'
-import { ReinhardToneMapping } from 'three/webgpu'
-import { bloom } from 'three/addons/tsl/display/BloomNode.js'
-import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { PerspectiveCamera, useAnimations, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { Suspense, useEffect } from 'react';
+import { ReinhardToneMapping } from 'three/webgpu';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { PerspectiveCamera, useAnimations, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const SHIP_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/PrimaryIonDrive.glb'
+const SHIP_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/PrimaryIonDrive.glb';
 
 //* Scene =========================================================
 
 function PrimaryIonDrive() {
-  const { scene, animations } = useGLTF(SHIP_URL)
-  const { actions } = useAnimations(animations, scene)
+  const { scene, animations } = useGLTF(SHIP_URL);
+  const { actions } = useAnimations(animations, scene);
 
   useEffect(() => {
     // By name, never Object.values(actions) — read off the clip since the GLTF
     // doesn't document it.
-    const name = animations[0]?.name
-    if (name) actions[name]?.play()
-  }, [actions, animations])
+    const name = animations[0]?.name;
+    if (name) actions[name]?.play();
+  }, [actions, animations]);
 
-  return <primitive object={scene} />
+  return <primitive object={scene} />;
 }
 
 //* Post-processing ===============================================
@@ -47,28 +47,28 @@ function PostFX() {
     strength: { value: 1, min: 0, max: 3, step: 0.01 },
     radius: { value: 0, min: 0, max: 1, step: 0.01 },
     exposure: { value: 1, min: 0.1, max: 2, step: 0.01 },
-  })
-  const uniforms = useUniforms(bloomValues)
-  const renderer = useThree((state) => state.renderer)
+  });
+  const uniforms = useUniforms(bloomValues);
+  const renderer = useThree((state) => state.renderer);
 
   useRenderPipeline(({ renderPipeline, passes }) => {
-    const scenePassColor = passes.scenePass.getTextureNode()
-    const bloomPass = bloom(scenePassColor)
+    const scenePassColor = passes.scenePass.getTextureNode();
+    const bloomPass = bloom(scenePassColor);
     // bloom() builds its own uniforms; swap ours in before the shader compiles and
     // leva drives the pass with no pipeline rebuild.
-    bloomPass.threshold = uniforms.threshold
-    bloomPass.strength = uniforms.strength
-    bloomPass.radius = uniforms.radius
-    renderPipeline.outputNode = scenePassColor.add(bloomPass)
-  })
+    bloomPass.threshold = uniforms.threshold;
+    bloomPass.strength = uniforms.strength;
+    bloomPass.radius = uniforms.radius;
+    renderPipeline.outputNode = scenePassColor.add(bloomPass);
+  });
 
   // Exposure is a renderer property, not a node — no place in the graph. pow(v, 4) is
   // the original's curve, which just makes the slider feel even.
   useEffect(() => {
-    renderer.toneMappingExposure = exposure ** 4
-  }, [renderer, exposure])
+    renderer.toneMappingExposure = exposure ** 4;
+  }, [renderer, exposure]);
 
-  return null
+  return null;
 }
 
 export default function PostprocessingBloom() {
@@ -86,5 +86,5 @@ export default function PostprocessingBloom() {
       <PostFX />
       <DemoHelpers grid={false} minDistance={3} maxDistance={8} maxPolarAngle={Math.PI * 0.5} />
     </Canvas>
-  )
+  );
 }

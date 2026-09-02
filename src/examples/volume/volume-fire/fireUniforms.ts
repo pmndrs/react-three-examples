@@ -1,9 +1,9 @@
 // All live uniforms of the fire simulation, shading, and display graphs. The
 // three-side nodes are registered once through fiber's `useUniforms`; a second
 // Leva-backed call updates only controlled values, leaving frame-driven values intact.
-import { uniform } from 'three/tsl'
-import { Color, Matrix4, Vector3 } from 'three/webgpu'
-import { KEY_LIGHT_POS, SIM_STEP, VOLUME_WORLD_SIZE_X, VOLUME_WORLD_SIZE_Y, VOLUME_WORLD_SIZE_Z } from './constants'
+import { uniform } from 'three/tsl';
+import { Color, Matrix4, Vector3 } from 'three/webgpu';
+import { KEY_LIGHT_POS, SIM_STEP, VOLUME_WORLD_SIZE_X, VOLUME_WORLD_SIZE_Y, VOLUME_WORLD_SIZE_Z } from './constants';
 
 export function createFireUniforms() {
   return {
@@ -57,7 +57,7 @@ export function createFireUniforms() {
     uBloomStrength: uniform(0.1),
     uBloomRadius: uniform(1.0),
     uBloomThreshold: uniform(0.5),
-  }
+  };
 }
 
-export type FireUniforms = ReturnType<typeof createFireUniforms>
+export type FireUniforms = ReturnType<typeof createFireUniforms>;

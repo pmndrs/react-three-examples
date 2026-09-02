@@ -41,32 +41,32 @@
  *   which runs the WebGPURenderer default (fiber's Canvas would otherwise default to
  *   ACESFilmic and mute the warm/cool light split; AGENTS.md v0.9 rule)
  */
-import { useRef } from 'react'
-import { NoToneMapping } from 'three/webgpu'
-import type { DirectionalLight, Group, Mesh } from 'three/webgpu'
+import { useRef } from 'react';
+import { NoToneMapping } from 'three/webgpu';
+import type { DirectionalLight, Group, Mesh } from 'three/webgpu';
 
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 function TorusKnot({ speed }: { speed: number }) {
-  const meshRef = useRef<Mesh>(null)
+  const meshRef = useRef<Mesh>(null);
 
   useFrame(({ delta }) => {
-    const mesh = meshRef.current
-    if (!mesh) return
-    mesh.rotation.x += 0.25 * speed * delta
-    mesh.rotation.y += 0.5 * speed * delta
-    mesh.rotation.z += 1 * speed * delta
-  })
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    mesh.rotation.x += 0.25 * speed * delta;
+    mesh.rotation.y += 0.5 * speed * delta;
+    mesh.rotation.z += 1 * speed * delta;
+  });
 
   return (
     <mesh ref={meshRef} position={[0, 3, 0]} scale={1 / 18} castShadow receiveShadow>
       <torusKnotGeometry args={[25, 8, 75, 20]} />
       <meshPhongMaterial color="#999999" shininess={0} specular="#222222" />
     </mesh>
-  )
+  );
 }
 
 const PILLAR_POSITIONS: [number, number, number][] = [
@@ -74,7 +74,7 @@ const PILLAR_POSITIONS: [number, number, number][] = [
   [8, 3.5, -8],
   [-8, 3.5, 8],
   [-8, 3.5, -8],
-]
+];
 
 function Pillars() {
   return PILLAR_POSITIONS.map((position) => (
@@ -82,7 +82,7 @@ function Pillars() {
       <cylinderGeometry args={[0.75, 0.75, 7, 32]} />
       <meshPhongMaterial color="#999999" shininess={0} specular="#222222" />
     </mesh>
-  ))
+  ));
 }
 
 // castShadow on the ground is load-bearing under VSM, not a copy/paste artifact — see
@@ -93,11 +93,11 @@ function Ground() {
       <planeGeometry args={[200, 200]} />
       <meshPhongMaterial color="#999999" shininess={0} specular="#111111" />
     </mesh>
-  )
+  );
 }
 
 interface LightsProps {
-  speed: number
+  speed: number;
 }
 
 // Warm spot + cool directional, both VSM casters with the original's deliberately tiny
@@ -113,19 +113,19 @@ function Lights({ speed }: LightsProps) {
       dirRadius: { value: 4, min: 0, max: 25, step: 0.1, label: 'radius' },
       dirSamples: { value: 8, min: 1, max: 25, step: 1, label: 'samples' },
     }),
-  })
-  const dirGroupRef = useRef<Group>(null)
-  const dirLightRef = useRef<DirectionalLight>(null)
-  const bobPhaseRef = useRef(0)
+  });
+  const dirGroupRef = useRef<Group>(null);
+  const dirLightRef = useRef<DirectionalLight>(null);
+  const bobPhaseRef = useRef(0);
 
   useFrame(({ delta }) => {
-    const group = dirGroupRef.current
-    const light = dirLightRef.current
-    if (!group || !light) return
-    group.rotation.y += 0.7 * speed * delta
-    bobPhaseRef.current += speed * delta // original rate: sin(time_ms * 0.001) = 1 rad/s
-    light.position.z = 17 + Math.sin(bobPhaseRef.current) * 5
-  })
+    const group = dirGroupRef.current;
+    const light = dirLightRef.current;
+    if (!group || !light) return;
+    group.rotation.y += 0.7 * speed * delta;
+    bobPhaseRef.current += speed * delta; // original rate: sin(time_ms * 0.001) = 1 rad/s
+    light.position.z = 17 + Math.sin(bobPhaseRef.current) * 5;
+  });
 
   return (
     <>
@@ -166,12 +166,12 @@ function Lights({ speed }: LightsProps) {
         />
       </group>
     </>
-  )
+  );
 }
 
 export default function ShadowmapVsm() {
   // speed is shared by Lights (directional bob/orbit) and TorusKnot (spin rate).
-  const { speed } = useControls('shadowmap-vsm', { speed: { value: 1, min: 0, max: 3, step: 0.05 } })
+  const { speed } = useControls('shadowmap-vsm', { speed: { value: 1, min: 0, max: 3, step: 0.05 } });
 
   return (
     <Canvas
@@ -186,5 +186,5 @@ export default function ShadowmapVsm() {
       <Ground />
       <DemoHelpers grid={false} target={[0, 2, 0]} minDistance={8} maxDistance={60} />
     </Canvas>
-  )
+  );
 }

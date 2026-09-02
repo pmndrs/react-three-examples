@@ -1,11 +1,11 @@
-import { Suspense } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router'
-import { Layout } from './Layout'
-import { exampleRoutes } from './routes'
-import { exampleMeta, metaBySlug } from './manifest'
-import { Titleblock } from './Titleblock'
+import { Suspense } from 'react';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
+import { Layout } from './Layout';
+import { exampleRoutes } from './routes';
+import { exampleMeta, metaBySlug } from './manifest';
+import { Titleblock } from './Titleblock';
 
-const firstSlug = exampleMeta[0]?.slug
+const firstSlug = exampleMeta[0]?.slug;
 
 export function App() {
   return (
@@ -14,7 +14,7 @@ export function App() {
         <Route element={<Layout />}>
           {firstSlug && <Route index element={<Navigate to={`/examples/${firstSlug}`} replace />} />}
           {exampleRoutes.map(({ slug, Component }) => {
-            const meta = metaBySlug.get(slug)
+            const meta = metaBySlug.get(slug);
             return (
               <Route
                 key={slug}
@@ -28,10 +28,10 @@ export function App() {
                   </div>
                 }
               />
-            )
+            );
           })}
         </Route>
       </Routes>
     </BrowserRouter>
-  )
+  );
 }

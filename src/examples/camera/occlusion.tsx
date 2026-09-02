@@ -30,49 +30,49 @@
  * - Tone mapping pinned to `NoToneMapping` (the original relies on the WebGPURenderer
  *   default; fiber's Canvas would otherwise default to ACESFilmic).
  */
-import { useEffect, useMemo, useState } from 'react'
-import { uniform } from 'three/tsl'
-import { Color, DoubleSide, Node, NodeUpdateType, NoToneMapping } from 'three/webgpu'
-import type { Mesh, NodeFrame, Object3D } from 'three/webgpu'
+import { useEffect, useMemo, useState } from 'react';
+import { uniform } from 'three/tsl';
+import { Color, DoubleSide, Node, NodeUpdateType, NoToneMapping } from 'three/webgpu';
+import type { Mesh, NodeFrame, Object3D } from 'three/webgpu';
 
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // Original defaults: plane shows blue while the sphere is visible, green once the
 // sphere is completely occluded behind it.
-const VISIBLE_COLOR = 0x0000ff
-const OCCLUDED_COLOR = 0x00ff00
+const VISIBLE_COLOR = 0x0000ff;
+const OCCLUDED_COLOR = 0x00ff00;
 
 // Ported from the original `webgpu_occlusion` example (three.js authors).
 // updateType OBJECT: the renderer calls update() right before drawing each object
 // that uses this node (here: the plane), so the uniform always carries the freshest
 // occlusion-query result for the sphere — read on the CPU, consumed by the shader.
 class OcclusionNode extends Node {
-  uniformNode = uniform(new Color())
+  uniformNode = uniform(new Color());
 
-  testObject: Object3D
-  normalColor: Color
-  occludedColor: Color
+  testObject: Object3D;
+  normalColor: Color;
+  occludedColor: Color;
 
   constructor(testObject: Object3D, normalColor: Color, occludedColor: Color) {
-    super('vec3')
-    this.updateType = NodeUpdateType.OBJECT
-    this.testObject = testObject
-    this.normalColor = normalColor
-    this.occludedColor = occludedColor
+    super('vec3');
+    this.updateType = NodeUpdateType.OBJECT;
+    this.testObject = testObject;
+    this.normalColor = normalColor;
+    this.occludedColor = occludedColor;
   }
 
   update(frame: NodeFrame): boolean | undefined {
-    if (frame.renderer === null) return undefined
-    const isOccluded = frame.renderer.isOccluded(this.testObject)
-    this.uniformNode.value.copy(isOccluded ? this.occludedColor : this.normalColor)
-    return undefined
+    if (frame.renderer === null) return undefined;
+    const isOccluded = frame.renderer.isOccluded(this.testObject);
+    this.uniformNode.value.copy(isOccluded ? this.occludedColor : this.normalColor);
+    return undefined;
   }
 
   setup() {
-    return this.uniformNode
+    return this.uniformNode;
   }
 }
 
@@ -81,22 +81,22 @@ export default function Occlusion() {
     sphereZ: { value: -1, min: -4, max: 2.5, step: 0.01, label: 'sphere z' },
     visibleColor: { value: '#0000ff', label: 'visible' },
     occludedColor: { value: '#00ff00', label: 'occluded' },
-  })
+  });
 
-  const [sphere, setSphere] = useState<Mesh | null>(null)
+  const [sphere, setSphere] = useState<Mesh | null>(null);
 
   // Built once the live sphere Mesh exists; leva colors are applied by mutation below
   // (the node holds the Color instances, update() copies from them per frame).
   const occlusionNode = useMemo(
     () => (sphere ? new OcclusionNode(sphere, new Color(VISIBLE_COLOR), new Color(OCCLUDED_COLOR)) : null),
     [sphere],
-  )
+  );
 
   useEffect(() => {
-    if (!occlusionNode) return
-    occlusionNode.normalColor.set(visibleColor)
-    occlusionNode.occludedColor.set(occludedColor)
-  }, [occlusionNode, visibleColor, occludedColor])
+    if (!occlusionNode) return;
+    occlusionNode.normalColor.set(visibleColor);
+    occlusionNode.occludedColor.set(occludedColor);
+  }, [occlusionNode, visibleColor, occludedColor]);
 
   return (
     <Canvas
@@ -112,13 +112,13 @@ export default function Occlusion() {
       <mesh
         position={[0, 0, sphereZ]}
         ref={(mesh) => {
-          if (!mesh) return
+          if (!mesh) return;
           // The renderer reads `object.occlusionTest` generically (RenderList.js:305)
           // to wrap this mesh's draw in a GPU occlusion query, but @types/three does
           // not declare the flag on Object3D — documented duck-typing cast (AGENTS.md
           // B11 family; verified against renderers/common in node_modules/three).
-          ;(mesh as Mesh & { occlusionTest: boolean }).occlusionTest = true
-          setSphere(mesh)
+          (mesh as Mesh & { occlusionTest: boolean }).occlusionTest = true;
+          setSphere(mesh);
         }}>
         <sphereGeometry args={[0.5]} />
         <meshPhongNodeMaterial color={0xffff00} />
@@ -134,5 +134,5 @@ export default function Occlusion() {
 
       <DemoHelpers grid={false} minDistance={3} maxDistance={25} />
     </Canvas>
-  )
+  );
 }

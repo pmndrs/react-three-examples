@@ -35,7 +35,7 @@
  *   original's `performance.now() / 1000`
  * - The example has no user-facing controls in the original — no leva panel here either
  */
-import { useRef } from 'react'
+import { useRef } from 'react';
 import {
   Fn,
   NodeAccess,
@@ -51,13 +51,13 @@ import {
   uvec2,
   vec2,
   vec4,
-} from 'three/tsl'
-import { HalfFloatType, StorageTexture, Vector2, type Node, type StorageTextureNode } from 'three/webgpu'
-import { Canvas, useFrame, useGPUStorage, useNodes, useThree } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/tsl';
+import { HalfFloatType, StorageTexture, Vector2, type Node, type StorageTextureNode } from 'three/webgpu';
+import { Canvas, useFrame, useGPUStorage, useNodes, useThree } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const WIDTH = 512
-const HEIGHT = 512
+const WIDTH = 512;
+const HEIGHT = 512;
 
 // Plain build-time closure, not a TSL Fn — see header DIVERGENCE. `.load()` clones
 // internally (TextureNode.sample -> this.clone()), so calling it 5x on the same
@@ -69,66 +69,66 @@ function blur5(readTex: StorageTextureNode, uv: Node<'ivec2'>) {
     .add(readTex.load(uv.add(ivec2(0, 0))))
     .add(readTex.load(uv.add(ivec2(1, -1))))
     .add(readTex.load(uv.add(ivec2(1, 1))))
-    .div(5.0)
+    .div(5.0);
 }
 
 function PingPongPlane() {
-  const renderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer);
 
   // Two HDR storage textures, create-once (StrictMode-safe).
   const { pingTexture, pongTexture } = useGPUStorage(() => {
-    const ping = new StorageTexture(WIDTH, HEIGHT)
-    const pong = new StorageTexture(WIDTH, HEIGHT)
-    ping.type = HalfFloatType
-    pong.type = HalfFloatType
-    return { pingTexture: ping, pongTexture: pong }
-  }, 'computeTexturePingPong') // WGSL-identifier rule: camelCase scope, never kebab-case
+    const ping = new StorageTexture(WIDTH, HEIGHT);
+    const pong = new StorageTexture(WIDTH, HEIGHT);
+    ping.type = HalfFloatType;
+    pong.type = HalfFloatType;
+    return { pingTexture: ping, pongTexture: pong };
+  }, 'computeTexturePingPong'); // WGSL-identifier rule: camelCase scope, never kebab-case
 
   // ROOT-LEVEL useNodes on purpose (UPSTREAM.md B16): a scoped call would name entries
   // `${scope}.${name}`, and these nodes reach WGSL codegen (storage-texture bindings).
   const { computeInit, computeToPing, computeToPong, uSeed, uPhase, colorNode } = useNodes(() => {
-    const uSeed = uniform(new Vector2())
+    const uSeed = uniform(new Vector2());
     // Flipped once per frame in useFrame below; drives the branchless display select.
-    const uPhase = uniform(true)
+    const uPhase = uniform(true);
 
-    const rand2 = (n: Node<'vec2'>) => n.dot(vec2(12.9898, 4.1414)).sin().mul(43758.5453).fract()
+    const rand2 = (n: Node<'vec2'>) => n.dot(vec2(12.9898, 4.1414)).sin().mul(43758.5453).fract();
 
-    const writePing = storageTexture(pingTexture).setAccess(NodeAccess.WRITE_ONLY)
-    const readPing = storageTexture(pingTexture).setAccess(NodeAccess.READ_ONLY)
-    const writePong = storageTexture(pongTexture).setAccess(NodeAccess.WRITE_ONLY)
-    const readPong = storageTexture(pongTexture).setAccess(NodeAccess.READ_ONLY)
+    const writePing = storageTexture(pingTexture).setAccess(NodeAccess.WRITE_ONLY);
+    const readPing = storageTexture(pingTexture).setAccess(NodeAccess.READ_ONLY);
+    const writePong = storageTexture(pongTexture).setAccess(NodeAccess.WRITE_ONLY);
+    const readPong = storageTexture(pongTexture).setAccess(NodeAccess.READ_ONLY);
 
     const computeInit = Fn(() => {
-      const posX = instanceIndex.mod(WIDTH)
-      const posY = instanceIndex.div(WIDTH)
-      const indexUV = uvec2(posX, posY)
-      const uv = vec2(float(posX).div(WIDTH), float(posY).div(HEIGHT))
+      const posX = instanceIndex.mod(WIDTH);
+      const posY = instanceIndex.div(WIDTH);
+      const indexUV = uvec2(posX, posY);
+      const uv = vec2(float(posX).div(WIDTH), float(posY).div(HEIGHT));
 
-      const r = rand2(uv.add(uSeed.mul(100))).sub(rand2(uv.add(uSeed.mul(300))))
-      const g = rand2(uv.add(uSeed.mul(200))).sub(rand2(uv.add(uSeed.mul(300))))
-      const b = rand2(uv.add(uSeed.mul(200))).sub(rand2(uv.add(uSeed.mul(100))))
+      const r = rand2(uv.add(uSeed.mul(100))).sub(rand2(uv.add(uSeed.mul(300))));
+      const g = rand2(uv.add(uSeed.mul(200))).sub(rand2(uv.add(uSeed.mul(300))));
+      const b = rand2(uv.add(uSeed.mul(200))).sub(rand2(uv.add(uSeed.mul(100))));
 
-      textureStore(writePing, indexUV, vec4(r, g, b, 1))
-    })().compute(WIDTH * HEIGHT)
+      textureStore(writePing, indexUV, vec4(r, g, b, 1));
+    })().compute(WIDTH * HEIGHT);
 
     // Read one buffer, blur, write the other — built twice, once per direction.
     const computeToPong = Fn(() => {
-      const posX = instanceIndex.mod(WIDTH)
-      const posY = instanceIndex.div(WIDTH)
-      const indexUV = ivec2(int(posX), int(posY))
+      const posX = instanceIndex.mod(WIDTH);
+      const posY = instanceIndex.div(WIDTH);
+      const indexUV = ivec2(int(posX), int(posY));
 
-      const blurred = blur5(readPing, indexUV)
-      textureStore(writePong, indexUV, vec4(blurred.rgb.mul(1.05), 1))
-    })().compute(WIDTH * HEIGHT)
+      const blurred = blur5(readPing, indexUV);
+      textureStore(writePong, indexUV, vec4(blurred.rgb.mul(1.05), 1));
+    })().compute(WIDTH * HEIGHT);
 
     const computeToPing = Fn(() => {
-      const posX = instanceIndex.mod(WIDTH)
-      const posY = instanceIndex.div(WIDTH)
-      const indexUV = ivec2(int(posX), int(posY))
+      const posX = instanceIndex.mod(WIDTH);
+      const posY = instanceIndex.div(WIDTH);
+      const indexUV = ivec2(int(posX), int(posY));
 
-      const blurred = blur5(readPong, indexUV)
-      textureStore(writePing, indexUV, vec4(blurred.rgb.mul(1.05), 1))
-    })().compute(WIDTH * HEIGHT)
+      const blurred = blur5(readPong, indexUV);
+      textureStore(writePing, indexUV, vec4(blurred.rgb.mul(1.05), 1));
+    })().compute(WIDTH * HEIGHT);
 
     return {
       computeInit,
@@ -138,38 +138,38 @@ function PingPongPlane() {
       uPhase,
       // uPhase true => computeToPong just ran (ping -> pong) => display pong.
       colorNode: select(uPhase, texture(pongTexture), texture(pingTexture)),
-    }
-  })
+    };
+  });
 
   // Imperative per-frame bookkeeping — must never trigger a re-render.
-  const phaseRef = useRef(true)
-  const lastUpdateRef = useRef(-1)
+  const phaseRef = useRef(true);
+  const lastUpdateRef = useRef(-1);
 
   useFrame(
     ({ elapsed }) => {
-      const seconds = Math.floor(elapsed)
+      const seconds = Math.floor(elapsed);
 
       // Reseed roughly once a second (only checked on the phase===true half of the
       // alternation, matching the original's `if (phase && seconds !== lastUpdate)`).
       if (phaseRef.current && seconds !== lastUpdateRef.current) {
-        uSeed.value.set(Math.random(), Math.random())
-        renderer.compute(computeInit)
-        lastUpdateRef.current = seconds
+        uSeed.value.set(Math.random(), Math.random());
+        renderer.compute(computeInit);
+        lastUpdateRef.current = seconds;
       }
 
-      renderer.compute(phaseRef.current ? computeToPong : computeToPing)
-      uPhase.value = phaseRef.current
-      phaseRef.current = !phaseRef.current
+      renderer.compute(phaseRef.current ? computeToPong : computeToPing);
+      uPhase.value = phaseRef.current;
+      phaseRef.current = !phaseRef.current;
     },
     { phase: 'update' },
-  )
+  );
 
   return (
     <mesh>
       <planeGeometry args={[2, 2]} />
       <meshBasicNodeMaterial colorNode={colorNode} />
     </mesh>
-  )
+  );
 }
 
 export default function ComputeTexturePingPong() {
@@ -178,5 +178,5 @@ export default function ComputeTexturePingPong() {
       <PingPongPlane />
       <DemoHelpers />
     </Canvas>
-  )
+  );
 }

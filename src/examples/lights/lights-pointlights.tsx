@@ -35,7 +35,7 @@
  * - DemoHelpers grid disabled (`grid={false}`) — the original scene is a black void
  *   with no floor; an infinite ground grid would be pure invention
  */
-import { Suspense, useMemo, useRef, type RefObject } from 'react'
+import { Suspense, useMemo, useRef, type RefObject } from 'react';
 import {
   BufferGeometry,
   Float32BufferAttribute,
@@ -43,9 +43,9 @@ import {
   Plane,
   SphereGeometry,
   Vector3,
-} from 'three/webgpu'
-import type { BufferAttribute, Mesh, PointLight } from 'three/webgpu'
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
+} from 'three/webgpu';
+import type { BufferAttribute, Mesh, PointLight } from 'three/webgpu';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 import {
   abs,
   attribute,
@@ -57,138 +57,138 @@ import {
   sin,
   time,
   uniform,
-} from 'three/tsl'
+} from 'three/tsl';
 
-import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const WALT_HEAD_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/obj/walt/WaltHead.obj'
+const WALT_HEAD_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/obj/walt/WaltHead.obj';
 
 // Shared marker-sphere geometry (radius 0.5, matches the original) — a constant asset,
 // not mutable state, so a module-scope THREE instance is the idiomatic call here (same
 // rationale as instance-mesh's scratch `dummy` Object3D).
-const markerGeometry = new SphereGeometry(0.5, 16, 8)
+const markerGeometry = new SphereGeometry(0.5, 16, 8);
 
 // Ported near-verbatim from the original's `createGeometry()` — see header
 // DEMONSTRATES. Pure CPU geometry processing: reads the source position attribute only,
 // never mutates it, and returns a brand-new BufferGeometry.
 function createGeometry(source: BufferGeometry) {
-  const positionAttribute = source.getAttribute('position') as BufferAttribute
+  const positionAttribute = source.getAttribute('position') as BufferAttribute;
 
-  const v0 = new Vector3()
-  const v1 = new Vector3()
-  const v2 = new Vector3()
-  const v3 = new Vector3()
-  const n = new Vector3()
-  const plane = new Plane()
+  const v0 = new Vector3();
+  const v1 = new Vector3();
+  const v2 = new Vector3();
+  const v3 = new Vector3();
+  const n = new Vector3();
+  const plane = new Plane();
 
-  const vertices: number[] = []
-  const times: number[] = []
-  const seeds: number[] = []
-  const displaceNormal: number[] = []
+  const vertices: number[] = [];
+  const times: number[] = [];
+  const seeds: number[] = [];
+  const displaceNormal: number[] = [];
 
   for (let i = 0; i < positionAttribute.count; i += 3) {
-    v0.fromBufferAttribute(positionAttribute, i)
-    v1.fromBufferAttribute(positionAttribute, i + 1)
-    v2.fromBufferAttribute(positionAttribute, i + 2)
+    v0.fromBufferAttribute(positionAttribute, i);
+    v1.fromBufferAttribute(positionAttribute, i + 1);
+    v2.fromBufferAttribute(positionAttribute, i + 2);
 
-    plane.setFromCoplanarPoints(v0, v1, v2)
+    plane.setFromCoplanarPoints(v0, v1, v2);
 
-    v3.copy(v0).add(v1).add(v2).divideScalar(3) // triangle centroid
-    v3.add(n.copy(plane.normal).multiplyScalar(-1)) // displace centroid inward
+    v3.copy(v0).add(v1).add(v2).divideScalar(3); // triangle centroid
+    v3.add(n.copy(plane.normal).multiplyScalar(-1)); // displace centroid inward
 
     // Emit a tetrahedron: the original face plus 3 faces to the displaced centroid.
-    vertices.push(v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z)
-    vertices.push(v3.x, v3.y, v3.z, v1.x, v1.y, v1.z, v0.x, v0.y, v0.z)
-    vertices.push(v3.x, v3.y, v3.z, v2.x, v2.y, v2.z, v1.x, v1.y, v1.z)
-    vertices.push(v3.x, v3.y, v3.z, v0.x, v0.y, v0.z, v2.x, v2.y, v2.z)
+    vertices.push(v0.x, v0.y, v0.z, v1.x, v1.y, v1.z, v2.x, v2.y, v2.z);
+    vertices.push(v3.x, v3.y, v3.z, v1.x, v1.y, v1.z, v0.x, v0.y, v0.z);
+    vertices.push(v3.x, v3.y, v3.z, v2.x, v2.y, v2.z, v1.x, v1.y, v1.z);
+    vertices.push(v3.x, v3.y, v3.z, v0.x, v0.y, v0.z, v2.x, v2.y, v2.z);
 
-    const t = Math.random()
-    const s = Math.random()
-    n.copy(plane.normal)
+    const t = Math.random();
+    const s = Math.random();
+    n.copy(plane.normal);
 
     for (let k = 0; k < 4; k++) {
-      times.push(t, t, t)
-      seeds.push(s, s, s)
-      displaceNormal.push(n.x, n.y, n.z, n.x, n.y, n.z, n.x, n.y, n.z)
+      times.push(t, t, t);
+      seeds.push(s, s, s);
+      displaceNormal.push(n.x, n.y, n.z, n.x, n.y, n.z, n.x, n.y, n.z);
     }
   }
 
-  const geometry = new BufferGeometry()
-  geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3))
-  geometry.setAttribute('time', new Float32BufferAttribute(times, 1))
-  geometry.setAttribute('seed', new Float32BufferAttribute(seeds, 1))
-  geometry.setAttribute('displaceNormal', new Float32BufferAttribute(displaceNormal, 3))
-  geometry.computeVertexNormals()
+  const geometry = new BufferGeometry();
+  geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute('time', new Float32BufferAttribute(times, 1));
+  geometry.setAttribute('seed', new Float32BufferAttribute(seeds, 1));
+  geometry.setAttribute('displaceNormal', new Float32BufferAttribute(displaceNormal, 3));
+  geometry.computeVertexNormals();
 
-  return geometry
+  return geometry;
 }
 
 // Builds the TSL vertex-displacement material, wired to both lights' LIVE positions —
 // see header DEMONSTRATES.
 function createMaterial(light1: PointLight, light2: PointLight) {
-  const material = new MeshPhongNodeMaterial()
+  const material = new MeshPhongNodeMaterial();
 
   // Explicit type args: `attribute<T>` infers `unknown` without one, which doesn't
   // structurally narrow to the math API used below (same family as
   // instancedBufferAttribute, documented in AGENTS.md).
-  const seedAttribute = attribute<'float'>('seed')
-  const displaceNormalAttribute = attribute<'vec3'>('displaceNormal')
-  const localTime = attribute<'float'>('time').add(time)
+  const seedAttribute = attribute<'float'>('seed');
+  const displaceNormalAttribute = attribute<'vec3'>('displaceNormal');
+  const localTime = attribute<'float'>('time').add(time);
 
-  const effector1 = uniform(light1.position).toVar()
-  const effector2 = uniform(light2.position).toVar()
+  const effector1 = uniform(light1.position).toVar();
+  const effector2 = uniform(light2.position).toVar();
 
-  const distance1 = distance(positionLocal, modelWorldMatrixInverse.mul(effector1))
-  const distance2 = distance(positionLocal, modelWorldMatrixInverse.mul(effector2))
+  const distance1 = distance(positionLocal, modelWorldMatrixInverse.mul(effector1));
+  const distance2 = distance(positionLocal, modelWorldMatrixInverse.mul(effector2));
 
-  const invDistance1 = max(0, float(20).sub(distance1)).div(2)
-  const invDistance2 = max(0, float(20).sub(distance2)).div(2)
+  const invDistance1 = max(0, float(20).sub(distance1)).div(2);
+  const invDistance2 = max(0, float(20).sub(distance2)).div(2);
 
   const s = abs(sin(localTime.mul(2).add(seedAttribute)).mul(0.5))
     .add(invDistance1)
-    .add(invDistance2)
+    .add(invDistance2);
 
-  material.positionNode = positionLocal.add(displaceNormalAttribute.mul(s))
+  material.positionNode = positionLocal.add(displaceNormalAttribute.mul(s));
 
-  return material
+  return material;
 }
 
 interface WaltHeadProps {
-  light1Ref: RefObject<PointLight | null>
-  light2Ref: RefObject<PointLight | null>
+  light1Ref: RefObject<PointLight | null>;
+  light2Ref: RefObject<PointLight | null>;
 }
 
 // Walt Disney's head: loaded as a plain OBJ (no material/scene data), then rebuilt into
 // the tetrahedron-expanded geometry + light-driven material described in the header.
 function WaltHead({ light1Ref, light2Ref }: WaltHeadProps) {
-  const obj = useLoader(OBJLoader, WALT_HEAD_URL)
+  const obj = useLoader(OBJLoader, WALT_HEAD_URL);
 
-  const geometry = useMemo(() => createGeometry((obj.children[0] as Mesh).geometry as BufferGeometry), [obj])
+  const geometry = useMemo(() => createGeometry((obj.children[0] as Mesh).geometry as BufferGeometry), [obj]);
 
   const material = useMemo(() => {
-    const light1 = light1Ref.current
-    const light2 = light2Ref.current
+    const light1 = light1Ref.current;
+    const light2 = light2Ref.current;
     // Both lights mount as siblings outside this Suspense boundary (see the page
     // component below), so their refs are already populated by the time the OBJ
     // fetch resolves and this runs.
-    if (!light1 || !light2) return null
-    return createMaterial(light1, light2)
-  }, [light1Ref, light2Ref])
+    if (!light1 || !light2) return null;
+    return createMaterial(light1, light2);
+  }, [light1Ref, light2Ref]);
 
-  if (!material) return null
+  if (!material) return null;
 
-  return <mesh geometry={geometry} material={material} scale={0.8} position={[0, -30, 0]} />
+  return <mesh geometry={geometry} material={material} scale={0.8} position={[0, -30, 0]} />;
 }
 
 interface OrbitingLightProps {
-  id: 1 | 2
-  lightRef: RefObject<PointLight | null>
-  color: string
-  intensity: number
-  speed: number
+  id: 1 | 2;
+  lightRef: RefObject<PointLight | null>;
+  color: string;
+  intensity: number;
+  speed: number;
 }
 
 // One of the two orbiting point lights, each following its own fixed elliptical path
@@ -196,15 +196,15 @@ interface OrbitingLightProps {
 // sphere as its own visible marker — see header DEMONSTRATES.
 function OrbitingLight({ id, lightRef, color, intensity, speed }: OrbitingLightProps) {
   useFrame(({ elapsed }) => {
-    const light = lightRef.current
-    if (!light) return
-    const t = elapsed * 0.5 * speed
+    const light = lightRef.current;
+    if (!light) return;
+    const t = elapsed * 0.5 * speed;
     if (id === 1) {
-      light.position.set(Math.sin(t) * 20, Math.cos(t * 0.75) * -30, Math.cos(t * 0.5) * 20)
+      light.position.set(Math.sin(t) * 20, Math.cos(t * 0.75) * -30, Math.cos(t * 0.5) * 20);
     } else {
-      light.position.set(Math.cos(t * 0.5) * 20, Math.sin(t * 0.75) * -30, Math.sin(t) * 20)
+      light.position.set(Math.cos(t * 0.5) * 20, Math.sin(t * 0.75) * -30, Math.sin(t) * 20);
     }
-  })
+  });
 
   return (
     <pointLight ref={lightRef} color={color} intensity={intensity}>
@@ -212,12 +212,12 @@ function OrbitingLight({ id, lightRef, color, intensity, speed }: OrbitingLightP
         <meshBasicMaterial color={color} />
       </mesh>
     </pointLight>
-  )
+  );
 }
 
 export default function LightsPointlights() {
-  const light1Ref = useRef<PointLight>(null)
-  const light2Ref = useRef<PointLight>(null)
+  const light1Ref = useRef<PointLight>(null);
+  const light2Ref = useRef<PointLight>(null);
 
   const { speed, light1Color, light1Intensity, light2Color, light2Intensity, ambient } = useControls(
     'lights-pointlights',
@@ -233,7 +233,7 @@ export default function LightsPointlights() {
       }),
       ambient: { value: 0.1, min: 0, max: 1, step: 0.01 },
     },
-  )
+  );
 
   return (
     <Canvas renderer background="#000000" camera={{ position: [0, 0, 100], fov: 50, near: 1, far: 1000 }}>
@@ -245,5 +245,5 @@ export default function LightsPointlights() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={20} maxDistance={400} />
     </Canvas>
-  )
+  );
 }

@@ -32,14 +32,14 @@
  *   origin) would pop the whole galaxy out when panning the origin off-screen —
  *   the original has the same latent bug and just never pans
  */
-import { useMemo } from 'react'
-import { cos, float, mix, range, sin, time, TWO_PI, uv, vec3, vec4 } from 'three/tsl'
-import { AdditiveBlending, InstancedMesh, PlaneGeometry, SpriteNodeMaterial } from 'three/webgpu'
+import { useMemo } from 'react';
+import { cos, float, mix, range, sin, time, TWO_PI, uv, vec3, vec4 } from 'three/tsl';
+import { AdditiveBlending, InstancedMesh, PlaneGeometry, SpriteNodeMaterial } from 'three/webgpu';
 
-import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 function Galaxy() {
   //* Controls ====================================================
@@ -50,7 +50,7 @@ function Galaxy() {
     colorOutside: '#311599',
     branches: { value: 3, min: 2, max: 8, step: 1 },
     count: { value: 20000, min: 1000, max: 100000, step: 1000 },
-  })
+  });
 
   // Run-time knobs: create-or-update semantics sync the leva values into the live
   // uniforms on every re-render — no graph rebuild.
@@ -62,7 +62,7 @@ function Galaxy() {
       uColorOutside: colorOutside,
     },
     'galaxy',
-  )
+  );
 
   // Build-time constants: `branches` and `count` are baked into the node graph /
   // instance allocation, so changing them re-runs this memo (fresh material + mesh,
@@ -71,40 +71,40 @@ function Galaxy() {
     const material = new SpriteNodeMaterial({
       depthWrite: false,
       blending: AdditiveBlending,
-    })
+    });
 
     // Per-instance random size, scaled by the live `size` uniform.
-    material.scaleNode = range(0, 1).mul(uSize)
+    material.scaleNode = range(0, 1).mul(uSize);
 
     // Radial placement: pow(1.5) biases particles toward the dense core.
-    const radiusRatio = range(0, 1)
-    const radius = radiusRatio.pow(1.5).mul(5).toVar()
+    const radiusRatio = range(0, 1);
+    const radius = radiusRatio.pow(1.5).mul(5).toVar();
 
     // Arm selection (build-time constant `branches`) + differential rotation:
     // inner particles (radiusRatio → 0) get the biggest time term, so the core
     // winds up faster than the rim.
-    const branchAngle = range(0, branches).floor().mul(TWO_PI.div(branches))
-    const angle = branchAngle.add(time.mul(uSpinSpeed).mul(radiusRatio.oneMinus()))
+    const branchAngle = range(0, branches).floor().mul(TWO_PI.div(branches));
+    const angle = branchAngle.add(time.mul(uSpinSpeed).mul(radiusRatio.oneMinus()));
 
-    const position = vec3(cos(angle), 0, sin(angle)).mul(radius)
+    const position = vec3(cos(angle), 0, sin(angle)).mul(radius);
 
     // Cubed random offset clusters particles near their arm; grows with radius.
-    const randomOffset = range(vec3(-1), vec3(1)).pow3().mul(radiusRatio).add(0.2)
+    const randomOffset = range(vec3(-1), vec3(1)).pow3().mul(radiusRatio).add(0.2);
 
-    material.positionNode = position.add(randomOffset)
+    material.positionNode = position.add(randomOffset);
 
     // Core→rim color ramp (eased toward the outside color), soft round falloff alpha.
-    const colorFinal = mix(uColorInside, uColorOutside, radiusRatio.oneMinus().pow(2).oneMinus())
-    const alpha = float(0.1).div(uv().sub(0.5).length()).sub(0.2)
-    material.colorNode = vec4(colorFinal, alpha)
+    const colorFinal = mix(uColorInside, uColorOutside, radiusRatio.oneMinus().pow(2).oneMinus());
+    const alpha = float(0.1).div(uv().sub(0.5).length()).sub(0.2);
+    material.colorNode = vec4(colorFinal, alpha);
 
-    const instanced = new InstancedMesh(new PlaneGeometry(1, 1), material, count)
+    const instanced = new InstancedMesh(new PlaneGeometry(1, 1), material, count);
     // Positions live only in the shader — see header DIVERGENCE.
-    instanced.frustumCulled = false
-    return instanced
-  }, [branches, count, uSize, uSpinSpeed, uColorInside, uColorOutside])
+    instanced.frustumCulled = false;
+    return instanced;
+  }, [branches, count, uSize, uSpinSpeed, uColorInside, uColorOutside]);
 
-  return <primitive object={mesh} />
+  return <primitive object={mesh} />;
 }
 
 export default function TslGalaxy() {
@@ -113,5 +113,5 @@ export default function TslGalaxy() {
       <Galaxy />
       <DemoHelpers grid={false} minDistance={0.1} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

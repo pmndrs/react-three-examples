@@ -30,8 +30,8 @@
  *   (Layer 1 rule) instead of imperative `renderer.toneMapping` assignment
  * - `renderer.inspector` dropped entirely (same gap as above)
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { hashBlur } from 'three/addons/tsl/display/hashBlur.js'
+import { Suspense, useEffect, useMemo } from 'react';
+import { hashBlur } from 'three/addons/tsl/display/hashBlur.js';
 import {
   checker,
   color,
@@ -44,47 +44,47 @@ import {
   uv,
   viewportLinearDepth,
   viewportSharedTexture,
-} from 'three/tsl'
-import { DoubleSide, MeshBasicNodeMaterial, NeutralToneMapping } from 'three/webgpu'
-import type { Node } from 'three/webgpu'
+} from 'three/tsl';
+import { DoubleSide, MeshBasicNodeMaterial, NeutralToneMapping } from 'three/webgpu';
+import type { Node } from 'three/webgpu';
 
-import { Canvas, useThree } from '@react-three/fiber/webgpu'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useThree } from '@react-three/fiber/webgpu';
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
+const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb';
 
 // scene.backgroundNode cast — @types/three's Scene doesn't declare it even though the
 // webgpu renderer reads it directly off the live scene instance (same duck-typed gap as
 // backdrop's SceneBackground, with a hue() rotation over time added here).
 function SceneBackground() {
-  const scene = useThree((s) => s.scene)
+  const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    withBackgroundNode.backgroundNode = hue(screenUV.y.mix(color(0x66bbff), color(0x4466ff)), time.mul(0.1))
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    withBackgroundNode.backgroundNode = hue(screenUV.y.mix(color(0x66bbff), color(0x4466ff)), time.mul(0.1));
     return () => {
-      withBackgroundNode.backgroundNode = null
-    }
-  }, [scene])
+      withBackgroundNode.backgroundNode = null;
+    };
+  }, [scene]);
 
-  return null
+  return null;
 }
 
 function Michelle() {
-  const { scene, animations } = useGLTF(MICHELLE_URL)
-  const { actions } = useAnimations(animations, scene)
+  const { scene, animations } = useGLTF(MICHELLE_URL);
+  const { actions } = useAnimations(animations, scene);
 
   useEffect(() => {
     // Play by name, never Object.values(actions) — Michelle.glb ships one clip, but a
     // GLTF can carry rest/utility clips that would otherwise pollute the blend.
-    const name = animations[0]?.name
-    if (name) actions[name]?.play()
-  }, [actions, animations])
+    const name = animations[0]?.name;
+    if (name) actions[name]?.play();
+  }, [actions, animations]);
 
-  return <primitive object={scene} />
+  return <primitive object={scene} />;
 }
 
 // Four alternate `backdropNode` graphs for the box, switchable via leva — see header
@@ -97,42 +97,42 @@ function Michelle() {
 // four shaders on every drag frame instead of the one pick.
 function useAreaMaterials() {
   return useMemo(() => {
-    const depthDistance = viewportLinearDepth.distance(linearDepth())
-    const depthAlphaNode = depthDistance.oneMinus().smoothstep(0.9, 2).mul(10).saturate()
-    const depthBlurred = hashBlur(viewportSharedTexture(), depthDistance.smoothstep(0, 0.6).mul(40).clamp().mul(0.1))
+    const depthDistance = viewportLinearDepth.distance(linearDepth());
+    const depthAlphaNode = depthDistance.oneMinus().smoothstep(0.9, 2).mul(10).saturate();
+    const depthBlurred = hashBlur(viewportSharedTexture(), depthDistance.smoothstep(0, 0.6).mul(40).clamp().mul(0.1));
 
-    const blurred = new MeshBasicNodeMaterial()
-    blurred.backdropNode = depthBlurred.add(depthAlphaNode.mix(color(0x003399).mul(0.3), 0))
-    blurred.transparent = true
-    blurred.side = DoubleSide
+    const blurred = new MeshBasicNodeMaterial();
+    blurred.backdropNode = depthBlurred.add(depthAlphaNode.mix(color(0x003399).mul(0.3), 0));
+    blurred.transparent = true;
+    blurred.side = DoubleSide;
 
-    const depth = new MeshBasicNodeMaterial()
-    depth.backdropNode = depthAlphaNode
-    depth.transparent = true
-    depth.side = DoubleSide
+    const depth = new MeshBasicNodeMaterial();
+    depth.backdropNode = depthAlphaNode;
+    depth.transparent = true;
+    depth.side = DoubleSide;
 
-    const checkerMat = new MeshBasicNodeMaterial()
-    checkerMat.backdropNode = hashBlur(viewportSharedTexture(), 0.05)
-    checkerMat.backdropAlphaNode = checker(uv().mul(3).mul(modelScale.xy))
-    checkerMat.opacityNode = checkerMat.backdropAlphaNode
-    checkerMat.transparent = true
-    checkerMat.side = DoubleSide
+    const checkerMat = new MeshBasicNodeMaterial();
+    checkerMat.backdropNode = hashBlur(viewportSharedTexture(), 0.05);
+    checkerMat.backdropAlphaNode = checker(uv().mul(3).mul(modelScale.xy));
+    checkerMat.opacityNode = checkerMat.backdropAlphaNode;
+    checkerMat.transparent = true;
+    checkerMat.side = DoubleSide;
 
-    const pixel = new MeshBasicNodeMaterial()
-    pixel.backdropNode = viewportSharedTexture(screenUV.mul(100).floor().div(100))
-    pixel.transparent = true
+    const pixel = new MeshBasicNodeMaterial();
+    pixel.backdropNode = viewportSharedTexture(screenUV.mul(100).floor().div(100));
+    pixel.transparent = true;
 
-    return { blurred, depth, checker: checkerMat, pixel }
-  }, [])
+    return { blurred, depth, checker: checkerMat, pixel };
+  }, []);
 }
 
 function Scene() {
-  const materials = useAreaMaterials()
+  const materials = useAreaMaterials();
   const { material, scaleX, scaleY } = useControls('backdrop-area', {
     material: { value: 'blurred', options: Object.keys(materials) },
     scaleX: { value: 1, min: 0.1, max: 2, step: 0.01, label: 'box scale x' },
     scaleY: { value: 1, min: 0.1, max: 2, step: 0.01, label: 'box scale y' },
-  })
+  });
 
   return (
     <>
@@ -157,7 +157,7 @@ function Scene() {
         />
       </mesh>
     </>
-  )
+  );
 }
 
 export default function BackdropArea() {
@@ -171,5 +171,5 @@ export default function BackdropArea() {
           DemoHelpers infinite grid double-exposes against it. */}
       <DemoHelpers grid={false} target={[0, 1, 0]} />
     </Canvas>
-  )
+  );
 }

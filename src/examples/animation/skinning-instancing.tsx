@@ -25,48 +25,48 @@
  *   (original always renders the blur at full strength with no UI)
  * - DemoHelpers baseline (grid + camera controls) added; original had a fixed camera
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
-import { color, mix, oscSine, range, time } from 'three/tsl'
-import { Color, InstancedBufferAttribute, Mesh, MeshStandardNodeMaterial, Object3D, PointLight } from 'three/webgpu'
-import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect, useMemo } from 'react';
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+import { color, mix, oscSine, range, time } from 'three/tsl';
+import { Color, InstancedBufferAttribute, Mesh, MeshStandardNodeMaterial, Object3D, PointLight } from 'three/webgpu';
+import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
+const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb';
 
 // Instance grid layout (matches the original's fixed 5-column arrangement).
-const COLUMNS = 5
+const COLUMNS = 5;
 
 // Three.js's manual-instancing escape hatch: a plain Mesh masquerading as an
 // InstancedMesh by setting these three fields directly (no InstancedMesh class).
 type InstancedSkinnedMesh = Mesh & {
-  isInstancedMesh: boolean
-  instanceMatrix: InstancedBufferAttribute
-  count: number
-}
+  isInstancedMesh: boolean;
+  instanceMatrix: InstancedBufferAttribute;
+  count: number;
+};
 
 // Point light rigidly attached to the camera (a "headlight"), wired imperatively to
 // showcase the escape hatch. drei's <PerspectiveCamera makeDefault> accepts children,
 // so the declarative form works too (see postprocessing-bloom) — this port keeps the
 // imperative version on purpose, since it attaches to whatever camera is already default.
 function CameraLight() {
-  const camera = useThree((s) => s.camera)
+  const camera = useThree((s) => s.camera);
   const light = useMemo(() => {
-    const l = new PointLight('#0099ff', 1, 100)
-    l.power = 400
-    return l
-  }, [])
+    const l = new PointLight('#0099ff', 1, 100);
+    l.power = 400;
+    return l;
+  }, []);
 
   useEffect(() => {
-    camera.add(light)
+    camera.add(light);
     return () => {
-      camera.remove(light)
-    }
-  }, [camera, light])
+      camera.remove(light);
+    };
+  }, [camera, light]);
 
-  return null
+  return null;
 }
 
 function Michelle() {
@@ -74,87 +74,87 @@ function Michelle() {
     instances: { value: 30, min: 5, max: 60, step: 5 },
     timeScale: { value: 1, min: 0, max: 2 },
     paused: false,
-  })
+  });
 
-  const { scene, animations } = useGLTF(MICHELLE_URL)
-  const { actions, mixer } = useAnimations(animations, scene)
+  const { scene, animations } = useGLTF(MICHELLE_URL);
+  const { actions, mixer } = useAnimations(animations, scene);
 
   useEffect(() => {
     // Play BY NAME (corpus rule): Michelle.glb also ships a TPose utility clip —
     // index-based selection predated the rule (retrofitted, wave 11).
-    actions.SambaDance?.play()
-  }, [actions])
+    actions.SambaDance?.play();
+  }, [actions]);
 
   useEffect(() => {
-    mixer.timeScale = paused ? 0 : timeScale
-  }, [mixer, paused, timeScale])
+    mixer.timeScale = paused ? 0 : timeScale;
+  }, [mixer, paused, timeScale]);
 
   // Node material + per-instance TSL variation — set up once per loaded scene.
   useEffect(() => {
     scene.traverse((child) => {
-      if (!(child as Mesh).isMesh) return
-      const mesh = child as Mesh
+      if (!(child as Mesh).isMesh) return;
+      const mesh = child as Mesh;
 
-      const oscNode = oscSine(time.mul(0.1))
+      const oscNode = oscSine(time.mul(0.1));
       // Random per-instance color/metalness between 0 and 1 (the `range()` node
       // samples one value per GPU instance, not per vertex/fragment).
-      const randomColors = range(new Color(0x000000), new Color(0xffffff))
-      const randomMetalness = range(0, 1)
+      const randomColors = range(new Color(0x000000), new Color(0xffffff));
+      const randomMetalness = range(0, 1);
 
-      const material = new MeshStandardNodeMaterial()
-      material.roughness = 0.1
-      material.metalnessNode = mix(0.0, randomMetalness, oscNode)
-      material.colorNode = mix(color(0xffffff), randomColors, oscNode)
-      mesh.material = material
-    })
-  }, [scene])
+      const material = new MeshStandardNodeMaterial();
+      material.roughness = 0.1;
+      material.metalnessNode = mix(0.0, randomMetalness, oscNode);
+      material.colorNode = mix(color(0xffffff), randomColors, oscNode);
+      mesh.material = material;
+    });
+  }, [scene]);
 
   // Instance transforms: draw the ONE skinned mesh `instances` times from a
   // manually-populated instanceMatrix buffer.
   useEffect(() => {
-    const dummy = new Object3D()
+    const dummy = new Object3D();
     scene.traverse((child) => {
-      if (!(child as Mesh).isMesh) return
-      const mesh = child as InstancedSkinnedMesh
+      if (!(child as Mesh).isMesh) return;
+      const mesh = child as InstancedSkinnedMesh;
 
-      mesh.isInstancedMesh = true
-      mesh.instanceMatrix = new InstancedBufferAttribute(new Float32Array(instances * 16), 16)
-      mesh.count = instances
+      mesh.isInstancedMesh = true;
+      mesh.instanceMatrix = new InstancedBufferAttribute(new Float32Array(instances * 16), 16);
+      mesh.count = instances;
 
       for (let i = 0; i < instances; i++) {
-        dummy.position.x = -200 + (i % COLUMNS) * 70
-        dummy.position.y = Math.floor(i / COLUMNS) * -200
-        dummy.updateMatrix()
-        dummy.matrix.toArray(mesh.instanceMatrix.array, i * 16)
+        dummy.position.x = -200 + (i % COLUMNS) * 70;
+        dummy.position.y = Math.floor(i / COLUMNS) * -200;
+        dummy.updateMatrix();
+        dummy.matrix.toArray(mesh.instanceMatrix.array, i * 16);
       }
-    })
-  }, [scene, instances])
+    });
+  }, [scene, instances]);
 
-  return <primitive object={scene} />
+  return <primitive object={scene} />;
 }
 
 function PostFX() {
-  const { blur } = useControls('skinning-instancing', { blur: { value: 1, min: 0, max: 1 } })
-  const { uBlur } = useUniforms(() => ({ uBlur: blur }))
+  const { blur } = useControls('skinning-instancing', { blur: { value: 1, min: 0, max: 1 } });
+  const { uBlur } = useUniforms(() => ({ uBlur: blur }));
 
   useEffect(() => {
-    uBlur.value = blur
-  }, [uBlur, blur])
+    uBlur.value = blur;
+  }, [uBlur, blur]);
 
   useRenderPipeline(({ renderPipeline, passes }) => {
-    if (!renderPipeline) return
+    if (!renderPipeline) return;
 
-    const sceneColor = passes.scenePass.getTextureNode()
+    const sceneColor = passes.scenePass.getTextureNode();
     // Blur radius grows with distance from camera (depth-driven, like a focus falloff).
-    const depth = passes.scenePass.getLinearDepthNode().remapClamp(0.15, 0.3)
+    const depth = passes.scenePass.getLinearDepthNode().remapClamp(0.15, 0.3);
 
-    const blurred = gaussianBlur(sceneColor)
-    blurred.directionNode = depth
+    const blurred = gaussianBlur(sceneColor);
+    blurred.directionNode = depth;
 
-    renderPipeline.outputNode = mix(sceneColor, blurred, uBlur)
-  })
+    renderPipeline.outputNode = mix(sceneColor, blurred, uBlur);
+  });
 
-  return null
+  return null;
 }
 
 export default function SkinningInstancing() {
@@ -170,5 +170,5 @@ export default function SkinningInstancing() {
       <PostFX />
       <DemoHelpers target={[0, 1, 0]} />
     </Canvas>
-  )
+  );
 }

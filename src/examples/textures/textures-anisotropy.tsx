@@ -37,35 +37,35 @@
  *   `update()` would fight it, and the default scene is never rendered anyway. Still
  *   mounted for the readiness signal
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { MathUtils, RepeatWrapping, Scene, SRGBColorSpace } from 'three/webgpu'
-import type { Texture } from 'three/webgpu'
-import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect, useMemo } from 'react';
+import { MathUtils, RepeatWrapping, Scene, SRGBColorSpace } from 'three/webgpu';
+import type { Texture } from 'three/webgpu';
+import { Canvas, createPortal, useFrame, useThree } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const CRATE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/crate.gif'
-const ANISOTROPY_LEVELS = [1, 2, 4, 8, 16]
+const CRATE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/crate.gif';
+const ANISOTROPY_LEVELS = [1, 2, 4, 8, 16];
 // Original: both scissor rects are (width/2 - 2) wide — a 2px clear-color seam
 // separates the panes.
-const PANE_SEAM_PX = 2
+const PANE_SEAM_PX = 2;
 // Original page background; doubles as the seam/sky color (see DIVERGENCE).
-const CLEAR_COLOR = 0xf1f1f1
+const CLEAR_COLOR = 0xf1f1f1;
 
 // One configured clone per pane: same image source, its own anisotropy (and therefore
 // its own WebGPU sampler). Re-clones when the leva control changes — see DIVERGENCE.
 function useCrateTexture(anisotropy: number): Texture {
-  const source = useTexture(CRATE_URL)
+  const source = useTexture(CRATE_URL);
   return useMemo(() => {
-    const texture = source.clone()
-    texture.colorSpace = SRGBColorSpace
-    texture.wrapS = texture.wrapT = RepeatWrapping
-    texture.repeat.set(512, 512)
-    texture.anisotropy = anisotropy
-    texture.needsUpdate = true
-    return texture
-  }, [source, anisotropy])
+    const texture = source.clone();
+    texture.colorSpace = SRGBColorSpace;
+    texture.wrapS = texture.wrapT = RepeatWrapping;
+    texture.repeat.set(512, 512);
+    texture.anisotropy = anisotropy;
+    texture.needsUpdate = true;
+    return texture;
+  }, [source, anisotropy]);
 }
 
 // Scene contents for one pane — identical fog/lights/ground in both scenes, only the
@@ -81,70 +81,70 @@ function CrateGround({ texture }: { texture: Texture }) {
         <meshPhongMaterial color="#ffffff" map={texture} />
       </mesh>
     </>
-  )
+  );
 }
 
 function AnisotropySplit() {
   const { left: leftAnisotropy, right: rightAnisotropy } = useControls('anisotropy', {
     left: { label: 'left pane', value: 16, options: ANISOTROPY_LEVELS },
     right: { label: 'right pane', value: 1, options: ANISOTROPY_LEVELS },
-  })
+  });
 
-  const renderer = useThree((state) => state.renderer)
+  const renderer = useThree((state) => state.renderer);
 
   // Original: texture1.anisotropy = renderer.getMaxAnisotropy() — the WebGPU backend
   // reports a constant 16 (spec ceiling), so the leva default of 16 IS max; the clamp
   // keeps any device-reported lower bound honest.
-  const maxAnisotropy = renderer.getMaxAnisotropy()
-  const leftTexture = useCrateTexture(Math.min(leftAnisotropy, maxAnisotropy))
-  const rightTexture = useCrateTexture(Math.min(rightAnisotropy, maxAnisotropy))
+  const maxAnisotropy = renderer.getMaxAnisotropy();
+  const leftTexture = useCrateTexture(Math.min(leftAnisotropy, maxAnisotropy));
+  const rightTexture = useCrateTexture(Math.min(rightAnisotropy, maxAnisotropy));
 
   // The two panes' scenes — plain THREE.Scenes outside the Canvas's own tree, populated
   // declaratively by the createPortal calls below.
-  const scenes = useMemo(() => [new Scene(), new Scene()] as const, [])
+  const scenes = useMemo(() => [new Scene(), new Scene()] as const, []);
 
   useEffect(() => {
-    renderer.setClearColor(CLEAR_COLOR, 1)
-    return () => renderer.setScissorTest(false)
-  }, [renderer])
+    renderer.setClearColor(CLEAR_COLOR, 1);
+    return () => renderer.setScissorTest(false);
+  }, [renderer]);
 
   // Render takeover: mouse-sway camera + two scissored renders of the same camera into
   // the two half-canvas panes (the original's hand-rolled `render()`).
   useFrame(
     (state) => {
-      const { width, height } = state.size
-      const camera = state.camera
+      const { width, height } = state.size;
+      const camera = state.camera;
 
       // Original easing: target x = pointer offset from center (px), target y = inverted
       // pointer offset + 200, height clamped to [50, 1000]. fiber's pointer is NDC
       // (-1..1, y-up), so scale by the half-extents to recover the original's pixels.
-      const targetX = state.pointer.x * (width / 2)
-      const targetY = state.pointer.y * (height / 2) + 200
-      camera.position.x += (targetX - camera.position.x) * 0.05
-      camera.position.y = MathUtils.clamp(camera.position.y + (targetY - camera.position.y) * 0.05, 50, 1000)
-      camera.lookAt(0, 0, 0)
+      const targetX = state.pointer.x * (width / 2);
+      const targetY = state.pointer.y * (height / 2) + 200;
+      camera.position.x += (targetX - camera.position.x) * 0.05;
+      camera.position.y = MathUtils.clamp(camera.position.y + (targetY - camera.position.y) * 0.05, 50, 1000);
+      camera.lookAt(0, 0, 0);
 
       // Full-canvas clear first: paints the seam between the panes (and the right-edge
       // sliver) that neither scissored render touches.
-      renderer.setScissorTest(false)
-      renderer.clear()
-      renderer.setScissorTest(true)
+      renderer.setScissorTest(false);
+      renderer.clear();
+      renderer.setScissorTest(true);
 
-      const halfWidth = width / 2
-      renderer.setScissor(0, 0, halfWidth - PANE_SEAM_PX, height)
-      renderer.render(scenes[0], camera)
-      renderer.setScissor(halfWidth, 0, halfWidth - PANE_SEAM_PX, height)
-      renderer.render(scenes[1], camera)
+      const halfWidth = width / 2;
+      renderer.setScissor(0, 0, halfWidth - PANE_SEAM_PX, height);
+      renderer.render(scenes[0], camera);
+      renderer.setScissor(halfWidth, 0, halfWidth - PANE_SEAM_PX, height);
+      renderer.render(scenes[1], camera);
     },
     { phase: 'render' },
-  )
+  );
 
   return (
     <>
       {createPortal(<CrateGround texture={leftTexture} />, scenes[0])}
       {createPortal(<CrateGround texture={rightTexture} />, scenes[1])}
     </>
-  )
+  );
 }
 
 export default function TexturesAnisotropyExample() {
@@ -155,5 +155,5 @@ export default function TexturesAnisotropyExample() {
       </Suspense>
       <DemoHelpers grid={false} controls={false} />
     </Canvas>
-  )
+  );
 }

@@ -24,67 +24,67 @@
  *   authored as JSX (`<planeGeometry>`/`<boxGeometry>`) and grouped via a `ref` callback
  *   pattern, avoiding a second geometry construction path
  */
-import { useLayoutEffect, useMemo, useRef } from 'react'
-import { DoubleSide, type BufferGeometry, type Mesh } from 'three/webgpu'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { useLayoutEffect, useMemo, useRef } from 'react';
+import { DoubleSide, type BufferGeometry, type Mesh } from 'three/webgpu';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const COLORS = ['#ff1493', '#0000ff', '#00ff00'] as const
+const COLORS = ['#ff1493', '#0000ff', '#00ff00'] as const;
 
 // Slices a plane's 4x4-subdivided triangle list into three horizontal bands, one
 // material index per band (original: three addGroup calls, each `numFacesPerRow` quads
 // = 6 * 4 indices wide).
 function groupPlane(geometry: BufferGeometry) {
-  geometry.clearGroups()
-  const facesPerBand = 6 * 4
-  geometry.addGroup(0, facesPerBand, 0)
-  geometry.addGroup(facesPerBand, facesPerBand, 1)
-  geometry.addGroup(facesPerBand * 2, facesPerBand, 2)
+  geometry.clearGroups();
+  const facesPerBand = 6 * 4;
+  geometry.addGroup(0, facesPerBand, 0);
+  geometry.addGroup(facesPerBand, facesPerBand, 1);
+  geometry.addGroup(facesPerBand * 2, facesPerBand, 2);
 }
 
 // Assigns one material per box face (6 indices each), pairing opposite faces to the
 // same material index — original: front/back -> 0, left/right -> 1, top/bottom -> 2.
 function groupBox(geometry: BufferGeometry) {
-  geometry.clearGroups()
-  geometry.addGroup(0, 6, 0) // front
-  geometry.addGroup(6, 6, 0) // back
-  geometry.addGroup(12, 6, 2) // top
-  geometry.addGroup(18, 6, 2) // bottom
-  geometry.addGroup(24, 6, 1) // left
-  geometry.addGroup(30, 6, 1) // right
+  geometry.clearGroups();
+  geometry.addGroup(0, 6, 0); // front
+  geometry.addGroup(6, 6, 0); // back
+  geometry.addGroup(12, 6, 2); // top
+  geometry.addGroup(18, 6, 2); // bottom
+  geometry.addGroup(24, 6, 1); // left
+  geometry.addGroup(30, 6, 1); // right
 }
 
 function MaterialArraysScene() {
   // Solid materials (shared by the plane and the box) plus a wireframe clone per
   // color, matching the original's separate `materialsWireframe` array.
-  const materials = useMemo(() => COLORS.map((color) => ({ color, side: DoubleSide })), [])
+  const materials = useMemo(() => COLORS.map((color) => ({ color, side: DoubleSide })), []);
 
-  const planeRef = useRef<Mesh>(null)
-  const planeWireframeRef = useRef<Mesh>(null)
-  const boxRef = useRef<Mesh>(null)
-  const boxWireframeRef = useRef<Mesh>(null)
+  const planeRef = useRef<Mesh>(null);
+  const planeWireframeRef = useRef<Mesh>(null);
+  const boxRef = useRef<Mesh>(null);
+  const boxWireframeRef = useRef<Mesh>(null);
 
   // Groups must land before the first render draws the mesh with its material array —
   // useLayoutEffect (not useEffect) per the "imperative setup that must precede first
   // render" rule (AGENTS.md).
   useLayoutEffect(() => {
-    if (planeRef.current) groupPlane(planeRef.current.geometry)
-    if (planeWireframeRef.current) groupPlane(planeWireframeRef.current.geometry)
-    if (boxRef.current) groupBox(boxRef.current.geometry)
-    if (boxWireframeRef.current) groupBox(boxWireframeRef.current.geometry)
-  }, [])
+    if (planeRef.current) groupPlane(planeRef.current.geometry);
+    if (planeWireframeRef.current) groupPlane(planeWireframeRef.current.geometry);
+    if (boxRef.current) groupBox(boxRef.current.geometry);
+    if (boxWireframeRef.current) groupBox(boxWireframeRef.current.geometry);
+  }, []);
 
   useFrame(({ delta }) => {
-    const spin = delta * 1 // ~0.005/frame at 60fps, matching the original's per-frame increment
+    const spin = delta * 1; // ~0.005/frame at 60fps, matching the original's per-frame increment
     if (boxRef.current) {
-      boxRef.current.rotation.y += spin
-      boxRef.current.rotation.x += spin
+      boxRef.current.rotation.y += spin;
+      boxRef.current.rotation.x += spin;
     }
     if (boxWireframeRef.current) {
-      boxWireframeRef.current.rotation.y += spin
-      boxWireframeRef.current.rotation.x += spin
+      boxWireframeRef.current.rotation.y += spin;
+      boxWireframeRef.current.rotation.x += spin;
     }
-  })
+  });
 
   return (
     <>
@@ -116,7 +116,7 @@ function MaterialArraysScene() {
         ))}
       </mesh>
     </>
-  )
+  );
 }
 
 export default function MaterialsArrays() {
@@ -125,5 +125,5 @@ export default function MaterialsArrays() {
       <MaterialArraysScene />
       <DemoHelpers grid={false} />
     </Canvas>
-  )
+  );
 }

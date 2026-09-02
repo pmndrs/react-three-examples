@@ -3,17 +3,17 @@
 // render pipeline (main pass + quarter-res volumetric pass -> gaussian denoise ->
 // additive compose). Uses fiber hooks throughout, so it lives inside <Canvas>; the
 // page shell owns leva and Suspense.
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { bayer16 } from 'three/addons/tsl/math/Bayer.js'
-import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
-import { pass, screenCoordinate, screenUV } from 'three/tsl'
-import { DoubleSide, Layers, VolumeNodeMaterial, type Mesh, type PointLight, type SpotLight } from 'three/webgpu'
-import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { TeapotGeometry } from '../../../assets/TeapotGeometry'
-import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog'
-import { COLORS_MAP_URL, LAYER_VOLUMETRIC_LIGHTING } from './constants'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+import { pass, screenCoordinate, screenUV } from 'three/tsl';
+import { DoubleSide, Layers, VolumeNodeMaterial, type Mesh, type PointLight, type SpotLight } from 'three/webgpu';
+import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { TeapotGeometry } from '../../../assets/TeapotGeometry';
+import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog';
+import { COLORS_MAP_URL, LAYER_VOLUMETRIC_LIGHTING } from './constants';
 
 export function VolumeLighting() {
   const { pointLightIntensity, spotIntensity, fogIntensity, smokeAmount } = useControls('volume-lighting scene', {
@@ -21,14 +21,14 @@ export function VolumeLighting() {
     spotIntensity: { value: 100, min: 0, max: 200, step: 1 },
     fogIntensity: { value: 1, min: 0, max: 2, step: 0.01 },
     smokeAmount: { value: 2, min: 0, max: 3, step: 0.05 },
-  })
+  });
   const { steps, resolution, denoiseStrength } = useControls('volume-lighting quality', {
     steps: { value: 12, min: 2, max: 16, step: 1 },
     resolution: { value: 0.25, min: 0.1, max: 1, step: 0.05 },
     denoiseStrength: { value: 0.6, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
-  const colorsMap = useTexture(COLORS_MAP_URL) // spot light cookie
+  const colorsMap = useTexture(COLORS_MAP_URL); // spot light cookie
 
   const {
     uSmokeAmount: uSmokeAmountNode,
@@ -37,102 +37,102 @@ export function VolumeLighting() {
   } = useUniforms(
     { uSmokeAmount: smokeAmount, uFogIntensity: fogIntensity, uDenoiseStrength: denoiseStrength },
     'volumeLighting',
-  )
+  );
 
-  const teapotGeometry = useMemo(() => new TeapotGeometry(0.8, 18), [])
+  const teapotGeometry = useMemo(() => new TeapotGeometry(0.8, 18), []);
 
   // --- Volumetric fog box: raymarched density from a tiled 3D noise field ---
   // (src/utils/VolumetricFog.ts — shared with volume-caustics/volume-lighting-rectarea,
   // whose three.js originals duplicate this exact block)
-  const fogTexture = useMemo(() => createFogTexture3D(), [])
+  const fogTexture = useMemo(() => createFogTexture3D(), []);
 
   const volumetricMaterial = useMemo(() => {
-    const material = new VolumeNodeMaterial()
-    material.steps = steps
+    const material = new VolumeNodeMaterial();
+    material.steps = steps;
     // Dithering to reduce raymarch banding (no `frameId` jitter here — original omits it).
-    material.offsetNode = bayer16(screenCoordinate)
+    material.offsetNode = bayer16(screenCoordinate);
     material.scatteringNode = createFogScatteringNode({
       fogTexture,
       smokeAmount: uSmokeAmountNode,
       octaves: [[0.1], [0.05, 1], [0.02, 2]],
       timeSpeed: [1, 0.3],
-    })
-    return material
+    });
+    return material;
     // `steps` intentionally omitted — handled by the effect below via `.steps =` so
     // changing it doesn't rebuild the scattering node graph.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fogTexture, uSmokeAmountNode])
+  }, [fogTexture, uSmokeAmountNode]);
 
   useEffect(() => {
-    volumetricMaterial.steps = steps
-  }, [volumetricMaterial, steps])
+    volumetricMaterial.steps = steps;
+  }, [volumetricMaterial, steps]);
 
   // Layer split: the fog box + both lights render in the half-res volumetric pass in
   // ADDITION to the main pass (lights keep their default layer 0 membership too) —
   // `layers` isn't a plain prop (THREE.Layers is a bitmask object, not replaceable via
   // JSX assignment), so this is imperative, matching the volume-caustics/volume-fire
   // ports.
-  const fogBoxRef = useRef<Mesh>(null)
-  const pointLightRef = useRef<PointLight>(null)
-  const spotLightRef = useRef<SpotLight>(null)
+  const fogBoxRef = useRef<Mesh>(null);
+  const pointLightRef = useRef<PointLight>(null);
+  const spotLightRef = useRef<SpotLight>(null);
   useLayoutEffect(() => {
-    const fogBox = fogBoxRef.current
-    const pointLightObj = pointLightRef.current
-    const spotLightObj = spotLightRef.current
-    if (!fogBox || !pointLightObj || !spotLightObj) return
-    fogBox.layers.disableAll()
-    fogBox.layers.enable(LAYER_VOLUMETRIC_LIGHTING)
-    pointLightObj.layers.enable(LAYER_VOLUMETRIC_LIGHTING)
-    spotLightObj.layers.enable(LAYER_VOLUMETRIC_LIGHTING)
-  }, [])
+    const fogBox = fogBoxRef.current;
+    const pointLightObj = pointLightRef.current;
+    const spotLightObj = spotLightRef.current;
+    if (!fogBox || !pointLightObj || !spotLightObj) return;
+    fogBox.layers.disableAll();
+    fogBox.layers.enable(LAYER_VOLUMETRIC_LIGHTING);
+    pointLightObj.layers.enable(LAYER_VOLUMETRIC_LIGHTING);
+    spotLightObj.layers.enable(LAYER_VOLUMETRIC_LIGHTING);
+  }, []);
 
   // --- Animation: orbiting point light, sweeping spot light, spinning teapot ---
   // (the original's `spotLight.lookAt(0, 0, 0)` every frame is a no-op — a SpotLight's
   // beam direction comes from `.target`'s world position, defaulted to the origin and
   // never reparented, not from the light's own quaternion — dropped, see header DIVERGENCE)
-  const teapotRef = useRef<Mesh>(null)
+  const teapotRef = useRef<Mesh>(null);
   useFrame((state) => {
-    const t = state.elapsed
-    const scale = 2.4
-    const pointLightObj = pointLightRef.current
-    const spotLightObj = spotLightRef.current
-    const teapot = teapotRef.current
+    const t = state.elapsed;
+    const scale = 2.4;
+    const pointLightObj = pointLightRef.current;
+    const spotLightObj = spotLightRef.current;
+    const teapot = teapotRef.current;
     if (pointLightObj) {
-      pointLightObj.position.set(Math.sin(t * 0.7) * scale, Math.cos(t * 0.5) * scale, Math.cos(t * 0.3) * scale)
+      pointLightObj.position.set(Math.sin(t * 0.7) * scale, Math.cos(t * 0.5) * scale, Math.cos(t * 0.3) * scale);
     }
-    if (spotLightObj) spotLightObj.position.x = Math.cos(t * 0.3) * scale
-    if (teapot) teapot.rotation.y = t * 0.2
-  })
+    if (spotLightObj) spotLightObj.position.x = Math.cos(t * 0.3) * scale;
+    if (teapot) teapot.rotation.y = t * 0.2;
+  });
 
   // --- Render pipeline: main scene pass (feeds the fog box's depth occlusion) +
   //     quarter-resolution volumetric-only pass -> gaussian denoise -> additive compose ---
   const { passes } = useRenderPipeline(({ renderPipeline, passes, scene, camera }) => {
-    if (!renderPipeline) return
+    if (!renderPipeline) return;
 
-    const volumetricLayer = new Layers()
-    volumetricLayer.disableAll()
-    volumetricLayer.enable(LAYER_VOLUMETRIC_LIGHTING)
+    const volumetricLayer = new Layers();
+    volumetricLayer.disableAll();
+    volumetricLayer.enable(LAYER_VOLUMETRIC_LIGHTING);
 
-    const volumetricPass = pass(scene, camera, { depthBuffer: false, samples: 0 })
-    volumetricPass.setLayers(volumetricLayer)
-    volumetricPass.setResolutionScale(0.25)
+    const volumetricPass = pass(scene, camera, { depthBuffer: false, samples: 0 });
+    volumetricPass.setLayers(volumetricLayer);
+    volumetricPass.setResolutionScale(0.25);
 
-    const sceneDepth = passes.scenePass.getTextureNode('depth')
-    volumetricMaterial.depthNode = sceneDepth.sample(screenUV)
+    const sceneDepth = passes.scenePass.getTextureNode('depth');
+    volumetricMaterial.depthNode = sceneDepth.sample(screenUV);
 
-    const blurredVolumetric = gaussianBlur(volumetricPass, uDenoiseStrengthNode)
+    const blurredVolumetric = gaussianBlur(volumetricPass, uDenoiseStrengthNode);
 
-    const sceneColor = passes.scenePass.getTextureNode()
-    renderPipeline.outputNode = sceneColor.add(blurredVolumetric.mul(uFogIntensityNode))
+    const sceneColor = passes.scenePass.getTextureNode();
+    renderPipeline.outputNode = sceneColor.add(blurredVolumetric.mul(uFogIntensityNode));
 
     // Return to register — the effect below mutates its uniform-backed knob.
-    return { volumetricPass }
-  })
+    return { volumetricPass };
+  });
 
   useEffect(() => {
-    const volumetricPass = passes.volumetricPass as { setResolutionScale: (s: number) => void } | undefined
-    volumetricPass?.setResolutionScale(resolution)
-  }, [passes, resolution])
+    const volumetricPass = passes.volumetricPass as { setResolutionScale: (s: number) => void } | undefined;
+    volumetricPass?.setResolutionScale(resolution);
+  }, [passes, resolution]);
 
   return (
     <>
@@ -178,5 +178,5 @@ export function VolumeLighting() {
         shadow-focus={1}
       />
     </>
-  )
+  );
 }

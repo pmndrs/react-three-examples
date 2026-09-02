@@ -28,75 +28,75 @@
  * - DemoHelpers grid disabled (a flat texture-mapped plane facing the camera has no
  *   ground plane to speak of); orbit controls stay on as harmless corpus baseline
  */
-import { Suspense, useMemo, useRef, useState } from 'react'
-import { Color, DataTexture, LinearFilter, MathUtils, NoToneMapping, SRGBColorSpace, Vector2 } from 'three/webgpu'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useMemo, useRef, useState } from 'react';
+import { Color, DataTexture, LinearFilter, MathUtils, NoToneMapping, SRGBColorSpace, Vector2 } from 'three/webgpu';
+import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/carbon/Carbon.png'
+const DIFFUSE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/carbon/Carbon.png';
 
 function PartialUpdatePlane() {
   const { patchSize, updateInterval } = useControls('textures-partialupdate', {
     patchSize: { value: 32, min: 8, max: 64, step: 8, label: 'patch size (px)' },
     updateInterval: { value: 0.1, min: 0.02, max: 0.5, step: 0.02, label: 'update interval (s)' },
-  })
+  });
 
-  const renderer = useThree((state) => state.renderer)
-  const diffuseMap = useTexture(DIFFUSE_URL)
+  const renderer = useThree((state) => state.renderer);
+  const diffuseMap = useTexture(DIFFUSE_URL);
 
   useMemo(() => {
-    diffuseMap.colorSpace = SRGBColorSpace
-    diffuseMap.minFilter = LinearFilter
-    diffuseMap.generateMipmaps = false
-  }, [diffuseMap])
+    diffuseMap.colorSpace = SRGBColorSpace;
+    diffuseMap.minFilter = LinearFilter;
+    diffuseMap.generateMipmaps = false;
+  }, [diffuseMap]);
 
   // Non-node instance captured by the per-frame closure below — lazy useState keeps
   // identity stable across a StrictMode re-render (AGENTS.md: compute-particles-snow
   // pattern), even though nothing here is a create-once GPU kernel.
   const [dataTexture] = useState(() => {
-    const data = new Uint8Array(patchSize * patchSize * 4)
-    const tex = new DataTexture(data, patchSize, patchSize)
-    tex.colorSpace = SRGBColorSpace
-    return tex
-  })
-  const position = useMemo(() => new Vector2(), [])
-  const color = useMemo(() => new Color(), [])
-  const lastUpdate = useRef(0)
+    const data = new Uint8Array(patchSize * patchSize * 4);
+    const tex = new DataTexture(data, patchSize, patchSize);
+    tex.colorSpace = SRGBColorSpace;
+    return tex;
+  });
+  const position = useMemo(() => new Vector2(), []);
+  const color = useMemo(() => new Color(), []);
+  const lastUpdate = useRef(0);
 
   useFrame((state) => {
-    if (state.elapsed - lastUpdate.current < updateInterval) return
-    lastUpdate.current = state.elapsed
+    if (state.elapsed - lastUpdate.current < updateInterval) return;
+    lastUpdate.current = state.elapsed;
 
-    position.x = patchSize * MathUtils.randInt(1, 16) - patchSize
-    position.y = patchSize * MathUtils.randInt(1, 16) - patchSize
+    position.x = patchSize * MathUtils.randInt(1, 16) - patchSize;
+    position.y = patchSize * MathUtils.randInt(1, 16) - patchSize;
 
-    color.setHex(Math.random() * 0xffffff)
-    const r = Math.floor(color.r * 255)
-    const g = Math.floor(color.g * 255)
-    const b = Math.floor(color.b * 255)
+    color.setHex(Math.random() * 0xffffff);
+    const r = Math.floor(color.r * 255);
+    const g = Math.floor(color.g * 255);
+    const b = Math.floor(color.b * 255);
 
-    const data = dataTexture.image.data as Uint8Array
-    const size = patchSize * patchSize
+    const data = dataTexture.image.data as Uint8Array;
+    const size = patchSize * patchSize;
     for (let i = 0; i < size; i++) {
-      const stride = i * 4
-      data[stride] = r
-      data[stride + 1] = g
-      data[stride + 2] = b
-      data[stride + 3] = 255
+      const stride = i * 4;
+      data[stride] = r;
+      data[stride + 1] = g;
+      data[stride + 2] = b;
+      data[stride + 3] = 255;
     }
-    dataTexture.needsUpdate = true
+    dataTexture.needsUpdate = true;
 
-    renderer.copyTextureToTexture(dataTexture, diffuseMap, null, position)
-  })
+    renderer.copyTextureToTexture(dataTexture, diffuseMap, null, position);
+  });
 
   return (
     <mesh>
       <planeGeometry args={[2, 2]} />
       <meshBasicNodeMaterial map={diffuseMap} />
     </mesh>
-  )
+  );
 }
 
 export default function TexturesPartialUpdate() {
@@ -112,5 +112,5 @@ export default function TexturesPartialUpdate() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={1} maxDistance={6} />
     </Canvas>
-  )
+  );
 }

@@ -1,19 +1,19 @@
 // Three normal-shaded shapes arranged on a circle, matching the original's fixed trio.
-import { useRef } from 'react'
-import type { Mesh } from 'three/webgpu'
+import { useRef } from 'react';
+import type { Mesh } from 'three/webgpu';
 
-import { useFrame } from '@react-three/fiber/webgpu'
+import { useFrame } from '@react-three/fiber/webgpu';
 
 export function Shapes() {
-  const meshRefs = useRef<(Mesh | null)[]>([])
+  const meshRefs = useRef<(Mesh | null)[]>([]);
 
   useFrame(() => {
     for (const mesh of meshRefs.current) {
-      if (!mesh) continue
-      mesh.rotation.x += 0.01
-      mesh.rotation.y += 0.02
+      if (!mesh) continue;
+      mesh.rotation.x += 0.01;
+      mesh.rotation.y += 0.02;
     }
-  })
+  });
 
   return (
     <>
@@ -30,5 +30,5 @@ export function Shapes() {
         <meshNormalMaterial />
       </mesh>
     </>
-  )
+  );
 }

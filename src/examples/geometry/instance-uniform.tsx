@@ -28,75 +28,75 @@
  * - Tone mapping pinned to `NoToneMapping` (the original relies on the WebGPURenderer
  *   default; fiber's Canvas would otherwise default to ACESFilmic)
  */
-import { Suspense, useMemo, useRef } from 'react'
-import { cubeTexture, uniform } from 'three/tsl'
-import { Color, MeshBasicNodeMaterial, Node, NodeUpdateType, NoToneMapping } from 'three/webgpu'
-import type { Mesh, NodeFrame } from 'three/webgpu'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { useCubeTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { TeapotGeometry } from '../../assets/TeapotGeometry'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useMemo, useRef } from 'react';
+import { cubeTexture, uniform } from 'three/tsl';
+import { Color, MeshBasicNodeMaterial, Node, NodeUpdateType, NoToneMapping } from 'three/webgpu';
+import type { Mesh, NodeFrame } from 'three/webgpu';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { useCubeTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { TeapotGeometry } from '../../assets/TeapotGeometry';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/SwedishRoyalCastle/'
-const CUBE_FILES = ['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']
+const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/SwedishRoyalCastle/';
+const CUBE_FILES = ['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'];
 
-const TEAPOT_COUNT = 12
+const TEAPOT_COUNT = 12;
 
 // Ported from the original `webgpu_instance_uniform` example (three.js authors).
 // One uniform, updated per OBJECT: the renderer calls update() right before drawing
 // each mesh that uses this node, so every mesh sees its own color in the same
 // compiled shader — the per-object-uniform pattern this example exists to teach.
 class InstanceUniformNode extends Node {
-  uniformNode = uniform(new Color())
+  uniformNode = uniform(new Color());
 
   constructor() {
-    super('vec3')
-    this.updateType = NodeUpdateType.OBJECT
+    super('vec3');
+    this.updateType = NodeUpdateType.OBJECT;
   }
 
   update(frame: NodeFrame): boolean | undefined {
-    const color = frame.object?.userData.color as Color | undefined
-    if (color) this.uniformNode.value.copy(color)
-    return undefined
+    const color = frame.object?.userData.color as Color | undefined;
+    if (color) this.uniformNode.value.copy(color);
+    return undefined;
   }
 
   setup() {
-    return this.uniformNode
+    return this.uniformNode;
   }
 }
 
 interface TeapotData {
-  color: Color
-  position: [number, number, number]
-  rotation: [number, number, number]
+  color: Color;
+  position: [number, number, number];
+  rotation: [number, number, number];
 }
 
 function Teapots() {
   const { speed } = useControls('instance-uniform', {
     speed: { value: 1, min: 0, max: 3, step: 0.01 },
-  })
+  });
 
-  const textureCube = useCubeTexture(CUBE_FILES, { path: CUBE_PATH })
+  const textureCube = useCubeTexture(CUBE_FILES, { path: CUBE_PATH });
 
-  const geometry = useMemo(() => new TeapotGeometry(50, 18), [])
+  const geometry = useMemo(() => new TeapotGeometry(50, 18), []);
 
   // ONE material shared by all 12 meshes — the custom node supplies per-object color.
   const material = useMemo(() => {
     // Runtime installs the fluent TSL surface on Node.prototype, but @types/three only
     // carries it on the typed `Node<T>` alias — cast the custom-node instance and the
     // vec4-flavored cube texture node once (AGENTS.md B10/B11 cast family).
-    const instanceColor = new InstanceUniformNode() as unknown as Node<'vec3'>
-    const envColor = cubeTexture(textureCube) as unknown as Node<'vec3'>
+    const instanceColor = new InstanceUniformNode() as unknown as Node<'vec3'>;
+    const envColor = cubeTexture(textureCube) as unknown as Node<'vec3'>;
 
-    const mat = new MeshBasicNodeMaterial()
-    mat.colorNode = instanceColor.add(envColor)
+    const mat = new MeshBasicNodeMaterial();
+    mat.colorNode = instanceColor.add(envColor);
     // B11: NodeMaterial.setupOutgoingLight reads `emissiveNode` generically at runtime
     // (verified in renderers/common), but @types/three declares it only on
     // MeshStandardNodeMaterial — documented duck-typing cast.
-    ;(mat as MeshBasicNodeMaterial & { emissiveNode: Node | null }).emissiveNode = instanceColor.mul(envColor)
-    return mat
-  }, [textureCube])
+    (mat as MeshBasicNodeMaterial & { emissiveNode: Node | null }).emissiveNode = instanceColor.mul(envColor);
+    return mat;
+  }, [textureCube]);
 
   // Random colors and rotations rolled once per mount, like the original's init().
   const teapots = useMemo<TeapotData[]>(
@@ -107,19 +107,19 @@ function Teapots() {
         rotation: [Math.random() * 200 - 100, Math.random() * 200 - 100, Math.random() * 200 - 100],
       })),
     [],
-  )
+  );
 
-  const meshRefs = useRef<(Mesh | null)[]>([])
+  const meshRefs = useRef<(Mesh | null)[]>([]);
 
   useFrame(({ delta }) => {
     // Original tuned at +0.01/+0.005 per frame at 60 fps — delta-scaled here.
-    const step = 60 * delta * speed
+    const step = 60 * delta * speed;
     for (const mesh of meshRefs.current) {
-      if (!mesh) continue
-      mesh.rotation.x += 0.01 * step
-      mesh.rotation.y += 0.005 * step
+      if (!mesh) continue;
+      mesh.rotation.x += 0.01 * step;
+      mesh.rotation.y += 0.005 * step;
     }
-  })
+  });
 
   return (
     <>
@@ -127,7 +127,7 @@ function Teapots() {
         <mesh
           key={i}
           ref={(mesh) => {
-            meshRefs.current[i] = mesh
+            meshRefs.current[i] = mesh;
           }}
           geometry={geometry}
           material={material}
@@ -137,7 +137,7 @@ function Teapots() {
         />
       ))}
     </>
-  )
+  );
 }
 
 export default function InstanceUniform() {
@@ -156,5 +156,5 @@ export default function InstanceUniform() {
       <gridHelper args={[1000, 40, '#303030', '#303030']} position={[0, -75, 0]} />
       <DemoHelpers grid={false} minDistance={400} maxDistance={2000} />
     </Canvas>
-  )
+  );
 }

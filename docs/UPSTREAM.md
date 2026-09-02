@@ -63,7 +63,7 @@ its input type independently:
 
 ```ts
 // dist/webgpu/index.d.ts:3809 — T is captured, then never used
-declare function useUniforms<T extends UniformInputRecord>(uniforms: T): UniformsWithUtils<UniformRecord<UniformNode>> // = Record<string, UniformNode<unknown, unknown>>
+declare function useUniforms<T extends UniformInputRecord>(uniforms: T): UniformsWithUtils<UniformRecord<UniformNode>>; // = Record<string, UniformNode<unknown, unknown>>
 ```
 
 So BOTH the node type and the **value** type are erased, and the keys with them.
@@ -74,13 +74,13 @@ Probe against three 0.185.1 + fiber 10.0.0-alpha.3 — three's side is already c
 which is why this is purely fiber's to fix:
 
 ```ts
-const a = uniform(0.5)
-const a1: Node<'float'> = a // ✓ compiles with no cast
-const a2: number = a.value // ✓
+const a = uniform(0.5);
+const a1: Node<'float'> = a; // ✓ compiles with no cast
+const a2: number = a.value; // ✓
 
-declare const b: UniformNode<unknown, unknown> // what useUniforms returns today
-const b1: Node<'float'> = b // ✗ TS2322
-const b2: number = b.value // ✗ TS2322
+declare const b: UniformNode<unknown, unknown>; // what useUniforms returns today
+const b1: Node<'float'> = b; // ✗ TS2322
+const b2: number = b.value; // ✗ TS2322
 ```
 
 three composes as `UniformNode<TNodeType, TValue> = UniformNodeClass<TValue> &
@@ -113,11 +113,11 @@ type UniformNodeFor<V> = V extends Node
                   ? UniformNode<'mat4', Matrix4>
                   : V extends string
                     ? UniformNode<'color', Color> // fiber converts color strings
-                    : UniformNode<unknown, V>
+                    : UniformNode<unknown, V>;
 
 declare function useUniforms<T extends UniformInputRecord>(
   uniforms: T,
-): { [K in keyof T]: UniformNodeFor<T[K]> } & UniformUtils
+): { [K in keyof T]: UniformNodeFor<T[K]> } & UniformUtils;
 ```
 
 Note the return type must NOT be routed through `UniformsWithUtils<…>`: its parameter

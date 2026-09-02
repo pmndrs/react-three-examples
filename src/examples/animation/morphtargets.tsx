@@ -29,66 +29,66 @@
  *   the original's `Vector3.applyAxisAngle` — avoids allocating a `Vector3` per loop
  *   iteration (`@react-three/no-new-in-loop`); same rotation-around-the-X-axis math
  */
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
-import { BoxGeometry, Float32BufferAttribute } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { PerspectiveCamera } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { BoxGeometry, Float32BufferAttribute } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { PerspectiveCamera } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const CAMERA_DISTANCE = 10
+const CAMERA_DISTANCE = 10;
 
 // Subdivided box with two morph targets baked onto `morphAttributes.position`:
 // index 0 bends the cube onto a sphere, index 1 twists it around the X axis. Ported
 // directly from the original's `createGeometry()`, minus the per-vertex `Vector3` reuse
 // (see header DIVERGENCE).
 function createMorphGeometry() {
-  const geometry = new BoxGeometry(2, 2, 2, 32, 32, 32)
-  const position = geometry.attributes.position
-  const count = position.count
+  const geometry = new BoxGeometry(2, 2, 2, 32, 32, 32);
+  const position = geometry.attributes.position;
+  const count = position.count;
 
-  const spherePositions: number[] = []
-  const twistPositions: number[] = []
+  const spherePositions: number[] = [];
+  const twistPositions: number[] = [];
 
   for (let i = 0; i < count; i++) {
-    const x = position.getX(i)
-    const y = position.getY(i)
-    const z = position.getZ(i)
+    const x = position.getX(i);
+    const y = position.getY(i);
+    const z = position.getZ(i);
 
     spherePositions.push(
       x * Math.sqrt(1 - (y * y) / 2 - (z * z) / 2 + (y * y * z * z) / 3),
       y * Math.sqrt(1 - (z * z) / 2 - (x * x) / 2 + (z * z * x * x) / 3),
       z * Math.sqrt(1 - (x * x) / 2 - (y * y) / 2 + (x * x * y * y) / 3),
-    )
+    );
 
     // Stretch along x so the twist reads clearly, then rotate (y, z) around the X axis
     // by an angle proportional to x — same math as the original's
     // `vertex.applyAxisAngle(new Vector3(1, 0, 0), angle)`, done with plain trig instead
     // of a per-vertex Vector3 allocation.
-    const stretchedX = x * 2
-    const angle = (Math.PI * x) / 2
-    const cos = Math.cos(angle)
-    const sin = Math.sin(angle)
-    twistPositions.push(stretchedX, y * cos - z * sin, y * sin + z * cos)
+    const stretchedX = x * 2;
+    const angle = (Math.PI * x) / 2;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    twistPositions.push(stretchedX, y * cos - z * sin, y * sin + z * cos);
   }
 
   geometry.morphAttributes.position = [
     new Float32BufferAttribute(spherePositions, 3),
     new Float32BufferAttribute(twistPositions, 3),
-  ]
+  ];
 
-  return geometry
+  return geometry;
 }
 
 function MorphBox() {
   const { spherify, twist } = useControls('morphtargets', {
     spherify: { value: 0, min: 0, max: 1, step: 0.01 },
     twist: { value: 0, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
-  const geometry = useMemo(() => createMorphGeometry(), [])
-  const meshRef = useRef<Mesh>(null)
+  const geometry = useMemo(() => createMorphGeometry(), []);
+  const meshRef = useRef<Mesh>(null);
 
   // `updateMorphTargets()` — see header DEMONSTRATES: fiber's `geometry` prop attach
   // doesn't run three's constructor-time morph-target setup, so this has to run once,
@@ -100,23 +100,23 @@ function MorphBox() {
   // null` baked in permanently (three caches it per-mesh in a WeakMap). A layout effect
   // runs synchronously in the commit phase, before any paint/rAF tick, so it always wins.
   useLayoutEffect(() => {
-    const mesh = meshRef.current
-    if (!mesh) return
-    if (!mesh.morphTargetInfluences) mesh.updateMorphTargets()
-  }, [])
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    if (!mesh.morphTargetInfluences) mesh.updateMorphTargets();
+  }, []);
 
   useEffect(() => {
-    const mesh = meshRef.current
-    if (!mesh?.morphTargetInfluences) return
-    mesh.morphTargetInfluences[0] = spherify
-    mesh.morphTargetInfluences[1] = twist
-  }, [spherify, twist])
+    const mesh = meshRef.current;
+    if (!mesh?.morphTargetInfluences) return;
+    mesh.morphTargetInfluences[0] = spherify;
+    mesh.morphTargetInfluences[1] = twist;
+  }, [spherify, twist]);
 
   return (
     <mesh ref={meshRef} geometry={geometry}>
       <meshPhongMaterial color="#ff0000" flatShading />
     </mesh>
-  )
+  );
 }
 
 export default function MorphTargets() {
@@ -130,5 +130,5 @@ export default function MorphTargets() {
       <MorphBox />
       <DemoHelpers grid={false} minDistance={CAMERA_DISTANCE} maxDistance={CAMERA_DISTANCE} />
     </Canvas>
-  )
+  );
 }

@@ -47,26 +47,26 @@
  * takeover (`{ phase: 'render' }`) is an already-documented, first-class idiom for
  * exactly this "custom rendering" case (`frame-loop.mdx`). No degraded port needed.
  */
-import { useMemo } from 'react'
-import { MathUtils } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { CameraRig } from './CameraRig'
+import { useMemo } from 'react';
+import { MathUtils } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { CameraRig } from './CameraRig';
 
-const PARTICLE_COUNT = 10000
-const PARTICLE_SPREAD = 2000
+const PARTICLE_COUNT = 10000;
+const PARTICLE_SPREAD = 2000;
 
 // Background star field — a static, non-mutating scene element, so unlike the camera
 // rig it's plain declarative JSX (original's imperative `BufferGeometry`/`setAttribute`
 // star field).
 function Particles() {
   const positions = useMemo(() => {
-    const array = new Float32Array(PARTICLE_COUNT * 3)
+    const array = new Float32Array(PARTICLE_COUNT * 3);
     for (let i = 0; i < array.length; i++) {
-      array[i] = MathUtils.randFloatSpread(PARTICLE_SPREAD)
+      array[i] = MathUtils.randFloatSpread(PARTICLE_SPREAD);
     }
-    return array
-  }, [])
+    return array;
+  }, []);
 
   return (
     <points>
@@ -75,7 +75,7 @@ function Particles() {
       </bufferGeometry>
       <pointsMaterial color="white" />
     </points>
-  )
+  );
 }
 
 export default function CameraExample() {
@@ -87,5 +87,5 @@ export default function CameraExample() {
       <CameraRig />
       <DemoHelpers grid={false} controls={false} />
     </Canvas>
-  )
+  );
 }

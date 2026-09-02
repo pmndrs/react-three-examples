@@ -41,69 +41,69 @@
  *   direction, already interactive via CameraControls — there's no extra parameter
  *   worth exposing (same call as `rtt`)
  */
-import { useEffect, useMemo } from 'react'
-import { SRGBColorSpace, SphereGeometry, VideoTexture } from 'three/webgpu'
+import { useEffect, useMemo } from 'react';
+import { SRGBColorSpace, SphereGeometry, VideoTexture } from 'three/webgpu';
 
-import { Canvas } from '@react-three/fiber/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const VIDEO_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/pano.webm'
+const VIDEO_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/pano.webm';
 
 // Fixed at the original's `distance = 0.5`: locks CameraControls' dolly range so the
 // camera only orbits in place at the sphere's center, matching
 // `camera.position = distance * sphericalDir(phi, theta); camera.lookAt(0, 0, 0)`.
-const CAMERA_DISTANCE = 0.5
-const CAMERA_POSITION: [number, number, number] = [CAMERA_DISTANCE, 0, 0]
+const CAMERA_DISTANCE = 0.5;
+const CAMERA_POSITION: [number, number, number] = [CAMERA_DISTANCE, 0, 0];
 
 function VideoPanoramaSphere() {
   const video = useMemo(() => {
-    const el = document.createElement('video')
-    el.loop = true
-    el.muted = true
-    el.playsInline = true
-    el.crossOrigin = 'anonymous'
-    el.src = VIDEO_URL
-    return el
-  }, [])
+    const el = document.createElement('video');
+    el.loop = true;
+    el.muted = true;
+    el.playsInline = true;
+    el.crossOrigin = 'anonymous';
+    el.src = VIDEO_URL;
+    return el;
+  }, []);
 
   useEffect(() => {
     // Muted autoplay is allowed without a prior user gesture in every evergreen
     // browser, including headless Chromium under Playwright; .catch() is defensive
     // only (see DIVERGENCE).
-    video.play().catch(() => {})
+    video.play().catch(() => {});
     return () => {
-      video.pause()
-      video.src = ''
-    }
-  }, [video])
+      video.pause();
+      video.src = '';
+    };
+  }, [video]);
 
   const texture = useMemo(() => {
-    const t = new VideoTexture(video)
-    t.colorSpace = SRGBColorSpace
-    return t
-  }, [video])
+    const t = new VideoTexture(video);
+    t.colorSpace = SRGBColorSpace;
+    return t;
+  }, [video]);
 
   // Baked (not a mesh transform) — see DIVERGENCE for why the distinction matters.
   const geometry = useMemo(() => {
-    const geo = new SphereGeometry(5, 60, 40)
-    geo.scale(-1, 1, 1)
-    return geo
-  }, [])
+    const geo = new SphereGeometry(5, 60, 40);
+    geo.scale(-1, 1, 1);
+    return geo;
+  }, []);
 
   useEffect(() => {
     return () => {
-      geometry.dispose()
-      texture.dispose()
-    }
-  }, [geometry, texture])
+      geometry.dispose();
+      texture.dispose();
+    };
+  }, [geometry, texture]);
 
   return (
     <mesh>
       <primitive object={geometry} attach="geometry" />
       <meshBasicNodeMaterial map={texture} />
     </mesh>
-  )
+  );
 }
 
 export default function VideoPanorama() {
@@ -112,5 +112,5 @@ export default function VideoPanorama() {
       <VideoPanoramaSphere />
       <DemoHelpers grid={false} minDistance={CAMERA_DISTANCE} maxDistance={CAMERA_DISTANCE} pan={false} />
     </Canvas>
-  )
+  );
 }

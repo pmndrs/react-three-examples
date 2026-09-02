@@ -41,21 +41,21 @@
  * - `renderer.inspector = new Inspector()` + its GUI dropped for leva, same gap noted
  *   across this corpus's other ports.
  */
-import { useEffect, useLayoutEffect, useRef } from 'react'
-import { Fn, mx_fractal_noise_vec3, positionWorld, color as tslColor } from 'three/tsl'
-import { ACESFilmicToneMapping } from 'three/webgpu'
-import type { DirectionalLight } from 'three/webgpu'
-import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js'
-import { TileShadowNodeHelper } from 'three/addons/tsl/shadows/TileShadowNodeHelper.js'
+import { useEffect, useLayoutEffect, useRef } from 'react';
+import { Fn, mx_fractal_noise_vec3, positionWorld, color as tslColor } from 'three/tsl';
+import { ACESFilmicToneMapping } from 'three/webgpu';
+import type { DirectionalLight } from 'three/webgpu';
+import { TileShadowNode } from 'three/addons/tsl/shadows/TileShadowNode.js';
+import { TileShadowNodeHelper } from 'three/addons/tsl/shadows/TileShadowNodeHelper.js';
 
-import { Canvas, useFrame, useNodes, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useFrame, useNodes, useThree } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Scenery, TorusKnotCentral } from './Scenery'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Scenery, TorusKnotCentral } from './Scenery';
 
 interface TiledSunProps {
-  speed: number
+  speed: number;
 }
 
 // The sole shadow-casting light: a directional "sun" orbiting the origin, its shadow
@@ -67,57 +67,57 @@ function TiledSun({ speed }: TiledSunProps) {
     tilesX: { value: 2, min: 1, max: 4, step: 1 },
     tilesY: { value: 2, min: 1, max: 4, step: 1 },
     helperVisible: { value: true, label: 'show tile helper' },
-  })
-  const lightRef = useRef<DirectionalLight>(null)
-  const helperRef = useRef<TileShadowNodeHelper | null>(null)
-  const { scene } = useThree()
-  const clockRef = useRef(0)
+  });
+  const lightRef = useRef<DirectionalLight>(null);
+  const helperRef = useRef<TileShadowNodeHelper | null>(null);
+  const { scene } = useThree();
+  const clockRef = useRef(0);
   // TileShadowNode only populates its internal shadow nodes during the light's FIRST
   // shadow-pass render; calling helper.update() any earlier logs a one-time "not ready"
   // console.error (TileShadowNodeHelper.init() guard). useFrame runs before the render
   // phase, so skip exactly one frame after every (re)build to let that render happen.
-  const skipNextRef = useRef(true)
+  const skipNextRef = useRef(true);
 
   useLayoutEffect(() => {
-    const light = lightRef.current
-    if (!light) return
+    const light = lightRef.current;
+    if (!light) return;
 
-    const tileShadowNode = new TileShadowNode(light, { tilesX, tilesY })
-    light.shadow.shadowNode = tileShadowNode
+    const tileShadowNode = new TileShadowNode(light, { tilesX, tilesY });
+    light.shadow.shadowNode = tileShadowNode;
 
-    const helper = new TileShadowNodeHelper(tileShadowNode)
-    helper.visible = helperVisible
-    scene.add(helper)
-    helperRef.current = helper
-    skipNextRef.current = true
+    const helper = new TileShadowNodeHelper(tileShadowNode);
+    helper.visible = helperVisible;
+    scene.add(helper);
+    helperRef.current = helper;
+    skipNextRef.current = true;
 
     return () => {
-      scene.remove(helper)
-      light.shadow.shadowNode = undefined
-      helperRef.current = null
-    }
+      scene.remove(helper);
+      light.shadow.shadowNode = undefined;
+      helperRef.current = null;
+    };
     // helperVisible intentionally excluded — applied live below without a full rebuild.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scene, tilesX, tilesY])
+  }, [scene, tilesX, tilesY]);
 
   useEffect(() => {
-    if (helperRef.current) helperRef.current.visible = helperVisible
-  }, [helperVisible])
+    if (helperRef.current) helperRef.current.visible = helperVisible;
+  }, [helperVisible]);
 
   useFrame(({ delta }) => {
-    const light = lightRef.current
-    if (!light) return
-    clockRef.current += delta * speed // original rate: sin(time_ms * 0.0001) = 0.1 rad/s
-    const t = clockRef.current
-    light.position.x = Math.sin(t) * 30
-    light.position.z = Math.cos(t) * 30
+    const light = lightRef.current;
+    if (!light) return;
+    clockRef.current += delta * speed; // original rate: sin(time_ms * 0.0001) = 0.1 rad/s
+    const t = clockRef.current;
+    light.position.x = Math.sin(t) * 30;
+    light.position.z = Math.cos(t) * 30;
 
     if (skipNextRef.current) {
-      skipNextRef.current = false
+      skipNextRef.current = false;
     } else {
-      helperRef.current?.update()
+      helperRef.current?.update();
     }
-  })
+  });
 
   return (
     <directionalLight
@@ -136,7 +136,7 @@ function TiledSun({ speed }: TiledSunProps) {
       shadow-mapSize-height={4096}
       shadow-radius={1}
     />
-  )
+  );
 }
 
 // Procedural green/brown ground, ported from the original's colorNode Fn — noise.x
@@ -144,24 +144,24 @@ function TiledSun({ speed }: TiledSunProps) {
 function Ground() {
   const { colorNode } = useNodes(() => ({
     colorNode: Fn(() => {
-      const noise = mx_fractal_noise_vec3(positionWorld.mul(0.05)).saturate()
-      const green = tslColor(0.4, 0.7, 0.3)
-      const brown = tslColor(0.6, 0.5, 0.3)
-      return noise.x.mix(green, brown)
+      const noise = mx_fractal_noise_vec3(positionWorld.mul(0.05)).saturate();
+      const green = tslColor(0.4, 0.7, 0.3);
+      const brown = tslColor(0.6, 0.5, 0.3);
+      return noise.x.mix(green, brown);
     })(),
-  }))
+  }));
 
   return (
     <mesh rotation-x={-Math.PI / 2} receiveShadow>
       <planeGeometry args={[1500, 1500, 2, 2]} />
       <meshPhongNodeMaterial color="#88aa44" shininess={5} specular="#222222" colorNode={colorNode} />
     </mesh>
-  )
+  );
 }
 
 export default function ShadowmapArray() {
   // speed is shared by TiledSun (light orbit) and TorusKnotCentral (spin rate).
-  const { speed } = useControls('shadowmap-array', { speed: { value: 1, min: 0, max: 3, step: 0.05 } })
+  const { speed } = useControls('shadowmap-array', { speed: { value: 1, min: 0, max: 3, step: 0.05 } });
 
   return (
     <Canvas
@@ -183,5 +183,5 @@ export default function ShadowmapArray() {
         maxPolarAngle={Math.PI / 2 - 0.1}
       />
     </Canvas>
-  )
+  );
 }

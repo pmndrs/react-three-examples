@@ -35,18 +35,18 @@
  *   (`autoRotate`, matching speed); grid disabled (`grid={false}`) — the scene floats
  *   in the Pisa skybox with no ground plane
  */
-import { Suspense, useLayoutEffect, useRef } from 'react'
-import { ACESFilmicToneMapping, LinearFilter, LinearMipmapLinearFilter } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
-import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js'
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { useCubeCamera, useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useLayoutEffect, useRef } from 'react';
+import { ACESFilmicToneMapping, LinearFilter, LinearMipmapLinearFilter } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
+import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu';
+import { useCubeCamera, useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
-const PISA_HDR_FILES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map((face) => `${TEXTURE_BASE}cube/pisaHDR/${face}.hdr`)
-const UV_GRID_URL = `${TEXTURE_BASE}uv_grid_opengl.jpg`
+const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/';
+const PISA_HDR_FILES = ['px', 'nx', 'py', 'ny', 'pz', 'nz'].map((face) => `${TEXTURE_BASE}cube/pisaHDR/${face}.hdr`);
+const UV_GRID_URL = `${TEXTURE_BASE}uv_grid_opengl.jpg`;
 
 // The mirror sphere. drei's useCubeCamera hook (not the <CubeCamera> render-prop —
 // see header DEMONSTRATES) hands back the CubeRenderTarget so the original's mipmap
@@ -56,26 +56,26 @@ function ReflectiveSphere() {
   const { roughness, metalness } = useControls('cubemap-dynamic', {
     roughness: { value: 0.05, min: 0, max: 1, step: 0.01 },
     metalness: { value: 1, min: 0, max: 1, step: 0.01 },
-  })
-  const { fbo, camera, update } = useCubeCamera({ resolution: 256, near: 1, far: 1000 })
-  const sphereRef = useRef<Mesh>(null)
+  });
+  const { fbo, camera, update } = useCubeCamera({ resolution: 256, near: 1, far: 1000 });
+  const sphereRef = useRef<Mesh>(null);
 
   // Mipmapped filtering on the live target is what lets the roughness slider blur the
   // reflection (original's explicit texture setup; drei only sets HalfFloatType).
   // Layout effect: must land before the first render writes into the target.
   useLayoutEffect(() => {
-    fbo.texture.minFilter = LinearMipmapLinearFilter
-    fbo.texture.magFilter = LinearFilter
-    fbo.texture.generateMipmaps = true
-  }, [fbo])
+    fbo.texture.minFilter = LinearMipmapLinearFilter;
+    fbo.texture.magFilter = LinearFilter;
+    fbo.texture.generateMipmaps = true;
+  }, [fbo]);
 
   useFrame(() => {
-    const sphere = sphereRef.current
-    if (!sphere) return
-    sphere.visible = false // the mirror must not reflect itself
-    update()
-    sphere.visible = true
-  })
+    const sphere = sphereRef.current;
+    if (!sphere) return;
+    sphere.visible = false; // the mirror must not reflect itself
+    update();
+    sphere.visible = true;
+  });
 
   return (
     <>
@@ -85,28 +85,28 @@ function ReflectiveSphere() {
         <meshStandardNodeMaterial envMap={fbo.texture} roughness={roughness} metalness={metalness} />
       </mesh>
     </>
-  )
+  );
 }
 
 // Skybox + IBL from the six Pisa Radiance .hdr faces (one nested-array useLoader call —
 // B20 workaround, pattern `clearcoat`). Layout effect so the assignment lands before
 // sibling meshes' first shader build reads `scene.environment` (B15 family).
 function PisaEnvironment() {
-  const scene = useThree((s) => s.scene)
-  const [envCube] = useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES])
+  const scene = useThree((s) => s.scene);
+  const [envCube] = useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES]);
 
   useLayoutEffect(() => {
-    envCube.minFilter = LinearMipmapLinearFilter
-    envCube.magFilter = LinearFilter
-    scene.background = envCube
-    scene.environment = envCube
+    envCube.minFilter = LinearMipmapLinearFilter;
+    envCube.magFilter = LinearFilter;
+    scene.background = envCube;
+    scene.environment = envCube;
     return () => {
-      scene.background = null
-      scene.environment = null
-    }
-  }, [scene, envCube])
+      scene.background = null;
+      scene.environment = null;
+    };
+  }, [scene, envCube]);
 
-  return null
+  return null;
 }
 
 // The two orbiting subjects the mirror tracks: a uv-grid cube lit by scene.environment
@@ -115,25 +115,25 @@ function PisaEnvironment() {
 function OrbitingObjects() {
   const { envMapIntensity } = useControls('cubemap-dynamic', {
     envMapIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
-  })
-  const uvTexture = useTexture(UV_GRID_URL)
-  const [envCube] = useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES])
-  const cubeRef = useRef<Mesh>(null)
-  const torusRef = useRef<Mesh>(null)
+  });
+  const uvTexture = useTexture(UV_GRID_URL);
+  const [envCube] = useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES]);
+  const cubeRef = useRef<Mesh>(null);
+  const torusRef = useRef<Mesh>(null);
 
   useFrame(({ elapsed: time, delta }) => {
-    const cube = cubeRef.current
-    const torus = torusRef.current
-    if (!cube || !torus) return
+    const cube = cubeRef.current;
+    const torus = torusRef.current;
+    if (!cube || !torus) return;
 
-    cube.position.set(Math.cos(time) * 30, Math.sin(time) * 30, Math.sin(time) * 30)
-    cube.rotation.x += 1.2 * delta
-    cube.rotation.y += 1.8 * delta
+    cube.position.set(Math.cos(time) * 30, Math.sin(time) * 30, Math.sin(time) * 30);
+    cube.rotation.x += 1.2 * delta;
+    cube.rotation.y += 1.8 * delta;
 
-    torus.position.set(Math.cos(time + 10) * 30, Math.sin(time + 10) * 30, Math.sin(time + 10) * 30)
-    torus.rotation.x += 1.2 * delta
-    torus.rotation.y += 1.8 * delta
-  })
+    torus.position.set(Math.cos(time + 10) * 30, Math.sin(time + 10) * 30, Math.sin(time + 10) * 30);
+    torus.rotation.x += 1.2 * delta;
+    torus.rotation.y += 1.8 * delta;
+  });
 
   return (
     <>
@@ -152,7 +152,7 @@ function OrbitingObjects() {
         />
       </mesh>
     </>
-  )
+  );
 }
 
 // toneMappingExposure is a WebGPURenderer property and environmentIntensity a Scene
@@ -161,16 +161,16 @@ function RendererSettings() {
   const { exposure, environmentIntensity } = useControls('cubemap-dynamic', {
     exposure: { value: 1, min: 0, max: 2, step: 0.01 },
     environmentIntensity: { value: 1, min: 0, max: 1, step: 0.01 },
-  })
-  const renderer = useThree((s) => s.renderer)
-  const scene = useThree((s) => s.scene)
+  });
+  const renderer = useThree((s) => s.renderer);
+  const scene = useThree((s) => s.scene);
 
   useLayoutEffect(() => {
-    renderer.toneMappingExposure = exposure
-    scene.environmentIntensity = environmentIntensity
-  }, [renderer, scene, exposure, environmentIntensity])
+    renderer.toneMappingExposure = exposure;
+    scene.environmentIntensity = environmentIntensity;
+  }, [renderer, scene, exposure, environmentIntensity]);
 
-  return null
+  return null;
 }
 
 export default function CubemapDynamic() {
@@ -188,5 +188,5 @@ export default function CubemapDynamic() {
       <RendererSettings />
       <DemoHelpers grid={false} autoRotate />
     </Canvas>
-  )
+  );
 }

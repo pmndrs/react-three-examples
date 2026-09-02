@@ -18,24 +18,24 @@
  * - `shadows="basic"` (BasicShadowMap — hard edges that pixelate cleanly) and
  *   nearest-filtered/no-mipmap textures as part of the retro look
  */
-import { Suspense, useEffect } from 'react'
-import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js'
-import { uniform } from 'three/tsl'
-import { NoToneMapping } from 'three/webgpu'
-import type { OrthographicCamera, UniformNode } from 'three/webgpu'
-import { Canvas, useFrame, useRenderPipeline, useThree } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Suspense, useEffect } from 'react';
+import { pixelationPass } from 'three/addons/tsl/display/PixelationPassNode.js';
+import { uniform } from 'three/tsl';
+import { NoToneMapping } from 'three/webgpu';
+import type { OrthographicCamera, UniformNode } from 'three/webgpu';
+import { Canvas, useFrame, useRenderPipeline, useThree } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { PixelScene } from './PixelScene'
-import { pixelAlignFrustum } from './pixelAlignFrustum'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { PixelScene } from './PixelScene';
+import { pixelAlignFrustum } from './pixelAlignFrustum';
 
 //* Post-processing ===============================================
 
 interface PostFXProps {
-  pixelSize: number
-  normalEdgeStrength: number
-  depthEdgeStrength: number
+  pixelSize: number;
+  normalEdgeStrength: number;
+  depthEdgeStrength: number;
 }
 
 // The pixelation pass renders the scene itself (scene + camera go into the factory),
@@ -46,32 +46,32 @@ interface PostFXProps {
 // retargets the low-res render target automatically.
 function PostFX({ pixelSize, normalEdgeStrength, depthEdgeStrength }: PostFXProps) {
   const { passes } = useRenderPipeline(({ renderPipeline, scene, camera }) => {
-    if (!renderPipeline) return
+    if (!renderPipeline) return;
 
     // Initial values come from the closure ONCE (pipeline callbacks never re-run on
     // re-render); every later change flows through the registered uniforms below.
-    const uPixelSize = uniform(pixelSize)
-    const uNormalEdgeStrength = uniform(normalEdgeStrength)
-    const uDepthEdgeStrength = uniform(depthEdgeStrength)
+    const uPixelSize = uniform(pixelSize);
+    const uNormalEdgeStrength = uniform(normalEdgeStrength);
+    const uDepthEdgeStrength = uniform(depthEdgeStrength);
 
-    const pixelPass = pixelationPass(scene, camera, uPixelSize, uNormalEdgeStrength, uDepthEdgeStrength)
-    renderPipeline.outputNode = pixelPass
+    const pixelPass = pixelationPass(scene, camera, uPixelSize, uNormalEdgeStrength, uDepthEdgeStrength);
+    renderPipeline.outputNode = pixelPass;
 
-    return { pixelPass, uPixelSize, uNormalEdgeStrength, uDepthEdgeStrength }
-  })
+    return { pixelPass, uPixelSize, uNormalEdgeStrength, uDepthEdgeStrength };
+  });
 
   useEffect(() => {
     // Only `.value` is touched, so the node-type param can stay unknown.
-    const uPixelSize = passes.uPixelSize as UniformNode<unknown, number> | undefined
-    const uNormalEdgeStrength = passes.uNormalEdgeStrength as UniformNode<unknown, number> | undefined
-    const uDepthEdgeStrength = passes.uDepthEdgeStrength as UniformNode<unknown, number> | undefined
-    if (!uPixelSize || !uNormalEdgeStrength || !uDepthEdgeStrength) return
-    uPixelSize.value = pixelSize
-    uNormalEdgeStrength.value = normalEdgeStrength
-    uDepthEdgeStrength.value = depthEdgeStrength
-  }, [passes, pixelSize, normalEdgeStrength, depthEdgeStrength])
+    const uPixelSize = passes.uPixelSize as UniformNode<unknown, number> | undefined;
+    const uNormalEdgeStrength = passes.uNormalEdgeStrength as UniformNode<unknown, number> | undefined;
+    const uDepthEdgeStrength = passes.uDepthEdgeStrength as UniformNode<unknown, number> | undefined;
+    if (!uPixelSize || !uNormalEdgeStrength || !uDepthEdgeStrength) return;
+    uPixelSize.value = pixelSize;
+    uNormalEdgeStrength.value = normalEdgeStrength;
+    uDepthEdgeStrength.value = depthEdgeStrength;
+  }, [passes, pixelSize, normalEdgeStrength, depthEdgeStrength]);
 
-  return null
+  return null;
 }
 
 // Owns the `manual` camera frustum. When pixel-aligned panning is on, the frustum is
@@ -81,24 +81,24 @@ function PostFX({ pixelSize, normalEdgeStrength, depthEdgeStrength }: PostFXProp
 function PixelAlignedFrustum({ enabled, pixelSize }: { enabled: boolean; pixelSize: number }) {
   // useThree's camera types as the base Camera even under `orthographic` — same cast
   // as materials-displacementmap.
-  const camera = useThree((s) => s.camera) as OrthographicCamera
-  const size = useThree((s) => s.size)
+  const camera = useThree((s) => s.camera) as OrthographicCamera;
+  const size = useThree((s) => s.size);
 
   useFrame(() => {
-    const aspectRatio = size.width / size.height
+    const aspectRatio = size.width / size.height;
     if (enabled) {
-      pixelAlignFrustum(camera, aspectRatio, Math.floor(size.width / pixelSize), Math.floor(size.height / pixelSize))
+      pixelAlignFrustum(camera, aspectRatio, Math.floor(size.width / pixelSize), Math.floor(size.height / pixelSize));
     } else if (camera.left !== -aspectRatio || camera.top !== 1) {
       // Reset the frustum if pixel alignment (or a resize) has modified it
-      camera.left = -aspectRatio
-      camera.right = aspectRatio
-      camera.top = 1
-      camera.bottom = -1
-      camera.updateProjectionMatrix()
+      camera.left = -aspectRatio;
+      camera.right = aspectRatio;
+      camera.top = 1;
+      camera.bottom = -1;
+      camera.updateProjectionMatrix();
     }
-  })
+  });
 
-  return null
+  return null;
 }
 
 //* Main ===========================================================
@@ -111,7 +111,7 @@ export default function PostprocessingPixel() {
     normalEdgeStrength: { value: 0.3, min: 0, max: 2, step: 0.05 },
     depthEdgeStrength: { value: 0.4, min: 0, max: 1, step: 0.05 },
     pixelAlignedPanning: true,
-  })
+  });
 
   return (
     <Canvas
@@ -141,5 +141,5 @@ export default function PostprocessingPixel() {
       <DemoHelpers grid={false} maxZoom={2} />
       <PixelAlignedFrustum enabled={pixelAlignedPanning} pixelSize={pixelSize} />
     </Canvas>
-  )
+  );
 }

@@ -46,37 +46,37 @@
  *   (background/camera-light fixtures / loaded character / backdrop ring), same
  *   rationale as `tsl-halftone`'s split
  */
-import { Suspense, useCallback, useRef } from 'react'
-import { NeutralToneMapping } from 'three/webgpu'
+import { Suspense, useCallback, useRef } from 'react';
+import { NeutralToneMapping } from 'three/webgpu';
 
-import { Canvas } from '@react-three/fiber/webgpu'
-import type CameraControlsImpl from 'camera-controls'
+import { Canvas } from '@react-three/fiber/webgpu';
+import type CameraControlsImpl from 'camera-controls';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { CameraLight, SceneBackground } from './SceneSetup'
-import { Michelle } from './Michelle'
-import { Portals } from './Portals'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { CameraLight, SceneBackground } from './SceneSetup';
+import { Michelle } from './Michelle';
+import { Portals } from './Portals';
 
 export default function Backdrop() {
   // Pausing the portal ring's auto-rotation while the user drags the camera — the
   // callback ref fires once camera-controls' instance is available (React 19 callback
   // refs support a cleanup return, so both subscribe and unsubscribe live here).
-  const rotatingRef = useRef(true)
+  const rotatingRef = useRef(true);
   const setControls = useCallback((instance: CameraControlsImpl | null) => {
-    if (!instance) return
+    if (!instance) return;
     const onStart = () => {
-      rotatingRef.current = false
-    }
+      rotatingRef.current = false;
+    };
     const onEnd = () => {
-      rotatingRef.current = true
-    }
-    instance.addEventListener('controlstart', onStart)
-    instance.addEventListener('controlend', onEnd)
+      rotatingRef.current = true;
+    };
+    instance.addEventListener('controlstart', onStart);
+    instance.addEventListener('controlend', onEnd);
     return () => {
-      instance.removeEventListener('controlstart', onStart)
-      instance.removeEventListener('controlend', onEnd)
-    }
-  }, [])
+      instance.removeEventListener('controlstart', onStart);
+      instance.removeEventListener('controlend', onEnd);
+    };
+  }, []);
 
   return (
     <Canvas
@@ -90,5 +90,5 @@ export default function Backdrop() {
       <Portals rotatingRef={rotatingRef} />
       <DemoHelpers target={[0, 1, 0]} controlsRef={setControls} />
     </Canvas>
-  )
+  );
 }

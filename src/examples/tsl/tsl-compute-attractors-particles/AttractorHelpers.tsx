@@ -2,21 +2,21 @@
 // plane) + cone arrow (spin direction) per attractor, oriented along its fixed
 // rotation axis. Pure declarative JSX — the original builds the same meshes
 // imperatively and hangs TransformControls off them (see entry DIVERGENCE).
-import { useMemo } from 'react'
-import { DoubleSide, Quaternion, Vector3 } from 'three/webgpu'
-import { ATTRACTOR_ROTATION_AXES } from './attractors'
+import { useMemo } from 'react';
+import { DoubleSide, Quaternion, Vector3 } from 'three/webgpu';
+import { ATTRACTOR_ROTATION_AXES } from './attractors';
 
 export interface AttractorHelpersProps {
-  positions: readonly { x: number; y: number; z: number }[]
-  visible: boolean
+  positions: readonly { x: number; y: number; z: number }[];
+  visible: boolean;
 }
 
 export function AttractorHelpers({ positions, visible }: AttractorHelpersProps) {
   // Axes are fixed, so the orientation quaternions are build-once.
   const quaternions = useMemo(() => {
-    const up = new Vector3(0, 1, 0)
-    return ATTRACTOR_ROTATION_AXES.map((axis) => new Quaternion().setFromUnitVectors(up, axis))
-  }, [])
+    const up = new Vector3(0, 1, 0);
+    return ATTRACTOR_ROTATION_AXES.map((axis) => new Quaternion().setFromUnitVectors(up, axis));
+  }, []);
 
   return (
     <group visible={visible}>
@@ -35,5 +35,5 @@ export function AttractorHelpers({ positions, visible }: AttractorHelpersProps) 
         </group>
       ))}
     </group>
-  )
+  );
 }

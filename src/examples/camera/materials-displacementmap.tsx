@@ -45,31 +45,31 @@
  * - DemoHelpers grid disabled (`grid={false}`) — the original scene is a single mesh
  *   floating in a colored-light void with no ground plane.
  */
-import { Suspense, useLayoutEffect, useMemo, useRef, type RefObject } from 'react'
-import { OBJLoader } from 'three/addons/loaders/OBJLoader.js'
-import { DoubleSide, PointLight } from 'three/webgpu'
-import type { BufferGeometry, Mesh, OrthographicCamera as OrthographicCameraType } from 'three/webgpu'
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu'
-import { OrthographicCamera, useCubeTexture, useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { DoubleSide, PointLight } from 'three/webgpu';
+import type { BufferGeometry, Mesh, OrthographicCamera as OrthographicCameraType } from 'three/webgpu';
+import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber/webgpu';
+import { OrthographicCamera, useCubeTexture, useTexture } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const NINJA_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/obj/ninja/'
-const NINJA_OBJ_URL = `${NINJA_PATH}ninjaHead_Low.obj`
-const NORMAL_URL = `${NINJA_PATH}normal.png`
-const AO_URL = `${NINJA_PATH}ao.jpg`
-const DISPLACEMENT_URL = `${NINJA_PATH}displacement.jpg`
+const NINJA_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/obj/ninja/';
+const NINJA_OBJ_URL = `${NINJA_PATH}ninjaHead_Low.obj`;
+const NORMAL_URL = `${NINJA_PATH}normal.png`;
+const AO_URL = `${NINJA_PATH}ao.jpg`;
+const DISPLACEMENT_URL = `${NINJA_PATH}displacement.jpg`;
 
-const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/SwedishRoyalCastle/'
-const CUBE_FILES = ['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg']
+const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/SwedishRoyalCastle/';
+const CUBE_FILES = ['px.jpg', 'nx.jpg', 'py.jpg', 'ny.jpg', 'pz.jpg', 'nz.jpg'];
 
 // Half-height (world units) of the orthographic frustum — the original's `height`
 // variable. See header DEMONSTRATES for how this is turned into a resize-stable zoom.
-const FRUSTUM_HALF_HEIGHT = 500
+const FRUSTUM_HALF_HEIGHT = 500;
 
 // rad/s for the orbiting red point light — delta-scaled replacement for the original's
 // fixed `r += 0.01` per rendered frame, see header DIVERGENCE.
-const ORBIT_SPEED = 0.6
+const ORBIT_SPEED = 0.6;
 
 // Keeps the orthographic frustum's visible height pinned to `2 * FRUSTUM_HALF_HEIGHT`
 // world units regardless of viewport size — see header DEMONSTRATES.
@@ -77,33 +77,33 @@ function OrthographicFraming() {
   // useThree's `camera` types as the base Camera union even on an `orthographic`
   // Canvas — cast is safe here since this component only mounts under one (same
   // family as the RootState renderer union cast documented in AGENTS.md, B9).
-  const camera = useThree((s) => s.camera) as OrthographicCameraType
-  const size = useThree((s) => s.size)
+  const camera = useThree((s) => s.camera) as OrthographicCameraType;
+  const size = useThree((s) => s.size);
 
   useLayoutEffect(() => {
-    camera.zoom = size.height / (2 * FRUSTUM_HALF_HEIGHT)
-    camera.updateProjectionMatrix()
-  }, [camera, size])
+    camera.zoom = size.height / (2 * FRUSTUM_HALF_HEIGHT);
+    camera.updateProjectionMatrix();
+  }, [camera, size]);
 
-  return null
+  return null;
 }
 
 interface OrbitingLightProps {
-  lightRef: RefObject<PointLight | null>
+  lightRef: RefObject<PointLight | null>;
 }
 
 // The scene's main light source, orbiting the mesh on the XZ plane — ported directly
 // from the original's `render()`, delta-scaled (see header DIVERGENCE).
 function OrbitingLight({ lightRef }: OrbitingLightProps) {
   useFrame((state) => {
-    const light = lightRef.current
-    if (!light) return
-    const r = state.elapsed * ORBIT_SPEED
-    light.position.x = 2500 * Math.cos(r)
-    light.position.z = 2500 * Math.sin(r)
-  })
+    const light = lightRef.current;
+    if (!light) return;
+    const r = state.elapsed * ORBIT_SPEED;
+    light.position.x = 2500 * Math.cos(r);
+    light.position.z = 2500 * Math.sin(r);
+  });
 
-  return <pointLight ref={lightRef} color="#ff0000" intensity={1.5} distance={0} decay={0} position={[0, 0, 2500]} />
+  return <pointLight ref={lightRef} color="#ff0000" intensity={1.5} distance={0} decay={0} position={[0, 0, 2500]} />;
 }
 
 // The ninja head mesh: a plain `OBJLoader` geometry (no material/scene metadata, same
@@ -122,25 +122,25 @@ function NinjaHead() {
         normalScale: { value: 1.0, min: -1, max: 1 },
       }),
     },
-  )
+  );
 
-  const obj = useLoader(OBJLoader, NINJA_OBJ_URL)
+  const obj = useLoader(OBJLoader, NINJA_OBJ_URL);
   const { normalMap, aoMap, displacementMap } = useTexture({
     normalMap: NORMAL_URL,
     aoMap: AO_URL,
     displacementMap: DISPLACEMENT_URL,
-  })
-  const envMap = useCubeTexture(CUBE_FILES, { path: CUBE_PATH })
+  });
+  const envMap = useCubeTexture(CUBE_FILES, { path: CUBE_PATH });
 
   // `.center()` mutates the loaded geometry in place; doing it in `useMemo` (render
   // phase, before the mesh's first paint) rather than an effect avoids the
   // "imperative mesh setup racing the first WebGPU render" pitfall documented in
   // AGENTS.md (morphtargets' `useLayoutEffect` rule) — this runs even earlier.
   const geometry = useMemo(() => {
-    const geo = (obj.children[0] as Mesh).geometry as BufferGeometry
-    geo.center()
-    return geo
-  }, [obj])
+    const geo = (obj.children[0] as Mesh).geometry as BufferGeometry;
+    geo.center();
+    return geo;
+  }, [obj]);
 
   return (
     <mesh geometry={geometry} scale={25}>
@@ -160,17 +160,17 @@ function NinjaHead() {
         envMapIntensity={envMapIntensity}
       />
     </mesh>
-  )
+  );
 }
 
 export default function MaterialsDisplacementmap() {
-  const lightRef = useRef<PointLight>(null)
+  const lightRef = useRef<PointLight>(null);
 
   const { ambientIntensity } = useControls('materials-displacementmap', {
     lighting: folder({
       ambientIntensity: { value: 0.2, min: 0, max: 1 },
     }),
-  })
+  });
 
   return (
     <Canvas renderer>
@@ -187,5 +187,5 @@ export default function MaterialsDisplacementmap() {
       </Suspense>
       <DemoHelpers grid={false} />
     </Canvas>
-  )
+  );
 }

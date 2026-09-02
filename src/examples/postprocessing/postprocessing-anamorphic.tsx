@@ -17,7 +17,7 @@
  * - Driving `bloom()`'s own `.strength`/`.radius`/`.threshold` fields from leva by
  *   assigning `useUniforms` nodes onto them before the shader compiles
  */
-import { useLayoutEffect, useMemo } from 'react'
+import { useLayoutEffect, useMemo } from 'react';
 import {
   Fn,
   Loop,
@@ -37,7 +37,7 @@ import {
   vec3,
   vec4,
   viewportSize,
-} from 'three/tsl'
+} from 'three/tsl';
 import {
   Color,
   IcosahedronGeometry,
@@ -46,91 +46,91 @@ import {
   MirroredRepeatWrapping,
   NeutralToneMapping,
   Object3D,
-} from 'three/webgpu'
-import type { Node } from 'three/webgpu'
-import { bloom } from 'three/addons/tsl/display/BloomNode.js'
-import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+} from 'three/webgpu';
+import type { Node } from 'three/webgpu';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+import { Canvas, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const SPHERE_COUNT = 200
+const SPHERE_COUNT = 200;
 
 //* Scene =========================================================
 
 // Radial gradient backdrop — a shader, not a texture.
 const gradientBackgroundNode = Fn(() => {
-  const dist = screenUV.distance(0.5).mul(2.0)
-  return mix(color(0x111111), color(0x000000), dist)
-})()
+  const dist = screenUV.distance(0.5).mul(2.0);
+  return mix(color(0x111111), color(0x000000), dist);
+})();
 
 function SceneBackground() {
-  const scene = useThree((s) => s.scene)
+  const scene = useThree((s) => s.scene);
 
   // `scene.backgroundNode` is duck-typed by the WebGPU renderer but not declared on
   // `@types/three`'s `Scene` (AGENTS.md B11). Set in a layout effect — read at
   // first-render shader-graph build time.
   useLayoutEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    withBackgroundNode.backgroundNode = gradientBackgroundNode
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    withBackgroundNode.backgroundNode = gradientBackgroundNode;
     return () => {
-      withBackgroundNode.backgroundNode = null
-    }
-  }, [scene])
+      withBackgroundNode.backgroundNode = null;
+    };
+  }, [scene]);
 
-  return null
+  return null;
 }
 
-const dummy = new Object3D()
+const dummy = new Object3D();
 
 // Custom high-pass: `rtt()` renders the bright-pass once, then a falloff-weighted
 // `Loop()` blurs it horizontally only — the anamorphic streak, ported from the
 // original's inline `highPassFn` override. Untyped `Record<string, unknown>` param:
 // fiber's `three/tsl` `Fn` overloads don't cover object-destructured params (B21).
 const anamorphicHighPass = Fn((inputs: Record<string, unknown>) => {
-  const input = inputs.input as Node<'vec4'>
-  const threshold = inputs.threshold as Node<'float'>
-  const smoothWidth = inputs.smoothWidth as Node<'float'>
-  const samples = uniform(80)
+  const input = inputs.input as Node<'vec4'>;
+  const threshold = inputs.threshold as Node<'float'>;
+  const smoothWidth = inputs.smoothWidth as Node<'float'>;
+  const samples = uniform(80);
 
-  const v = luminance(input.rgb)
-  const alpha = smoothstep(threshold, threshold.add(smoothWidth), v)
+  const v = luminance(input.rgb);
+  const alpha = smoothstep(threshold, threshold.add(smoothWidth), v);
   const brightPass = rtt(mix(vec4(0), input, alpha), null, null, {
     wrapS: MirroredRepeatWrapping,
     wrapT: MirroredRepeatWrapping,
-  })
+  });
 
-  const total = vec4(0).toVar()
-  const halfSamples = samples.div(2)
-  const invSize = vec2(1.0).div(viewportSize)
+  const total = vec4(0).toVar();
+  const halfSamples = samples.div(2);
+  const invSize = vec2(1.0).div(viewportSize);
 
   Loop({ start: halfSamples.negate(), end: halfSamples }, ({ i }) => {
-    let softness = float(i).abs().div(halfSamples).oneMinus()
-    softness = softness.pow(2.0)
+    let softness = float(i).abs().div(halfSamples).oneMinus();
+    softness = softness.pow(2.0);
 
-    const shiftedUV = vec2(uv().x.add(invSize.x.mul(i).mul(4.0)), uv().y)
-    total.addAssign(brightPass.sample(shiftedUV).mul(softness))
-  })
+    const shiftedUV = vec2(uv().x.add(invSize.x.mul(i).mul(4.0)), uv().y);
+    total.addAssign(brightPass.sample(shiftedUV).mul(softness));
+  });
 
-  return total.div(samples.div(3.0))
-})
+  return total.div(samples.div(3.0));
+});
 
 function InstancedSpheres() {
   const { timeScale } = useControls('Anamorphic', {
     timeScale: { value: 0.5, min: 0, max: 1, step: 0.01 },
-  })
-  const uniforms = useUniforms({ timeScale })
+  });
+  const uniforms = useUniforms({ timeScale });
 
-  const geometry = useMemo(() => new IcosahedronGeometry(0.1, 3), [])
+  const geometry = useMemo(() => new IcosahedronGeometry(0.1, 3), []);
 
   const material = useMemo(() => {
-    const mat = new MeshBasicNodeMaterial({ color: 0xffffff })
+    const mat = new MeshBasicNodeMaterial({ color: 0xffffff });
     // instanceIndex as a per-instance phase offset, animated fully GPU-side.
     mat.positionNode = positionLocal.add(
       vec3(0, time.add(instanceIndex.toFloat().mul(0.5)).mul(uniforms.timeScale).sin().mul(5.0), 0),
-    )
-    return mat
-  }, [uniforms.timeScale])
+    );
+    return mat;
+  }, [uniforms.timeScale]);
 
   return (
     <instancedMesh
@@ -138,21 +138,21 @@ function InstancedSpheres() {
       // positionNode relocates instances outside the geometry's bounds (tsl-galaxy pattern).
       frustumCulled={false}
       ref={(mesh: InstancedMesh | null) => {
-        if (!mesh) return
-        const colorObj = new Color()
-        const rand = () => (Math.random() - 0.5) * 20
+        if (!mesh) return;
+        const colorObj = new Color();
+        const rand = () => (Math.random() - 0.5) * 20;
         for (let i = 0; i < SPHERE_COUNT; i++) {
-          dummy.position.set(rand(), rand(), rand())
-          dummy.updateMatrix()
-          mesh.setMatrixAt(i, dummy.matrix)
-          colorObj.setHex(Math.random() * 0xffffff)
-          mesh.setColorAt(i, colorObj)
+          dummy.position.set(rand(), rand(), rand());
+          dummy.updateMatrix();
+          mesh.setMatrixAt(i, dummy.matrix);
+          colorObj.setHex(Math.random() * 0xffffff);
+          mesh.setColorAt(i, colorObj);
         }
-        mesh.instanceMatrix.needsUpdate = true
-        if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true
+        mesh.instanceMatrix.needsUpdate = true;
+        if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
       }}
     />
-  )
+  );
 }
 
 //* Post-processing ===============================================
@@ -163,26 +163,26 @@ function PostFX() {
     threshold: { value: 0.3, min: 0, max: 0.9, step: 0.01 },
     tintColor: { value: '#7a8aff' },
     radius: { value: 0.0, min: 0, max: 1, step: 0.01 },
-  })
-  const uniforms = useUniforms({ intensity, threshold, tintColor, radius })
+  });
+  const uniforms = useUniforms({ intensity, threshold, tintColor, radius });
 
   useRenderPipeline(({ renderPipeline, passes }) => {
-    const scenePassColor = passes.scenePass.getTextureNode()
-    const bloomPass = bloom(scenePassColor)
+    const scenePassColor = passes.scenePass.getTextureNode();
+    const bloomPass = bloom(scenePassColor);
     // bloom() builds its own uniforms; swap ours in before the shader compiles.
-    bloomPass.strength = uniforms.intensity
-    bloomPass.radius = uniforms.radius
-    bloomPass.threshold = uniforms.threshold
-    bloomPass.setResolutionScale(0.25)
+    bloomPass.strength = uniforms.intensity;
+    bloomPass.radius = uniforms.radius;
+    bloomPass.threshold = uniforms.threshold;
+    bloomPass.setResolutionScale(0.25);
 
     // `highPassFn`'s declared type is `(params) => void`; the runtime (and the
     // addon's own default) returns a Node — documented @types gap, cast once.
-    bloomPass.highPassFn = anamorphicHighPass as unknown as typeof bloomPass.highPassFn
+    bloomPass.highPassFn = anamorphicHighPass as unknown as typeof bloomPass.highPassFn;
 
-    renderPipeline.outputNode = scenePassColor.add(bloomPass.mul(uniforms.tintColor))
-  })
+    renderPipeline.outputNode = scenePassColor.add(bloomPass.mul(uniforms.tintColor));
+  });
 
-  return null
+  return null;
 }
 
 export default function PostprocessingAnamorphic() {
@@ -196,5 +196,5 @@ export default function PostprocessingAnamorphic() {
       <PostFX />
       <DemoHelpers grid={false} minDistance={2} maxDistance={25} />
     </Canvas>
-  )
+  );
 }

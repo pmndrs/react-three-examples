@@ -68,8 +68,8 @@
  *   change at rest. The compute-in-`geometryNode` dispatch is still live every frame
  *   (verified: `__frameCount` advances, no dual-root warnings) — it is idle, not frozen
  */
-import { Suspense, useMemo } from 'react'
-import { Fn, If, attribute, color, instanceIndex, objectWorldMatrix, screenUV, storage, uniform } from 'three/tsl'
+import { Suspense, useMemo } from 'react';
+import { Fn, If, attribute, color, instanceIndex, objectWorldMatrix, screenUV, storage, uniform } from 'three/tsl';
 import {
   MeshNormalNodeMaterial,
   NoToneMapping,
@@ -78,35 +78,35 @@ import {
   type BufferAttribute,
   type Mesh,
   type Node,
-} from 'three/webgpu'
-import { Canvas, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/webgpu';
+import { Canvas, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu';
+import { useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const ASSETS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples'
-const MODEL_URL = `${ASSETS}/models/gltf/LeePerrySmith/LeePerrySmith.glb`
+const ASSETS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples';
+const MODEL_URL = `${ASSETS}/models/gltf/LeePerrySmith/LeePerrySmith.glb`;
 
 // scene.backgroundNode cast — @types/three's Scene doesn't declare it even though the
 // webgpu renderer reads it directly off the live scene instance (B11 family, same
 // pattern as backdrop-area's SceneBackground). Purple radial-vignette gradient, ported
 // verbatim from the original's init().
 function SceneBackground() {
-  const scene = useThree((s) => s.scene)
+  const scene = useThree((s) => s.scene);
 
   useMemo(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null }
-    const bgColor = screenUV.y.mix(color(0x9f87f7), color(0xf2cdcd))
-    const bgVignette = screenUV.distance(0.5).remapClamp(0.3, 0.8).oneMinus()
-    const bgIntensity = 4
-    withBackgroundNode.backgroundNode = bgColor.mul(bgVignette.mul(color(0xa78ff6).mul(bgIntensity)))
-  }, [scene])
+    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const bgColor = screenUV.y.mix(color(0x9f87f7), color(0xf2cdcd));
+    const bgVignette = screenUV.distance(0.5).remapClamp(0.3, 0.8).oneMinus();
+    const bgIntensity = 4;
+    withBackgroundNode.backgroundNode = bgColor.mul(bgVignette.mul(color(0xa78ff6).mul(bgIntensity)));
+  }, [scene]);
 
-  return null
+  return null;
 }
 
 function JellyHead() {
-  const renderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer);
 
   //* Controls =====================================================
   const { elasticity, damping, brushSize, brushStrength } = useControls('compute-geometry', {
@@ -114,95 +114,95 @@ function JellyHead() {
     damping: { value: 0.94, min: 0.9, max: 0.98, step: 0.01 },
     brushSize: { value: 0.25, min: 0.1, max: 0.5, step: 0.01, label: 'brush size' },
     brushStrength: { value: 0.22, min: 0.1, max: 0.3, step: 0.01, label: 'brush strength' },
-  })
+  });
   // Called BEFORE the suspending useGLTF below (ordering rule, AGENTS.md B18;
   // compute-cloth precedent). WGSL-identifier rule: camelCase scope.
   const { uElasticity, uDamping, uBrushSize, uBrushStrength } = useUniforms(
     { uElasticity: elasticity, uDamping: damping, uBrushSize: brushSize, uBrushStrength: brushStrength },
     'computeGeometry',
-  )
+  );
 
-  const { scene } = useGLTF(MODEL_URL)
-  const mesh = useMemo(() => scene.children[0] as Mesh, [scene])
+  const { scene } = useGLTF(MODEL_URL);
+  const mesh = useMemo(() => scene.children[0] as Mesh, [scene]);
 
   // Plain useMemo, not useNodes: the graph closes over the SUSPENDED mesh/geometry,
   // and nothing here needs the fiber store (same rationale as skinning-points).
   const { material, uPointer } = useMemo(() => {
-    const geometry = mesh.geometry
-    const count = geometry.attributes.position.count
+    const geometry = mesh.geometry;
+    const count = geometry.attributes.position.count;
 
-    const positionBaseAttribute = geometry.attributes.position as BufferAttribute
-    const positionStorageBufferAttribute = new StorageBufferAttribute(count, 3)
-    const speedBufferAttribute = new StorageBufferAttribute(count, 3)
+    const positionBaseAttribute = geometry.attributes.position as BufferAttribute;
+    const positionStorageBufferAttribute = new StorageBufferAttribute(count, 3);
+    const speedBufferAttribute = new StorageBufferAttribute(count, 3);
 
     // The vertex stage reads this attribute BY NAME every frame (see `attribute()`
     // below) — the compute kernel is the only thing that ever writes it.
-    geometry.setAttribute('storagePosition', positionStorageBufferAttribute)
+    geometry.setAttribute('storagePosition', positionStorageBufferAttribute);
 
-    const positionAttribute = storage(positionBaseAttribute, 'vec3', count)
-    const positionStorageAttribute = storage(positionStorageBufferAttribute, 'vec3', count)
-    const speedAttribute = storage(speedBufferAttribute, 'vec3', count)
+    const positionAttribute = storage(positionBaseAttribute, 'vec3', count);
+    const positionStorageAttribute = storage(positionStorageBufferAttribute, 'vec3', count);
+    const speedAttribute = storage(speedBufferAttribute, 'vec3', count);
 
-    const basePosition = positionAttribute.element(instanceIndex)
-    const currentPosition = positionStorageAttribute.element(instanceIndex)
-    const currentSpeed = speedAttribute.element(instanceIndex)
+    const basePosition = positionAttribute.element(instanceIndex);
+    const currentPosition = positionStorageAttribute.element(instanceIndex);
+    const currentSpeed = speedAttribute.element(instanceIndex);
 
     // Mutated imperatively per pointer event, not from React state — a plain TSL
     // uniform, not useUniforms (same rationale as compute-particles' uClickPos). `.w`
     // is the original's "brush active" flag (1 = painting, 0 = idle).
-    const uPointer = uniform(new Vector4(0, 0, 0, 0))
+    const uPointer = uniform(new Vector4(0, 0, 0, 0));
 
     const computeInit = Fn(() => {
-      currentPosition.assign(basePosition)
-    })().compute(count)
+      currentPosition.assign(basePosition);
+    })().compute(count);
 
     const computeUpdate = Fn(() => {
       If(uPointer.w.equal(1), () => {
-        const worldPosition = objectWorldMatrix(mesh).mul(currentPosition)
-        const dist = worldPosition.distance(uPointer.xyz)
-        const direction = uPointer.xyz.sub(worldPosition).normalize()
-        const power = uBrushSize.sub(dist).max(0).mul(uBrushStrength)
+        const worldPosition = objectWorldMatrix(mesh).mul(currentPosition);
+        const dist = worldPosition.distance(uPointer.xyz);
+        const direction = uPointer.xyz.sub(worldPosition).normalize();
+        const power = uBrushSize.sub(dist).max(0).mul(uBrushStrength);
 
-        currentPosition.addAssign(direction.mul(power))
-      })
+        currentPosition.addAssign(direction.mul(power));
+      });
 
       // jelly: spring the current position back toward the rest shape
-      const distance = basePosition.distance(currentPosition)
-      const force = uElasticity.mul(distance).mul(basePosition.sub(currentPosition))
+      const distance = basePosition.distance(currentPosition);
+      const force = uElasticity.mul(distance).mul(basePosition.sub(currentPosition));
 
-      currentSpeed.addAssign(force)
-      currentSpeed.mulAssign(uDamping)
-      currentPosition.addAssign(currentSpeed)
-    })().compute(count)
+      currentSpeed.addAssign(force);
+      currentSpeed.mulAssign(uDamping);
+      currentPosition.addAssign(currentSpeed);
+    })().compute(count);
 
-    const material = new MeshNormalNodeMaterial()
+    const material = new MeshNormalNodeMaterial();
     // The zero-arg Fn idiom (see header DEMONSTRATES) — geometryNode auto-dispatches
     // this compute before every draw, no useFrame/renderer.compute() call needed here.
-    material.geometryNode = computeUpdate
-    material.positionNode = attribute('storagePosition')
+    material.geometryNode = computeUpdate;
+    material.positionNode = attribute('storagePosition');
 
     // ONCE, dispatched SYNCHRONOUSLY here — not in an effect. See header UPSTREAM
     // FINDING: geometryNode auto-dispatches computeUpdate on the very FIRST rendered
     // frame, and even useLayoutEffect (fires before paint) loses that race in
     // practice. Seeding inline, before this useMemo returns, is the only timing that
     // reliably lands before the first auto-dispatch.
-    renderer.compute(computeInit)
+    renderer.compute(computeInit);
 
-    return { material, uPointer }
-  }, [mesh, renderer, uElasticity, uDamping, uBrushSize, uBrushStrength])
+    return { material, uPointer };
+  }, [mesh, renderer, uElasticity, uDamping, uBrushSize, uBrushStrength]);
 
   const onPointerMove = (event: ThreeEvent<PointerEvent>) => {
-    uPointer.value.set(event.point.x, event.point.y, event.point.z, 1)
-  }
+    uPointer.value.set(event.point.x, event.point.y, event.point.z, 1);
+  };
   const onPointerLeave = () => {
-    uPointer.value.w = 0
-  }
+    uPointer.value.w = 0;
+  };
 
   return (
     <primitive object={mesh} scale={0.1} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
       <primitive object={material} attach="material" />
     </primitive>
-  )
+  );
 }
 
 export default function ComputeGeometry() {
@@ -221,5 +221,5 @@ export default function ComputeGeometry() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={0.7} maxDistance={2} />
     </Canvas>
-  )
+  );
 }

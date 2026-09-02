@@ -33,7 +33,7 @@
  *   with the WebGPURenderer default, and fiber's ACESFilmic default would mute the
  *   unlit blue/orange point palette
  */
-import { Suspense, useEffect, useLayoutEffect, useMemo } from 'react'
+import { Suspense, useEffect, useLayoutEffect, useMemo } from 'react';
 import {
   Fn,
   color,
@@ -43,19 +43,19 @@ import {
   mix,
   objectWorldMatrix,
   shapeCircle,
-} from 'three/tsl'
-import { NoToneMapping } from 'three/webgpu'
-import type { Node, Renderer, SkinnedMesh } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useAnimations, useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/tsl';
+import { NoToneMapping } from 'three/webgpu';
+import type { Node, Renderer, SkinnedMesh } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { useAnimations, useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb'
+const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb';
 
 // The original's x100 blow-up. The speed->color/size constants below are tuned for
 // world deltas at this scale — keep them together.
-const MODEL_SCALE = 100
+const MODEL_SCALE = 100;
 
 // One point cloud per skinned mesh: n instanced quads whose positions live in a GPU
 // storage buffer that the material's own positionNode-compute rewrites every frame.
@@ -64,19 +64,19 @@ function SkinnedMeshPoints({ mesh }: { mesh: SkinnedMesh }) {
   // mesh), and creator-store writes deferred past a suspension are the B18 hazard —
   // nothing here needs the fiber store, three-side nodes work fine.
   const { count, positionNode, colorNode, sizeNode, opacityNode } = useMemo(() => {
-    const count = mesh.geometry.getAttribute('position').count
+    const count = mesh.geometry.getAttribute('position').count;
 
     // Current world position + last-frame delta, one vec3 each per source vertex.
-    const pointPositions = instancedArray(count, 'vec3').setPBO(true)
-    const pointSpeeds = instancedArray(count, 'vec3').setPBO(true)
+    const pointPositions = instancedArray(count, 'vec3').setPBO(true);
+    const pointSpeeds = instancedArray(count, 'vec3').setPBO(true);
 
-    const speedAttribute = pointSpeeds.toAttribute()
+    const speedAttribute = pointSpeeds.toAttribute();
 
     // Cast: @types/three declares computeSkinning as returning void, but at runtime
     // it returns the skinned geometry-space position node (its own jsdoc says
     // {Node<vec3>}) — B10/B11-family typing gap, verified against
     // src/nodes/accessors/Skinning.js.
-    const skinnedPosition = computeSkinning(mesh) as unknown as Node<'vec3'>
+    const skinnedPosition = computeSkinning(mesh) as unknown as Node<'vec3'>;
 
     // The update: skin -> world space, diff against the stored position for speed,
     // store both. The original wraps this in `Fn(..., 'void')` and calls it as a TSL
@@ -86,14 +86,14 @@ function SkinnedMeshPoints({ mesh }: { mesh: SkinnedMesh }) {
     // into whichever kernel calls it (void TSL Fns are build-time inlined anyway;
     // identical node graph, no typing gap).
     const emitPointUpdate = () => {
-      const pointPosition = pointPositions.element(instanceIndex)
-      const pointSpeed = pointSpeeds.element(instanceIndex)
+      const pointPosition = pointPositions.element(instanceIndex);
+      const pointSpeed = pointSpeeds.element(instanceIndex);
 
-      const skinnedWorldPosition = objectWorldMatrix(mesh).mul(skinnedPosition)
+      const skinnedWorldPosition = objectWorldMatrix(mesh).mul(skinnedPosition);
 
-      pointSpeed.assign(skinnedWorldPosition.sub(pointPosition))
-      pointPosition.assign(skinnedWorldPosition)
-    }
+      pointSpeed.assign(skinnedWorldPosition.sub(pointPosition));
+      pointPosition.assign(skinnedWorldPosition);
+    };
 
     return {
       count,
@@ -103,17 +103,17 @@ function SkinnedMeshPoints({ mesh }: { mesh: SkinnedMesh }) {
       // pre-first-frame dispatch (its renderer arg makes useThree unnecessary —
       // param annotated, the chained onInit types it away).
       positionNode: Fn(() => {
-        emitPointUpdate()
+        emitPointUpdate();
 
-        return pointPositions.toAttribute()
+        return pointPositions.toAttribute();
       })()
         .compute(count)
         .onInit(({ renderer }: { renderer: Renderer }) => {
           renderer.compute(
             Fn(() => {
-              emitPointUpdate()
+              emitPointUpdate();
             })().compute(count),
-          )
+          );
         }),
       // Verbatim original graph: the chained `speed.mul(0.6).mix(blue, orange)` maps
       // to mixElement — the NODE is the mix FACTOR: mix(blue, orange, speed * 0.6)
@@ -123,8 +123,8 @@ function SkinnedMeshPoints({ mesh }: { mesh: SkinnedMesh }) {
       colorNode: mix(color(0x0066ff), color(0xff9000), speedAttribute.mul(0.6) as unknown as Node<'float'>),
       sizeNode: speedAttribute.length().exp().min(5).mul(5).add(1),
       opacityNode: shapeCircle(),
-    }
-  }, [mesh])
+    };
+  }, [mesh]);
 
   return (
     // positionNode fully relocates the unit quad into world space — three's CPU-side
@@ -139,7 +139,7 @@ function SkinnedMeshPoints({ mesh }: { mesh: SkinnedMesh }) {
         alphaTest={0.5}
       />
     </sprite>
-  )
+  );
 }
 
 function MichellePoints() {
@@ -147,35 +147,35 @@ function MichellePoints() {
     timeScale: { value: 1, min: 0, max: 2 },
     paused: false,
     showSource: false,
-  })
+  });
 
-  const { scene, animations } = useGLTF(MICHELLE_URL)
-  const { actions, mixer } = useAnimations(animations, scene)
+  const { scene, animations } = useGLTF(MICHELLE_URL);
+  const { actions, mixer } = useAnimations(animations, scene);
 
   // BY NAME: Michelle.glb ships SambaDance AND a TPose utility clip (corpus rule —
   // never play Object.values(actions) blindly).
   useEffect(() => {
-    actions.SambaDance?.play()
-  }, [actions])
+    actions.SambaDance?.play();
+  }, [actions]);
 
   useEffect(() => {
-    mixer.timeScale = paused ? 0 : timeScale
-  }, [mixer, paused, timeScale])
+    mixer.timeScale = paused ? 0 : timeScale;
+  }, [mixer, paused, timeScale]);
 
   const skinnedMeshes = useMemo(() => {
-    const meshes: SkinnedMesh[] = []
+    const meshes: SkinnedMesh[] = [];
     scene.traverse((child) => {
-      if ((child as SkinnedMesh).isSkinnedMesh) meshes.push(child as SkinnedMesh)
-    })
-    return meshes
-  }, [scene])
+      if ((child as SkinnedMesh).isSkinnedMesh) meshes.push(child as SkinnedMesh);
+    });
+    return meshes;
+  }, [scene]);
 
   // Hide the source mesh before the first render (layout, not passive — no one-frame
   // flash of the rasterized model). The mixer still animates its skeleton, which is
   // all computeSkinning reads.
   useLayoutEffect(() => {
-    for (const mesh of skinnedMeshes) mesh.visible = showSource
-  }, [skinnedMeshes, showSource])
+    for (const mesh of skinnedMeshes) mesh.visible = showSource;
+  }, [skinnedMeshes, showSource]);
 
   return (
     <>
@@ -184,7 +184,7 @@ function MichellePoints() {
         <SkinnedMeshPoints key={mesh.uuid} mesh={mesh} />
       ))}
     </>
-  )
+  );
 }
 
 export default function SkinningPoints() {
@@ -201,5 +201,5 @@ export default function SkinningPoints() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 85, 0]} minDistance={40} maxDistance={900} />
     </Canvas>
-  )
+  );
 }

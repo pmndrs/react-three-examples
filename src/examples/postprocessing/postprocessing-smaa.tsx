@@ -14,75 +14,75 @@
  * - A wireframe box (thin diagonal edges) next to a textured box (high-frequency
  *   detail) — the two aliasing cases SMAA is built to smooth
  */
-import { Suspense, useEffect, useMemo, useRef } from 'react'
-import { BoxGeometry, MeshBasicMaterial, NoToneMapping, SRGBColorSpace } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
-import { smaa } from 'three/addons/tsl/display/SMAANode.js'
-import { Canvas, useFrame, useRenderPipeline } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
+import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { BoxGeometry, MeshBasicMaterial, NoToneMapping, SRGBColorSpace } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
+import { smaa } from 'three/addons/tsl/display/SMAANode.js';
+import { Canvas, useFrame, useRenderPipeline } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const BRICK_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/brick_diffuse.jpg'
+const BRICK_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/brick_diffuse.jpg';
 
 //* Scene =========================================================
 
 // A wireframe box (thin diagonal edges) and a brick-textured box (high-frequency
 // detail) side by side — the two aliasing cases SMAA is built to smooth.
 function Boxes() {
-  const { autoRotate } = useControls('SMAA', { autoRotate: true })
-  const wireRef = useRef<Mesh>(null)
-  const texRef = useRef<Mesh>(null)
+  const { autoRotate } = useControls('SMAA', { autoRotate: true });
+  const wireRef = useRef<Mesh>(null);
+  const texRef = useRef<Mesh>(null);
 
-  const geometry = useMemo(() => new BoxGeometry(120, 120, 120), [])
-  const wireMaterial = useMemo(() => new MeshBasicMaterial({ color: 0xffffff, wireframe: true }), [])
+  const geometry = useMemo(() => new BoxGeometry(120, 120, 120), []);
+  const wireMaterial = useMemo(() => new MeshBasicMaterial({ color: 0xffffff, wireframe: true }), []);
 
-  const brickTexture = useTexture(BRICK_URL)
+  const brickTexture = useTexture(BRICK_URL);
   const texMaterial = useMemo(() => {
-    brickTexture.colorSpace = SRGBColorSpace
-    return new MeshBasicMaterial({ map: brickTexture })
-  }, [brickTexture])
+    brickTexture.colorSpace = SRGBColorSpace;
+    return new MeshBasicMaterial({ map: brickTexture });
+  }, [brickTexture]);
 
   useFrame(({ delta }) => {
-    if (!autoRotate) return
+    if (!autoRotate) return;
     for (const ref of [wireRef, texRef]) {
-      const mesh = ref.current
-      if (!mesh) continue
-      mesh.rotation.x += 0.3 * delta
-      mesh.rotation.y += 0.6 * delta
+      const mesh = ref.current;
+      if (!mesh) continue;
+      mesh.rotation.x += 0.3 * delta;
+      mesh.rotation.y += 0.6 * delta;
     }
-  })
+  });
 
   return (
     <>
       <mesh ref={wireRef} geometry={geometry} material={wireMaterial} position={[-100, 0, 0]} />
       <mesh ref={texRef} geometry={geometry} material={texMaterial} position={[100, 0, 0]} />
     </>
-  )
+  );
 }
 
 //* Post-processing ===============================================
 
 function SMAAPipeline() {
-  const { enabled } = useControls('SMAA', { enabled: true })
+  const { enabled } = useControls('SMAA', { enabled: true });
   const { renderPipeline, passes } = useRenderPipeline(({ renderPipeline, passes }) => {
-    const scenePassColor = passes.scenePass.getTextureNode()
-    const smaaPass = smaa(scenePassColor)
-    renderPipeline.outputNode = smaaPass
+    const scenePassColor = passes.scenePass.getTextureNode();
+    const smaaPass = smaa(scenePassColor);
+    renderPipeline.outputNode = smaaPass;
 
-    return { smaaPass }
-  })
+    return { smaaPass };
+  });
 
   useEffect(() => {
-    const smaaPass = passes.smaaPass as ReturnType<typeof smaa> | undefined
-    const scenePass = passes.scenePass
-    if (!renderPipeline || !smaaPass || !scenePass) return
-    renderPipeline.outputNode = enabled ? smaaPass : scenePass.getTextureNode()
-    renderPipeline.needsUpdate = true
-  }, [renderPipeline, passes, enabled])
+    const smaaPass = passes.smaaPass as ReturnType<typeof smaa> | undefined;
+    const scenePass = passes.scenePass;
+    if (!renderPipeline || !smaaPass || !scenePass) return;
+    renderPipeline.outputNode = enabled ? smaaPass : scenePass.getTextureNode();
+    renderPipeline.needsUpdate = true;
+  }, [renderPipeline, passes, enabled]);
 
-  return null
+  return null;
 }
 
 export default function PostprocessingSmaa() {
@@ -102,5 +102,5 @@ export default function PostprocessingSmaa() {
       </Suspense>
       <DemoHelpers grid={false} maxDistance={900} />
     </Canvas>
-  )
+  );
 }

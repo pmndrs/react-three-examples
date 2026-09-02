@@ -56,15 +56,15 @@
  * - `WebGPU.isAvailable()` guard, Inspector wiring and `.toInspector()` tags,
  *   `.setName()` kernel labels (fiber names store nodes by key) dropped
  */
-import { useRef } from 'react'
-import { ACESFilmicToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import type CameraControlsImpl from 'camera-controls'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { VolumeFire } from './VolumeFire'
+import { useRef } from 'react';
+import { ACESFilmicToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import type CameraControlsImpl from 'camera-controls';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { VolumeFire } from './VolumeFire';
 
 export default function VolumeFireExample() {
-  const cameraControlsRef = useRef<CameraControlsImpl | null>(null)
+  const cameraControlsRef = useRef<CameraControlsImpl | null>(null);
 
   return (
     <Canvas
@@ -78,5 +78,5 @@ export default function VolumeFireExample() {
       <VolumeFire cameraControlsRef={cameraControlsRef} />
       <DemoHelpers grid={false} target={[0, 3.6, 0]} minDistance={2} maxDistance={40} controlsRef={cameraControlsRef} />
     </Canvas>
-  )
+  );
 }

@@ -32,32 +32,32 @@
  * - DemoHelpers grid disabled (flat texture-mapped plane facing the camera, no
  *   ground plane in the original — same rationale as the two sibling texture ports)
  */
-import { Suspense } from 'react'
-import { texture, time, uv } from 'three/tsl'
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas, useLocalNodes, useUniforms } from '@react-three/fiber/webgpu'
-import { useKTX2 } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense } from 'react';
+import { texture, time, uv } from 'three/tsl';
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas, useLocalNodes, useUniforms } from '@react-three/fiber/webgpu';
+import { useKTX2 } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const KTX2_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/spiritedaway.ktx2'
+const KTX2_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/spiritedaway.ktx2';
 // Pinned to the r185 CDN release, same convention as loader-gltf-compressed's
 // BasisU transcoder path (not drei's default drei-assets CDN).
-const BASIS_TRANSCODER_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/jsm/libs/basis/'
-const PLANE_WIDTH = 50
-const PLANE_HEIGHT = 25
+const BASIS_TRANSCODER_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/jsm/libs/basis/';
+const PLANE_WIDTH = 50;
+const PLANE_HEIGHT = 25;
 
 function AnimatedClipPlane() {
   const { layersPerSecond } = useControls('textures-2d-array-compressed', {
     layersPerSecond: { value: 2, min: 0.5, max: 10, step: 0.5, label: 'layers / second' },
-  })
+  });
 
-  const { uLayersPerSecond } = useUniforms({ uLayersPerSecond: layersPerSecond })
+  const { uLayersPerSecond } = useUniforms({ uLayersPerSecond: layersPerSecond });
 
-  const map = useKTX2(KTX2_URL, BASIS_TRANSCODER_PATH)
+  const map = useKTX2(KTX2_URL, BASIS_TRANSCODER_PATH);
   // drei's `useKTX2` types the result's `image` as `unknown` (it can't know what the
   // transcoder produced); a KTX2 array texture's image carries the layer count.
-  const layerCount = (map.image as { depth: number }).depth
+  const layerCount = (map.image as { depth: number }).depth;
 
   // Linear ramp through [0, layerCount) that wraps — the TSL-builtin replacement for
   // the original's JS `Timer` + per-frame `uniform.value = depthStep % 5` (see
@@ -66,14 +66,14 @@ function AnimatedClipPlane() {
   // JS number read once the texture is loaded, embedded as a literal (it never changes).
   const { colorNode } = useLocalNodes(() => ({
     colorNode: texture(map, uv().flipY()).depth(time.mul(uLayersPerSecond).mod(layerCount)),
-  }))
+  }));
 
   return (
     <mesh>
       <planeGeometry args={[PLANE_WIDTH, PLANE_HEIGHT]} />
       <meshBasicNodeMaterial colorNode={colorNode} />
     </mesh>
-  )
+  );
 }
 
 export default function TexturesArray2DCompressed() {
@@ -89,5 +89,5 @@ export default function TexturesArray2DCompressed() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={20} maxDistance={200} />
     </Canvas>
-  )
+  );
 }

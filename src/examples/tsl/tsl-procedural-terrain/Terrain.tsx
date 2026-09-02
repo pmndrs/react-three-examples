@@ -1,7 +1,7 @@
 // Terrain scene role: the TSL-displaced plane (position/normal/color node graph) plus
 // the invisible drag plane that scrolls the noise domain. Everything here needs fiber
 // hooks (`useUniforms`/`useThree`), so it lives inside <Canvas>, not in the page shell.
-import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react'
+import { useEffect, useLayoutEffect, useRef, type RefObject } from 'react';
 import {
   Fn,
   Loop,
@@ -16,20 +16,20 @@ import {
   uniform,
   varying,
   vec3,
-} from 'three/tsl'
-import { Mesh, PlaneGeometry, Vector2, Vector3 } from 'three/webgpu'
+} from 'three/tsl';
+import { Mesh, PlaneGeometry, Vector2, Vector3 } from 'three/webgpu';
 
-import { useThree, useNodes, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
-import type CameraControlsImpl from 'camera-controls'
+import { useThree, useNodes, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
+import type CameraControlsImpl from 'camera-controls';
 
 // The original declares this as a uniform but never exposes it — folded to a constant
 // (see header DIVERGENCE). It's the finite-difference step for normal reconstruction.
-const NORMAL_LOOKUP_SHIFT = 0.01
+const NORMAL_LOOKUP_SHIFT = 0.01;
 
 export interface TerrainProps {
   /** Live camera-controls instance — suspended while dragging the terrain. */
-  controlsRef: RefObject<CameraControlsImpl | null>
+  controlsRef: RefObject<CameraControlsImpl | null>;
 }
 
 export function Terrain({ controlsRef }: TerrainProps) {
@@ -56,7 +56,7 @@ export function Terrain({ controlsRef }: TerrainProps) {
       colorSnow: '#ffffff',
       colorRock: '#bfbd8d',
     }),
-  })
+  });
 
   const {
     uNoiseIterations,
@@ -81,7 +81,7 @@ export function Terrain({ controlsRef }: TerrainProps) {
       uColorRock: colorRock,
     },
     'terrain',
-  )
+  );
 
   // Built once — `useNodes` is create-if-not-exists, and `useUniforms` returns stable
   // node instances across re-renders (leva edits mutate `.value` in place), so this
@@ -90,121 +90,121 @@ export function Terrain({ controlsRef }: TerrainProps) {
     // Drag-driven noise-domain scroll. Plain TSL `uniform()` wrapping a live Vector2
     // (not `useUniforms`): the drag handlers mutate `.value` imperatively and a React
     // re-render must never write it back to its initial value.
-    const uOffset = uniform(new Vector2(0, 0))
+    const uOffset = uniform(new Vector2(0, 0));
 
-    const vNormal = varying(vec3())
-    const vPosition = varying(vec3())
+    const vNormal = varying(vec3());
+    const vPosition = varying(vec3());
 
     const terrainElevation = Fn(([positionIn]) => {
       // Fn's destructured params come back as bare `ShaderNodeObject<Node>` — too loose
       // for typed TSL math (three-side gap, UPSTREAM.md B10).
-      const position = positionIn
+      const position = positionIn;
 
-      const warpedPosition = position.add(uOffset).toVar()
+      const warpedPosition = position.add(uOffset).toVar();
       warpedPosition.addAssign(
         mx_noise_float(warpedPosition.mul(uPositionFrequency).mul(uWarpFrequency), 1, 0).mul(uWarpStrength),
-      )
+      );
 
-      const elevation = float(0).toVar()
+      const elevation = float(0).toVar();
       // Run-time loop: the octave count is a uniform, so the iteration bound must be a
       // TSL `Loop` (a JS `for` here would bake the count at graph build).
       Loop({ type: 'float', start: float(1), end: uNoiseIterations, condition: '<=' }, ({ i }) => {
-        const noiseInput = warpedPosition.mul(uPositionFrequency).mul(i.mul(2)).add(i.mul(987))
-        const noise = mx_noise_float(noiseInput, 1, 0).div(i.add(1).mul(2))
-        elevation.addAssign(noise)
-      })
+        const noiseInput = warpedPosition.mul(uPositionFrequency).mul(i.mul(2)).add(i.mul(987));
+        const noise = mx_noise_float(noiseInput, 1, 0).div(i.add(1).mul(2));
+        elevation.addAssign(noise);
+      });
 
-      const elevationSign = sign(elevation)
-      elevation.assign(elevation.abs().pow(2).mul(elevationSign).mul(uStrength))
+      const elevationSign = sign(elevation);
+      elevation.assign(elevation.abs().pow(2).mul(elevationSign).mul(uStrength));
 
-      return elevation
-    })
+      return elevation;
+    });
 
     const positionNode = Fn(() => {
       // neighbours positions
-      const neighbourA = positionLocal.xyz.add(vec3(NORMAL_LOOKUP_SHIFT, 0.0, 0.0)).toVar()
-      const neighbourB = positionLocal.xyz.add(vec3(0.0, 0.0, -NORMAL_LOOKUP_SHIFT)).toVar()
+      const neighbourA = positionLocal.xyz.add(vec3(NORMAL_LOOKUP_SHIFT, 0.0, 0.0)).toVar();
+      const neighbourB = positionLocal.xyz.add(vec3(0.0, 0.0, -NORMAL_LOOKUP_SHIFT)).toVar();
 
       // elevations
-      const position = positionLocal.xyz.toVar()
-      const elevation = terrainElevation(positionLocal.xz)
-      position.y.addAssign(elevation)
+      const position = positionLocal.xyz.toVar();
+      const elevation = terrainElevation(positionLocal.xz);
+      position.y.addAssign(elevation);
 
-      neighbourA.y.addAssign(terrainElevation(neighbourA.xz))
-      neighbourB.y.addAssign(terrainElevation(neighbourB.xz))
+      neighbourA.y.addAssign(terrainElevation(neighbourA.xz));
+      neighbourB.y.addAssign(terrainElevation(neighbourB.xz));
 
       // compute normal from the neighbour taps (geometry has no normal attribute)
-      const toA = neighbourA.sub(position).normalize()
-      const toB = neighbourB.sub(position).normalize()
-      vNormal.assign(cross(toA, toB))
+      const toA = neighbourA.sub(position).normalize();
+      const toB = neighbourB.sub(position).normalize();
+      vNormal.assign(cross(toA, toB));
 
       // varyings — world-ish position including the drag offset, for the color bands
-      vPosition.assign(position.add(vec3(uOffset.x, 0, uOffset.y)))
+      vPosition.assign(position.add(vec3(uOffset.x, 0, uOffset.y)));
 
-      return position
-    })()
+      return position;
+    })();
 
-    const normalNode = transformNormalToView(vNormal)
+    const normalNode = transformNormalToView(vNormal);
 
     const colorNode = Fn(() => {
-      const finalColor = uColorSand.toVar()
+      const finalColor = uColorSand.toVar();
 
       // grass
-      const grassMix = step(-0.06, vPosition.y)
-      finalColor.assign(grassMix.mix(finalColor, uColorGrass))
+      const grassMix = step(-0.06, vPosition.y);
+      finalColor.assign(grassMix.mix(finalColor, uColorGrass));
 
       // rock — steep faces above the sand line
       const rockMix = step(0.5, dot(vNormal, vec3(0, 1, 0)))
         .oneMinus()
-        .mul(step(-0.06, vPosition.y))
-      finalColor.assign(rockMix.mix(finalColor, uColorRock))
+        .mul(step(-0.06, vPosition.y));
+      finalColor.assign(rockMix.mix(finalColor, uColorRock));
 
       // snow — noisy altitude threshold
-      const snowThreshold = mx_noise_float(vPosition.xz.mul(25), 1, 0).mul(0.1).add(0.45)
-      const snowMix = step(snowThreshold, vPosition.y)
-      finalColor.assign(snowMix.mix(finalColor, uColorSnow))
+      const snowThreshold = mx_noise_float(vPosition.xz.mul(25), 1, 0).mul(0.1).add(0.45);
+      const snowMix = step(snowThreshold, vPosition.y);
+      finalColor.assign(snowMix.mix(finalColor, uColorSnow));
 
-      return finalColor
-    })()
+      return finalColor;
+    })();
 
-    return { positionNode, normalNode, colorNode, uOffset }
-  })
+    return { positionNode, normalNode, colorNode, uOffset };
+  });
 
   // --- drag-to-scroll -----------------------------------------------------------
-  const domElement = useThree((s) => s.renderer.domElement)
-  const dragPlane = useRef<Mesh>(null)
-  const dragging = useRef(false)
-  const prevWorld = useRef(new Vector3())
+  const domElement = useThree((s) => s.renderer.domElement);
+  const dragPlane = useRef<Mesh>(null);
+  const dragging = useRef(false);
+  const prevWorld = useRef(new Vector3());
 
   const onPointerDown = (e: ThreeEvent<PointerEvent>) => {
-    dragging.current = true
-    prevWorld.current.copy(e.point)
+    dragging.current = true;
+    prevWorld.current.copy(e.point);
     // Grow the hit plane 10x for the duration of the drag so a fast pointer can't
     // leave the raycast area mid-gesture (original trick, ported verbatim).
-    dragPlane.current?.scale.setScalar(10)
-    if (controlsRef.current) controlsRef.current.enabled = false
-    domElement.style.cursor = 'grabbing'
-  }
+    dragPlane.current?.scale.setScalar(10);
+    if (controlsRef.current) controlsRef.current.enabled = false;
+    domElement.style.cursor = 'grabbing';
+  };
 
   const onPointerMove = (e: ThreeEvent<PointerEvent>) => {
-    if (!dragging.current) return
-    uOffset.value.x += prevWorld.current.x - e.point.x
-    uOffset.value.y += prevWorld.current.z - e.point.z
-    prevWorld.current.copy(e.point)
-  }
+    if (!dragging.current) return;
+    uOffset.value.x += prevWorld.current.x - e.point.x;
+    uOffset.value.y += prevWorld.current.z - e.point.z;
+    prevWorld.current.copy(e.point);
+  };
 
   // End-of-drag on window: the pointer can be released outside the canvas.
   useEffect(() => {
     const endDrag = () => {
-      if (!dragging.current) return
-      dragging.current = false
-      dragPlane.current?.scale.setScalar(1)
-      if (controlsRef.current) controlsRef.current.enabled = true
-      domElement.style.cursor = 'default'
-    }
-    window.addEventListener('pointerup', endDrag)
-    return () => window.removeEventListener('pointerup', endDrag)
-  }, [controlsRef, domElement])
+      if (!dragging.current) return;
+      dragging.current = false;
+      dragPlane.current?.scale.setScalar(1);
+      if (controlsRef.current) controlsRef.current.enabled = true;
+      domElement.style.cursor = 'default';
+    };
+    window.addEventListener('pointerup', endDrag);
+    return () => window.removeEventListener('pointerup', endDrag);
+  }, [controlsRef, domElement]);
 
   return (
     <>
@@ -228,16 +228,16 @@ export function Terrain({ controlsRef }: TerrainProps) {
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerOver={() => {
-          if (!dragging.current) domElement.style.cursor = 'grab'
+          if (!dragging.current) domElement.style.cursor = 'grab';
         }}
         onPointerOut={() => {
-          if (!dragging.current) domElement.style.cursor = 'default'
+          if (!dragging.current) domElement.style.cursor = 'default';
         }}>
         <planeGeometry args={[10, 10]} />
         <meshBasicMaterial visible={false} />
       </mesh>
     </>
-  )
+  );
 }
 
 /**
@@ -248,18 +248,18 @@ export function Terrain({ controlsRef }: TerrainProps) {
  * data into the standard material.
  */
 function TerrainGeometry() {
-  const geometryRef = useRef<PlaneGeometry>(null)
+  const geometryRef = useRef<PlaneGeometry>(null);
 
   useLayoutEffect(() => {
-    const geometry = geometryRef.current
+    const geometry = geometryRef.current;
     // Fast Refresh keeps the geometry but reruns the effect — prepare only once.
-    if (!geometry || geometry.userData.prepared) return
+    if (!geometry || geometry.userData.prepared) return;
 
-    geometry.userData.prepared = true
-    geometry.deleteAttribute('uv')
-    geometry.deleteAttribute('normal')
-    geometry.rotateX(-Math.PI * 0.5)
-  }, [])
+    geometry.userData.prepared = true;
+    geometry.deleteAttribute('uv');
+    geometry.deleteAttribute('normal');
+    geometry.rotateX(-Math.PI * 0.5);
+  }, []);
 
-  return <planeGeometry args={[10, 10, 500, 500]} ref={geometryRef} />
+  return <planeGeometry args={[10, 10, 500, 500]} ref={geometryRef} />;
 }

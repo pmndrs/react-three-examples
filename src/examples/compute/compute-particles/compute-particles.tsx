@@ -47,9 +47,9 @@
  *   past the ~200-line threshold — split by scene role (page shell vs the compute
  *   pipeline, controls, and sprite field that need fiber hooks inside `<Canvas>`)
  */
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Particles } from './Particles'
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Particles } from './Particles';
 
 export default function ComputeParticles() {
   return (
@@ -57,5 +57,5 @@ export default function ComputeParticles() {
       <Particles />
       <DemoHelpers target={[0, -8, 0]} minDistance={5} maxDistance={200} />
     </Canvas>
-  )
+  );
 }

@@ -38,15 +38,15 @@
  * - Grid disabled — the tornado's own noise floor plate covers the origin and a
  *   grid would slice through it
  */
-import { Suspense } from 'react'
-import { bloom } from 'three/addons/tsl/display/BloomNode.js'
-import { ACESFilmicToneMapping } from 'three/webgpu'
+import { Suspense } from 'react';
+import { bloom } from 'three/addons/tsl/display/BloomNode.js';
+import { ACESFilmicToneMapping } from 'three/webgpu';
 
-import { Canvas, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Tornado } from './Tornado'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Tornado } from './Tornado';
 
 // Scene color + bloom, matching the original's RenderPipeline: the floor's ×3
 // emissive cells and the luminance-normalized core blow past the bloom threshold (1)
@@ -56,20 +56,20 @@ function PostFX() {
   const { bloomStrength, bloomRadius } = useControls('bloom', {
     bloomStrength: { value: 1, min: 0, max: 10, step: 0.01, label: 'strength' },
     bloomRadius: { value: 0.1, min: 0, max: 1, step: 0.01, label: 'radius' },
-  })
-  const uniforms = useUniforms({ bloomStrength, bloomRadius })
+  });
+  const uniforms = useUniforms({ bloomStrength, bloomRadius });
 
   useRenderPipeline(({ renderPipeline, passes }) => {
-    const scenePassColor = passes.scenePass.getTextureNode('output')
-    const bloomPass = bloom(scenePassColor, undefined, undefined, 1)
+    const scenePassColor = passes.scenePass.getTextureNode('output');
+    const bloomPass = bloom(scenePassColor, undefined, undefined, 1);
     // bloom() builds its own uniforms; swap ours in before the shader compiles so
     // leva drives the pass with no pipeline rebuild.
-    bloomPass.strength = uniforms.bloomStrength
-    bloomPass.radius = uniforms.bloomRadius
-    renderPipeline.outputNode = scenePassColor.add(bloomPass)
-  })
+    bloomPass.strength = uniforms.bloomStrength;
+    bloomPass.radius = uniforms.bloomRadius;
+    renderPipeline.outputNode = scenePassColor.add(bloomPass);
+  });
 
-  return null
+  return null;
 }
 
 export default function TslVfxTornado() {
@@ -88,5 +88,5 @@ export default function TslVfxTornado() {
 
       <DemoHelpers grid={false} target={[0, 0.4, 0]} minDistance={0.1} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

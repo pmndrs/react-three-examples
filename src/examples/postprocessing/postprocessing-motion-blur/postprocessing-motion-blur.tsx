@@ -14,16 +14,16 @@
  * - `useAnimations` playing a skinned run clip by name, alongside object-level and
  *   camera-level motion — velocity picks up all three per pixel
  */
-import { Suspense } from 'react'
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Suspense } from 'react';
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { CheckerRoom } from './CheckerRoom'
-import { MotionBlurPipeline } from './MotionBlurPipeline'
-import { SpinningToruses } from './SpinningToruses'
-import { XbotRunner } from './XbotRunner'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { CheckerRoom } from './CheckerRoom';
+import { MotionBlurPipeline } from './MotionBlurPipeline';
+import { SpinningToruses } from './SpinningToruses';
+import { XbotRunner } from './XbotRunner';
 
 export default function PostprocessingMotionBlur() {
   // Shared by the two siblings below — kept at this level rather than split across
@@ -31,7 +31,7 @@ export default function PostprocessingMotionBlur() {
   const { autoRotate, speed } = useControls('Motion Blur', {
     autoRotate: true,
     speed: { value: 1, min: 0, max: 2, step: 0.01 },
-  })
+  });
 
   return (
     <Canvas
@@ -71,5 +71,5 @@ export default function PostprocessingMotionBlur() {
         autoRotateSpeed={1}
       />
     </Canvas>
-  )
+  );
 }

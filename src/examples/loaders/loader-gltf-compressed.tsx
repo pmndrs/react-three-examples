@@ -27,38 +27,38 @@
  *   backdrop, and the mat's base sits at y = -0.8, so a ground grid at y ≈ 0 would
  *   slice through the middle of the model
  */
-import { Suspense, useRef } from 'react'
-import { ReinhardToneMapping, type PointLight } from 'three/webgpu'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { useGLTF } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useRef } from 'react';
+import { ReinhardToneMapping, type PointLight } from 'three/webgpu';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { useGLTF } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/coffeemat.glb'
+const MODEL_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/coffeemat.glb';
 // BasisU transcoder (basis_transcoder.js + .wasm) — same r185 pin as the model.
-const BASIS_TRANSCODER_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/jsm/libs/basis/'
+const BASIS_TRANSCODER_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/jsm/libs/basis/';
 
 // coffeemat.glb was produced from the source scene with `gltfpack -cc -tc`:
 // Meshopt-compressed geometry (-cc) + KTX2/BasisU-compressed textures (-tc).
 function CoffeeMat() {
-  const { scene } = useGLTF(MODEL_URL, { draco: true, meshopt: true, ktx2: BASIS_TRANSCODER_PATH })
-  return <primitive object={scene} position={[0, -0.8, 0]} scale={0.01} />
+  const { scene } = useGLTF(MODEL_URL, { draco: true, meshopt: true, ktx2: BASIS_TRANSCODER_PATH });
+  return <primitive object={scene} position={[0, -0.8, 0]} scale={0.01} />;
 }
 
 // The original parents this light to the camera (`camera.add(light)`); copying the
 // camera position per frame is equivalent for an omnidirectional point light.
 function Headlight({ power }: { power: number }) {
-  const lightRef = useRef<PointLight>(null)
+  const lightRef = useRef<PointLight>(null);
   useFrame(({ camera }) => {
-    lightRef.current?.position.copy(camera.position)
-  })
-  return <pointLight ref={lightRef} color={0xffffff} power={power} />
+    lightRef.current?.position.copy(camera.position);
+  });
+  return <pointLight ref={lightRef} color={0xffffff} power={power} />;
 }
 
 export default function LoaderGltfCompressed() {
   const { power } = useControls('loader-gltf-compressed', {
     power: { value: 1300, min: 100, max: 4000, step: 10 },
-  })
+  });
 
   return (
     <Canvas
@@ -73,5 +73,5 @@ export default function LoaderGltfCompressed() {
       <Headlight power={power} />
       <DemoHelpers grid={false} minDistance={3} maxDistance={6} />
     </Canvas>
-  )
+  );
 }

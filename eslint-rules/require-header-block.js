@@ -14,9 +14,9 @@
 //
 // DEMONSTRATES is required. DIVERGENCE is OPTIONAL by design — a faithful port has
 // nothing to say, and forcing the section only manufactures boilerplate.
-import examples from '../src/examples.json' with { type: 'json' }
+import examples from '../src/examples.json' with { type: 'json' };
 
-const SLUGS = new Set(examples.map((example) => example.slug))
+const SLUGS = new Set(examples.map((example) => example.slug));
 
 export default {
   meta: {
@@ -33,18 +33,18 @@ export default {
     schema: [],
   },
   create(context) {
-    const filename = context.filename.replace(/\\/g, '/')
-    if (!filename.includes('/src/examples/') || !filename.endsWith('.tsx')) return {}
+    const filename = context.filename.replace(/\\/g, '/');
+    if (!filename.includes('/src/examples/') || !filename.endsWith('.tsx')) return {};
     // Basename, not a path regex: a greedy `.*` backtracks to capture one character.
-    const slug = filename.slice(filename.lastIndexOf('/') + 1, -'.tsx'.length)
-    if (!SLUGS.has(slug)) return {}
+    const slug = filename.slice(filename.lastIndexOf('/') + 1, -'.tsx'.length);
+    if (!SLUGS.has(slug)) return {};
 
     return {
       Program(node) {
-        const first = context.sourceCode.getAllComments()[0]
-        const ok = first && first.type === 'Block' && first.loc.start.line <= 2 && first.value.includes('DEMONSTRATES')
-        if (!ok) context.report({ node, messageId: 'missingHeader' })
+        const first = context.sourceCode.getAllComments()[0];
+        const ok = first && first.type === 'Block' && first.loc.start.line <= 2 && first.value.includes('DEMONSTRATES');
+        if (!ok) context.report({ node, messageId: 'missingHeader' });
       },
-    }
+    };
   },
-}
+};

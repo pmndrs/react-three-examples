@@ -52,21 +52,21 @@
  *   as `camera-array`) — each quadrant gets its own raw `OrbitControls` instead
  *   (`MultiViewRig.tsx`), matching the original's own per-view controls.
  */
-import { Suspense } from 'react'
-import { NoToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useZippedVolumeData } from '../../../utils/useZippedVolumeData'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { MultiViewRig } from './MultiViewRig'
+import { Suspense } from 'react';
+import { NoToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { useZippedVolumeData } from '../../../utils/useZippedVolumeData';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { MultiViewRig } from './MultiViewRig';
 
-const VOLUME_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/3d/head256x256x109.zip'
-const VOLUME_ENTRY = 'head256x256x109'
+const VOLUME_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/3d/head256x256x109.zip';
+const VOLUME_ENTRY = 'head256x256x109';
 
 function Rig() {
   // Suspends until the shared zip volume is loaded + unpacked (see
   // `textures-2d-array` for the sibling port using the same asset).
-  const data = useZippedVolumeData(VOLUME_URL, VOLUME_ENTRY)
-  return <MultiViewRig data={data} />
+  const data = useZippedVolumeData(VOLUME_URL, VOLUME_ENTRY);
+  return <MultiViewRig data={data} />;
 }
 
 export default function RenderTarget2DArray3D() {
@@ -79,5 +79,5 @@ export default function RenderTarget2DArray3D() {
       </Suspense>
       <DemoHelpers grid={false} controls={false} />
     </Canvas>
-  )
+  );
 }

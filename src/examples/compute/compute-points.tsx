@@ -50,16 +50,16 @@
  *   `Sprite`, which does declare it) — set imperatively in a `useLayoutEffect` via a
  *   ref instead of a JSX prop (candidate DefinitelyTyped fix, not a fiber/corpus gap)
  */
-import { useLayoutEffect, useRef } from 'react'
-import { Fn, color, float, instanceIndex, instancedArray, uniform, vec2 } from 'three/tsl'
-import { Vector2, type OrthographicCamera, type Points, type Renderer } from 'three/webgpu'
-import { Canvas, useFrame, useNodes, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { useLayoutEffect, useRef } from 'react';
+import { Fn, color, float, instanceIndex, instancedArray, uniform, vec2 } from 'three/tsl';
+import { Vector2, type OrthographicCamera, type Points, type Renderer } from 'three/webgpu';
+import { Canvas, useFrame, useNodes, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const PARTICLE_COUNT = 300_000
+const PARTICLE_COUNT = 300_000;
 // World-space half-size of the fixed frustum square (see header DIVERGENCE).
-const FRUSTUM_HALF = 1.1
+const FRUSTUM_HALF = 1.1;
 
 // Pins the orthographic frustum to a `2*FRUSTUM_HALF` world-unit SQUARE regardless of
 // viewport aspect — fiber's default ortho sizing is raw PIXELS (materials-displacementmap
@@ -67,60 +67,60 @@ const FRUSTUM_HALF = 1.1
 function OrthographicFraming() {
   // useThree's `camera` types as the base Camera union even on an `orthographic`
   // Canvas — cast is safe here since this component only mounts under one (B9 family).
-  const camera = useThree((s) => s.camera) as OrthographicCamera
-  const size = useThree((s) => s.size)
+  const camera = useThree((s) => s.camera) as OrthographicCamera;
+  const size = useThree((s) => s.size);
 
   useLayoutEffect(() => {
-    camera.zoom = Math.min(size.width, size.height) / (2 * FRUSTUM_HALF)
-    camera.updateProjectionMatrix()
-  }, [camera, size])
+    camera.zoom = Math.min(size.width, size.height) / (2 * FRUSTUM_HALF);
+    camera.updateProjectionMatrix();
+  }, [camera, size]);
 
-  return null
+  return null;
 }
 
 function PointsField() {
-  const renderer = useThree((s) => s.renderer)
-  const pointsRef = useRef<Points>(null)
+  const renderer = useThree((s) => s.renderer);
+  const pointsRef = useRef<Points>(null);
 
   //* Controls =====================================================
   const { boundsX, boundsY } = useControls('compute-points', {
     boundsX: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds x' },
     boundsY: { value: 1, min: 0, max: 1, step: 0.01, label: 'bounds y' },
-  })
+  });
   const { uBoundsX, uBoundsY } = useUniforms(
     { uBoundsX: boundsX, uBoundsY: boundsY },
     'computePoints', // WGSL-identifier rule: camelCase scope, never kebab-case
-  )
+  );
 
   // All node graphs built once. ROOT-LEVEL useNodes on purpose (UPSTREAM.md B16):
   // a scoped call would name entries `${scope}.${name}`, and the sprite-material
   // nodes below reach WGSL codegen.
   const { computeNode, uPointer, positionNode, colorNode } = useNodes(() => {
-    const particleArray = instancedArray(PARTICLE_COUNT, 'vec2')
-    const velocityArray = instancedArray(PARTICLE_COUNT, 'vec2')
+    const particleArray = instancedArray(PARTICLE_COUNT, 'vec2');
+    const velocityArray = instancedArray(PARTICLE_COUNT, 'vec2');
 
     // Mutated imperatively from the invisible plane's onPointerMove below, not from
     // React state — a plain TSL uniform, not useUniforms (same rationale as
     // compute-particles' `uClickPos`). Off-canvas until the first real hover.
-    const uPointer = uniform(new Vector2(-10, -10))
+    const uPointer = uniform(new Vector2(-10, -10));
 
     const computeShaderFn = Fn(() => {
-      const particle = particleArray.element(instanceIndex)
-      const velocity = velocityArray.element(instanceIndex)
+      const particle = particleArray.element(instanceIndex);
+      const velocity = velocityArray.element(instanceIndex);
 
-      const limit = vec2(uBoundsX, uBoundsY)
-      const position = particle.add(velocity).toVar()
+      const limit = vec2(uBoundsX, uBoundsY);
+      const position = particle.add(velocity).toVar();
 
-      velocity.x.assign(position.x.abs().greaterThanEqual(limit.x).select(velocity.x.negate(), velocity.x))
-      velocity.y.assign(position.y.abs().greaterThanEqual(limit.y).select(velocity.y.negate(), velocity.y))
+      velocity.x.assign(position.x.abs().greaterThanEqual(limit.x).select(velocity.x.negate(), velocity.x));
+      velocity.y.assign(position.y.abs().greaterThanEqual(limit.y).select(velocity.y.negate(), velocity.y));
 
-      position.assign(position.min(limit).max(limit.negate()))
+      position.assign(position.min(limit).max(limit.negate()));
 
-      const pointerSize = float(0.1)
-      const distanceFromPointer = uPointer.sub(position).length()
+      const pointerSize = float(0.1);
+      const distanceFromPointer = uPointer.sub(position).length();
 
-      particle.assign(distanceFromPointer.lessThanEqual(pointerSize).select(vec2(0, 0), position))
-    })
+      particle.assign(distanceFromPointer.lessThanEqual(pointerSize).select(vec2(0, 0), position));
+    });
 
     const computeNode = computeShaderFn()
       .compute(PARTICLE_COUNT)
@@ -128,54 +128,54 @@ function PointsField() {
         // Precompute: give every particle a tiny, angle-randomized drift velocity —
         // fires exactly once, the first time this compute node is dispatched.
         const precomputeShaderNode = Fn(() => {
-          const particleIndex = float(instanceIndex)
+          const particleIndex = float(instanceIndex);
 
-          const randomAngle = particleIndex.mul(0.005).mul(Math.PI * 2)
-          const randomSpeed = particleIndex.mul(0.00000001).add(0.0000001)
+          const randomAngle = particleIndex.mul(0.005).mul(Math.PI * 2);
+          const randomSpeed = particleIndex.mul(0.00000001).add(0.0000001);
 
-          const velX = randomAngle.sin().mul(randomSpeed)
-          const velY = randomAngle.cos().mul(randomSpeed)
+          const velX = randomAngle.sin().mul(randomSpeed);
+          const velY = randomAngle.cos().mul(randomSpeed);
 
-          velocityArray.element(instanceIndex).assign(vec2(velX, velY))
-        })
+          velocityArray.element(instanceIndex).assign(vec2(velX, velY));
+        });
 
-        renderer.compute(precomputeShaderNode().compute(PARTICLE_COUNT))
-      })
+        renderer.compute(precomputeShaderNode().compute(PARTICLE_COUNT));
+      });
 
     return {
       computeNode,
       uPointer,
       positionNode: particleArray.element(instanceIndex),
       colorNode: particleArray.element(instanceIndex).add(color(0xffffff)),
-    }
-  })
+    };
+  });
 
   // EVERY FRAME: step the simulation. Pointer updates arrive separately, via the
   // invisible plane's onPointerMove below (see header DIVERGENCE for why NOT
   // state.pointer).
   useFrame(
     () => {
-      renderer.compute(computeNode)
+      renderer.compute(computeNode);
     },
     { phase: 'update' },
-  )
+  );
 
   // R3F already did the raycast; event.point.xy lands directly in the same -1..1
   // space the kernel expects (the plane spans the fixed frustum square).
   const onPointerMove = (event: ThreeEvent<PointerEvent>) => {
-    uPointer.value.set(event.point.x, event.point.y)
-  }
+    uPointer.value.set(event.point.x, event.point.y);
+  };
 
   // Imperative escape hatch: `Points.count` (instanced draw count) and a 1-vertex
   // drawRange are read generically off the object by the renderer (RenderObject.js)
   // but aren't declared on `@types/three`'s Points class — see header DIVERGENCE.
   // Must land before the first WebGPU render reads it (Layer 1 useLayoutEffect rule).
   useLayoutEffect(() => {
-    const points = pointsRef.current
-    if (!points) return
-    points.geometry.drawRange.count = 1
-    ;(points as unknown as { count: number }).count = PARTICLE_COUNT
-  }, [])
+    const points = pointsRef.current;
+    if (!points) return;
+    points.geometry.drawRange.count = 1;
+    (points as unknown as { count: number }).count = PARTICLE_COUNT;
+  }, []);
 
   return (
     <>
@@ -196,7 +196,7 @@ function PointsField() {
         <meshBasicMaterial visible={false} />
       </mesh>
     </>
-  )
+  );
 }
 
 export default function ComputePoints() {
@@ -213,5 +213,5 @@ export default function ComputePoints() {
       <PointsField />
       <DemoHelpers grid={false} controls={false} />
     </Canvas>
-  )
+  );
 }

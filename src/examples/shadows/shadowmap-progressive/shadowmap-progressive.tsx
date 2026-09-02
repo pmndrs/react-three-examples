@@ -39,17 +39,17 @@
  * - Grid disabled (`grid={false}`) — the scene's own 600×600 ground plane is the
  *   lightmap receiver in frame, and TransformControls gizmos already crowd the view.
  */
-import { Suspense, useRef } from 'react'
-import { NoToneMapping } from 'three/webgpu'
+import { Suspense, useRef } from 'react';
+import { NoToneMapping } from 'three/webgpu';
 
-import { Canvas } from '@react-three/fiber/webgpu'
-import type CameraControlsImpl from 'camera-controls'
+import { Canvas } from '@react-three/fiber/webgpu';
+import type CameraControlsImpl from 'camera-controls';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { LightmapScene } from './LightmapScene'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { LightmapScene } from './LightmapScene';
 
 export default function ShadowmapProgressive() {
-  const controlsRef = useRef<CameraControlsImpl>(null)
+  const controlsRef = useRef<CameraControlsImpl>(null);
 
   return (
     <Canvas
@@ -73,5 +73,5 @@ export default function ShadowmapProgressive() {
         controlsRef={controlsRef}
       />
     </Canvas>
-  )
+  );
 }

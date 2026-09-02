@@ -19,15 +19,15 @@
 //
 // UNWIND CONDITION: delete this script, its postinstall hook, and the ~40 casts the
 // moment fiber ships the B1 fix (both halves). The casts are the regression signal.
-import { readFile, writeFile } from 'node:fs/promises'
-import { fileURLToPath } from 'node:url'
+import { readFile, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 
-const MARKER = 'UniformNodeFor' // idempotency guard
+const MARKER = 'UniformNodeFor'; // idempotency guard
 const TARGETS = [
   '../node_modules/@react-three/fiber/dist/webgpu/index.d.ts',
   '../node_modules/@react-three/fiber/dist/webgpu/index.d.mts',
   '../node_modules/@react-three/fiber/dist/webgpu/index.d.cts',
-]
+];
 
 // Mirrors three's own `Uniform` overload table (UniformNode.d.ts). `V extends Node`
 // passes TSL nodes (color(), vec3(), an existing uniform) through untouched.
@@ -50,7 +50,7 @@ type MappedUniforms<T> = { [K in keyof T]: UniformNodeFor<T[K]> } & {
     clearUniforms: ClearUniformsFn;
     rebuildUniforms: RebuildUniformsFn;
 };
-`
+`;
 
 // The four typed overloads (the no-arg / scope-only readers stay as they are: with no
 // input record there is nothing to infer from).
@@ -71,45 +71,45 @@ const REPLACEMENTS = [
     'declare function useUniforms<T extends UniformInputRecord>(uniforms: T, scope: string): UniformsWithUtils<UniformRecord<UniformNode>>;',
     'declare function useUniforms<T extends UniformInputRecord>(uniforms: T, scope: string): MappedUniforms<T>;',
   ],
-]
+];
 
-let patched = 0
-let skipped = 0
+let patched = 0;
+let skipped = 0;
 
 for (const relative of TARGETS) {
-  const path = fileURLToPath(new URL(relative, import.meta.url))
-  let source
+  const path = fileURLToPath(new URL(relative, import.meta.url));
+  let source;
   try {
-    source = await readFile(path, 'utf8')
+    source = await readFile(path, 'utf8');
   } catch {
-    continue // variant not present in this build — fine
+    continue; // variant not present in this build — fine
   }
 
   if (source.includes(MARKER)) {
-    skipped++
-    continue
+    skipped++;
+    continue;
   }
 
-  const anchor = REPLACEMENTS[0][0]
+  const anchor = REPLACEMENTS[0][0];
   if (!source.includes(anchor)) {
     console.warn(
       `[patch-fiber-types] anchor not found in ${relative} — fiber's useUniforms signature changed.\n` +
         `  Check whether B1 landed upstream; if so, delete this script and the casts it exists for.`,
-    )
-    process.exitCode = 1
-    continue
+    );
+    process.exitCode = 1;
+    continue;
   }
 
-  let out = source
-  for (const [from, to] of REPLACEMENTS) out = out.replaceAll(from, to)
+  let out = source;
+  for (const [from, to] of REPLACEMENTS) out = out.replaceAll(from, to);
   out = out.replace(
     anchor.replace('UniformsWithUtils<UniformRecord<UniformNode>>', 'MappedUniforms<T>'),
     (m) => HELPER + m,
-  )
+  );
 
-  await writeFile(path, out)
-  patched++
+  await writeFile(path, out);
+  patched++;
 }
 
-if (patched) console.log(`[patch-fiber-types] patched ${patched} declaration file(s) (UPSTREAM B1/A9)`)
-else if (skipped) console.log(`[patch-fiber-types] already applied (${skipped} file(s))`)
+if (patched) console.log(`[patch-fiber-types] patched ${patched} declaration file(s) (UPSTREAM B1/A9)`);
+else if (skipped) console.log(`[patch-fiber-types] already applied (${skipped} file(s))`);

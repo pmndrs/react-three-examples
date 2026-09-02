@@ -40,12 +40,12 @@
  * - The spring force buffer allocates `springCount` vec3 elements, not the
  *   original's `springCount * 3` over-allocation (only `springCount` are indexed)
  */
-import { Suspense } from 'react'
-import { NeutralToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
+import { Suspense } from 'react';
+import { NeutralToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Cloth } from './Cloth'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Cloth } from './Cloth';
 
 export default function ComputeCloth() {
   return (
@@ -68,5 +68,5 @@ export default function ComputeCloth() {
 
       <DemoHelpers grid={false} target={[0, -0.1, 0]} minDistance={1} maxDistance={3} />
     </Canvas>
-  )
+  );
 }

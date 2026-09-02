@@ -41,19 +41,19 @@
  *   color nodes + shadows), leaving shadowed valleys pitch black — race verified both
  *   ways locally; gating makes the first build deterministic
  */
-import { Suspense, useRef } from 'react'
-import { ACESFilmicToneMapping } from 'three/webgpu'
+import { Suspense, useRef } from 'react';
+import { ACESFilmicToneMapping } from 'three/webgpu';
 
-import { Canvas } from '@react-three/fiber/webgpu'
-import { Environment } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
-import type CameraControlsImpl from 'camera-controls'
+import { Canvas } from '@react-three/fiber/webgpu';
+import { Environment } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
+import type CameraControlsImpl from 'camera-controls';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Terrain } from './Terrain'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Terrain } from './Terrain';
 
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/pedestrian_overpass_1k.hdr'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/pedestrian_overpass_1k.hdr';
 
 export default function TslProceduralTerrain() {
   // Only consumed by the water mesh right here — the terrain's own knobs live next
@@ -64,11 +64,11 @@ export default function TslProceduralTerrain() {
       waterIor: { value: 1.333, min: 1, max: 2, step: 0.001, label: 'ior' },
       waterColor: { value: '#4db2ff', label: 'color' },
     }),
-  })
+  });
 
   // Escape hatch to the live camera-controls instance — Terrain disables orbiting for
   // the duration of a terrain drag, like the original's `controls.enabled = false`.
-  const controlsRef = useRef<CameraControlsImpl>(null)
+  const controlsRef = useRef<CameraControlsImpl>(null);
 
   return (
     <Canvas
@@ -120,5 +120,5 @@ export default function TslProceduralTerrain() {
         controlsRef={controlsRef}
       />
     </Canvas>
-  )
+  );
 }

@@ -37,11 +37,11 @@
  *   them but no kernel reads them); `setPBO(true)` calls are dropped — they are
  *   a WebGL2-fallback affordance and this port is WebGPU-only
  */
-import { NeutralToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Birds } from './Birds'
-import { Sky } from './Sky'
+import { NeutralToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Birds } from './Birds';
+import { Sky } from './Sky';
 
 export default function ComputeBirds() {
   return (
@@ -59,5 +59,5 @@ export default function ComputeBirds() {
       <Birds />
       <DemoHelpers grid={false} />
     </Canvas>
-  )
+  );
 }

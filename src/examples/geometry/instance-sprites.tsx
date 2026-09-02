@@ -46,66 +46,66 @@
  *   `instanceIndex` explicitly `.toFloat()`ed before the float add (same codegen —
  *   TSL would coerce anyway; strict-tsc-friendly)
  */
-import { Suspense, useEffect, useMemo } from 'react'
-import { instancedBufferAttribute, instanceIndex, time, uniform } from 'three/tsl'
-import { InstancedBufferAttribute, NoToneMapping, SpriteNodeMaterial, SRGBColorSpace } from 'three/webgpu'
-import { Canvas, useFrame } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect, useMemo } from 'react';
+import { instancedBufferAttribute, instanceIndex, time, uniform } from 'three/tsl';
+import { InstancedBufferAttribute, NoToneMapping, SpriteNodeMaterial, SRGBColorSpace } from 'three/webgpu';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const SNOWFLAKE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sprites/snowflake1.png'
+const SNOWFLAKE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/sprites/snowflake1.png';
 
 function SnowField() {
   const { sizeAttenuation, hueSpeed, count } = useControls('instance-sprites', {
     sizeAttenuation: true,
     hueSpeed: { value: 1, min: 0, max: 5, step: 0.1 },
     count: { value: 10000, min: 1000, max: 100000, step: 1000 },
-  })
+  });
 
-  const map = useTexture(SNOWFLAKE_URL)
+  const map = useTexture(SNOWFLAKE_URL);
 
   // Build-time: attribute + material rebuilt only when `count` changes (fresh
   // randoms), exactly like the original's one-time scatter in a 2000-unit cube.
   const { material, scaleUniform } = useMemo(() => {
-    map.colorSpace = SRGBColorSpace
+    map.colorSpace = SRGBColorSpace;
 
-    const positions = new Float32Array(count * 3)
+    const positions = new Float32Array(count * 3);
     for (let i = 0; i < positions.length; i++) {
-      positions[i] = 2000 * Math.random() - 1000
+      positions[i] = 2000 * Math.random() - 1000;
     }
-    const positionAttribute = new InstancedBufferAttribute(positions, 3)
+    const positionAttribute = new InstancedBufferAttribute(positions, 3);
 
-    const mat = new SpriteNodeMaterial({ sizeAttenuation: true, map, alphaMap: map, alphaTest: 0.1 })
-    mat.color.setHSL(1.0, 0.3, 0.7, SRGBColorSpace)
+    const mat = new SpriteNodeMaterial({ sizeAttenuation: true, map, alphaMap: map, alphaTest: 0.1 });
+    mat.color.setHSL(1.0, 0.3, 0.7, SRGBColorSpace);
     // Explicit type param: typed-TSL creators don't infer from their args (AGENTS.md).
-    mat.positionNode = instancedBufferAttribute<'vec3'>(positionAttribute, 'vec3')
-    mat.rotationNode = time.add(instanceIndex.toFloat()).sin()
+    mat.positionNode = instancedBufferAttribute<'vec3'>(positionAttribute, 'vec3');
+    mat.rotationNode = time.add(instanceIndex.toFloat()).sin();
 
-    const scaleUniform = uniform(15)
-    mat.scaleNode = scaleUniform
+    const scaleUniform = uniform(15);
+    mat.scaleNode = scaleUniform;
 
-    return { material: mat, scaleUniform }
-  }, [map, count])
+    return { material: mat, scaleUniform };
+  }, [map, count]);
 
   // sizeAttenuation is a build-time material flag — the r185 setter bumps
   // needsUpdate on change (shader rebuild); the paired scale value keeps the
   // flakes the same apparent size in both modes. Idempotent, StrictMode-safe.
   useEffect(() => {
-    material.sizeAttenuation = sizeAttenuation
-    scaleUniform.value = sizeAttenuation ? 15 : 0.03
-  }, [material, scaleUniform, sizeAttenuation])
+    material.sizeAttenuation = sizeAttenuation;
+    scaleUniform.value = sizeAttenuation ? 15 : 0.03;
+  }, [material, scaleUniform, sizeAttenuation]);
 
   // The original's per-frame hue sweep (Date.now() * 0.00005 ≡ 0.05/s), verbatim
   // otherwise: material.color is reference-node-backed, mutation is enough.
   useFrame((state) => {
-    const t = state.elapsed * 0.05 * hueSpeed
-    const h = ((360 * (1.0 + t)) % 360) / 360
-    material.color.setHSL(h, 0.5, 0.5)
-  })
+    const t = state.elapsed * 0.05 * hueSpeed;
+    const h = ((360 * (1.0 + t)) % 360) / 360;
+    material.color.setHSL(h, 0.5, 0.5);
+  });
 
   // Placement lives only in positionNode — see header DIVERGENCE.
-  return <sprite material={material} count={count} frustumCulled={false} />
+  return <sprite material={material} count={count} frustumCulled={false} />;
 }
 
 export default function InstanceSprites() {
@@ -123,5 +123,5 @@ export default function InstanceSprites() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={10} maxDistance={1800} />
     </Canvas>
-  )
+  );
 }

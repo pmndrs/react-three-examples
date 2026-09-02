@@ -31,45 +31,45 @@
  * - No leva controls: nothing in the original is parameterized beyond the fixed
  *   manual-vs-auto comparison the example exists to teach
  */
-import { Suspense, useMemo } from 'react'
-import { CubeTextureLoader, LinearFilter, LinearMipmapLinearFilter, SRGBColorSpace } from 'three/webgpu'
-import type { CubeTexture } from 'three/webgpu'
-import { Canvas, useLoader } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useMemo } from 'react';
+import { CubeTextureLoader, LinearFilter, LinearMipmapLinearFilter, SRGBColorSpace } from 'three/webgpu';
+import type { CubeTexture } from 'three/webgpu';
+import { Canvas, useLoader } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/angus/'
-const MAX_LEVEL = 8
+const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/angus/';
+const MAX_LEVEL = 8;
 
 // One 6-face URL set per mip level: cube_m00_c00..c05.jpg (level 0) through
 // cube_m08_c00..c05.jpg (level 8) — ported verbatim from the original's nested loop.
 const LEVEL_URLS = Array.from({ length: MAX_LEVEL + 1 }, (_, level) =>
   Array.from({ length: 6 }, (_, face) => `${CUBE_PATH}cube_m0${level}_c0${face}.jpg`),
-)
+);
 
 function MipmappedSpheres() {
   // Nine CubeTextures, one per mip level — the multi-resource form of the B20
   // useLoader(nested-array) pattern (see DEMONSTRATES).
-  const levels = useLoader(CubeTextureLoader, LEVEL_URLS) as CubeTexture[]
+  const levels = useLoader(CubeTextureLoader, LEVEL_URLS) as CubeTexture[];
 
   // Built once per `levels` identity (stable across re-renders — useLoader's
   // suspend-react cache keeps the same array reference) so the two materials don't
   // get a fresh texture/GPU sampler every render.
   const { manualTexture, autoTexture } = useMemo(() => {
-    const manual = levels[0]
-    manual.mipmaps = levels.slice(1)
-    manual.colorSpace = SRGBColorSpace
-    manual.minFilter = LinearMipmapLinearFilter
-    manual.magFilter = LinearFilter
-    manual.generateMipmaps = false
-    manual.needsUpdate = true
+    const manual = levels[0];
+    manual.mipmaps = levels.slice(1);
+    manual.colorSpace = SRGBColorSpace;
+    manual.minFilter = LinearMipmapLinearFilter;
+    manual.magFilter = LinearFilter;
+    manual.generateMipmaps = false;
+    manual.needsUpdate = true;
 
-    const auto = manual.clone()
-    auto.mipmaps = []
-    auto.generateMipmaps = true
-    auto.needsUpdate = true
+    const auto = manual.clone();
+    auto.mipmaps = [];
+    auto.generateMipmaps = true;
+    auto.needsUpdate = true;
 
-    return { manualTexture: manual, autoTexture: auto }
-  }, [levels])
+    return { manualTexture: manual, autoTexture: auto };
+  }, [levels]);
 
   return (
     <>
@@ -82,7 +82,7 @@ function MipmappedSpheres() {
         <meshBasicNodeMaterial color="#ffffff" envMap={autoTexture} />
       </mesh>
     </>
-  )
+  );
 }
 
 export default function MaterialsCubemapMipmaps() {
@@ -95,5 +95,5 @@ export default function MaterialsCubemapMipmaps() {
       </Suspense>
       <DemoHelpers grid={false} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 1.5} />
     </Canvas>
-  )
+  );
 }

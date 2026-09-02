@@ -3,23 +3,23 @@
 // volumetric-lighting mesh, and the layered render pipeline (main pass + quarter-res
 // volumetric pass -> gaussian denoise -> additive compose). Uses fiber hooks
 // throughout, so it lives inside <Canvas>; the page shell owns leva.
-import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react'
-import { bayer16 } from 'three/addons/tsl/math/Bayer.js'
-import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
-import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js'
-import { checker, pass, screenCoordinate, screenUV, uv } from 'three/tsl'
-import { BackSide, Layers, RectAreaLightNode, VolumeNodeMaterial, type Mesh, type RectAreaLight } from 'three/webgpu'
-import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog'
-import { LAYER_VOLUMETRIC_LIGHTING } from './constants'
+import { useEffect, useLayoutEffect, useMemo, useRef, type RefObject } from 'react';
+import { bayer16 } from 'three/addons/tsl/math/Bayer.js';
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+import { RectAreaLightTexturesLib } from 'three/addons/lights/RectAreaLightTexturesLib.js';
+import { checker, pass, screenCoordinate, screenUV, uv } from 'three/tsl';
+import { BackSide, Layers, RectAreaLightNode, VolumeNodeMaterial, type Mesh, type RectAreaLight } from 'three/webgpu';
+import { useFrame, useRenderPipeline, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { createFogScatteringNode, createFogTexture3D } from '../../../utils/VolumetricFog';
+import { LAYER_VOLUMETRIC_LIGHTING } from './constants';
 
 // One-time, global BRDF texture registration for RectAreaLight on the WebGPU backend
 // (same module-scope pattern as the lights-rectarealight port — idempotent, so safe
 // to run at load rather than gating it behind an effect).
-RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init())
+RectAreaLightNode.setLTC(RectAreaLightTexturesLib.init());
 
-const KNOT_POSITION: [number, number, number] = [0, 5.5, 0]
+const KNOT_POSITION: [number, number, number] = [0, 5.5, 0];
 
 // A RectAreaLight with a visible panel as a real scene-graph child — a dark backing
 // plane plus a color-matched emissive-looking front face (`BackSide` so it faces the
@@ -31,11 +31,11 @@ function RectLightPanel({
   height,
   lightRef,
 }: {
-  color: string
-  position: [number, number, number]
-  width: number
-  height: number
-  lightRef: RefObject<RectAreaLight | null>
+  color: string;
+  position: [number, number, number];
+  width: number;
+  height: number;
+  lightRef: RefObject<RectAreaLight | null>;
 }) {
   return (
     <rectAreaLight ref={lightRef} color={color} intensity={5} width={width} height={height} position={position}>
@@ -48,7 +48,7 @@ function RectLightPanel({
         <meshBasicMaterial color={color} side={BackSide} />
       </mesh>
     </rectAreaLight>
-  )
+  );
 }
 
 export function VolumeLightingRectarea() {
@@ -56,12 +56,12 @@ export function VolumeLightingRectarea() {
     fogIntensity: { value: 1, min: 0, max: 2, step: 0.01 },
     smokeAmount: { value: 2, min: 0, max: 3, step: 0.05 },
     rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
+  });
   const { steps, resolution, denoiseStrength } = useControls('volume-lighting-rectarea quality', {
     steps: { value: 12, min: 2, max: 16, step: 1 },
     resolution: { value: 0.25, min: 0.1, max: 1, step: 0.05 },
     denoiseStrength: { value: 0.6, min: 0, max: 1, step: 0.01 },
-  })
+  });
 
   const {
     uSmokeAmount: uSmokeAmountNode,
@@ -70,93 +70,93 @@ export function VolumeLightingRectarea() {
   } = useUniforms(
     { uSmokeAmount: smokeAmount, uFogIntensity: fogIntensity, uDenoiseStrength: denoiseStrength },
     'volumeLightingRectarea',
-  )
+  );
 
-  const roughnessNode = useMemo(() => checker(uv().mul(400)), [])
+  const roughnessNode = useMemo(() => checker(uv().mul(400)), []);
 
   // --- Volumetric fog box: raymarched density from a tiled 3D noise field ---
   // (src/utils/VolumetricFog.ts — shared with volume-caustics/volume-lighting, whose
   // three.js originals duplicate this exact block; the octave/time constants here are
   // identical to volume-lighting's, since the original's scatteringNode is byte-for-
   // byte the same function)
-  const fogTexture = useMemo(() => createFogTexture3D(), [])
+  const fogTexture = useMemo(() => createFogTexture3D(), []);
 
   const volumetricMaterial = useMemo(() => {
-    const material = new VolumeNodeMaterial()
-    material.steps = steps
-    material.offsetNode = bayer16(screenCoordinate)
+    const material = new VolumeNodeMaterial();
+    material.steps = steps;
+    material.offsetNode = bayer16(screenCoordinate);
     material.scatteringNode = createFogScatteringNode({
       fogTexture,
       smokeAmount: uSmokeAmountNode,
       octaves: [[0.1], [0.05, 1], [0.02, 2]],
       timeSpeed: [1, 0.3],
-    })
-    return material
+    });
+    return material;
     // `steps` intentionally omitted — handled by the effect below via `.steps =` so
     // changing it doesn't rebuild the scattering node graph.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fogTexture, uSmokeAmountNode])
+  }, [fogTexture, uSmokeAmountNode]);
 
   useEffect(() => {
-    volumetricMaterial.steps = steps
-  }, [volumetricMaterial, steps])
+    volumetricMaterial.steps = steps;
+  }, [volumetricMaterial, steps]);
 
   // Layer split: the fog box is volumetric-pass-ONLY; the three lights ADD the layer
   // to their default membership so they keep lighting the knot in the main pass too —
   // `layers` isn't a plain prop (THREE.Layers is a bitmask object, not replaceable via
   // JSX assignment), so this is imperative, matching the sibling volume-* ports.
-  const fogBoxRef = useRef<Mesh>(null)
-  const light1Ref = useRef<RectAreaLight>(null)
-  const light2Ref = useRef<RectAreaLight>(null)
-  const light3Ref = useRef<RectAreaLight>(null)
+  const fogBoxRef = useRef<Mesh>(null);
+  const light1Ref = useRef<RectAreaLight>(null);
+  const light2Ref = useRef<RectAreaLight>(null);
+  const light3Ref = useRef<RectAreaLight>(null);
   useLayoutEffect(() => {
-    const fogBox = fogBoxRef.current
-    const lights = [light1Ref.current, light2Ref.current, light3Ref.current]
-    if (!fogBox || lights.some((l) => !l)) return
-    fogBox.layers.disableAll()
-    fogBox.layers.enable(LAYER_VOLUMETRIC_LIGHTING)
-    lights.forEach((l) => l!.layers.enable(LAYER_VOLUMETRIC_LIGHTING))
-  }, [])
+    const fogBox = fogBoxRef.current;
+    const lights = [light1Ref.current, light2Ref.current, light3Ref.current];
+    if (!fogBox || lights.some((l) => !l)) return;
+    fogBox.layers.disableAll();
+    fogBox.layers.enable(LAYER_VOLUMETRIC_LIGHTING);
+    lights.forEach((l) => l!.layers.enable(LAYER_VOLUMETRIC_LIGHTING));
+  }, []);
 
   useFrame(({ delta }) => {
-    const l1 = light1Ref.current
-    const l2 = light2Ref.current
-    const l3 = light3Ref.current
-    if (!l1 || !l2 || !l3) return
-    l1.rotation.y -= delta * rotationSpeed
-    l2.rotation.y += delta * 0.5 * rotationSpeed
-    l3.rotation.y += delta * rotationSpeed
-  })
+    const l1 = light1Ref.current;
+    const l2 = light2Ref.current;
+    const l3 = light3Ref.current;
+    if (!l1 || !l2 || !l3) return;
+    l1.rotation.y -= delta * rotationSpeed;
+    l2.rotation.y += delta * 0.5 * rotationSpeed;
+    l3.rotation.y += delta * rotationSpeed;
+  });
 
   // --- Render pipeline: main scene pass (feeds the fog box's depth occlusion) +
   //     quarter-resolution volumetric-only pass -> gaussian denoise -> additive compose ---
   const { passes } = useRenderPipeline(({ renderPipeline, passes, scene, camera }) => {
-    if (!renderPipeline) return
+    if (!renderPipeline) return;
 
-    const volumetricLayer = new Layers()
-    volumetricLayer.disableAll()
-    volumetricLayer.enable(LAYER_VOLUMETRIC_LIGHTING)
+    const volumetricLayer = new Layers();
+    volumetricLayer.disableAll();
+    volumetricLayer.enable(LAYER_VOLUMETRIC_LIGHTING);
 
-    const volumetricPass = pass(scene, camera, { depthBuffer: false, samples: 0 })
-    volumetricPass.setLayers(volumetricLayer)
-    volumetricPass.setResolutionScale(0.25)
+    const volumetricPass = pass(scene, camera, { depthBuffer: false, samples: 0 });
+    volumetricPass.setLayers(volumetricLayer);
+    volumetricPass.setResolutionScale(0.25);
 
-    const sceneDepth = passes.scenePass.getTextureNode('depth')
-    volumetricMaterial.depthNode = sceneDepth.sample(screenUV)
+    const sceneDepth = passes.scenePass.getTextureNode('depth');
+    volumetricMaterial.depthNode = sceneDepth.sample(screenUV);
 
-    const blurredVolumetric = gaussianBlur(volumetricPass, uDenoiseStrengthNode)
+    const blurredVolumetric = gaussianBlur(volumetricPass, uDenoiseStrengthNode);
 
-    const sceneColor = passes.scenePass.getTextureNode()
-    renderPipeline.outputNode = sceneColor.add(blurredVolumetric.mul(uFogIntensityNode))
+    const sceneColor = passes.scenePass.getTextureNode();
+    renderPipeline.outputNode = sceneColor.add(blurredVolumetric.mul(uFogIntensityNode));
 
     // Return to register — the effect below mutates its uniform-backed knob.
-    return { volumetricPass }
-  })
+    return { volumetricPass };
+  });
 
   useEffect(() => {
-    const volumetricPass = passes.volumetricPass as { setResolutionScale: (s: number) => void } | undefined
-    volumetricPass?.setResolutionScale(resolution)
-  }, [passes, resolution])
+    const volumetricPass = passes.volumetricPass as { setResolutionScale: (s: number) => void } | undefined;
+    volumetricPass?.setResolutionScale(resolution);
+  }, [passes, resolution]);
 
   return (
     <>
@@ -180,5 +180,5 @@ export function VolumeLightingRectarea() {
         <primitive object={volumetricMaterial} attach="material" />
       </mesh>
     </>
-  )
+  );
 }

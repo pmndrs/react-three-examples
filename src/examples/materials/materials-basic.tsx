@@ -35,25 +35,25 @@
  *   parallax (no user-navigable orbit target) — DemoHelpers still renders the readiness
  *   signal
  */
-import { Suspense, useEffect, useRef } from 'react'
-import { CubeReflectionMapping, CubeRefractionMapping, MathUtils } from 'three/webgpu'
-import type { MeshBasicNodeMaterial } from 'three/webgpu'
-import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu'
-import { Instance, Instances, useCubeTexture } from '@react-three/drei/webgpu'
-import type { PositionMesh } from '@react-three/drei/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { Suspense, useEffect, useRef } from 'react';
+import { CubeReflectionMapping, CubeRefractionMapping, MathUtils } from 'three/webgpu';
+import type { MeshBasicNodeMaterial } from 'three/webgpu';
+import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu';
+import { Instance, Instances, useCubeTexture } from '@react-three/drei/webgpu';
+import type { PositionMesh } from '@react-three/drei/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/pisa/'
-const CUBE_FILES = ['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']
+const CUBE_PATH = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/cube/pisa/';
+const CUBE_FILES = ['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'];
 
-const SPHERE_COUNT = 500
+const SPHERE_COUNT = 500;
 // Camera parallax scale/ease: original's mousemove was raw pixel offset / 100 (several
 // world units at typical viewport widths) lerped at a fixed 0.05/frame; fiber's
 // state.pointer is NDC -1..1, so RANGE maps it back to a comparable wander and DAMP is
 // the MathUtils.damp lambda tuned to match the original's apparent easing at 60fps.
-const PARALLAX_RANGE = 4
-const PARALLAX_DAMP = 4
+const PARALLAX_RANGE = 4;
+const PARALLAX_DAMP = 4;
 
 // Per-instance random scale (1..4) and Z depth (-5..5), computed once. The original
 // also randomizes mesh.position.x/y at init, but its animate() loop overwrites both
@@ -61,7 +61,7 @@ const PARALLAX_DAMP = 4
 const instanceData = Array.from({ length: SPHERE_COUNT }, () => ({
   scale: Math.random() * 3 + 1,
   z: Math.random() * 10 - 5,
-}))
+}));
 
 function SphereSwarm() {
   const { color, refraction, refractionRatio, transparent, opacity } = useControls('materials-basic', {
@@ -70,32 +70,32 @@ function SphereSwarm() {
     refractionRatio: { value: 0.98, min: 0, max: 1, step: 0.01 },
     transparent: false,
     opacity: { value: 1, min: 0, max: 1, step: 0.01 },
-  })
-  const scene = useThree((s) => s.scene)
-  const textureCube = useCubeTexture(CUBE_FILES, { path: CUBE_PATH })
-  const materialRef = useRef<MeshBasicNodeMaterial>(null)
-  const instanceRefs = useRef<PositionMesh[]>([])
+  });
+  const scene = useThree((s) => s.scene);
+  const textureCube = useCubeTexture(CUBE_FILES, { path: CUBE_PATH });
+  const materialRef = useRef<MeshBasicNodeMaterial>(null);
+  const instanceRefs = useRef<PositionMesh[]>([]);
 
   useEffect(() => {
-    scene.background = textureCube
-  }, [scene, textureCube])
+    scene.background = textureCube;
+  }, [scene, textureCube]);
 
   // Mapping type is read at shader-graph BUILD time — see header DEMONSTRATES.
   useEffect(() => {
-    textureCube.mapping = refraction ? CubeRefractionMapping : CubeReflectionMapping
-    if (materialRef.current) materialRef.current.needsUpdate = true
-  }, [textureCube, refraction])
+    textureCube.mapping = refraction ? CubeRefractionMapping : CubeReflectionMapping;
+    if (materialRef.current) materialRef.current.needsUpdate = true;
+  }, [textureCube, refraction]);
 
   useFrame(({ elapsed }) => {
     for (let i = 0; i < SPHERE_COUNT; i++) {
-      const { scale, z } = instanceData[i]
-      const instance = instanceRefs.current[i]
-      if (!instance) continue
+      const { scale, z } = instanceData[i];
+      const instance = instanceRefs.current[i];
+      if (!instance) continue;
 
-      instance.position.set(5 * Math.cos(elapsed * 0.1 + i), 5 * Math.sin(elapsed * 0.1 + i * 1.1), z)
-      instance.scale.setScalar(scale)
+      instance.position.set(5 * Math.cos(elapsed * 0.1 + i), 5 * Math.sin(elapsed * 0.1 + i * 1.1), z);
+      instance.scale.setScalar(scale);
     }
-  })
+  });
 
   return (
     <Instances limit={SPHERE_COUNT}>
@@ -112,12 +112,12 @@ function SphereSwarm() {
         <Instance
           key={i}
           ref={(instance: PositionMesh | null) => {
-            if (instance) instanceRefs.current[i] = instance
+            if (instance) instanceRefs.current[i] = instance;
           }}
         />
       ))}
     </Instances>
-  )
+  );
 }
 
 // Pointer-parallax camera: no orbit controls (see header DIVERGENCE) — the camera eases
@@ -125,11 +125,11 @@ function SphereSwarm() {
 // matching the original's mousemove-driven rig.
 function ParallaxCamera() {
   useFrame(({ camera, pointer }, delta) => {
-    camera.position.x = MathUtils.damp(camera.position.x, pointer.x * PARALLAX_RANGE, PARALLAX_DAMP, delta)
-    camera.position.y = MathUtils.damp(camera.position.y, pointer.y * PARALLAX_RANGE, PARALLAX_DAMP, delta)
-    camera.lookAt(0, 0, 0)
-  })
-  return null
+    camera.position.x = MathUtils.damp(camera.position.x, pointer.x * PARALLAX_RANGE, PARALLAX_DAMP, delta);
+    camera.position.y = MathUtils.damp(camera.position.y, pointer.y * PARALLAX_RANGE, PARALLAX_DAMP, delta);
+    camera.lookAt(0, 0, 0);
+  });
+  return null;
 }
 
 export default function MaterialsBasic() {
@@ -143,5 +143,5 @@ export default function MaterialsBasic() {
       <ParallaxCamera />
       <DemoHelpers grid={false} controls={false} />
     </Canvas>
-  )
+  );
 }

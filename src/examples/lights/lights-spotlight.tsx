@@ -39,44 +39,44 @@
  *   IS the shadow receiver this example is about; an infinite grid at y=0.002 would
  *   render through/under it, competing with the shadow for visual attention
  */
-import { Suspense, useEffect, useMemo, useRef } from 'react'
-import { CameraHelper, SpotLightHelper } from 'three/webgpu'
-import type { SpotLight } from 'three/webgpu'
-import { PLYLoader } from 'three/addons/loaders/PLYLoader.js'
+import { Suspense, useEffect, useMemo, useRef } from 'react';
+import { CameraHelper, SpotLightHelper } from 'three/webgpu';
+import type { SpotLight } from 'three/webgpu';
+import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
 
-import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
-const LUCY_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/ply/binary/Lucy100k.ply'
+const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/';
+const LUCY_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/ply/binary/Lucy100k.ply';
 
 const MAP_URLS = {
   disturb: `${TEXTURE_BASE}disturb.jpg`,
   colors: `${TEXTURE_BASE}colors.png`,
   uvgrid: `${TEXTURE_BASE}uv_grid_opengl.jpg`,
-}
-type MapKey = 'none' | keyof typeof MAP_URLS
+};
+type MapKey = 'none' | keyof typeof MAP_URLS;
 
 // Stanford Lucy statue: a geometry-only PLY, no normals baked in — computeVertexNormals
 // (post-scale, matching the original's call order) is required, not cosmetic.
 function Lucy() {
-  const raw = useLoader(PLYLoader, LUCY_URL)
+  const raw = useLoader(PLYLoader, LUCY_URL);
 
   const geometry = useMemo(() => {
-    const geo = raw.clone()
-    geo.scale(0.0024, 0.0024, 0.0024)
-    geo.computeVertexNormals()
-    return geo
-  }, [raw])
+    const geo = raw.clone();
+    geo.scale(0.0024, 0.0024, 0.0024);
+    geo.computeVertexNormals();
+    return geo;
+  }, [raw]);
 
   return (
     <mesh geometry={geometry} rotation-y={-Math.PI / 2} position={[0, 0.8, 0]} castShadow receiveShadow>
       <meshLambertMaterial />
     </mesh>
-  )
+  );
 }
 
 function Floor() {
@@ -85,7 +85,7 @@ function Floor() {
       <planeGeometry args={[10, 10]} />
       <meshLambertMaterial color="#bcbcbc" />
     </mesh>
-  )
+  );
 }
 
 // The spotlight itself: orbits the statue at the original's fixed rate, projects a
@@ -110,70 +110,70 @@ function SpotlightRig() {
       }),
       helpers: false,
     },
-  )
+  );
 
-  const lightRef = useRef<SpotLight>(null)
-  const helperPairRef = useRef<{ spot: SpotLightHelper; shadowCam: CameraHelper } | null>(null)
-  const textures = useTexture(MAP_URLS)
+  const lightRef = useRef<SpotLight>(null);
+  const helperPairRef = useRef<{ spot: SpotLightHelper; shadowCam: CameraHelper } | null>(null);
+  const textures = useTexture(MAP_URLS);
 
   // `shadow.focus`/`shadow.intensity` have no fiber dash-path prop (only shadow-camera-*
   // and shadow-mapSize-* do) — sync them imperatively, mirroring the original's GUI
   // `onChange` handlers.
   useEffect(() => {
-    const light = lightRef.current
-    if (!light) return
-    light.shadow.focus = focus
-    light.shadow.intensity = shadowIntensity
-  }, [focus, shadowIntensity])
+    const light = lightRef.current;
+    if (!light) return;
+    light.shadow.focus = focus;
+    light.shadow.intensity = shadowIntensity;
+  }, [focus, shadowIntensity]);
 
   // Texture projected through the cone; 'none' clears it back to null, same as the
   // original's `map` dropdown (which includes a `none` entry mapped to `null`).
   useEffect(() => {
-    const light = lightRef.current
-    if (!light) return
-    light.map = map === 'none' ? null : textures[map]
-  }, [map, textures])
+    const light = lightRef.current;
+    if (!light) return;
+    light.map = map === 'none' ? null : textures[map];
+  }, [map, textures]);
 
   // Mount once: attach both helpers as real children of the light (see header
   // DEMONSTRATES) so they inherit its orbiting transform for free, matching
   // lights-rectarealight's RectAreaLightHelper pattern.
   useEffect(() => {
-    const light = lightRef.current
-    if (!light) return
+    const light = lightRef.current;
+    if (!light) return;
 
-    const spot = new SpotLightHelper(light)
-    const shadowCam = new CameraHelper(light.shadow.camera)
-    light.add(spot)
-    light.add(shadowCam)
-    helperPairRef.current = { spot, shadowCam }
+    const spot = new SpotLightHelper(light);
+    const shadowCam = new CameraHelper(light.shadow.camera);
+    light.add(spot);
+    light.add(shadowCam);
+    helperPairRef.current = { spot, shadowCam };
 
     return () => {
-      light.remove(spot)
-      light.remove(shadowCam)
-      spot.dispose()
-      helperPairRef.current = null
-    }
-  }, [])
+      light.remove(spot);
+      light.remove(shadowCam);
+      spot.dispose();
+      helperPairRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
-    const pair = helperPairRef.current
-    if (!pair) return
-    pair.spot.visible = helpers
-    pair.shadowCam.visible = helpers
-  }, [helpers])
+    const pair = helperPairRef.current;
+    if (!pair) return;
+    pair.spot.visible = helpers;
+    pair.shadowCam.visible = helpers;
+  }, [helpers]);
 
   useFrame(({ time }) => {
-    const light = lightRef.current
-    if (!light) return
+    const light = lightRef.current;
+    if (!light) return;
     // Original: `performance.now() / 3000`; `state.time` is the RAF-derived ms clock.
-    const t = time / 3000
-    light.position.x = Math.cos(t) * 2.5
-    light.position.z = Math.sin(t) * 2.5
+    const t = time / 3000;
+    light.position.x = Math.cos(t) * 2.5;
+    light.position.z = Math.sin(t) * 2.5;
 
-    const pair = helperPairRef.current
-    pair?.spot.update()
-    pair?.shadowCam.update()
-  })
+    const pair = helperPairRef.current;
+    pair?.spot.update();
+    pair?.shadowCam.update();
+  });
 
   return (
     <spotLight
@@ -191,7 +191,7 @@ function SpotlightRig() {
       shadow-camera-near={2}
       shadow-camera-far={10}
     />
-  )
+  );
 }
 
 export default function LightsSpotlight() {
@@ -207,5 +207,5 @@ export default function LightsSpotlight() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 1, 0]} minDistance={2} maxDistance={10} maxPolarAngle={Math.PI / 2} />
     </Canvas>
-  )
+  );
 }

@@ -36,7 +36,7 @@
  *   void with no ground plane; dolly range set to the original OrbitControls'
  *   `minDistance`/`maxDistance` (0.1 / 50)
  */
-import { Suspense, useRef } from 'react'
+import { Suspense, useRef } from 'react';
 import {
   bumpMap,
   cameraPosition,
@@ -51,24 +51,24 @@ import {
   uv,
   vec3,
   vec4,
-} from 'three/tsl'
-import { BackSide, SRGBColorSpace } from 'three/webgpu'
-import type { Mesh } from 'three/webgpu'
-import { Canvas, useFrame, useLocalNodes, useTexture, useUniforms } from '@react-three/fiber/webgpu'
-import { folder, useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/tsl';
+import { BackSide, SRGBColorSpace } from 'three/webgpu';
+import type { Mesh } from 'three/webgpu';
+import { Canvas, useFrame, useLocalNodes, useTexture, useUniforms } from '@react-three/fiber/webgpu';
+import { folder, useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/planets'
-const DAY_URL = `${TEXTURE_BASE}/earth_day_4096.jpg`
-const NIGHT_URL = `${TEXTURE_BASE}/earth_night_4096.jpg`
-const BUMP_ROUGHNESS_CLOUDS_URL = `${TEXTURE_BASE}/earth_bump_roughness_clouds_4096.jpg`
+const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/planets';
+const DAY_URL = `${TEXTURE_BASE}/earth_day_4096.jpg`;
+const NIGHT_URL = `${TEXTURE_BASE}/earth_night_4096.jpg`;
+const BUMP_ROUGHNESS_CLOUDS_URL = `${TEXTURE_BASE}/earth_bump_roughness_clouds_4096.jpg`;
 
 // Static sun direction — shared between the real `<directionalLight>` (drives the
 // material's standard PBR lighting into `output`) and the hand-rolled `sunOrientation`
 // term below (drives the night/atmosphere blend). Both must agree for the terminator to
 // line up, so this one constant feeds both.
-const SUN_POSITION: [number, number, number] = [0, 0, 3]
-const CAMERA_POSITION: [number, number, number] = [4.5, 2, 3]
+const SUN_POSITION: [number, number, number] = [0, 0, 3];
+const CAMERA_POSITION: [number, number, number] = [4.5, 2, 3];
 
 function Globe() {
   //* Controls =====================================================
@@ -82,66 +82,66 @@ function Globe() {
       uRoughnessHigh: { value: 0.35, min: 0, max: 1, step: 0.001, label: 'high' },
     }),
     rotationSpeed: { value: 1, min: 0, max: 3, step: 0.05 },
-  })
+  });
 
-  const { uDayColor, uTwilightColor, uRoughnessLow, uRoughnessHigh } = useUniforms(uniformValues, 'earth')
+  const { uDayColor, uTwilightColor, uRoughnessLow, uRoughnessHigh } = useUniforms(uniformValues, 'earth');
 
   const textures = useTexture({
     day: DAY_URL,
     night: NIGHT_URL,
     bumpRoughnessClouds: BUMP_ROUGHNESS_CLOUDS_URL,
-  })
+  });
 
   //* Refs ---------------
-  const globeRef = useRef<Mesh>(null)
-  const atmosphereRef = useRef<Mesh>(null)
+  const globeRef = useRef<Mesh>(null);
+  const atmosphereRef = useRef<Mesh>(null);
 
   //* Nodes ---------------
   const { globeColorNode, globeRoughnessNode, globeNormalNode, globeOutputNode, atmosphereOutputNode } = useLocalNodes(
     () => {
       // Color-critical textures need sRGB decoding; the packed bump/roughness/clouds
       // texture is data, not color, so it is left in its default color space.
-      textures.day.colorSpace = SRGBColorSpace
-      textures.day.anisotropy = 8
-      textures.night.colorSpace = SRGBColorSpace
-      textures.night.anisotropy = 8
-      textures.bumpRoughnessClouds.anisotropy = 8
+      textures.day.colorSpace = SRGBColorSpace;
+      textures.day.anisotropy = 8;
+      textures.night.colorSpace = SRGBColorSpace;
+      textures.night.anisotropy = 8;
+      textures.bumpRoughnessClouds.anisotropy = 8;
 
-      const viewDirection = positionWorld.sub(cameraPosition).normalize()
-      const fresnel = viewDirection.dot(normalWorldGeometry).abs().oneMinus().toVar()
-      const sunOrientation = normalWorldGeometry.dot(normalize(vec3(...SUN_POSITION))).toVar()
-      const atmosphereColor = mix(uTwilightColor, uDayColor, sunOrientation.smoothstep(-0.25, 0.75))
+      const viewDirection = positionWorld.sub(cameraPosition).normalize();
+      const fresnel = viewDirection.dot(normalWorldGeometry).abs().oneMinus().toVar();
+      const sunOrientation = normalWorldGeometry.dot(normalize(vec3(...SUN_POSITION))).toVar();
+      const atmosphereColor = mix(uTwilightColor, uDayColor, sunOrientation.smoothstep(-0.25, 0.75));
 
       // Globe
-      const cloudsStrength = texture(textures.bumpRoughnessClouds, uv()).b.smoothstep(0.2, 1)
-      const globeColorNode = mix(texture(textures.day), vec3(1), cloudsStrength.mul(2))
+      const cloudsStrength = texture(textures.bumpRoughnessClouds, uv()).b.smoothstep(0.2, 1);
+      const globeColorNode = mix(texture(textures.day), vec3(1), cloudsStrength.mul(2));
 
-      const roughness = max(texture(textures.bumpRoughnessClouds).g, step(0.01, cloudsStrength))
-      const globeRoughnessNode = roughness.remap(0, 1, uRoughnessLow, uRoughnessHigh)
+      const roughness = max(texture(textures.bumpRoughnessClouds).g, step(0.01, cloudsStrength));
+      const globeRoughnessNode = roughness.remap(0, 1, uRoughnessLow, uRoughnessHigh);
 
-      const night = texture(textures.night)
-      const dayStrength = sunOrientation.smoothstep(-0.25, 0.5)
+      const night = texture(textures.night);
+      const dayStrength = sunOrientation.smoothstep(-0.25, 0.5);
 
-      const atmosphereDayStrength = sunOrientation.smoothstep(-0.5, 1)
-      const atmosphereMix = atmosphereDayStrength.mul(fresnel.pow(2)).clamp(0, 1)
+      const atmosphereDayStrength = sunOrientation.smoothstep(-0.5, 1);
+      const atmosphereMix = atmosphereDayStrength.mul(fresnel.pow(2)).clamp(0, 1);
 
-      const finalOutput = mix(mix(night.rgb, output.rgb, dayStrength), atmosphereColor, atmosphereMix)
-      const globeOutputNode = vec4(finalOutput, output.a)
+      const finalOutput = mix(mix(night.rgb, output.rgb, dayStrength), atmosphereColor, atmosphereMix);
+      const globeOutputNode = vec4(finalOutput, output.a);
 
-      const bumpElevation = max(texture(textures.bumpRoughnessClouds).r, cloudsStrength)
-      const globeNormalNode = bumpMap(bumpElevation)
+      const bumpElevation = max(texture(textures.bumpRoughnessClouds).r, cloudsStrength);
+      const globeNormalNode = bumpMap(bumpElevation);
 
       // Atmosphere
-      const alpha = fresnel.remap(0.73, 1, 1, 0).pow(3).mul(sunOrientation.smoothstep(-0.5, 1))
-      const atmosphereOutputNode = vec4(atmosphereColor, alpha)
+      const alpha = fresnel.remap(0.73, 1, 1, 0).pow(3).mul(sunOrientation.smoothstep(-0.5, 1));
+      const atmosphereOutputNode = vec4(atmosphereColor, alpha);
 
-      return { globeColorNode, globeRoughnessNode, globeNormalNode, globeOutputNode, atmosphereOutputNode }
+      return { globeColorNode, globeRoughnessNode, globeNormalNode, globeOutputNode, atmosphereOutputNode };
     },
-  )
+  );
 
   useFrame(({ delta }) => {
-    if (globeRef.current) globeRef.current.rotation.y += delta * 0.025 * rotationSpeed
-  })
+    if (globeRef.current) globeRef.current.rotation.y += delta * 0.025 * rotationSpeed;
+  });
 
   return (
     <>
@@ -159,7 +159,7 @@ function Globe() {
         <meshBasicNodeMaterial side={BackSide} transparent outputNode={atmosphereOutputNode} />
       </mesh>
     </>
-  )
+  );
 }
 
 export default function TslEarth() {
@@ -171,5 +171,5 @@ export default function TslEarth() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={0.1} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

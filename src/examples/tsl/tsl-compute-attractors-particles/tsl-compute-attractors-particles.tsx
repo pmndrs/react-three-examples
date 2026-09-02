@@ -48,15 +48,15 @@
  * - OrbitControls becomes the DemoHelpers/camera-controls baseline with the
  *   original's dolly limits (0.1/50); grid off (particles float in a black void)
  */
-import { Canvas } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
+import { Canvas } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { ATTRACTOR_DEFAULT_POSITIONS } from './attractors'
-import { AttractorHelpers } from './AttractorHelpers'
-import { AttractorParticles } from './AttractorParticles'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { ATTRACTOR_DEFAULT_POSITIONS } from './attractors';
+import { AttractorHelpers } from './AttractorHelpers';
+import { AttractorParticles } from './AttractorParticles';
 
-const [defaultA, defaultB, defaultC] = ATTRACTOR_DEFAULT_POSITIONS
+const [defaultA, defaultB, defaultC] = ATTRACTOR_DEFAULT_POSITIONS;
 
 export default function TslComputeAttractorsParticles() {
   // Attractor positions are consumed by BOTH AttractorParticles (the uniformArray)
@@ -68,9 +68,9 @@ export default function TslComputeAttractorsParticles() {
     attractor2: { value: { x: defaultB.x, y: defaultB.y, z: defaultB.z }, step: 0.1 },
     attractor3: { value: { x: defaultC.x, y: defaultC.y, z: defaultC.z }, step: 0.1 },
     helpers: true,
-  })
+  });
 
-  const attractorPositions = [attractor1, attractor2, attractor3]
+  const attractorPositions = [attractor1, attractor2, attractor3];
 
   return (
     <Canvas renderer background="#000000" camera={{ position: [3, 5, 8], fov: 25, near: 0.1, far: 100 }}>
@@ -78,5 +78,5 @@ export default function TslComputeAttractorsParticles() {
       <AttractorHelpers positions={attractorPositions} visible={helpers} />
       <DemoHelpers grid={false} minDistance={0.1} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

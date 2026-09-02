@@ -37,18 +37,18 @@
  * - `dpr={1}` mirrors the original's `setPixelRatio(1.0)` ("important for
  *   performance": 41 clearcoat physical materials)
  */
-import { Suspense } from 'react'
-import { NeutralToneMapping } from 'three/webgpu'
+import { Suspense } from 'react';
+import { NeutralToneMapping } from 'three/webgpu';
 
-import { Canvas } from '@react-three/fiber/webgpu'
-import { Environment } from '@react-three/drei/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu';
+import { Environment } from '@react-three/drei/webgpu';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { GridPlane } from './GridPlane'
-import { WoodShowcase } from './WoodShowcase'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { GridPlane } from './GridPlane';
+import { WoodShowcase } from './WoodShowcase';
 
 const HDR_URL =
-  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/san_giuseppe_bridge_2k.hdr'
+  'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/equirectangular/san_giuseppe_bridge_2k.hdr';
 
 export default function TslWood() {
   return (
@@ -72,5 +72,5 @@ export default function TslWood() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 0, 0.548]} />
     </Canvas>
-  )
+  );
 }

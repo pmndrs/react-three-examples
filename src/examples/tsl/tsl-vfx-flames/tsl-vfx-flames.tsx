@@ -39,13 +39,13 @@
  *   updating — the whole scene freezes on its first frame. Bisected on this port;
  *   sprites/tsl-earth/refraction in this corpus exhibit the same latent freeze
  */
-import { Suspense } from 'react'
-import { NoToneMapping } from 'three/webgpu'
+import { Suspense } from 'react';
+import { NoToneMapping } from 'three/webgpu';
 
-import { Canvas } from '@react-three/fiber/webgpu'
+import { Canvas } from '@react-three/fiber/webgpu';
 
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { Flames } from './Flames'
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { Flames } from './Flames';
 
 export default function TslVfxFlames() {
   return (
@@ -63,5 +63,5 @@ export default function TslVfxFlames() {
       </Suspense>
       <DemoHelpers grid={false} minDistance={0.1} maxDistance={50} />
     </Canvas>
-  )
+  );
 }

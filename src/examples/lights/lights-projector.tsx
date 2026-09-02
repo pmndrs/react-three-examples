@@ -33,7 +33,7 @@
  * - DemoHelpers grid disabled (`grid={false}`) — the original's own floor plane IS the
  *   shadow/projection receiver this example is about
  */
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ACESFilmicToneMapping,
   CameraHelper,
@@ -41,40 +41,40 @@ import {
   SRGBColorSpace,
   SpotLightHelper,
   VideoTexture,
-} from 'three/webgpu'
-import type { ProjectorLight as ProjectorLightImpl, Texture } from 'three/webgpu'
-import { PLYLoader } from 'three/addons/loaders/PLYLoader.js'
-import { Fn, color, mx_worley_noise_float, time } from 'three/tsl'
+} from 'three/webgpu';
+import type { ProjectorLight as ProjectorLightImpl, Texture } from 'three/webgpu';
+import { PLYLoader } from 'three/addons/loaders/PLYLoader.js';
+import { Fn, color, mx_worley_noise_float, time } from 'three/tsl';
 
-import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu'
-import { useTexture } from '@react-three/drei/webgpu'
-import { folder, useControls } from 'leva'
+import { Canvas, useFrame, useLoader } from '@react-three/fiber/webgpu';
+import { useTexture } from '@react-three/drei/webgpu';
+import { folder, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
-const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/'
-const COLORS_URL = `${TEXTURE_BASE}colors.png`
-const VIDEO_URL = `${TEXTURE_BASE}sintel.mp4`
-const LUCY_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/ply/binary/Lucy100k.ply'
+const TEXTURE_BASE = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/';
+const COLORS_URL = `${TEXTURE_BASE}colors.png`;
+const VIDEO_URL = `${TEXTURE_BASE}sintel.mp4`;
+const LUCY_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/ply/binary/Lucy100k.ply';
 
-type ProjectionType = 'procedural' | 'video' | 'texture'
+type ProjectionType = 'procedural' | 'video' | 'texture';
 
 // Stanford Lucy statue: same geometry-only PLY as lights-spotlight, no baked normals.
 function Lucy() {
-  const raw = useLoader(PLYLoader, LUCY_URL)
+  const raw = useLoader(PLYLoader, LUCY_URL);
 
   const geometry = useMemo(() => {
-    const geo = raw.clone()
-    geo.scale(0.0024, 0.0024, 0.0024)
-    geo.computeVertexNormals()
-    return geo
-  }, [raw])
+    const geo = raw.clone();
+    geo.scale(0.0024, 0.0024, 0.0024);
+    geo.computeVertexNormals();
+    return geo;
+  }, [raw]);
 
   return (
     <mesh geometry={geometry} rotation-y={-Math.PI / 2} position={[0, 0.8, 0]} castShadow receiveShadow>
       <meshLambertMaterial />
     </mesh>
-  )
+  );
 }
 
 function Floor() {
@@ -83,7 +83,7 @@ function Floor() {
       <planeGeometry args={[200, 200]} />
       <meshLambertMaterial color="#bcbcbc" />
     </mesh>
-  )
+  );
 }
 
 // The projector light itself: orbits the statue at the original's fixed rate, projects
@@ -115,11 +115,11 @@ function ProjectorRig() {
       focus: { value: 1, min: 0, max: 1, step: 0.01 },
     }),
     helpers: false,
-  })
+  });
 
-  const lightRef = useRef<ProjectorLightImpl>(null)
-  const helperPairRef = useRef<{ spot: SpotLightHelper; shadowCam: CameraHelper } | null>(null)
-  const colorsTexture = useTexture(COLORS_URL)
+  const lightRef = useRef<ProjectorLightImpl>(null);
+  const helperPairRef = useRef<{ spot: SpotLightHelper; shadowCam: CameraHelper } | null>(null);
+  const colorsTexture = useTexture(COLORS_URL);
 
   // Procedural caustic "gel": the renderer calls this with the light's own projected
   // UV every fragment (see header DEMONSTRATES). Built once — a pure TSL graph
@@ -129,94 +129,94 @@ function ProjectorRig() {
       Fn(([lightCoord]) => {
         // Fn's destructured param types as bare ShaderNodeObject<Node> (AGENTS.md B10
         // cast family) — the light passes its vec3 projected coordinate here.
-        const projectorUV = lightCoord
-        const waterLayer0 = mx_worley_noise_float(projectorUV.mul(10).add(time)).pow(2)
-        return waterLayer0.mul(color('#5abcd8')).mul(2)
+        const projectorUV = lightCoord;
+        const waterLayer0 = mx_worley_noise_float(projectorUV.mul(10).add(time)).pow(2);
+        return waterLayer0.mul(color('#5abcd8')).mul(2);
       }),
     [],
-  )
+  );
 
   const [videoTexture] = useState(() => {
-    const video = document.createElement('video')
-    video.src = VIDEO_URL
-    video.loop = true
-    video.muted = true
-    video.playsInline = true
-    video.crossOrigin = 'anonymous'
-    return new VideoTexture(video)
-  })
+    const video = document.createElement('video');
+    video.src = VIDEO_URL;
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.crossOrigin = 'anonymous';
+    return new VideoTexture(video);
+  });
 
   useEffect(() => {
-    colorsTexture.minFilter = LinearFilter
-    colorsTexture.magFilter = LinearFilter
-    colorsTexture.generateMipmaps = false
-    colorsTexture.colorSpace = SRGBColorSpace
-  }, [colorsTexture])
+    colorsTexture.minFilter = LinearFilter;
+    colorsTexture.magFilter = LinearFilter;
+    colorsTexture.generateMipmaps = false;
+    colorsTexture.colorSpace = SRGBColorSpace;
+  }, [colorsTexture]);
 
   // Swap the projected "gel" source — see header DEMONSTRATES/DIVERGENCE.
   useEffect(() => {
-    const light = lightRef.current
-    if (!light) return
-    const nodeLight = light as unknown as { colorNode: typeof causticEffect | null }
+    const light = lightRef.current;
+    if (!light) return;
+    const nodeLight = light as unknown as { colorNode: typeof causticEffect | null };
 
-    nodeLight.colorNode = null
-    light.map = null
-    videoTexture.image.pause()
+    nodeLight.colorNode = null;
+    light.map = null;
+    videoTexture.image.pause();
 
     if (type === 'procedural') {
-      nodeLight.colorNode = causticEffect
+      nodeLight.colorNode = causticEffect;
     } else if (type === 'video') {
-      light.map = videoTexture as unknown as Texture
-      videoTexture.image.play().catch(() => {})
+      light.map = videoTexture as unknown as Texture;
+      videoTexture.image.play().catch(() => {});
     } else {
-      light.map = colorsTexture as Texture
+      light.map = colorsTexture as Texture;
     }
-  }, [type, causticEffect, videoTexture, colorsTexture])
+  }, [type, causticEffect, videoTexture, colorsTexture]);
 
   useEffect(() => {
-    const light = lightRef.current
-    if (!light) return
-    light.shadow.focus = focus
-  }, [focus])
+    const light = lightRef.current;
+    if (!light) return;
+    light.shadow.focus = focus;
+  }, [focus]);
 
   // Mount once: attach both helpers as real children of the light — see
   // lights-spotlight header DEMONSTRATES.
   useEffect(() => {
-    const light = lightRef.current
-    if (!light) return
+    const light = lightRef.current;
+    if (!light) return;
 
-    const spot = new SpotLightHelper(light)
-    const shadowCam = new CameraHelper(light.shadow.camera)
-    light.add(spot)
-    light.add(shadowCam)
-    helperPairRef.current = { spot, shadowCam }
+    const spot = new SpotLightHelper(light);
+    const shadowCam = new CameraHelper(light.shadow.camera);
+    light.add(spot);
+    light.add(shadowCam);
+    helperPairRef.current = { spot, shadowCam };
 
     return () => {
-      light.remove(spot)
-      light.remove(shadowCam)
-      spot.dispose()
-      helperPairRef.current = null
-    }
-  }, [])
+      light.remove(spot);
+      light.remove(shadowCam);
+      spot.dispose();
+      helperPairRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
-    const pair = helperPairRef.current
-    if (!pair) return
-    pair.spot.visible = helpers
-    pair.shadowCam.visible = helpers
-  }, [helpers])
+    const pair = helperPairRef.current;
+    if (!pair) return;
+    pair.spot.visible = helpers;
+    pair.shadowCam.visible = helpers;
+  }, [helpers]);
 
   useFrame(({ time: nowMs }) => {
-    const light = lightRef.current
-    if (!light) return
-    const t = nowMs / 3000
-    light.position.x = Math.cos(t) * 2.5
-    light.position.z = Math.sin(t) * 2.5
+    const light = lightRef.current;
+    if (!light) return;
+    const t = nowMs / 3000;
+    light.position.x = Math.cos(t) * 2.5;
+    light.position.z = Math.sin(t) * 2.5;
 
-    const pair = helperPairRef.current
-    pair?.spot.update()
-    pair?.shadowCam.update()
-  })
+    const pair = helperPairRef.current;
+    pair?.spot.update();
+    pair?.shadowCam.update();
+  });
 
   return (
     <projectorLight
@@ -234,7 +234,7 @@ function ProjectorRig() {
       shadow-camera-near={1}
       shadow-camera-far={10}
     />
-  )
+  );
 }
 
 export default function LightsProjector() {
@@ -254,5 +254,5 @@ export default function LightsProjector() {
       </Suspense>
       <DemoHelpers grid={false} target={[0, 1, 0]} minDistance={2} maxDistance={10} maxPolarAngle={Math.PI / 2} />
     </Canvas>
-  )
+  );
 }

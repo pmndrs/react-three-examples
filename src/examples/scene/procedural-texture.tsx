@@ -30,26 +30,26 @@
  *   wired to a live "update once" button instead of left as dead code, so the API is
  *   actually demonstrated, not just narrated in a comment
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js'
-import { checker, convertToTexture, uv } from 'three/tsl'
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
+import { checker, convertToTexture, uv } from 'three/tsl';
 
-import { Canvas, useUniforms } from '@react-three/fiber/webgpu'
-import { button, useControls } from 'leva'
+import { Canvas, useUniforms } from '@react-three/fiber/webgpu';
+import { button, useControls } from 'leva';
 
-import { DemoHelpers } from '../../utils/DemoHelpers'
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 function ProceduralPlane() {
-  const [updateTick, setUpdateTick] = useState(0)
+  const [updateTick, setUpdateTick] = useState(0);
 
   const { uvScale, blurAmount, autoUpdate } = useControls('procedural-texture', {
     uvScale: { value: 4, min: 1, max: 10, step: 0.1, label: 'uv scale (before rtt)' },
     blurAmount: { value: 0.5, min: 0, max: 2, step: 0.01, label: 'blur amount (after rtt)' },
     autoUpdate: { value: true, label: 'auto update' },
     'update once': button(() => setUpdateTick((n) => n + 1)),
-  })
+  });
 
-  const { uvScale: uvScaleNode, blurAmount: blurAmountNode } = useUniforms({ uvScale, blurAmount })
+  const { uvScale: uvScaleNode, blurAmount: blurAmountNode } = useUniforms({ uvScale, blurAmount });
 
   // Procedural checker pattern, baked to a 512x512 texture. `convertToTexture` returns
   // an `RTTNode` (typed as such by @types/three) — no cast needed to reach `.autoUpdate`/
@@ -61,34 +61,34 @@ function ProceduralPlane() {
     // for the lint rule, not for churn. It guards against re-baking a brand new RTTNode
     // (render target + quad mesh) on every leva tick.
     [uvScaleNode],
-  )
+  );
 
   const colorNode = useMemo(
     () => gaussianBlur(proceduralToTexture, blurAmountNode, 20),
     [proceduralToTexture, blurAmountNode],
-  )
+  );
 
   useEffect(() => {
-    proceduralToTexture.autoUpdate = autoUpdate
-  }, [proceduralToTexture, autoUpdate])
+    proceduralToTexture.autoUpdate = autoUpdate;
+  }, [proceduralToTexture, autoUpdate]);
 
   // "update once": force exactly one more bake on button click. Skip the mount tick —
   // the initial bake already happens on its own (autoUpdate defaults true).
-  const isMount = useRef(true)
+  const isMount = useRef(true);
   useEffect(() => {
     if (isMount.current) {
-      isMount.current = false
-      return
+      isMount.current = false;
+      return;
     }
-    proceduralToTexture.textureNeedsUpdate = true
-  }, [updateTick, proceduralToTexture])
+    proceduralToTexture.textureNeedsUpdate = true;
+  }, [updateTick, proceduralToTexture]);
 
   return (
     <mesh>
       <planeGeometry args={[2, 2]} />
       <meshBasicNodeMaterial colorNode={colorNode} />
     </mesh>
-  )
+  );
 }
 
 export default function ProceduralTexture() {
@@ -97,5 +97,5 @@ export default function ProceduralTexture() {
       <ProceduralPlane />
       <DemoHelpers />
     </Canvas>
-  )
+  );
 }

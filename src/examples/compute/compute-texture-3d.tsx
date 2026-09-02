@@ -35,7 +35,7 @@
  *   shading are ported verbatim from `volume-cloud` (same technique, not re-derived) —
  *   duplicated rather than shared, per this corpus's one-file-per-example convention
  */
-import { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react';
 import {
   Break,
   Fn,
@@ -48,20 +48,20 @@ import {
   time,
   vec3,
   vec4,
-} from 'three/tsl'
-import { BackSide, CanvasTexture, NoToneMapping, SRGBColorSpace, Storage3DTexture } from 'three/webgpu'
-import type { StorageTexture } from 'three/webgpu'
-import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js'
-import { Canvas, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu'
-import { useControls } from 'leva'
-import { DemoHelpers } from '../../utils/DemoHelpers'
+} from 'three/tsl';
+import { BackSide, CanvasTexture, NoToneMapping, SRGBColorSpace, Storage3DTexture } from 'three/webgpu';
+import type { StorageTexture } from 'three/webgpu';
+import { RaymarchingBox } from 'three/addons/tsl/utils/Raymarching.js';
+import { Canvas, useFrame, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu';
+import { useControls } from 'leva';
+import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // Per-axis voxel resolution — 200^3 = 8M compute invocations/frame, matching the
 // original exactly (a single cheap noise-write pass; real GPUs handle this at 60fps).
-const GRID_SIZE = 200
+const GRID_SIZE = 200;
 
 function CloudVolume() {
-  const renderer = useThree((s) => s.renderer)
+  const renderer = useThree((s) => s.renderer);
 
   //* Controls =====================================================
   const { threshold, opacity, range, steps, animationSpeed } = useControls('compute-texture-3d', {
@@ -70,11 +70,11 @@ function CloudVolume() {
     range: { value: 0.1, min: 0, max: 1, step: 0.01 },
     steps: { value: 100, min: 0, max: 200, step: 1 },
     animationSpeed: { value: 1, min: 0, max: 3, step: 0.05, label: 'animation speed' },
-  })
+  });
   const { uThreshold, uOpacity, uRange, uSteps, uAnimSpeed } = useUniforms(
     { uThreshold: threshold, uOpacity: opacity, uRange: range, uSteps: steps, uAnimSpeed: animationSpeed },
     'computeTexture3d', // WGSL-identifier rule: camelCase scope, never kebab-case
-  )
+  );
 
   // Cast at the boundary: fiber's `StorageLike` union misses `Storage3DTexture`
   // even though the compute docs show one being stored (fiber typing gap — the
@@ -86,11 +86,11 @@ function CloudVolume() {
   // already targets (AGENTS.md's non-node-instance rule, pattern:
   // compute-particles-snow).
   const [cloudTexture] = useState<StorageTexture>(() => {
-    const tex = new Storage3DTexture(GRID_SIZE, GRID_SIZE, GRID_SIZE)
-    tex.generateMipmaps = false
-    tex.name = 'cloud'
-    return tex as unknown as StorageTexture
-  })
+    const tex = new Storage3DTexture(GRID_SIZE, GRID_SIZE, GRID_SIZE);
+    tex.generateMipmaps = false;
+    tex.name = 'cloud';
+    return tex as unknown as StorageTexture;
+  });
 
   // ROOT-LEVEL useNodes on purpose (UPSTREAM.md B16): a scoped call would name entries
   // `${scope}.${name}`, and the raymarch material's texture-sample node reaches WGSL
@@ -99,97 +99,97 @@ function CloudVolume() {
     // Zero-arg Fn closing over cloudTexture directly — see header DIVERGENCE (the
     // original threads it through an object-destructured Fn param instead).
     const computeCloud = Fn(() => {
-      const scale = 0.05
-      const id = instanceIndex
+      const scale = 0.05;
+      const id = instanceIndex;
 
-      const x = id.mod(GRID_SIZE)
-      const y = id.div(GRID_SIZE).mod(GRID_SIZE)
-      const z = id.div(GRID_SIZE * GRID_SIZE)
+      const x = id.mod(GRID_SIZE);
+      const y = id.div(GRID_SIZE).mod(GRID_SIZE);
+      const z = id.div(GRID_SIZE * GRID_SIZE);
 
-      const coord3d = vec3(x, y, z)
-      const centered = coord3d.sub(GRID_SIZE / 2).div(GRID_SIZE)
-      const d = centered.length().oneMinus()
+      const coord3d = vec3(x, y, z);
+      const centered = coord3d.sub(GRID_SIZE / 2).div(GRID_SIZE);
+      const d = centered.length().oneMinus();
 
-      const noiseCoord = coord3d.mul(scale / 1.5).add(time.mul(uAnimSpeed))
-      const noise = mx_noise_vec3(noiseCoord).toConst('noise')
-      const data = noise.mul(d).mul(d).toConst('data')
+      const noiseCoord = coord3d.mul(scale / 1.5).add(time.mul(uAnimSpeed));
+      const noise = mx_noise_vec3(noiseCoord).toConst('noise');
+      const data = noise.mul(d).mul(d).toConst('data');
 
-      textureStore(cloudTexture, vec3(x, y, z), vec4(vec3(data.x), 1.0))
-    })
+      textureStore(cloudTexture, vec3(x, y, z), vec4(vec3(data.x), 1.0));
+    });
 
-    const map = texture3D(cloudTexture, null, 0)
+    const map = texture3D(cloudTexture, null, 0);
 
     const raymarchCloud = Fn(() => {
-      const finalColor = vec4(0).toVar()
+      const finalColor = vec4(0).toVar();
 
       RaymarchingBox(uSteps, ({ positionRay }) => {
-        const mapValue = map.sample(positionRay.add(0.5)).r.toVar()
+        const mapValue = map.sample(positionRay.add(0.5)).r.toVar();
 
-        mapValue.assign(smoothstep(uThreshold.sub(uRange), uThreshold.add(uRange), mapValue).mul(uOpacity))
+        mapValue.assign(smoothstep(uThreshold.sub(uRange), uThreshold.add(uRange), mapValue).mul(uOpacity));
 
-        const shading = map.sample(positionRay.add(vec3(-0.01))).r.sub(map.sample(positionRay.add(vec3(0.01))).r)
-        const col = shading.mul(4.0).add(positionRay.x.add(positionRay.y).mul(0.5)).add(0.3)
+        const shading = map.sample(positionRay.add(vec3(-0.01))).r.sub(map.sample(positionRay.add(vec3(0.01))).r);
+        const col = shading.mul(4.0).add(positionRay.x.add(positionRay.y).mul(0.5)).add(0.3);
 
-        finalColor.rgb.addAssign(finalColor.a.oneMinus().mul(mapValue).mul(col))
-        finalColor.a.addAssign(finalColor.a.oneMinus().mul(mapValue))
+        finalColor.rgb.addAssign(finalColor.a.oneMinus().mul(mapValue).mul(col));
+        finalColor.a.addAssign(finalColor.a.oneMinus().mul(mapValue));
 
         If(finalColor.a.greaterThanEqual(0.95), () => {
-          Break()
-        })
-      })
+          Break();
+        });
+      });
 
-      return finalColor
-    })
+      return finalColor;
+    });
 
     return {
       computeNode: computeCloud().compute(GRID_SIZE * GRID_SIZE * GRID_SIZE),
       colorNode: raymarchCloud(),
-    }
-  })
+    };
+  });
 
   useFrame(
     () => {
-      renderer.compute(computeNode)
+      renderer.compute(computeNode);
     },
     { phase: 'update' },
-  )
+  );
 
   return (
     <mesh rotation-y={Math.PI / 2}>
       <boxGeometry args={[10, 10, 10]} />
       <nodeMaterial colorNode={colorNode} side={BackSide} transparent />
     </mesh>
-  )
+  );
 }
 
 function Sky() {
   // 1x32 vertical gradient painted on a 2D canvas — ported verbatim from volume-cloud.
   const skyMap = useMemo(() => {
-    const canvas = document.createElement('canvas')
-    canvas.width = 1
-    canvas.height = 32
+    const canvas = document.createElement('canvas');
+    canvas.width = 1;
+    canvas.height = 32;
 
-    const context = canvas.getContext('2d')
+    const context = canvas.getContext('2d');
     if (context) {
-      const gradient = context.createLinearGradient(0, 0, 0, 32)
-      gradient.addColorStop(0.0, '#014a84')
-      gradient.addColorStop(0.5, '#0561a0')
-      gradient.addColorStop(1.0, '#437ab6')
-      context.fillStyle = gradient
-      context.fillRect(0, 0, 1, 32)
+      const gradient = context.createLinearGradient(0, 0, 0, 32);
+      gradient.addColorStop(0.0, '#014a84');
+      gradient.addColorStop(0.5, '#0561a0');
+      gradient.addColorStop(1.0, '#437ab6');
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 1, 32);
     }
 
-    const map = new CanvasTexture(canvas)
-    map.colorSpace = SRGBColorSpace
-    return map
-  }, [])
+    const map = new CanvasTexture(canvas);
+    map.colorSpace = SRGBColorSpace;
+    return map;
+  }, []);
 
   return (
     <mesh>
       <sphereGeometry args={[10]} />
       <meshBasicNodeMaterial map={skyMap} side={BackSide} />
     </mesh>
-  )
+  );
 }
 
 export default function ComputeTexture3D() {
@@ -204,5 +204,5 @@ export default function ComputeTexture3D() {
       <CloudVolume />
       <DemoHelpers grid={false} />
     </Canvas>
-  )
+  );
 }

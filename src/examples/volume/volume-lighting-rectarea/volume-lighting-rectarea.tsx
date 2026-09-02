@@ -33,13 +33,13 @@
  *   its own 2000-unit floor slab)
  * - `Inspector`/`.toInspector()` wiring dropped (not ported)
  */
-import { Suspense } from 'react'
-import { NeutralToneMapping } from 'three/webgpu'
-import { Canvas } from '@react-three/fiber/webgpu'
-import { DemoHelpers } from '../../../utils/DemoHelpers'
-import { VolumeLightingRectarea } from './VolumeLightingRectarea'
+import { Suspense } from 'react';
+import { NeutralToneMapping } from 'three/webgpu';
+import { Canvas } from '@react-three/fiber/webgpu';
+import { DemoHelpers } from '../../../utils/DemoHelpers';
+import { VolumeLightingRectarea } from './VolumeLightingRectarea';
 
-const KNOT_POSITION: [number, number, number] = [0, 5.5, 0]
+const KNOT_POSITION: [number, number, number] = [0, 5.5, 0];
 
 export default function VolumeLightingRectareaExample() {
   return (
@@ -55,5 +55,5 @@ export default function VolumeLightingRectareaExample() {
       </Suspense>
       <DemoHelpers grid={false} target={KNOT_POSITION} minDistance={5} maxDistance={200} />
     </Canvas>
-  )
+  );
 }
