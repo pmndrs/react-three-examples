@@ -2,28 +2,11 @@
 
 Generated from `research/data/files_r185.json` vs `src/examples.json`.
 
-**214 in r185 · 129 ported · 85 unported · 10 excluded · 7 deferred · 68 TO PORT.**
+**214 in r185 · 145 ported · 10 excluded · 7 deferred · 52 TO PORT.**
 
-> **DECIDED 2026-09-02 — 10 excluded, 75 to port.** These r185 `webgpu_*` pages exercise
-> renderer internals or measure performance rather than teaching a visual technique, so a
-> React port would demonstrate nothing about R3F. They are struck through below and
-> enumerated in `docs/SPEC.md` §4, which always said "minus stress/internal tests" without
-> listing them.
->
-> `sandbox` · `test-memory` · `performance` · `performance-renderbundle` · `pmrem-test` ·
-> `furnace-test` · `compile-async` · `multisampled-renderbuffers` ·
-> `reversed-depth-buffer` · `centroid-sampling`
->
-> `furnace-test` (PBR correctness) and `centroid-sampling` (an MSAA subtlety) are the
-> arguable two — revisit if a "renderer correctness" group ever makes sense.
-
-> **DEFERRED 2026-09-02 — 7 more, by rules SPEC §4 already had.** Nobody had applied them
-> to this list. WebXR (`xr-cubes`, `xr-native-layers`, `xr-rollercoaster`) and webaudio
-> (`compute-audio`) are "explicitly out of scope for now — final-phase items"; the TSL
-> tooling pages (`tsl-editor`, `tsl-transpiler`, `tsl-graph`) are "a later-phase project,
-> not v1". Deferred, not excluded — they come back in a later phase.
->
-> **Net: 68 ports in Phase 1.**
+> Checkboxes are the source of truth; the counts above are hand-updated. After a wave,
+> re-tick with `node scripts/tick-backlog.mjs` — anything present in `src/examples.json`
+> is ported.
 
 Category is a FIRST GUESS from the slug — the porting agent confirms it and may
 place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
@@ -100,19 +83,19 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## reflections (5)
 
-- [ ] `cubemap-adjustments`
-- [ ] `cubemap-mix`
-- [ ] `equirectangular`
-- [ ] `pmrem-cubemap`
-- [ ] `reflection-roughness`
+- [x] ~~`cubemap-adjustments`~~ — ported
+- [x] ~~`cubemap-mix`~~ — ported
+- [x] ~~`equirectangular`~~ — ported
+- [x] ~~`pmrem-cubemap`~~ — ported
+- [x] ~~`reflection-roughness`~~ — ported
 
 ## geometry (5)
 
-- [ ] `instance-path`
-- [ ] `instancing-morph`
-- [ ] `lines-fat-raycasting`
-- [ ] `lines-fat-wireframe`
-- [ ] `skinning-instancing-individual`
+- [x] ~~`instance-path`~~ — ported
+- [x] ~~`instancing-morph`~~ — ported
+- [x] ~~`lines-fat-raycasting`~~ — ported
+- [x] ~~`lines-fat-wireframe`~~ — ported
+- [x] ~~`skinning-instancing-individual`~~ — ported
 
 ## materials (5)
 
@@ -132,10 +115,10 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## textures (4)
 
-- [ ] `loader-texture-ktx2`
-- [ ] `texturegather`
-- [ ] `texturegrad`
-- [ ] `video-frame`
+- [x] ~~`loader-texture-ktx2`~~ — ported
+- [x] ~~`texturegather`~~ — ported
+- [x] ~~`texturegrad`~~ — ported
+- [x] ~~`video-frame`~~ — ported
 
 ## animation (3)
 
@@ -145,8 +128,8 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## camera (2)
 
-- [ ] `camera-logarithmicdepthbuffer`
-- [ ] `display-stereo`
+- [x] ~~`camera-logarithmicdepthbuffer`~~ — ported
+- [x] ~~`display-stereo`~~ — ported
 
 ## volume (1)
 

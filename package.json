@@ -19,7 +19,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "generate:manifest": "node scripts/generate-manifest.mjs",
-    "compare": "node scripts/compare-lines.mjs"
+    "compare": "node scripts/compare-lines.mjs",
+    "tick": "node scripts/tick-backlog.mjs"
   },
   "dependencies": {
     "@react-three/drei": "11.0.0-alpha.6",

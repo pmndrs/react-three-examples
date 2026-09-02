@@ -14,6 +14,11 @@ Contract: [docs/SPEC.md](docs/SPEC.md) · Milestones: [docs/ROADMAP.md](docs/ROA
 When a port forces a divergence from this doc, that divergence must end up as an
 example fix OR an amendment here (with a changelog entry) — never silent.
 
+**A judgment call you cannot make from the rules goes in
+[docs/REVIEW-QUEUE.md](docs/REVIEW-QUEUE.md), not into the code silently.** Add the entry
+(and a `REVIEW(<topic>):` comment at the site if there is one), say what you'd do and why,
+and move on. Never resolve someone else's entry there.
+
 ## Commands
 
 - Package manager: **pnpm only**
