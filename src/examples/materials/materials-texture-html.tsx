@@ -25,8 +25,9 @@
  *
  * DIVERGENCE from original
  * - The polyfill import is the one place this repo loads executable code from a CDN
- *   rather than a data asset — pinned to an exact version, matching what the
- *   original's own import map does (`https://cdn.jsdelivr.net/npm/three-html-render@…`)
+ *   rather than a data asset (AGENTS.md § Repo format allows it only to shim an
+ *   unshipped browser API, only where the original does it too). We pin the exact
+ *   version; the original's import map does not
  * - RoomEnvironment -> PMREM IBL kept as a `useEffect` (skinning-instancing-individual
  *   pattern) instead of the original's synchronous `await renderer.init()` sequencing
  */

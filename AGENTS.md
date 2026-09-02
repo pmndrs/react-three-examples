@@ -581,6 +581,14 @@ ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
 - Assets: hotlink jsdelivr pinned to the release —
   `https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/<path>`. No vendored
   binaries. **curl-check the URL** — the mirror doesn't carry every asset variant.
+- **Executable JS from a CDN: only to shim an unshipped browser API, and only where
+  the original does it too.** A library that is merely third-party goes in
+  `package.json` and is imported normally — the CDN form is for polyfills whose whole
+  reason to exist is that the platform hasn't shipped the feature yet, which makes
+  installing them a lockfile entry we'd have to remove again later. Pin the exact
+  version (upstream's import maps usually don't), keep the feature detect that gates
+  it, and say so in the header. Sole instance: `materials-texture-html`
+  (`three-html-render`, polyfilling WICG HTML-in-Canvas).
 - **Verify dead or no-op code before porting it faithfully.** three.js examples are
   demo-quality: `volume_caustics` loads a texture it never assigns; `volume_lighting`
   calls `spotLight.lookAt()` every frame, which does nothing. Drop it and say so.
@@ -661,6 +669,11 @@ new patch, pin, or override lands with an UPSTREAM.md entry in the same commit.*
 
 ## Changelog
 
+- **2026-09-02 — § Repo format gained the runtime-CDN-JS rule.** `materials-texture-html`
+  loads the HTML-in-Canvas polyfill from jsdelivr, which the assets rule (about _data_
+  pinned to the three.js release) did not cover. Decided (Dennis): the API is a WICG
+  proposal shipping nowhere stable, so **match the original** rather than adding a 0.1.x
+  shim to the lockfile; an ordinary third-party library still gets installed normally.
 - **2026-09-01 — v1.1, amended by the `postprocessing` restyle pilot.** 17 examples
   restyled against v1.0; the doc changed where the pilot proved it wrong.
   **§ Post-processing: three dynamism patterns → four, and the SELECTION RULE is now

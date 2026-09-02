@@ -53,24 +53,6 @@ for a constant the demo is _about_" — otherwise the clause keeps getting stret
 
 ## 🟡 Worth a look
 
-### 3b. 🔴 `materials-texture-html` loads EXECUTABLE JS from a CDN at runtime
-
-`src/examples/materials/materials-texture-html.tsx` dynamically imports
-`three-html-render@0.1.2` from jsdelivr (pinned, `/* @vite-ignore */`). The original does
-exactly this — real browser support for `HTMLCanvasElement.prototype.requestPaint` is
-still unshipped, so the polyfill is feature-detected and fetched at runtime.
-
-**This is a new category of dependency.** AGENTS.md § Assets covers hotlinking _data_
-(textures, models, HDRs) pinned to the three.js release. Executable third-party JS,
-fetched at runtime, from a package that is not in our lockfile, is a different thing —
-supply-chain-wise and offline-wise.
-
-**Options:** (a) allow it, amend § Assets to say runtime JS must be version-pinned and
-named in the header; (b) add `three-html-render` as a real dependency and import it
-normally; (c) drop the example. **What I'd do:** (b) if the package is sane, else (a) —
-the demo is genuinely about HTML-as-texture and there is no way to show it without the
-polyfill. Flagging rather than setting tacit precedent.
-
 ### 4. Shared-instance markers — is `<Instances>` the real answer?
 
 Rule 3's carve-out (performance beats declarative when sharing is real) is working, but
@@ -147,10 +129,11 @@ unaffected. Arguably it should filter too. Small change, purely a taste call.
 
 ## Resolved
 
-| decided    | what                                                                   | outcome                                                                                                                                                                 |
-| ---------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-02 | Rule 3 vs `useMemo`'d materials shared across many meshes              | **Performance wins when sharing is real**, but flag it with `REVIEW(shared-instance):` so a human can check whether `<Instances>` is the better answer. Rule 3 amended. |
-| 2026-09-02 | `postprocessing.tsx`'s 4 sliders for constants the original hard-codes | **Keep.** They adjust hidden constants and cost ~8 lines.                                                                                                               |
-| 2026-09-02 | Formatter                                                              | **Prettier, r3f's config, with `semi: true`** — Dennis writes semicolons and `semi: false` was deleting them.                                                           |
-| 2026-09-02 | Which unported examples to cut                                         | **10 excluded** (renderer-internal/benchmark pages) + **7 deferred** by rules SPEC §4 already had (WebXR, webaudio, TSL tooling). Enumerated in SPEC §4.                |
-| 2026-09-02 | Action-bar buttons                                                     | **Real brand icons**, not text monograms.                                                                                                                               |
+| decided    | what                                                                   | outcome                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-02 | Rule 3 vs `useMemo`'d materials shared across many meshes              | **Performance wins when sharing is real**, but flag it with `REVIEW(shared-instance):` so a human can check whether `<Instances>` is the better answer. Rule 3 amended.                                                                                                                                                                                                                           |
+| 2026-09-02 | `postprocessing.tsx`'s 4 sliders for constants the original hard-codes | **Keep.** They adjust hidden constants and cost ~8 lines.                                                                                                                                                                                                                                                                                                                                         |
+| 2026-09-02 | Formatter                                                              | **Prettier, r3f's config, with `semi: true`** — Dennis writes semicolons and `semi: false` was deleting them.                                                                                                                                                                                                                                                                                     |
+| 2026-09-02 | Which unported examples to cut                                         | **10 excluded** (renderer-internal/benchmark pages) + **7 deferred** by rules SPEC §4 already had (WebXR, webaudio, TSL tooling). Enumerated in SPEC §4.                                                                                                                                                                                                                                          |
+| 2026-09-02 | Action-bar buttons                                                     | **Real brand icons**, not text monograms.                                                                                                                                                                                                                                                                                                                                                         |
+| 2026-09-02 | `materials-texture-html`'s runtime CDN import of `three-html-render`   | **Keep the CDN import, matching the original.** The rule Dennis set: a stable library gets installed properly; a shim for an unshipped browser API does what upstream does. WICG HTML-in-Canvas ships nowhere stable, so the polyfill stays a pinned, feature-detected runtime import rather than a 0.1.x lockfile entry we'd remove once the API lands. AGENTS.md § Repo format now states this. |
