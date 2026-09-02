@@ -20,9 +20,11 @@
     "format:check": "prettier --check .",
     "generate:manifest": "node scripts/generate-manifest.mjs",
     "compare": "node scripts/compare-lines.mjs",
-    "tick": "node scripts/tick-backlog.mjs"
+    "tick": "node scripts/tick-backlog.mjs",
+    "shot:original": "node scripts/shoot-original.mjs"
   },
   "dependencies": {
+    "@perplexdotgg/bounce": "^1.10.0",
     "@react-three/drei": "11.0.0-alpha.6",
     "@react-three/fiber": "10.0.0-alpha.4",
     "camera-controls": "^3.1.2",

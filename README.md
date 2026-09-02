@@ -7,7 +7,7 @@ The official [three.js examples](https://threejs.org/examples/), rebuilt in idio
 Same GPU, same techniques, less ceremony. A port that ends up longer, more indirect or
 more imperative than the original has failed, even if it renders perfectly.
 
-131 examples across 15 categories. Every one links back to its three.js original — this
+199 examples across 15 categories. Every one links back to its three.js original — this
 is a companion to the three.js examples, not a fork of them.
 
 ## Run it
@@ -22,17 +22,19 @@ single Vite app; each example owns its own `<Canvas>`.
 
 ## Commands
 
-| command                    | what it does                                                                |
-| -------------------------- | --------------------------------------------------------------------------- |
-| `pnpm dev`                 | Vite dev server on 5173                                                     |
-| `pnpm build`               | typecheck + production build                                                |
-| `pnpm lint`                | eslint **and** `prettier --check`                                           |
-| `pnpm format`              | prettier `--write`                                                          |
-| `pnpm test:changed <slug>` | smoke + animates for one example                                            |
-| `pnpm test:smoke`          | readiness / real `webgpu` context / non-black / clean console, all examples |
-| `pnpm test:animates`       | two-frame pixel diff — catches freezes smoke can't see                      |
-| `pnpm shot <slug>`         | screenshot to `screenshots/`                                                |
-| `pnpm generate:manifest`   | rebuild `category` + normalise tags in `examples.json`                      |
+| command                     | what it does                                                                |
+| --------------------------- | --------------------------------------------------------------------------- |
+| `pnpm dev`                  | Vite dev server on 5173                                                     |
+| `pnpm build`                | typecheck + production build                                                |
+| `pnpm lint`                 | eslint **and** `prettier --check`                                           |
+| `pnpm format`               | prettier `--write`                                                          |
+| `pnpm test:changed <slug>`  | smoke + animates for one example                                            |
+| `pnpm test:smoke`           | readiness / real `webgpu` context / non-black / clean console, all examples |
+| `pnpm test:animates`        | two-frame pixel diff — catches freezes smoke can't see                      |
+| `pnpm shot <slug>`          | screenshot to `screenshots/` (`SHOT_DELAY_MS` to capture later)             |
+| `pnpm shot:original <name>` | screenshot the LIVE three.js original, the review oracle                    |
+| `pnpm compare <slug>`       | our code lines **and** chars vs the original's                              |
+| `pnpm generate:manifest`    | rebuild `category` + normalise tags in `examples.json`                      |
 
 ## Layout
 
@@ -49,8 +51,8 @@ depth can change without touching routing.
 
 ## Scope
 
-- **Phase 1 — the `webgpu_*` set.** 129 of 214 r185 examples ported; **75 left**
-  ([docs/PORTING-BACKLOG.md](docs/PORTING-BACKLOG.md)).
+- **Phase 1 — the `webgpu_*` set: COMPLETE.** 197 of 214 r185 examples ported, 10
+  excluded, 7 deferred ([docs/PORTING-BACKLOG.md](docs/PORTING-BACKLOG.md)).
 - **10 examples are deliberately excluded**: `sandbox`, `test-memory`, `performance`,
   `performance-renderbundle`, `pmrem-test`, `furnace-test`, `compile-async`,
   `multisampled-renderbuffers`, `reversed-depth-buffer`, `centroid-sampling`. They

@@ -707,6 +707,91 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
   surface is attached by node TYPE, and every interface that stores a node untyped drops
   it. Fixing the storage types is more valuable than fixing them one call site at a time.
 
+### B37 · @types/three: `NodeBuilder.context` is declared `unknown`
+
+- **What**: `NodeBuilder.d.ts:11` types `context` as `unknown`, so the documented way to
+  suppress a lighting contribution inside a node's setup — `builder.context.radiance =
+vec3(0)` — cannot be written without a cast. The runtime object is a plain record of
+  node slots (`radiance`, `irradiance`, `ambientOcclusion`, …).
+- **Cost**: one cast per site, at exactly the points where a custom lighting integration
+  has to opt out of a built-in term.
+- **Where it bites**: `postprocessing/postprocessing-ssr-denoise`.
+- **Same family as B11** (duck-typed `*Node` fields). A declared `NodeContext` interface
+  would fix it once.
+
+### B38 · @types/three: the r185 meshopt clusterizer and simplifier ship no declarations
+
+- **What**: `three/examples/jsm/libs/` gained `meshopt_clusterizer.module.js` and
+  `meshopt_simplifier.module.js` in r185. `@types/three` declares `meshopt_decoder` but
+  not those two, so importing either is `TS7016` under `strict` (no `allowJs` here, so
+  their JSDoc is never read).
+- **Local shim**: `src/types/meshopt.d.ts` declares only the surface
+  `compute-rasterizer-ibl` uses (`buildMeshlets`, bounds, the packed buffer shapes).
+  **Unwind condition**: delete the file when `@types/three` ships declarations for both.
+- **Where it bites**: `compute/compute-rasterizer-ibl` — meshlet LOD generation.
+
+### B39 · @types/three: `PassNode.options` is undeclared, so `samples` can't be set after construction
+
+- **What**: `PassNode` assigns `this.options = options` in its constructor and reads
+  `this.options.samples` in `setup()`, but `PassNode.d.ts` declares `options` only as a
+  constructor PARAMETER. So `ssaaPass(scene, camera).options.samples = 0` fails `tsc` —
+  and `ssaaPass()` takes no options argument, so construction-time is not available either.
+- **Why it's invisible today**: fiber's `PassRecord = Record<string, any>` launders it, so
+  `passes.scenePass.options.samples = 0` typechecks by accident. Anything holding its own
+  pass instance does not get that.
+- **Where it bites**: `postprocessing-ssaa`, `postprocessing-traa` (both must force
+  single-sampled targets or WebGPU throws a sample-count validation error).
+
+### B40 · fiber: `onCreated`'s `RootState` types `renderer` as the WebGL/WebGPU union
+
+- **What**: on the `/webgpu` entry, `useThree((s) => s.renderer)` is correctly typed
+  `WebGPURenderer`, but `Canvas`'s `onCreated?: (state: RootState) => void` hands back a
+  `RootState` whose `renderer` is the union, so any WebGPU-only member (`.lighting`,
+  `.compute`, …) is a type error at the one callback that runs EARLY enough to configure
+  the renderer before its first render.
+- **Cost**: an `instanceof WebGPURenderer` narrow or a cast. Narrowing is fine but reads as
+  defensive code for a condition that cannot be false on this entry point.
+- Note `onCreated` turned out to be the wrong hook for `lights-clustered` anyway (see
+  B41) — but the typing gap stands for anything else that legitimately uses it.
+- **Where it bites**: `lights/lights-clustered`.
+
+### B41 · three: `Lighting.getNode()` caches into a MODULE-level WeakMap, so the first manager to touch a scene wins forever
+
+- **What**: `Lighting.getNode(scene)` reads and writes a module-scope
+  `const _weakMap = new WeakMap()` — **not** per-instance state. The renderer's own
+  `RenderList` calls it while being constructed
+  (`this.lightsNode = lighting.getNode( scene )`). So whichever `Lighting` instance is
+  installed when the FIRST render list for a scene is built has its node cached against
+  that scene permanently; assigning `renderer.lighting = new ClusteredLighting()` after
+  that point changes `renderer.lighting` but NOT the node anyone reads back.
+- **Why it's nasty**: it fails silently in the common case. `lights-clustered` only
+  crashed (`lightingNode.setSize is not a function`) because it calls a clustered-only
+  method. An example that merely reads the node would render with DEFAULT lighting while
+  looking correct and passing every test — a clustered-lighting demo not doing clustered
+  lighting.
+- **Suggested fix**: make the cache an instance field, or key it on
+  `(scene, lightingManager)`. Failing that, a public way to evict a scene's cached node.
+- **Where it bites**: `lights/lights-clustered` — worked around by installing the manager
+  in fiber's renderer FACTORY (`renderer={(props) => …}`), i.e. at construction, which is
+  what the vanilla original does. Neither a Canvas child's layout effect nor `onCreated`
+  is early enough. Measured ordering, which is the reverse of what you'd guess:
+  **layout effect runs BEFORE `onCreated`**, and the node is already cached before both.
+
+### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
+
+- **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from
+  `three/examples/jsm/modifiers/CurveModifier.js`. That `Flow` patches a `ShaderMaterial`
+  through `onBeforeCompile`, which does nothing to a node material — so the component is
+  inert on the WebGPU entry point that exports it.
+- **The fix exists upstream**: `three/examples/jsm/modifiers/CurveModifierGPU.js` ships a
+  node-material `Flow`. A `/webgpu` build importing that one would make spline-flow
+  declarative again.
+- **Where it bites**: `geometry/modifier-curve` — ported imperatively instead, because the
+  drei component silently renders unmodified geometry.
+- **Caveat for whoever takes this**: `CurveModifierGPU`'s `.d.ts` declares four helper
+  exports the shipped `.js` does not have (see B-adjacent note in AGENTS.md § Environment
+  gotchas). Only `Flow` is real at runtime.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

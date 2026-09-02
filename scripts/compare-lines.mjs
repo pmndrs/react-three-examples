@@ -10,6 +10,13 @@
 //   original — the whole .html (head, importmap and GUI code are all authored work),
 //              minus HTML comments, JS comments and blank lines.
 //
+// Two numbers, because ONE of them lies on TSL-dense examples. Prettier wraps at 120 cols
+// and the originals are 4-space-tab HTML with long lines, so a deeply-nested node graph
+// costs us several lines where the original spent one. `compute-rasterizer-ibl` reads
+// +40.6% by line and +8.5% by content — the line figure is measuring our formatter, not
+// our verbosity. So we also print CHARS: non-whitespace characters, which no line-wrapping
+// policy can move. When the two disagree sharply, believe CHARS and say so.
+//
 // Caveat: comment stripping is lexical, not a parser. A `//` inside a string literal or a
 // regex can be miscounted. It is a metric, not a proof — good to ±a couple of lines.
 //
@@ -35,7 +42,7 @@ const EXAMPLES_DIR = fileURLToPath(new URL('../src/examples', import.meta.url));
 function codeLines(source, { html = false } = {}) {
   let inBlock = false;
   let inHtmlComment = false;
-  let n = 0;
+  const kept = [];
 
   for (const raw of source.split('\n')) {
     const line = raw.trim();
@@ -59,9 +66,9 @@ function codeLines(source, { html = false } = {}) {
       if (!line.includes('*/')) inBlock = true;
       continue;
     }
-    n++;
+    kept.push(line);
   }
-  return n;
+  return { lines: kept.length, chars: kept.reduce((n, l) => n + l.replace(/\s+/g, '').length, 0) };
 }
 
 /**
@@ -142,7 +149,13 @@ async function main() {
     }
 
     const files = filesFor(slug);
-    const ours = files.reduce((n, f) => n + codeLines(readFileSync(f, 'utf8')), 0);
+    const ours = files.reduce(
+      (acc, f) => {
+        const c = codeLines(readFileSync(f, 'utf8'));
+        return { lines: acc.lines + c.lines, chars: acc.chars + c.chars };
+      },
+      { lines: 0, chars: 0 },
+    );
 
     const url = `https://raw.githubusercontent.com/mrdoob/three.js/r185/examples/${name}.html`;
     const res = await fetch(url);
@@ -152,22 +165,31 @@ async function main() {
     }
     const theirs = codeLines(await res.text(), { html: true });
 
-    rows.push({ slug, files: files.length, ours, theirs, delta: ours - theirs });
+    rows.push({ slug, files: files.length, ours, theirs });
   }
 
   const pad = (s, n) => String(s).padEnd(n);
   const lpad = (s, n) => String(s).padStart(n);
-  console.log(`${pad('slug', 34)}${lpad('files', 6)}${lpad('ours', 7)}${lpad('orig', 7)}${lpad('delta', 8)}`);
-  console.log('-'.repeat(62));
+  const pct = (a, b) => `${a > b ? '+' : ''}${(((a - b) / b) * 100).toFixed(1)}%`;
+
+  const head = `${pad('slug', 30)}${lpad('files', 6)}${lpad('lines', 7)}${lpad('orig', 7)}${lpad('Δ', 8)}${lpad('chars', 8)}${lpad('orig', 8)}${lpad('Δ', 8)}`;
+  console.log(head);
+  console.log('-'.repeat(head.length));
   for (const r of rows) {
-    const sign = r.delta <= 0 ? `${r.delta}` : `+${r.delta}`;
-    console.log(`${pad(r.slug, 34)}${lpad(r.files, 6)}${lpad(r.ours, 7)}${lpad(r.theirs, 7)}${lpad(sign, 8)}`);
+    console.log(
+      `${pad(r.slug, 30)}${lpad(r.files, 6)}${lpad(r.ours.lines, 7)}${lpad(r.theirs.lines, 7)}` +
+        `${lpad(pct(r.ours.lines, r.theirs.lines), 8)}${lpad(r.ours.chars, 8)}${lpad(r.theirs.chars, 8)}` +
+        `${lpad(pct(r.ours.chars, r.theirs.chars), 8)}`,
+    );
   }
   if (rows.length > 1) {
-    const o = rows.reduce((n, r) => n + r.ours, 0);
-    const t = rows.reduce((n, r) => n + r.theirs, 0);
-    console.log('-'.repeat(62));
-    console.log(`${pad('TOTAL', 40)}${lpad(o, 7)}${lpad(t, 7)}${lpad(`${(((o - t) / t) * 100).toFixed(1)}%`, 8)}`);
+    const sum = (k, side) => rows.reduce((n, r) => n + r[side][k], 0);
+    console.log('-'.repeat(head.length));
+    console.log(
+      `${pad('TOTAL', 36)}${lpad(sum('lines', 'ours'), 7)}${lpad(sum('lines', 'theirs'), 7)}` +
+        `${lpad(pct(sum('lines', 'ours'), sum('lines', 'theirs')), 8)}${lpad(sum('chars', 'ours'), 8)}` +
+        `${lpad(sum('chars', 'theirs'), 8)}${lpad(pct(sum('chars', 'ours'), sum('chars', 'theirs')), 8)}`,
+    );
   }
 }
 

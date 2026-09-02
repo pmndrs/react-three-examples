@@ -1,4 +1,82 @@
-# Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–2)
+# Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
+
+## Porting wave 3 — the last 31, 168 -> 198 (2026-09-02)
+
+Phase 1 is **effectively complete**: 196 of 214 r185 examples ported, 10 excluded,
+7 deferred. Six batches: SSR/SSGI family, compute, misc, filters, AA/DOF, buffers +
+upscaling, TSL/caustics — plus `postprocessing-ssgi-ballpool`, which needed a real
+dependency (below).
+
+### Three AGENTS.md rules were WRONG, not just incomplete
+
+Each had already cost an agent real time, and each was verified before rewriting:
+
+- **"Addons with no `.d.ts` still typecheck (TS infers from JSDoc)"** — false. There is no
+  `allowJs`, so it is `TS7016`. Probed directly by pulling `src/types/meshopt.d.ts` and
+  compiling. r185's `meshopt_clusterizer`/`_simplifier` are the live case (B38).
+- **"Hold non-node instances in lazy `useState`"** — safe for CPU-side objects, wrong for
+  anything the GPU binds. StrictMode double-invokes the initializer; a create-once hook
+  keeps the FIRST instance while the component commits the SECOND, so an
+  `IndirectStorageBufferAttribute` reaches the graph with no GPU buffer and dies at
+  `dispatchWorkgroupsIndirect`. Use `useBuffers`.
+- **`useUniforms` reconciles on every React re-render** and writes the declared value back
+  over whatever `useFrame` wrote — so dragging an unrelated leva slider resets a
+  frame-driven uniform. Verified in fiber's source
+  (`reconcile: … if (!equals) existing.value = newVal`). Frame-owned uniforms are plain
+  `uniform()` inside `useNodes`. **This one contradicted how much of the corpus reads**,
+  which is why it was checked rather than taken on report.
+
+### The line metric was lying, and now there are two
+
+`compute-rasterizer-ibl` reads **+40.6% by line and +8.5% by content**; `postprocessing-retro`
+**+3.9% / −14.1%**; `tsl-vfx-linkedparticles` **+15.0% / −17.4%**. Prettier wraps dense TSL
+at 120 cols where the original spent one long line — the line count was measuring our
+formatter. `pnpm compare` now prints non-whitespace chars alongside. The two agree
+everywhere else, which is what makes the divergence diagnostic rather than flattering.
+
+### New tooling, both filling a gap the docs already assumed
+
+- **`pnpm shot:original <name>`** — captures the LIVE three.js original. AGENTS.md has
+  always said to compare against the live original rather than the stale gallery
+  thumbnail; there was no tool for that half, so it largely didn't happen.
+- **`SHOT_DELAY_MS`** on `pnpm shot`, for demos whose picture develops over seconds.
+
+Together they settled `compute-reduce`: our flat square is **faithful** (the original's
+planes are flat white too) — but the capture showed the demo's substance lives in the DOM
+we drop as page furniture (pass counts, GPU timings, the subgroup explainer). Filed as a
+🔴 decision, since `storage-buffer` dropped `trackTimestamp` for the same reason.
+
+### A new dependency, under the rule set the same day
+
+`postprocessing-ssgi-ballpool`'s original drives everything through `@perplexdotgg/bounce`
+from a CDN import map. The runtime-CDN-JS rule settled that morning says a CDN import is
+only for polyfilling an unshipped browser API — an ordinary library gets installed. So
+`@perplexdotgg/bounce ^1.10.0` is now a real dependency (MIT, typed, one transitive dep).
+It is newer than the original's 1.8.1.
+
+### Other findings
+
+- **Prototype patching is module-scope mutable state.** `postprocessing-ssr-denoise`'s
+  original patches `PhysicalLightingModel.prototype` at module scope; in this SPA that
+  would follow the user into every later example. Symmetric `useLayoutEffect` instead.
+- **`passes.scenePass` is `undefined` on the first render** — pattern (d) always reads it
+  in an effect, and unguarded it surfaces as a readiness timeout, not an error.
+- **`<line>` is `<threeLine>`** — fiber omits `line`/`path`/`audio`/`source`; `<line>`
+  compiles as SVG and renders nothing.
+- New UPSTREAM briefs **B36** (drei `<CurveModifier>` is WebGL-only on the `/webgpu`
+  entry), **B37** (`NodeBuilder.context` is `unknown`), **B38** (meshopt declarations),
+  **B39** (`PassNode.options` undeclared).
+- Two upstream bugs fixed in `tsl-vfx-linkedparticles`: the spawn-rate slider _thins_ the
+  emitter (thread count baked at build, ring index uses the live value), and the cursor
+  plane normal compounds every frame so the emitter drifts off the cursor as you orbit.
+
+### Infrastructure note
+
+Three agents were killed mid-flight when the machine slept. Two had written nothing; two
+left structurally-complete but **unverified** files that were already registered in the
+manifest. Relaunched agents were told to treat those as unreviewed drafts rather than
+trust or overwrite them. Worth remembering: a registered-but-unverified example is the
+failure mode that slips into a commit unnoticed.
 
 ## Porting wave 2 — 21 examples, 147 -> 168 (2026-09-02)
 

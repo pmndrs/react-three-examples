@@ -2,7 +2,7 @@
 
 Generated from `research/data/files_r185.json` vs `src/examples.json`.
 
-**214 in r185 · 145 ported · 10 excluded · 7 deferred · 52 TO PORT.**
+**214 in r185 · 197 ported · 10 excluded · 7 deferred · 0 TO PORT — Phase 1 complete.**
 
 > Checkboxes are the source of truth; the counts above are hand-updated. After a wave,
 > re-tick with `node scripts/tick-backlog.mjs` — anything present in `src/examples.json`
@@ -16,38 +16,38 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 - [x] ~~`centroid-sampling`~~ — excluded (internal/benchmark)
 - [x] ~~`compile-async`~~ — excluded (internal/benchmark)
 - [x] ~~`furnace-test`~~ — excluded (internal/benchmark)
-- [ ] `modifier-curve`
+- [x] ~~`modifier-curve`~~ — ported
 - [x] ~~`multisampled-renderbuffers`~~ — excluded (internal/benchmark)
-- [ ] `particles`
+- [x] ~~`particles`~~ — ported
 - [x] ~~`performance`~~ — excluded (internal/benchmark)
 - [x] ~~`performance-renderbundle`~~ — excluded (internal/benchmark)
-- [ ] `pmrem-scene`
+- [x] ~~`pmrem-scene`~~ — ported
 - [x] ~~`pmrem-test`~~ — excluded (internal/benchmark)
 - [x] ~~`reversed-depth-buffer`~~ — excluded (internal/benchmark)
 - [x] ~~`sandbox`~~ — excluded (internal/benchmark)
-- [ ] `shadertoy`
-- [ ] `storage-buffer`
-- [ ] `struct-drawindirect`
+- [x] ~~`shadertoy`~~ — ported
+- [x] ~~`storage-buffer`~~ — ported
+- [x] ~~`struct-drawindirect`~~ — ported
 - [x] ~~`test-memory`~~ — excluded (internal/benchmark)
-- [ ] `upscaling-fsr1`
-- [ ] `upscaling-taau`
+- [x] ~~`upscaling-fsr1`~~ — ported
+- [x] ~~`upscaling-taau`~~ — ported
 
 ## postprocessing (14)
 
-- [ ] `postprocessing-3dlut`
-- [ ] `postprocessing-difference`
-- [ ] `postprocessing-dof-basic`
-- [ ] `postprocessing-masking`
-- [ ] `postprocessing-radial-blur`
-- [ ] `postprocessing-retro`
-- [ ] `postprocessing-ssaa`
-- [ ] `postprocessing-ssgi`
-- [ ] `postprocessing-ssgi-ballpool`
-- [ ] `postprocessing-ssr`
-- [ ] `postprocessing-ssr-denoise`
-- [ ] `postprocessing-sss`
-- [ ] `postprocessing-traa`
-- [ ] `postprocessing-transition`
+- [x] ~~`postprocessing-3dlut`~~ — ported
+- [x] ~~`postprocessing-difference`~~ — ported
+- [x] ~~`postprocessing-dof-basic`~~ — ported
+- [x] ~~`postprocessing-masking`~~ — ported
+- [x] ~~`postprocessing-radial-blur`~~ — ported
+- [x] ~~`postprocessing-retro`~~ — ported
+- [x] ~~`postprocessing-ssaa`~~ — ported
+- [x] ~~`postprocessing-ssgi`~~ — ported
+- [x] ~~`postprocessing-ssgi-ballpool`~~ — ported
+- [x] ~~`postprocessing-ssr`~~ — ported
+- [x] ~~`postprocessing-ssr-denoise`~~ — ported
+- [x] ~~`postprocessing-sss`~~ — ported
+- [x] ~~`postprocessing-traa`~~ — ported
+- [x] ~~`postprocessing-transition`~~ — ported
 
 ## scene (10)
 
@@ -65,12 +65,12 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 ## compute (7)
 
 - [x] ~~`compute-audio`~~ — deferred (webaudio — SPEC §4 out of scope for now)
-- [ ] `compute-particles-fluid`
-- [ ] `compute-rasterizer`
-- [ ] `compute-rasterizer-ibl`
-- [ ] `compute-reduce`
-- [ ] `compute-sort-bitonic`
-- [ ] `water`
+- [x] ~~`compute-particles-fluid`~~ — ported
+- [x] ~~`compute-rasterizer`~~ — ported
+- [x] ~~`compute-rasterizer-ibl`~~ — ported
+- [x] ~~`compute-reduce`~~ — ported
+- [x] ~~`compute-sort-bitonic`~~ — ported
+- [x] ~~`water`~~ — ported
 
 ## lights (6)
 
@@ -109,9 +109,9 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 - [x] ~~`tsl-editor`~~ — deferred (TSL editor/transpiler — SPEC §4 later-phase project, not v1)
 - [x] ~~`tsl-graph`~~ — deferred (TSL editor/transpiler — SPEC §4 later-phase project, not v1)
-- [ ] `tsl-interoperability`
+- [x] ~~`tsl-interoperability`~~ — ported
 - [x] ~~`tsl-transpiler`~~ — deferred (TSL editor/transpiler — SPEC §4 later-phase project, not v1)
-- [ ] `tsl-vfx-linkedparticles`
+- [x] ~~`tsl-vfx-linkedparticles`~~ — ported
 
 ## textures (4)
 
@@ -133,4 +133,4 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## volume (1)
 
-- [ ] `caustics`
+- [x] ~~`caustics`~~ — ported

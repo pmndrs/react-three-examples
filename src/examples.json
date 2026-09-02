@@ -1,5 +1,66 @@
 [
   {
+    "slug": "upscaling-taau",
+    "title": "Postprocessing / Upscaling TAAU",
+    "category": "postprocessing",
+    "tags": [
+      "animation",
+      "gltf",
+      "leva",
+      "mrt",
+      "postprocessing",
+      "render-pipeline",
+      "tsl",
+      "upscaling",
+      "velocity"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_upscaling_taau",
+    "credits": "Littlest Tokyo model by Glen Fox (CC-BY 4.0), from the three.js examples"
+  },
+  {
+    "slug": "upscaling-fsr1",
+    "title": "Postprocessing / Upscaling FSR1",
+    "category": "postprocessing",
+    "tags": [
+      "animation",
+      "gltf",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "tsl",
+      "upscaling"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_upscaling_fsr1",
+    "credits": "Littlest Tokyo model by Glen Fox (CC-BY 4.0), from the three.js examples"
+  },
+  {
+    "slug": "struct-drawindirect",
+    "title": "Compute / Struct Draw Indirect",
+    "category": "compute",
+    "tags": [
+      "compute",
+      "instancing",
+      "node-material",
+      "storage",
+      "tsl",
+      "webgpu-only"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_struct_drawindirect"
+  },
+  {
+    "slug": "storage-buffer",
+    "title": "Compute / Storage Buffer",
+    "category": "compute",
+    "tags": [
+      "compute",
+      "storage",
+      "tsl",
+      "webgpu-only"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_storage_buffer",
+    "animationWindowMs": 1500
+  },
+  {
     "slug": "materials-texture-html",
     "title": "Materials / Texture HTML",
     "category": "materials",
@@ -818,6 +879,19 @@
     "credits": "Galaxy generator based on Bruno Simon's Three.js Journey lessons"
   },
   {
+    "slug": "tsl-interoperability",
+    "title": "TSL / Interoperability",
+    "category": "tsl",
+    "tags": [
+      "leva",
+      "node-material",
+      "tsl",
+      "wgsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_tsl_interoperability",
+    "credits": "CRT shader adapted from Xor (gmshaders.com), via the three.js examples; earth lights texture from the three.js examples"
+  },
+  {
     "slug": "tsl-procedural-terrain",
     "title": "TSL / Procedural Terrain",
     "category": "tsl",
@@ -1003,6 +1077,27 @@
     ],
     "original": "https://threejs.org/examples/#webgpu_tsl_vfx_tornado",
     "credits": "Tornado VFX by Bruno Simon, based on Three.js Journey lessons; perlin noise texture from the three.js examples"
+  },
+  {
+    "slug": "tsl-vfx-linkedparticles",
+    "title": "TSL / VFX Linked Particles",
+    "category": "tsl",
+    "tags": [
+      "bloom",
+      "compute",
+      "leva",
+      "node-material",
+      "noise",
+      "particles",
+      "pointer",
+      "postprocessing",
+      "sprites",
+      "storage-buffer",
+      "tsl",
+      "vfx"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_tsl_vfx_linkedparticles",
+    "credits": "Linked particles experiment by Christophe Choffel (ULuIQ12), via the three.js examples"
   },
   {
     "slug": "tsl-vfx-flames",
@@ -1226,6 +1321,21 @@
     ],
     "original": "https://threejs.org/examples/#webgpu_shadowmap_vsm",
     "credits": "VSM Shadows example by Paul Brunt"
+  },
+  {
+    "slug": "caustics",
+    "title": "Shadows / Caustics",
+    "category": "shadows",
+    "tags": [
+      "gltf",
+      "leva",
+      "node-material",
+      "shadows",
+      "transmission",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_caustics",
+    "credits": "Duck model from the Khronos glTF sample assets; Caustic_Free.jpg from opengameart.org, via the three.js examples"
   },
   {
     "slug": "ocean",
@@ -2541,5 +2651,427 @@
       "viewport"
     ],
     "original": "https://threejs.org/examples/#webgpu_multiple_elements"
+  },
+  {
+    "slug": "postprocessing-ssr",
+    "title": "Postprocessing / SSR",
+    "category": "postprocessing",
+    "tags": [
+      "environment",
+      "g-buffer",
+      "gltf",
+      "leva",
+      "mrt",
+      "postprocessing",
+      "reflection",
+      "smaa",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_ssr",
+    "credits": "Steampunk Camera by dylanheyes (CC-BY), from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "modifier-curve",
+    "title": "Modifier / Curve",
+    "category": "geometry",
+    "tags": [
+      "geometry",
+      "interaction",
+      "node-material",
+      "text",
+      "transform-controls",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_modifier_curve",
+    "credits": "CurveModifierGPU (Flow) addon and helvetiker font from the three.js examples"
+  },
+  {
+    "slug": "particles",
+    "title": "Particles",
+    "category": "tsl",
+    "tags": [
+      "instancing",
+      "leva",
+      "node-material",
+      "particles",
+      "sprites",
+      "tsl",
+      "vfx"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_particles",
+    "credits": "Smoke sprite from OpenGameArt, via the three.js examples"
+  },
+  {
+    "slug": "pmrem-scene",
+    "title": "PMREM / Scene",
+    "category": "reflections",
+    "tags": [
+      "cubemap",
+      "environment",
+      "leva",
+      "node-material",
+      "pmrem",
+      "reflection",
+      "render-target",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_pmrem_scene",
+    "credits": "Park3Med cube map from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "postprocessing-sss",
+    "title": "Postprocessing / Screen Space Shadows",
+    "category": "postprocessing",
+    "tags": [
+      "gltf",
+      "leva",
+      "mrt",
+      "postprocessing",
+      "shadows",
+      "sss",
+      "traa",
+      "tsl",
+      "velocity"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_sss",
+    "credits": "Nemetona model from the three.js examples"
+  },
+  {
+    "slug": "compute-particles-fluid",
+    "title": "Compute / Particles Fluid",
+    "category": "compute",
+    "tags": [
+      "compute",
+      "environment",
+      "fluid-simulation",
+      "hdr",
+      "instancing",
+      "leva",
+      "particles",
+      "pointer",
+      "struct",
+      "tsl",
+      "ultrahdr"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_compute_particles_fluid",
+    "credits": "Royal Esplanade UltraHDR environment from the three.js examples (Poly Haven)"
+  },
+  {
+    "slug": "postprocessing-ssgi",
+    "title": "Postprocessing / SSGI",
+    "category": "postprocessing",
+    "tags": [
+      "ao",
+      "g-buffer",
+      "leva",
+      "mrt",
+      "point-light",
+      "postprocessing",
+      "shadows",
+      "traa",
+      "tsl",
+      "velocity"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_ssgi"
+  },
+  {
+    "slug": "postprocessing-ssgi-ballpool",
+    "title": "Postprocessing / SSGI Ball Pool",
+    "category": "postprocessing",
+    "tags": [
+      "g-buffer",
+      "instancing",
+      "mrt",
+      "physics",
+      "point-light",
+      "pointer",
+      "postprocessing",
+      "shadows",
+      "traa",
+      "tsl",
+      "velocity"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_ssgi_ballpool",
+    "credits": "Physics by @perplexdotgg/bounce (MIT), as in the three.js original"
+  },
+  {
+    "slug": "shadertoy",
+    "title": "ShaderToy",
+    "category": "tsl",
+    "tags": [
+      "custom-node",
+      "node-material",
+      "noise",
+      "procedural",
+      "tsl",
+      "wgsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_shadertoy",
+    "credits": "ShaderToy shaders Mt2SzR and 3tcBzH, embedded in the three.js example"
+  },
+  {
+    "slug": "postprocessing-ssr-denoise",
+    "title": "Postprocessing / SSR + Denoise",
+    "category": "postprocessing",
+    "tags": [
+      "environment",
+      "g-buffer",
+      "gltf",
+      "hdr",
+      "leva",
+      "mrt",
+      "postprocessing",
+      "reflection",
+      "traa",
+      "tsl",
+      "velocity"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_ssr_denoise",
+    "credits": "Dungeon - Low Poly Game Level Challenge by Warkarma; quarry_01 HDR (Poly Haven), both from the three.js examples"
+  },
+  {
+    "slug": "compute-rasterizer",
+    "title": "Compute / Rasterizer",
+    "category": "compute",
+    "tags": [
+      "compute",
+      "instancing",
+      "leva",
+      "pointer",
+      "render-takeover",
+      "storage",
+      "textures",
+      "tsl",
+      "webgpu-only"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_compute_rasterizer"
+  },
+  {
+    "slug": "compute-reduce",
+    "title": "Compute / Reduce",
+    "category": "compute",
+    "tags": [
+      "compute",
+      "leva",
+      "multi-canvas",
+      "performance",
+      "storage",
+      "tsl",
+      "webgpu-only",
+      "wgsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_compute_reduce",
+    "animationWindowMs": 4000
+  },
+  {
+    "slug": "water",
+    "title": "Water",
+    "category": "reflections",
+    "tags": [
+      "bloom",
+      "environment",
+      "fxaa",
+      "gltf",
+      "hdr",
+      "leva",
+      "mrt",
+      "node-material",
+      "postprocessing",
+      "reflection",
+      "refraction",
+      "render-pipeline",
+      "textures",
+      "tsl",
+      "ultrahdr",
+      "water"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_water",
+    "credits": "Pool model and water normal maps from the three.js examples; Moonless Golf HDR by Greg Zaal (Poly Haven), via the three.js examples"
+  },
+  {
+    "slug": "compute-sort-bitonic",
+    "title": "Compute / Sort Bitonic",
+    "category": "compute",
+    "tags": [
+      "compute",
+      "leva",
+      "multi-canvas",
+      "storage",
+      "tsl",
+      "webgpu-only"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_compute_sort_bitonic",
+    "credits": "Bitonic merge sort reference implementation by Tim Gfrerer"
+  },
+  {
+    "slug": "compute-rasterizer-ibl",
+    "title": "Compute / Rasterizer IBL",
+    "category": "compute",
+    "tags": [
+      "compute",
+      "environment",
+      "gltf",
+      "hdr",
+      "instancing",
+      "leva",
+      "occlusion",
+      "render-takeover",
+      "render-target",
+      "storage",
+      "tsl",
+      "ultrahdr",
+      "webgpu-only"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_compute_rasterizer_ibl",
+    "credits": "Battle Damaged Sci-fi Helmet by theblueturtle_, from the three.js examples; Royal Esplanade UltraHDR environment from the three.js examples (Poly Haven)"
+  },
+  {
+    "slug": "postprocessing-3dlut",
+    "title": "Postprocessing / 3D LUT",
+    "category": "postprocessing",
+    "tags": [
+      "color-grading",
+      "gltf",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "textures",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_3dlut",
+    "credits": "Coffee mug model and LUT files from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-difference",
+    "title": "Postprocessing / Difference",
+    "category": "postprocessing",
+    "tags": [
+      "fog",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "textures",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_difference",
+    "credits": "crate texture from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "postprocessing-masking",
+    "title": "Postprocessing / Masking",
+    "category": "postprocessing",
+    "tags": [
+      "mask-node",
+      "postprocessing",
+      "render-pipeline",
+      "scene",
+      "textures",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_masking",
+    "credits": "Caravaggio still life and photograph from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-radial-blur",
+    "title": "Postprocessing / Radial Blur",
+    "category": "postprocessing",
+    "tags": [
+      "blur",
+      "instancing",
+      "leva",
+      "lights",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_radial_blur"
+  },
+  {
+    "slug": "postprocessing-retro",
+    "title": "Postprocessing / Retro CRT",
+    "category": "postprocessing",
+    "tags": [
+      "crt",
+      "dithering",
+      "gltf",
+      "hdr",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_retro",
+    "credits": "Coffee mug and Damaged Helmet models, Venice Sunset HDR from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-dof-basic",
+    "title": "Postprocessing / Depth of Field (Basic)",
+    "category": "postprocessing",
+    "tags": [
+      "animation",
+      "depth-of-field",
+      "fxaa",
+      "gltf",
+      "interaction",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "tsl",
+      "ultrahdr"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_dof_basic",
+    "credits": "Bath day by Stan.St (CC-BY), and the Spruit Sunrise UltraHDR environment, from the three.js examples"
+  },
+  {
+    "slug": "postprocessing-ssaa",
+    "title": "Postprocessing / SSAA",
+    "category": "postprocessing",
+    "tags": [
+      "antialiasing",
+      "instancing",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "ssaa",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_ssaa"
+  },
+  {
+    "slug": "postprocessing-traa",
+    "title": "Postprocessing / TRAA",
+    "category": "postprocessing",
+    "tags": [
+      "antialiasing",
+      "mrt",
+      "postprocessing",
+      "render-pipeline",
+      "textures",
+      "traa",
+      "tsl",
+      "velocity"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_traa",
+    "credits": "brick_diffuse texture from the three.js examples",
+    "animationWindowMs": 4000
+  },
+  {
+    "slug": "postprocessing-transition",
+    "title": "Postprocessing / Scene Transition",
+    "category": "postprocessing",
+    "tags": [
+      "instancing",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "scene",
+      "textures",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_transition",
+    "credits": "transition wipe textures from the three.js examples; original implementation by fernandojsg"
   }
 ]

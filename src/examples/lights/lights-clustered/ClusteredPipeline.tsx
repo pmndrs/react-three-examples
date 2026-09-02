@@ -1,28 +1,18 @@
 // `renderer.lighting = new ClusteredLighting()` (Forward+ clustered shading) plus a
 // debug overlay tinting each screen tile by how many lights its cluster holds, at a
 // chosen depth slice — see the page header for the full DEMONSTRATES.
-import { useEffect, useLayoutEffect, useState } from 'react';
-import { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';
+import { useEffect, useLayoutEffect } from 'react';
+import type { ClusteredLighting } from 'three/addons/lighting/ClusteredLighting.js';
 import type ClusteredLightsNode from 'three/addons/tsl/lighting/ClusteredLightsNode.js';
 import { float, mix, step, uniform, vec3 } from 'three/tsl';
 
 import { useNodes, useRenderPipeline, useThree, useUniforms } from '@react-three/fiber/webgpu';
 import { folder, useControls } from 'leva';
 
-export function ClusteredPipeline() {
+export function ClusteredPipeline({ lighting }: { lighting: ClusteredLighting }) {
   const scene = useThree((s) => s.scene);
   const renderer = useThree((s) => s.renderer);
   const size = useThree((s) => s.size);
-
-  // Identity-stable across StrictMode's double render — it's assigned onto the
-  // renderer and read back every frame by `getNode()`'s scene-keyed cache.
-  const [lighting] = useState(() => new ClusteredLighting());
-
-  // Must land before the first shader build: every material's lighting graph is
-  // compiled against whichever backend `renderer.lighting` holds at that point.
-  useLayoutEffect(() => {
-    renderer.lighting = lighting;
-  }, [renderer, lighting]);
 
   const { clusterInfluence, debugZSlice } = useControls('lights-clustered', {
     overlay: folder({

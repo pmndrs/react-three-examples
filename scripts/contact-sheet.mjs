@@ -3,6 +3,9 @@
 //
 // Usage (dev server must be running on :5173):
 //   pnpm shot <slug> [slug...]   capture just those examples
+//   SHOT_DELAY_MS=5000 pnpm shot <slug>   wait longer after readiness before capturing,
+//                                for demos whose visual only develops after some seconds
+//                                (a once-per-second state machine, a slow accumulation)
 //   pnpm shot --changed          capture examples touched vs origin/main
 //   pnpm contact-sheet           capture everything (wave-end sweep)
 //
@@ -19,6 +22,10 @@ const BASE = process.env.BASE_URL ?? 'http://localhost:5173';
 const OUT = new URL('../screenshots/', import.meta.url);
 // Hard ceiling per example. Nothing here may wait indefinitely.
 const READY_TIMEOUT_MS = Number(process.env.SHOT_TIMEOUT_MS ?? 60_000);
+// Readiness fires at animation t≈0. 800ms is enough for most scenes to leave their rest
+// pose, but a demo that only develops its picture over seconds needs longer — raise it
+// per-run rather than slowing the whole sweep down.
+const SETTLE_MS = Number(process.env.SHOT_DELAY_MS ?? 800);
 
 const selected = selectSlugs();
 const bySlug = new Map(examples.map((e) => [e.slug, e]));
@@ -50,7 +57,7 @@ try {
       });
       // Readiness fires at animation t≈0; let motion get past the rest pose so
       // animated scenes don't contact-sheet as static A-poses.
-      await page.waitForTimeout(800);
+      await page.waitForTimeout(SETTLE_MS);
       // Hide control-surface chrome — we're reviewing the scene, not the panel
       // (leva overlays center-frame subjects at small viewports).
       await page.addStyleTag({

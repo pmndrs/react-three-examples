@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@perplexdotgg/bounce':
+        specifier: ^1.10.0
+        version: 1.10.0
       '@react-three/drei':
         specifier: 11.0.0-alpha.6
         version: 11.0.0-alpha.6(@react-three/fiber@10.0.0-alpha.4(@types/react@19.2.17)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1))(@types/react@19.2.17)(@types/three@0.185.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(three@0.185.1)
@@ -299,6 +302,9 @@ packages:
 
   '@oxc-project/types@0.139.0':
     resolution: {integrity: sha512-r9gHphtCs+1M7J0pw6Sn/hh/Wpa/iQrOOkrNAlVLF/gHq+/CJmHIWKKUUhdWjcD6CIa8idarspCsASiXCXvFUw==}
+
+  '@perplexdotgg/bounce@1.10.0':
+    resolution: {integrity: sha512-4cA07y6j6LUizuAYJ3fof0CZxRVIpYhDWaY8JXoPRG4d+KcetxZ5p6F/XJSAAEV2ANKsqvovg76gXuUQDx0B0A==}
 
   '@playwright/test@1.62.0':
     resolution: {integrity: sha512-9zOJ6ZQRAena31MpOH9VSzIz8Ou3YJ/wtY/eQm5T2uhfhG7/U3COrMS8xOtUrZrp9OgdmzEnIYODye3nY1VqzA==}
@@ -1499,6 +1505,9 @@ packages:
     resolution: {integrity: sha512-WRoDn//mXBiJ1H40rqa3vH0toePwSsGb45iInWlTySa+Uu4k3tYUSxa2v1KqAiLtvlrSzaExqS1gtk96A9zvEA==}
     engines: {node: '>=0.10.0'}
 
+  monomorph@2.3.1:
+    resolution: {integrity: sha512-kACbfiM0x7viZ00Ofgwy9HmElqqqY21w0S45hbH+W6BQUFhvs9mHIAmKEgBKo5hF5w4OUgRtABRgftDDVc5zFw==}
+
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
@@ -2199,6 +2208,10 @@ snapshots:
       fastq: 1.20.1
 
   '@oxc-project/types@0.139.0': {}
+
+  '@perplexdotgg/bounce@1.10.0':
+    dependencies:
+      monomorph: 2.3.1
 
   '@playwright/test@1.62.0':
     dependencies:
@@ -3311,6 +3324,8 @@ snapshots:
     dependencies:
       for-in: 1.0.2
       is-extendable: 1.0.1
+
+  monomorph@2.3.1: {}
 
   ms@2.1.3: {}
 
