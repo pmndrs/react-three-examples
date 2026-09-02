@@ -231,6 +231,69 @@
     "credits": "RectAreaLight LTC BRDF approximation by Eric Heitz et al.; RectAreaLightHelper by abelnation, from the three.js examples"
   },
   {
+    "slug": "instance-path",
+    "title": "Instance Path",
+    "category": "geometry",
+    "tags": [
+      "environment",
+      "instancing",
+      "node-material",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_instance_path"
+  },
+  {
+    "slug": "instancing-morph",
+    "title": "Instancing Morph",
+    "category": "geometry",
+    "tags": [
+      "gltf",
+      "instancing",
+      "morph-targets",
+      "node-material",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_instancing_morph",
+    "credits": "Horse model from the three.js examples"
+  },
+  {
+    "slug": "lines-fat-raycasting",
+    "title": "Lines / Fat / Raycasting",
+    "category": "geometry",
+    "tags": [
+      "line-material",
+      "raycasting"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_lines_fat_raycasting"
+  },
+  {
+    "slug": "lines-fat-wireframe",
+    "title": "Lines / Fat / Wireframe",
+    "category": "geometry",
+    "tags": [
+      "line-material",
+      "wireframe"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_lines_fat_wireframe",
+    "static": true
+  },
+  {
+    "slug": "skinning-instancing-individual",
+    "title": "Skinning / Instancing / Individual",
+    "category": "animation",
+    "tags": [
+      "animation",
+      "compute",
+      "gltf",
+      "instancing",
+      "shadows",
+      "skinning",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_skinning_instancing_individual",
+    "credits": "Michelle model from the three.js examples"
+  },
+  {
     "slug": "instance-mesh",
     "title": "Instance Mesh",
     "category": "geometry",
@@ -2024,5 +2087,155 @@
     ],
     "original": "https://threejs.org/examples/#webgpu_rendertarget_2d-array_3d",
     "credits": "Scanned head data by Divine Augustine (CPOL), from the three.js examples"
+  },
+  {
+    "slug": "cubemap-adjustments",
+    "title": "Cubemap / Adjustments",
+    "category": "reflections",
+    "tags": [
+      "environment",
+      "hdr",
+      "leva",
+      "node-material",
+      "pmrem",
+      "reflection",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_cubemap_adjustments",
+    "credits": "DamagedHelmet model by theblueturtle_; pedestrian_overpass and 752-hdri-skies-com HDRs from the three.js examples (Poly Haven / HDRI Skies)",
+    "static": true
+  },
+  {
+    "slug": "cubemap-mix",
+    "title": "Cubemap Mix",
+    "category": "reflections",
+    "tags": [
+      "cubemap",
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "pmrem",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_cubemap_mix",
+    "credits": "DamagedHelmet model by theblueturtle_; Pisa HDR cube and MilkyWay cube textures from the three.js examples"
+  },
+  {
+    "slug": "equirectangular",
+    "title": "Equirectangular Panorama",
+    "category": "reflections",
+    "tags": [
+      "environment",
+      "leva",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_equirectangular",
+    "credits": "Panorama photo by Jón Ragnarsson, from the three.js examples"
+  },
+  {
+    "slug": "pmrem-cubemap",
+    "title": "PMREM / Cubemap",
+    "category": "reflections",
+    "tags": [
+      "cubemap",
+      "environment",
+      "hdr",
+      "leva",
+      "node-material",
+      "pmrem",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_pmrem_cubemap",
+    "credits": "Pisa HDR cube map from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "reflection-roughness",
+    "title": "Reflection / Roughness",
+    "category": "reflections",
+    "tags": [
+      "environment",
+      "hdr",
+      "node-material",
+      "reflection",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_reflection_roughness",
+    "credits": "spruit_sunrise HDR, uv_grid_directx and perlin noise textures from the three.js examples"
+  },
+  {
+    "slug": "texturegrad",
+    "title": "Texture Gradient",
+    "category": "textures",
+    "tags": [
+      "textures",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_texturegrad",
+    "credits": "uv_grid_opengl texture from the three.js examples"
+  },
+  {
+    "slug": "texturegather",
+    "title": "Texture Gather",
+    "category": "textures",
+    "tags": [
+      "render-target",
+      "textures",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_texturegather",
+    "static": true
+  },
+  {
+    "slug": "video-frame",
+    "title": "Video Frames",
+    "category": "textures",
+    "tags": [
+      "textures",
+      "video",
+      "webcodecs"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_video_frame",
+    "credits": "sintel.mp4 (Sintel trailer, Blender Foundation) from the three.js examples"
+  },
+  {
+    "slug": "loader-texture-ktx2",
+    "title": "Loader / Texture KTX2",
+    "category": "loaders",
+    "tags": [
+      "compression",
+      "ktx2",
+      "loader",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_loader_texture_ktx2",
+    "static": true
+  },
+  {
+    "slug": "display-stereo",
+    "title": "Display / Stereo",
+    "category": "camera",
+    "tags": [
+      "environment",
+      "instancing",
+      "leva",
+      "postprocessing",
+      "stereo",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_display_stereo",
+    "credits": "Park3Med cube map from the three.js examples"
+  },
+  {
+    "slug": "camera-logarithmicdepthbuffer",
+    "title": "Camera / Logarithmic Depth Buffer",
+    "category": "camera",
+    "tags": [
+      "camera",
+      "depth",
+      "node-material"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_camera_logarithmicdepthbuffer"
   }
 ]

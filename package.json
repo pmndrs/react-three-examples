@@ -18,7 +18,8 @@
     "contact-sheet": "node scripts/contact-sheet.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "generate:manifest": "node scripts/generate-manifest.mjs"
+    "generate:manifest": "node scripts/generate-manifest.mjs",
+    "compare": "node scripts/compare-lines.mjs"
   },
   "dependencies": {
     "@react-three/drei": "11.0.0-alpha.6",

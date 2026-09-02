@@ -653,6 +653,43 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
   actually creates unless told otherwise), with `OrthographicCamera` narrowing when
   `orthographic` is set.
 
+### B32 · @types/three: `demuxer_mp4.js` addon ships no type declarations at all
+
+- **What**: `three/addons/libs/demuxer_mp4.js` has no `.d.ts` anywhere — not in the npm
+  package, not in `@types/three`. Most untyped addons still typecheck because TS infers
+  from JSDoc (AGENTS.md: "a missing `.d.ts` is not a reason to reach for `any`"); this one
+  has neither, so any import of it is an error.
+- **Cost**: consumers must hand-write an ambient declaration. Ours is
+  `src/types/demuxer-mp4.d.ts`, narrowed to what `video-frame` actually uses.
+- **Where it bites**: `textures/video-frame` — the WebCodecs `VideoDecoder` path that
+  `VideoFrameTexture` is designed for.
+
+### B33 · @types/three: `VideoFrameTexture.image` is `VideoFrame | {}`, so `.close()` never narrows
+
+- **What**: `VideoFrameTexture.image` is typed as a union with the empty object, and
+  `instanceof VideoFrame` narrowing does not survive to a callable `.close()` even when
+  assigned to a local first. Releasing a decoded frame therefore needs a cast.
+- **Cost**: one isolated cast per consumer, on the exact call that prevents a GPU-memory
+  leak — the worst place to make people reach for `any`.
+- **Where it bites**: `textures/video-frame` (`closeIfFrame`).
+- **Fix**: type `image` as `VideoFrame` on `VideoFrameTexture`, which is what the class
+  actually holds.
+
+### B34 · @types/three: `count` is declared on `Mesh` but not `Points` / `Line`
+
+- **What**: WebGPU instancing-by-count (`<mesh count={n}>`, no `InstancedMesh` class) is
+  honoured by the renderer for points and lines too, but `@types/three` declares
+  `count: number` only on `Mesh` (`src/objects/Mesh.d.ts:85`). `Points` and `Line` have no
+  such field, so setting it needs a cast.
+- **Cost**: two casts in this corpus that cannot be removed —
+  `compute/compute-points.tsx` (`(points as unknown as { count: number })`) and
+  `compute/compute-cloth/VerletWireframe.tsx` (`(lines as Line & { count: number })`).
+  Both are correct and should stay until this is fixed.
+- **Note**: the `Mesh` half WAS fixed — `instance-path` sets `<mesh count>` with no cast
+  in 0.185.1. Only the points/line half remains.
+- **Fix**: declare `count` wherever the renderer reads it — most simply on the shared
+  geometry-bearing base rather than per subclass.
+
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
 - Loaders can start synchronously inside another component's render; a component

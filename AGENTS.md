@@ -468,6 +468,17 @@ set samples 0.
   (B28).
 - StrictMode double-invokes effects: never `dispose()` a `useMemo`'d instance in an
   effect cleanup. Use symmetric connect/disconnect (see `src/utils/CameraControls.tsx`).
+- **Never mutate a Suspense-CACHED scene graph from `useMemo`.** `useGLTF`/`useLoader`
+  results are shared across every consumer and survive unmount, so
+  `source.visible = false` or `parent.add(mesh)` inside a `useMemo` leaks across
+  StrictMode's mount → unmount → remount. Do it in a `useEffect` with a symmetric cleanup
+  (detach, restore visibility).
+  **The failure mode is silent**: `skinning-instancing-individual` rendered a black scene
+  in dev and worked perfectly in a production build, because two transiently-coexisting
+  compute-kernel/storage-buffer sets pointed at the same skeleton and the surviving
+  mount's compute writes never reached the renderer — no thrown error, no console warning,
+  and `getArrayBufferAsync` readback showed all zeros. If a compute example is black in
+  dev but fine in `pnpm build`, look here first.
 - Non-node instances captured by create-once hook closures (RenderTargets, cameras,
   override materials) must be identity-stable — hold them in lazy `useState(() => …)`,
   not `useMemo`.
@@ -569,6 +580,14 @@ Run for YOUR example only — `pnpm test:changed <slug>` (smoke + animates).
    `browser.close()`.
 5. Look at the screenshot. Both test tiers passed `shadowmap-csm`'s tone-mapping bug;
    only the screenshot caught it.
+
+**Multi-`<Canvas>` examples are only partly covered.** `tests/smoke.spec.ts` and
+`scripts/contact-sheet.mjs` both capture `locator('canvas').first()`, so a second root is
+never asserted on or photographed. `camera-logarithmicdepthbuffer` is the first example
+that genuinely needs two (`logarithmicDepthBuffer` is a construction-time renderer
+parameter, so one canvas cannot show both sides). If you write another, say so in the
+header and verify the second canvas by hand — the automated tiers will report green while
+seeing half the demo.
 
 **Full sweeps are wave-end only.** Running many heavy WebGPU examples in one process
 produces contention flakes on a different example each run. Test scoped, one at a time

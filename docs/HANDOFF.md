@@ -1,5 +1,83 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–2)
 
+## Porting wave 1 — 16 new examples, 131 -> 147 (2026-09-02)
+
+First ports against `PORTING-BRIEF.md`. reflections 5, textures+camera 6, geometry 5.
+
+| batch                 | result vs original (code lines, comments stripped BOTH sides) |
+| --------------------- | ------------------------------------------------------------- |
+| reflections (5)       | 413 vs 497, **-16.9%** — 4 of 5 under                         |
+| textures + camera (6) | 643 vs 939, **-31.5%** — 6 of 6 under                         |
+| geometry (5)          | 1047 vs 984, **+6.4%** — 4 of 5 under, one big overrun        |
+
+### The measurement was wrong twice, both my fault
+
+1. Agents compared against the extracted `<script>`, not the `.html`, making good ports
+   look 2x bloated. The `.html` IS the original. Dennis had corrected me on this earlier in
+   the session and I failed to put it in the brief.
+2. Then Dennis pointed out I was counting OUR comments against an original that has almost
+   none. Built `scripts/compare-lines.mjs` (`pnpm compare <slug>… | --all`) to strip
+   comments and blanks from both sides.
+
+That tool then had two bugs of its own, both found by looking at implausible output:
+
+- **slug-equals-category**: `postprocessing.tsx`/`camera.tsx` live in folders named after
+  themselves, so sibling-detection swept the whole category — `postprocessing` read 680
+  lines instead of 74. Fixed by disambiguating on path DEPTH.
+- **regex comment-stripping ate code**: replacing `/* … */` spans deletes their newlines and
+  a stray `*/` swallows real lines; a 55-line file counted as 21. Rewritten line-oriented
+  with block-state tracking.
+
+**Corpus-wide, corrected: 19,901 vs 22,688 code lines — 12.3% fewer. 111 smaller, 31 larger.**
+Biggest wins are scene-graph-heavy (`animation-skinning-blending` 73 vs 301); overruns are
+small and pipeline/TSL-heavy, which is the documented parity outcome.
+
+### The find of the wave — silent StrictMode failure
+
+`skinning-instancing-individual` rendered BLACK in dev and worked perfectly in a production
+build. Root cause: a `useMemo` mutated the Suspense-CACHED GLTF scene graph
+(`source.visible = false`, `parent.add(mesh)`) with no cleanup, so StrictMode's
+mount→unmount→remount left two coexisting compute-kernel/storage-buffer sets on one
+skeleton and the surviving mount's compute writes never reached the renderer. **No thrown
+error, no console warning**; `getArrayBufferAsync` readback showed all zeros. Fixed with a
+symmetric `useEffect`. Added to AGENTS.md — the existing StrictMode rule only covered
+material disposal, this is a distinct second case.
+
+### Other findings
+
+- **UPSTREAM B32** — `three/addons/libs/demuxer_mp4.js` ships NO type declarations at all
+  (not even JSDoc-inferable). Needed `src/types/demuxer-mp4.d.ts`.
+- **UPSTREAM B33** — `VideoFrameTexture.image` is `VideoFrame | {}`; `instanceof` narrowing
+  doesn't reach `.close()`, forcing a cast on the call that prevents a GPU-memory leak.
+- **UPSTREAM B34** — `count` is declared on `Mesh` but NOT `Points`/`Line`, though the
+  renderer honours it on all three. Two corpus casts are therefore correct and must stay.
+  (The `Mesh` half was fixed in 0.185.1 — `instance-path` sets `<mesh count>` uncast.)
+- **AGENTS.md § Verification**: multi-`<Canvas>` examples are only half-tested — smoke and
+  contact-sheet both capture `locator('canvas').first()`.
+  `camera-logarithmicdepthbuffer` is the first example that genuinely needs two.
+- `loader-texture-ktx2` introduces the corpus's first `ErrorBoundary` (per-texture, so an
+  unsupported format degrades instead of killing the page). New precedent.
+- `video-frame` needed `DefaultLoadingManager.itemStart/itemEnd` around the first decode —
+  without it readiness fired on a black plane and both smoke and `pnpm shot` raced the
+  network.
+
+### Needs Dennis
+
+- `skinning-instancing-individual` is **462 vs 320 (+44%)**, the worst overrun in the wave.
+  `rig.ts` is genuine CPU-side data prep the original also does (verified), and it carries
+  the StrictMode fix, but it is the one to look at.
+- `skinning-instancing-individual` was moved to `animation/` (from the geometry batch) to
+  sit beside `skinning-instancing`. Reasonable, but a category call.
+
+### Verified
+
+tsc 0, lint 0, manifest `--check` clean, smoke **145/147** — both failures the known B28
+flakes (`tsl-wood` with the signature, `loader-gltf-dispersion` passing on retry).
+
+### Remaining
+
+**52 to port** (68 minus this wave's 16). Backlog in `docs/PORTING-BACKLOG.md`.
+
 ## Site shell — home, search, action bar (2026-09-02)
 
 Built by an agent in an isolated worktree, then merged. `src/app/` went 158 -> ~1000 lines.
