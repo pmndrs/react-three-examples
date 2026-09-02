@@ -2,41 +2,42 @@
 
 Generated from `research/data/files_r185.json` vs `src/examples.json`.
 
-**214 webgpu examples in r185 · 129 ported · 85 remaining.**
+**214 webgpu examples in r185 · 129 ported · 85 unported · 10 excluded · 75 TO PORT.**
 
-> **Not all 85 are showcase demos.** These read as three.js internal test/benchmark
-> pages rather than things worth porting — they demonstrate renderer internals, not a
-> visual idea. Recommend cutting them (a decision for Dennis, not the porting agent):
+> **DECIDED 2026-09-02 — 10 excluded, 75 to port.** These r185 `webgpu_*` pages exercise
+> renderer internals or measure performance rather than teaching a visual technique, so a
+> React port would demonstrate nothing about R3F. They are struck through below and
+> enumerated in `docs/SPEC.md` §4, which always said "minus stress/internal tests" without
+> listing them.
 >
-> `sandbox` · `test-memory` · `performance` · `performance-renderbundle` ·
-> `pmrem-test` · `furnace-test` · `compile-async` · `multisampled-renderbuffers` ·
+> `sandbox` · `test-memory` · `performance` · `performance-renderbundle` · `pmrem-test` ·
+> `furnace-test` · `compile-async` · `multisampled-renderbuffers` ·
 > `reversed-depth-buffer` · `centroid-sampling`
 >
-> Cutting those leaves **75** genuine ports. Some are arguable — `furnace-test` is a
-> real PBR-correctness check and `centroid-sampling` teaches a genuine MSAA subtlety —
-> so this is a curation call, not a mechanical one.
+> `furnace-test` (PBR correctness) and `centroid-sampling` (an MSAA subtlety) are the
+> arguable two — revisit if a "renderer correctness" group ever makes sense.
 
 Category is a FIRST GUESS from the slug — the porting agent confirms it and may
 place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## uncategorised (18)
 
-- [ ] `centroid-sampling`
-- [ ] `compile-async`
-- [ ] `furnace-test`
+- [x] ~~`centroid-sampling`~~ — excluded (internal/benchmark)
+- [x] ~~`compile-async`~~ — excluded (internal/benchmark)
+- [x] ~~`furnace-test`~~ — excluded (internal/benchmark)
 - [ ] `modifier-curve`
-- [ ] `multisampled-renderbuffers`
+- [x] ~~`multisampled-renderbuffers`~~ — excluded (internal/benchmark)
 - [ ] `particles`
-- [ ] `performance`
-- [ ] `performance-renderbundle`
+- [x] ~~`performance`~~ — excluded (internal/benchmark)
+- [x] ~~`performance-renderbundle`~~ — excluded (internal/benchmark)
 - [ ] `pmrem-scene`
-- [ ] `pmrem-test`
-- [ ] `reversed-depth-buffer`
-- [ ] `sandbox`
+- [x] ~~`pmrem-test`~~ — excluded (internal/benchmark)
+- [x] ~~`reversed-depth-buffer`~~ — excluded (internal/benchmark)
+- [x] ~~`sandbox`~~ — excluded (internal/benchmark)
 - [ ] `shadertoy`
 - [ ] `storage-buffer`
 - [ ] `struct-drawindirect`
-- [ ] `test-memory`
+- [x] ~~`test-memory`~~ — excluded (internal/benchmark)
 - [ ] `upscaling-fsr1`
 - [ ] `upscaling-taau`
 

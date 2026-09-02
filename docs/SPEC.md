@@ -52,6 +52,27 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
 - **Phase 1: 100% of the `webgpu_*` set** minus stress/internal tests (~190–200 ports).
   Start with the 77 dual-renderer examples (best-understood ground truth), then the
   webgpu-only set (compute, TSL, MRT — the high-value thin-training-data territory).
+
+  _(Amended 2026-09-02 — "stress/internal tests" enumerated.)_ These 10 r185 `webgpu_*`
+  pages are **excluded from Phase 1**: they exercise renderer internals or measure
+  performance rather than teaching a visual technique, so a React port of them would
+  demonstrate nothing about R3F.
+
+  | excluded                                              | why                                                |
+  | ----------------------------------------------------- | -------------------------------------------------- |
+  | `sandbox`                                             | scratch page, no stable subject                    |
+  | `test_memory`                                         | allocates until it breaks; a leak harness          |
+  | `performance`, `performance_renderbundle`             | throughput benchmarks                              |
+  | `pmrem_test`, `furnace_test`                          | renderer-correctness checks (white-furnace, PMREM) |
+  | `compile_async`                                       | shader-compilation timing, not a scene             |
+  | `multisampled_renderbuffers`, `reversed_depth_buffer` | renderer configuration probes                      |
+  | `centroid_sampling`                                   | MSAA sampling-mode probe                           |
+
+  Two are genuinely arguable — `furnace_test` is a real PBR-correctness technique and
+  `centroid_sampling` teaches an MSAA subtlety a reader could hit. Revisit if the
+  Patterns track wants a "renderer correctness" group. **Phase 1 target is therefore 75
+  remaining ports, not 85.**
+
 - **Patterns track (not ports): ~12–20 app-scale examples** teaching what single-canvas
   demos can't: canvas in a real layout, persistent canvas across routes, shared DOM↔scene
   state, suspense/loading orchestration, multiple views, DOM↔scene events, testing R3F
