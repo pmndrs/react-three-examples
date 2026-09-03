@@ -301,6 +301,11 @@ const lightRef = ref ?? localRef;
 Type the exposed prop `React.RefObject<T | null>`, not `React.Ref<T>` — `React.Ref`
 admits callback refs, which have no `.current` to read.
 
+**A drei controls ref is typed from the element**, not from a class import:
+`useRef<React.ComponentRef<typeof OrbitControls>>(null)`. That is rule 5 applied to
+drei — no `import type { OrbitControls as Impl } from 'three/addons/…'` needed
+(pattern: `camera/controls`, `camera/controls-transform`).
+
 ## 10. `useFrame` destructuring
 
 `useFrame(({ elapsed, delta }) => …)`. Don't write `(_, delta)` to skip state —

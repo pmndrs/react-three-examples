@@ -852,6 +852,15 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Where it bites**: `geometry-spline-editor` (worked around), `modifier-curve` (same
   fix applied 2026-09-03), and any future `<TransformControls>` user.
 
+### B49 · drei: the `/webgpu` build reads the deprecated `state.gl` alias in 33 places
+
+- **What**: `useThree((state) => state.gl)` throughout `webgpu/index.mjs` (controls
+  `domElement` resolution, `PointerLockControls`, FBO helpers, …). fiber v10 keeps `gl` as
+  a deprecated alias of `renderer`, so it works on alpha.4 and breaks the day the alias is
+  removed — across every drei control at once.
+- **Fix**: `state.renderer` (v10) with a `gl` fallback for v9.
+- **Where it bites**: latent; every example using drei controls on `/webgpu`.
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from
