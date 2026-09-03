@@ -30,6 +30,7 @@ import { CatmullRomCurve3, Mesh, MeshStandardNodeMaterial, NoToneMapping } from 
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { Flow } from 'three/addons/modifiers/CurveModifierGPU.js';
 import { Canvas, useFrame } from '@react-three/fiber/webgpu';
+import type { TransformControls as TransformControlsImpl } from 'three/addons/controls/TransformControls.js';
 import { TransformControls, useFont } from '@react-three/drei/webgpu';
 import type CameraControlsImpl from 'camera-controls';
 import '../../assets/ThreeLine';
@@ -97,6 +98,7 @@ function CurveScene({ controlsRef }: CurveSceneProps) {
   const handleRefs = useRef<(Mesh | null)[]>([]);
   const [curve, setCurve] = useState<CatmullRomCurve3 | null>(null);
   const [selected, setSelected] = useState<Mesh | null>(null);
+  const [gizmo, setGizmo] = useState<TransformControlsImpl | null>(null);
   const [revision, setRevision] = useState(0);
 
   // The curve holds the handle meshes' own Vector3s, so dragging a handle moves the
@@ -166,7 +168,11 @@ function CurveScene({ controlsRef }: CurveSceneProps) {
         </>
       )}
 
-      {selected && <TransformControls object={selected} onMouseDown={beginDrag} onMouseUp={endDrag} />}
+      {selected && <TransformControls ref={setGizmo} object={selected} onMouseDown={beginDrag} onMouseUp={endDrag} />}
+      {/* TODO(drei-gap): since r169 `TransformControls` is a Controls, not an Object3D — the arrows
+          live in `getHelper()`, which drei's component never adds. Without this there is no gizmo
+          and nothing to drag (UPSTREAM B46). */}
+      {gizmo && <primitive object={gizmo.getHelper()} />}
     </>
   );
 }
