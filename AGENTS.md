@@ -734,8 +734,12 @@ declaration file`. (Verified — an earlier version of this bullet claimed the o
   `/examples/camera`.
 - Split a file when it passes **~200 lines**, and split by scene role — the split
   itself is a taught pattern, not a size workaround.
-- Slug = the original three.js name, kebab-case, with the `webgpu_`/`webgl_` prefix
-  **always dropped**. `webgpu_skinning_instancing` → `skinning-instancing`.
+- Slug = the original three.js name, kebab-case, with the `webgpu_`/`webgl_`/`misc_`/
+  `physics_`/`css3d_`… prefix **always dropped**. `webgpu_skinning_instancing` →
+  `skinning-instancing`. **When the bare name collides with a shipped slug, keep the
+  original's prefix** — `css3d_sprites` → `css3d-sprites`, because `sprites` is
+  `webgpu_sprites`. The route is the slug, so a collision is a broken example, not a
+  warning.
 - Register in [src/examples.json](src/examples.json):
   `{ slug, title, tags, original?, credits? }`. The shell renders the titleblock from
   this — **never build title/credits UI inside an example**.
