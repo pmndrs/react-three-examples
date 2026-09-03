@@ -614,6 +614,18 @@ ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
 - `useLoader(Loader, [urls])` takes N resources in one call and returns N results.
 - Derived textures (clone/mutate of a loader result) must be `useMemo`'d off the
   loader's stable return.
+- **Removing a prop resets it to literal `0` on any class whose constructor takes
+  arguments** — which is every node material. fiber's `diffProps` restores a removed
+  prop from the memoized prototype only when `constructor.length === 0`; otherwise
+  `changedProps[prop] = 0` (verified, `diffProps`). So swapping
+  `<meshStandardNodeMaterial color="red" />` for `<meshStandardNodeMaterial />` renders
+  BLACK, and dropping `map` sets it to `0`. Key the element on the selection so it
+  remounts instead of diffing (pattern: `modifier-subdivision`). B47.
+- **Per-object `onPointerMissed` is NOT click-gated.** fiber fires it on every registered
+  object that a pointer event did not hit whenever the event hit some other object with a
+  handler — hover included. Only the Canvas-level `onPointerMissed` is gated to clicks
+  within 2px. If you mean "clicked elsewhere", use the Canvas prop or check
+  `event.type === 'click'`.
 - **`@react-three/rapier` auto-colliders wrap EVERY descendant mesh.** `<RigidBody
 colliders="cuboid">` around a chassis with child wheel meshes gives each wheel its own
   collider too — visible only in the `debug` view, and it passes both test tiers. Write

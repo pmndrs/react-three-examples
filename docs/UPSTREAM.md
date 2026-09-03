@@ -827,6 +827,17 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   frame.
 - **Where it bites**: `geometry-colors-lookuptable` (legend overlay).
 
+### B47 · fiber: `diffProps` resets a removed prop to `0` when the constructor takes arguments
+
+- **What**: on prop removal, `diffProps` does
+  `if (root.constructor.length === 0) changedProps[prop] = memoizedPrototype[key]; else changedProps[prop] = 0;`.
+  Every node material's constructor takes a `parameters` object, so removing `color`
+  writes `material.color = 0` (renders black), removing `map` writes `map = 0`. The
+  `length === 0` guard is the wrong test — it should construct a default instance (or
+  read `new Ctor()`'s field) for any class, or leave the property untouched.
+- **Where it bites**: any example that swaps between two same-type material elements
+  with different prop sets (`modifier-subdivision`, worked around with a `key`).
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from
