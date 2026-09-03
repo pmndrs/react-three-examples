@@ -1,5 +1,34 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
 
+## Phase 2 greenlit — wave 4 group 1 in flight (2026-09-03)
+
+Dennis: _"continue on the list until we have as much covered as we can; stuck > a few
+minutes → REVIEW-QUEUE; mark why we skipped."_ Patterns track is out of 1.0 and likely a
+separate repo.
+
+**The webgl audit was re-verified and held**, with two corrections now in
+[PORTING-BACKLOG-PHASE2.md](PORTING-BACKLOG-PHASE2.md): 77 non-`webgl_`/`webgpu_` examples
+(physics, controls, css3d, games) had never been audited at all, and the audit's
+"low-value" test was three.js-technique-centric where ours is "where is R3F clearer".
+Result: **77 ports · 50 skips (each with a reason) · 1 review · 31 final-phase (XR/audio,
+unverifiable here — review-queued).** Loader rule from Dennis: a loader that just loads a
+model is not needed; 12 of 47 earn a page.
+
+Feasibility checked before launch: path tracer is WebGL-only (skip), `AsciiEffect` takes a
+`WebGLRenderer` (skip), fiber v10 has no OffscreenCanvas worker story (review), no
+`GlitchNode` in r185 TSL (hand-port), `@react-three/rapier` peers on fiber `^9` (**the
+`rapier-basic` port is a probe**, fallback specified: inline three's `RapierPhysics`
+addon over the installed `@dimforge/rapier3d-compat`, replacing its skypack CDN import).
+Deps installed with the server down / cache cleared / restarted / verified, before any
+agent launched — the wave-2 lesson.
+
+Group 1 (running): geometry addons ×9, modifiers + marching cubes ×6, interaction/picking
+×8, physics probe + 6. Group 2 queued: controls/drei, animation, css3d→`<Html>`, loaders,
+materials/misc.
+
+`scripts/tick-backlog.mjs` now reads both backlog files and matches on the manifest's
+`original` anchor as well as the slug (Phase 2 lists originals by name).
+
 ## Porting wave 3 — the last 31, 168 -> 198 (2026-09-02)
 
 Phase 1 is **effectively complete**: 196 of 214 r185 examples ported, 10 excluded,
