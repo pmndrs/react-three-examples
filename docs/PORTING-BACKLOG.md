@@ -2,7 +2,7 @@
 
 Generated from `research/data/files_r185.json` vs `src/examples.json`.
 
-**214 in r185 · 197 ported · 10 excluded · 7 deferred · 0 TO PORT — Phase 1 complete.**
+**214 in r185 · 197 ported · 13 excluded · 4 deferred · 0 TO PORT — Phase 1 complete.**
 
 > Checkboxes are the source of truth; the counts above are hand-updated. After a wave,
 > re-tick with `node scripts/tick-backlog.mjs` — anything present in `src/examples.json`
@@ -107,10 +107,10 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## tsl (5)
 
-- [x] ~~`tsl-editor`~~ — deferred (TSL editor/transpiler — SPEC §4 later-phase project, not v1)
-- [x] ~~`tsl-graph`~~ — deferred (TSL editor/transpiler — SPEC §4 later-phase project, not v1)
+- [x] ~~`tsl-editor`~~ — excluded (internal tooling — a Monaco editor / Inspector UI, not a scene; not porting — Dennis, 2026-09-03)
+- [x] ~~`tsl-graph`~~ — excluded (internal tooling — a Monaco editor / Inspector UI, not a scene; not porting — Dennis, 2026-09-03)
 - [x] ~~`tsl-interoperability`~~ — ported
-- [x] ~~`tsl-transpiler`~~ — deferred (TSL editor/transpiler — SPEC §4 later-phase project, not v1)
+- [x] ~~`tsl-transpiler`~~ — excluded (internal tooling — a Monaco editor / Inspector UI, not a scene; not porting — Dennis, 2026-09-03)
 - [x] ~~`tsl-vfx-linkedparticles`~~ — ported
 
 ## textures (4)

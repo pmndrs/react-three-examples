@@ -2,10 +2,12 @@
 //
 // Answers "of the demos worth porting, how many do we have, and why not all?" by joining
 // research/data/files_r185.json (the universe), research/webgl-unique-list.md (the dedup
-// audit, Class B/C tables), both porting backlogs (struck ~~names~~ carry the decision), and
-// src/examples.json (what is shipped, matched on the `original` anchor).
+// audit, Class B/C tables), both porting backlogs (struck ~~names~~ carry the decision AND
+// the reason text that follows it), and src/examples.json (what is shipped, matched on the
+// `original` anchor). Runs prettier on the output so `pnpm lint` stays green.
 //
 // Usage: pnpm inventory   (or: node scripts/demo-inventory.mjs)
+import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 const at = (p) => fileURLToPath(new URL(p, import.meta.url));
@@ -64,11 +66,20 @@ const struck = (item) => {
   }
   return s;
 };
-const collect = (txt, re) => {
-  const s = new Set();
-  for (const it of items(txt)) if (re.test(it)) for (const n of struck(it)) s.add(n);
-  return s;
+// name -> the reason text the backlog recorded next to the decision (so the inventory can
+// show WHY, not just that a reason exists). `extract` pulls it out of the joined item.
+const cell = (s) => s.replace(/\|/g, '\\|').replace(/\s+/g, ' ').trim();
+const collect = (txt, re, extract = () => '') => {
+  const m = new Map();
+  for (const it of items(txt)) {
+    if (!re.test(it)) continue;
+    const why = cell(extract(it) ?? '');
+    for (const n of struck(it)) m.set(n, why);
+  }
+  return m;
 };
+const paren = (word) => (it) => it.match(new RegExp(word + ' \\((.*?)\\)'))?.[1];
+const afterSkip = (it) => it.match(/\*\*SKIP\*\*:?\s*(.*)$/)?.[1];
 const section = (a, b) => {
   const i = audit.indexOf(a);
   const j = b ? audit.indexOf(b, i) : audit.length;
@@ -80,31 +91,34 @@ const firstCol = (t) =>
 const classB = firstCol(section('## Class B', '## Class C'));
 const classC = firstCol(section('## Class C'));
 const twins = new Set(all.filter((n) => n.startsWith('webgl_') && ALL.has('webgpu_' + n.slice(6))));
-const p1ex = collect(b1, /excluded/);
-const p1def = collect(b1, /deferred/);
-const p2skip = collect(b2, /\*\*SKIP\*\*/);
+const p1ex = collect(b1, /excluded/, paren('excluded'));
+const p1def = collect(b1, /deferred/, paren('deferred'));
+const p2skip = collect(b2, /\*\*SKIP\*\*/, afterSkip);
 const p2rev = collect(b2, /\*\*REVIEW\*\*|review-queued|REVIEW-QUEUE/);
 const folded = collect(b2, /ported inside/);
 const xr = new Set(all.filter((n) => /^webxr_|^webaudio_/.test(n)));
 
 const notWorth = new Map();
+// `why` is a label, or a function of the name when the backlog recorded a per-item reason.
 const put = (set, why, guard = () => true) => {
-  for (const n of set) if (guard(n) && !notWorth.has(n)) notWorth.set(n, why);
+  for (const n of set.keys())
+    if (guard(n) && !notWorth.has(n)) notWorth.set(n, typeof why === 'function' ? why(n) : why);
 };
-put(p1ex, 'internal / benchmark / sandbox (SPEC §4)');
+const withReason = (label, map) => (n) => (map.get(n) ? `${label}: ${map.get(n)}` : label);
+put(p1ex, withReason('excluded (Phase 1 backlog)', p1ex));
 const notShipped = (n) => !shipped.has(n) && !folded.has(n);
 put(twins, 'duplicate — its webgpu_ twin is ported', notShipped);
 put(classB, 'duplicate — same technique under a webgpu_ name (audit B)', notShipped);
 put(classC, 'low value — legacy API / stress / trivial toggle (audit C)', notShipped);
-put(p2skip, 'skipped with a recorded reason (Phase 2 backlog)', notShipped);
+put(p2skip, withReason('skipped (Phase 2 backlog)', p2skip), notShipped);
 
 const worth = all.filter((n) => !notWorth.has(n));
 const rows = worth.map((n) => {
   if (shipped.has(n)) return { n, status: 'HAVE', why: '`' + shipped.get(n) + '`' };
   if (folded.has(n)) return { n, status: 'HAVE (folded)', why: 'inside a combined example' };
   if (p2rev.has(n)) return { n, status: 'BLOCKED', why: 'review-queued — REVIEW-QUEUE.md' };
-  if (xr.has(n)) return { n, status: 'LATER', why: 'final phase: WebXR / webaudio (SPEC §3)' };
-  if (p1def.has(n)) return { n, status: 'LATER', why: 'deferred: TSL editor tooling (SPEC §3)' };
+  if (p1def.has(n)) return { n, status: 'LATER', why: 'final phase — ' + p1def.get(n) };
+  if (xr.has(n)) return { n, status: 'LATER', why: 'final phase — WebXR / webaudio (SPEC §3)' };
   return { n, status: 'GAP', why: 'no decision recorded' };
 });
 const count = (k) => rows.filter((x) => x.status === k).length;
@@ -116,14 +130,14 @@ const md = [
   '> and `src/examples.json`. Do not edit by hand — change a backlog decision and regenerate.',
   '> Answers one question: **of the demos worth porting, how many do we have, and why not all?**',
   '',
-  `r185 ships **${all.length}** examples. **${notWorth.size} are not worth a page** — duplicated by a \`webgpu_\` example, low-value, internal/sandbox, or skipped with a recorded reason (all listed at the bottom). **${worth.length} are worth porting.**`,
+  `r185 ships **${all.length}** examples. **${notWorth.size} are not worth a page** — duplicated by a \`webgpu_\` example, low-value, internal/sandbox, or skipped with a recorded reason (all listed at the bottom, with the reason). **${worth.length} are worth porting.**`,
   '',
   '| status | count |',
   '| --- | ---: |',
   `| HAVE — own page | ${count('HAVE')} |`,
   `| HAVE — folded into a combined example | ${count('HAVE (folded)')} |`,
   `| BLOCKED — review-queued, needs a decision | ${count('BLOCKED')} |`,
-  `| LATER — final phase (WebXR / webaudio / TSL tooling) | ${count('LATER')} |`,
+  `| LATER — final phase (WebXR / webaudio) | ${count('LATER')} |`,
   `| GAP — no decision recorded | ${count('GAP')} |`,
   `| **worth porting** | **${worth.length}** |`,
   '',
@@ -134,9 +148,19 @@ const md = [
 ];
 for (const x of rows.sort((a, b) => a.status.localeCompare(b.status) || a.n.localeCompare(b.n)))
   md.push(`| \`${x.n}\` | ${x.status} | ${x.why} |`);
-md.push('', `## Not worth a page — the other ${notWorth.size}`, '', '| original | why |', '| --- | --- |');
+md.push(
+  '',
+  `## Not worth a page — the other ${notWorth.size}`,
+  '',
+  'Reasons are quoted from the backlog item that made the call — edit them there, not here.',
+  '',
+  '| original | why |',
+  '| --- | --- |',
+);
 for (const [n, w] of [...notWorth].sort()) md.push(`| \`${n}\` | ${w} |`);
-writeFileSync(at('../docs/DEMO-INVENTORY.md'), md.join('\n') + '\n');
+const out = at('../docs/DEMO-INVENTORY.md');
+writeFileSync(out, md.join('\n') + '\n');
+execFileSync(at('../node_modules/.bin/prettier'), ['--write', out], { stdio: 'ignore' });
 console.log(`r185 ${all.length} | not worth ${notWorth.size} | WORTH ${worth.length}`);
 console.log(
   `HAVE ${count('HAVE')} + folded ${count('HAVE (folded)')} = ${count('HAVE') + count('HAVE (folded)')} | BLOCKED ${count('BLOCKED')} | LATER ${count('LATER')} | GAP ${count('GAP')}`,

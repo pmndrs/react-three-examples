@@ -1,5 +1,16 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
 
+## 2026-09-03 — TSL tooling pages excluded; inventory now quotes reasons
+
+Dennis ruled `webgpu_tsl_editor`, `webgpu_tsl_transpiler` and `webgpu_tsl_graph` **internal
+tooling, not porting** (their UI — Monaco, the Inspector graph — is the demo; the transpiler
+runtime already ships inside `shadertoy`). SPEC §3/§4 (v1.2 amendment), ROADMAP and the Phase
+1 backlog updated; final phase is WebXR + webaudio only (4 deferred, 13 excluded).
+`pnpm inventory` now carries the backlog's own reason text into every "not worth a page" row
+(previously a bare "skipped with a recorded reason (Phase 2 backlog)" pointer) and runs
+prettier on its output, so [DEMO-INVENTORY.md](DEMO-INVENTORY.md) answers "why not" by
+itself. Counts after: WORTH 314, HAVE 274, BLOCKED 6, LATER 34, GAP 0.
+
 ## Wave 4 — Phase 2 end-of-wave compile (2026-09-03)
 
 Every porting agent from "Phase 2 greenlit" (below) finished; this session ran the

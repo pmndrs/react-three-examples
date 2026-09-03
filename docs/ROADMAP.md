@@ -12,7 +12,8 @@ Two vocabularies are in use and they are not the same axis:
 
 - **Phases** (SPEC §4) are _what gets ported_: **Phase 1** = the `webgpu_`* set;
   **Patterns track** = 12–20 app-scale examples; **Phase 2** = curated webgl-only
-  examples + the loader gallery; **Final phase** = WebXR, webaudio, TSL tooling.
+  examples + the loader gallery; **Final phase** = WebXR, webaudio (the TSL tooling pages
+  were excluded as internal, 2026-09-03).
 - **Milestones** (this file) are _what ships_: M0 foundations → M1 golden path → M2
   pilot batch + site v1 → M3 full WebGPU set → M4 launch.
 
@@ -219,9 +220,9 @@ Then, in the order SPEC §4 already sets:
 - **1.2 — Phase 2**: the 34 validated webgl-unique examples, ported to WebGPU where
   feasible. The **loader gallery** (47 formats) is its own decision, still open in SPEC
   §14: all formats, or a representative set.
-- **Final phase**: the 7 deferred (`xr-cubes`, `xr-native-layers`, `xr-rollercoaster`,
-  `compute-audio`, `tsl-editor`, `tsl-graph`, `tsl-transpiler`) — WebXR needs
-  `@react-three/xr` on v10; TSL tooling is a separate product.
+- **Final phase**: the 4 deferred (`xr-cubes`, `xr-native-layers`, `xr-rollercoaster`,
+  `compute-audio`) — WebXR needs `@react-three/xr` on v10. `tsl-editor`, `tsl-graph`,
+  `tsl-transpiler` were excluded as internal tooling on 2026-09-03 (SPEC §3), not deferred.
 - **Standing**: monthly three `files.json` re-diff (SPEC §11); drei gap-closure watch —
   when drei ships something in `utils/`, migrate and retire.
 

@@ -37,8 +37,9 @@ R3F is an AND with vanilla three.js, not an OR.
 ## 3. Non-goals
 
 - Not a re-teaching of three.js fundamentals.
-- No ports of API/stress/capability tests or renderer internals; the TSL editor/transpiler
-  pages are a _later-phase project_, not v1.
+- No ports of API/stress/capability tests, renderer internals, or the TSL editor /
+  transpiler / graph pages — those are tooling UIs (Monaco, the Inspector), not scenes.
+  Marked internal, not porting (Dennis, 2026-09-03; v1.1 had them as "later-phase").
 - WebXR and webaudio: explicitly out of scope for now — final-phase items if things go fast.
 - **Not pixel-parity with upstream.** Idiomatic-primary; divergence expected (§8).
 - Not a fork of the three.js examples — originals are linked, not vendored.
@@ -86,7 +87,8 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   **+ 47 loader-format gallery examples** (only glTF/KTX2/MaterialX have webgpu ports).
   Phase 2 = curate from the 34; the loader gallery is its own decision (❓ port all formats,
   or a representative set?). Ported to WebGPURenderer where feasible.
-- **Final phase (aspirational): WebXR (@react-three/xr), webaudio, TSL editor tooling.**
+- **Final phase (aspirational): WebXR (@react-three/xr), webaudio.** The TSL editor/
+  transpiler/graph pages are excluded outright (§3), not deferred.
 
 ## 5. Example format
 
@@ -304,3 +306,8 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
     Inspector marked deferred (never wired, every port drops it); §7 restructured to three
     labelled sections with a prune-on-bump rule; §10 records the shipped animates tier and
     the real CI cadence. Operational detail lives in [AGENTS.md](../AGENTS.md) v1.0.
+- **v1.2 (2026-09-03)** — §3/§4: the three TSL tooling pages (`webgpu_tsl_editor`,
+  `webgpu_tsl_transpiler`, `webgpu_tsl_graph`) moved from "later-phase project" to
+  **excluded as internal tooling** — their UI (a Monaco editor, the Inspector's node graph)
+  is the demo, so a port would be an editor product, not an example. The transpiler
+  runtime is already exercised by `shadertoy`. Final phase is now WebXR + webaudio only.

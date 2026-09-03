@@ -5,611 +5,613 @@
 > and `src/examples.json`. Do not edit by hand — change a backlog decision and regenerate.
 > Answers one question: **of the demos worth porting, how many do we have, and why not all?**
 
-r185 ships **588** examples. **271 are not worth a page** — duplicated by a `webgpu_` example, low-value, internal/sandbox, or skipped with a recorded reason (all listed at the bottom). **317 are worth porting.**
+r185 ships **588** examples. **274 are not worth a page** — duplicated by a `webgpu_` example, low-value, internal/sandbox, or skipped with a recorded reason (all listed at the bottom, with the reason). **314 are worth porting.**
 
-| status                                               |   count |
-| ---------------------------------------------------- | ------: |
-| HAVE — own page                                      |     262 |
-| HAVE — folded into a combined example                |      12 |
-| BLOCKED — review-queued, needs a decision            |       6 |
-| LATER — final phase (WebXR / webaudio / TSL tooling) |      37 |
-| GAP — no decision recorded                           |       0 |
-| **worth porting**                                    | **317** |
+| status                                    |   count |
+| ----------------------------------------- | ------: |
+| HAVE — own page                           |     262 |
+| HAVE — folded into a combined example     |      12 |
+| BLOCKED — review-queued, needs a decision |       6 |
+| LATER — final phase (WebXR / webaudio)    |      34 |
+| GAP — no decision recorded                |       0 |
+| **worth porting**                         | **314** |
 
 ## The list
 
-| original                                   | status        | slug / reason                           |
-| ------------------------------------------ | ------------- | --------------------------------------- |
-| `webgl_batch_lod_bvh`                      | BLOCKED       | review-queued — REVIEW-QUEUE.md         |
-| `webgl_loader_3dtiles`                     | BLOCKED       | review-queued — REVIEW-QUEUE.md         |
-| `webgl_loader_gltf_animation_pointer`      | BLOCKED       | review-queued — REVIEW-QUEUE.md         |
-| `webgl_loader_gltf_progressive_lod`        | BLOCKED       | review-queued — REVIEW-QUEUE.md         |
-| `webgl_morphtargets_webcam`                | BLOCKED       | review-queued — REVIEW-QUEUE.md         |
-| `webgl_worker_offscreencanvas`             | BLOCKED       | review-queued — REVIEW-QUEUE.md         |
-| `css2d_label`                              | HAVE          | `label`                                 |
-| `css3d_molecules`                          | HAVE          | `molecules`                             |
-| `css3d_periodictable`                      | HAVE          | `periodictable`                         |
-| `css3d_sprites`                            | HAVE          | `css3d-sprites`                         |
-| `css3d_youtube`                            | HAVE          | `youtube`                               |
-| `games_fps`                                | HAVE          | `fps`                                   |
-| `misc_animation_groups`                    | HAVE          | `animation-groups`                      |
-| `misc_animation_keys`                      | HAVE          | `animation-keys`                        |
-| `misc_boxselection`                        | HAVE          | `boxselection`                          |
-| `misc_controls_drag`                       | HAVE          | `controls-drag`                         |
-| `misc_controls_orbit`                      | HAVE          | `controls`                              |
-| `misc_controls_transform`                  | HAVE          | `controls-transform`                    |
-| `misc_exporter_gltf`                       | HAVE          | `exporter`                              |
-| `misc_raycaster_helper`                    | HAVE          | `raycaster-helper`                      |
-| `physics_rapier_basic`                     | HAVE          | `rapier-basic`                          |
-| `physics_rapier_character_controller`      | HAVE          | `rapier-character-controller`           |
-| `physics_rapier_instancing`                | HAVE          | `rapier-instancing`                     |
-| `physics_rapier_joints`                    | HAVE          | `rapier-joints`                         |
-| `physics_rapier_terrain`                   | HAVE          | `rapier-terrain`                        |
-| `physics_rapier_vehicle_controller`        | HAVE          | `rapier-vehicle-controller`             |
-| `webgl_animation_skinning_blending`        | HAVE          | `animation-skinning-blending`           |
-| `webgl_animation_skinning_ik`              | HAVE          | `animation-skinning-ik`                 |
-| `webgl_animation_walk`                     | HAVE          | `animation-walk`                        |
-| `webgl_clipping_stencil`                   | HAVE          | `clipping-stencil`                      |
-| `webgl_decals`                             | HAVE          | `decals`                                |
-| `webgl_geometries`                         | HAVE          | `geometries`                            |
-| `webgl_geometry_colors_lookuptable`        | HAVE          | `geometry-colors-lookuptable`           |
-| `webgl_geometry_convex`                    | HAVE          | `geometry-convex`                       |
-| `webgl_geometry_csg`                       | HAVE          | `geometry-csg`                          |
-| `webgl_geometry_minecraft`                 | HAVE          | `geometry-minecraft`                    |
-| `webgl_geometry_nurbs`                     | HAVE          | `geometry-nurbs`                        |
-| `webgl_geometry_spline_editor`             | HAVE          | `geometry-spline-editor`                |
-| `webgl_geometry_teapot`                    | HAVE          | `geometry-teapot`                       |
-| `webgl_geometry_terrain_raycast`           | HAVE          | `geometry-terrain-raycast`              |
-| `webgl_geometry_text`                      | HAVE          | `geometry-text`                         |
-| `webgl_helpers`                            | HAVE          | `helpers`                               |
-| `webgl_instancing_raycast`                 | HAVE          | `instancing-raycast`                    |
-| `webgl_instancing_scatter`                 | HAVE          | `instancing-scatter`                    |
-| `webgl_interactive_cubes`                  | HAVE          | `interactive-cubes`                     |
-| `webgl_interactive_cubes_gpu`              | HAVE          | `interactive-cubes-gpu`                 |
-| `webgl_interactive_voxelpainter`           | HAVE          | `interactive-voxelpainter`              |
-| `webgl_lines_dashed`                       | HAVE          | `lines-dashed`                          |
-| `webgl_loader_collada_kinematics`          | HAVE          | `loader-collada-kinematics`             |
-| `webgl_loader_gltf_instancing`             | HAVE          | `loader-gltf-instancing`                |
-| `webgl_loader_gltf_variants`               | HAVE          | `loader-gltf-variants`                  |
-| `webgl_loader_ldraw`                       | HAVE          | `loader-ldraw`                          |
-| `webgl_loader_md2_control`                 | HAVE          | `loader-md2-control`                    |
-| `webgl_loader_pdb`                         | HAVE          | `loader-pdb`                            |
-| `webgl_loader_svg`                         | HAVE          | `loader-svg`                            |
-| `webgl_loader_texture_exr`                 | HAVE          | `texture-hdr-formats`                   |
-| `webgl_loader_texture_lottie`              | HAVE          | `texture-lottie`                        |
-| `webgl_lod`                                | HAVE          | `lod`                                   |
-| `webgl_marchingcubes`                      | HAVE          | `marchingcubes`                         |
-| `webgl_materials_blending`                 | HAVE          | `materials-blending`                    |
-| `webgl_materials_car`                      | HAVE          | `materials-car`                         |
-| `webgl_materials_texture_canvas`           | HAVE          | `materials-texture-canvas`              |
-| `webgl_modifier_edgesplit`                 | HAVE          | `modifier-edgesplit`                    |
-| `webgl_modifier_simplifier`                | HAVE          | `modifier-simplifier`                   |
-| `webgl_modifier_subdivision`               | HAVE          | `modifier-subdivision`                  |
-| `webgl_modifier_tessellation`              | HAVE          | `modifier-tessellation`                 |
-| `webgl_multiple_scenes_comparison`         | HAVE          | `multiple-scenes-comparison`            |
-| `webgl_multiple_views`                     | HAVE          | `multiple-views`                        |
-| `webgl_postprocessing_glitch`              | HAVE          | `postprocessing-glitch`                 |
-| `webgl_raycaster_bvh`                      | HAVE          | `raycaster-bvh`                         |
-| `webgl_raycaster_texture`                  | HAVE          | `raycaster-texture`                     |
-| `webgpu_animation_retargeting`             | HAVE          | `animation-retargeting`                 |
-| `webgpu_animation_retargeting_readyplayer` | HAVE          | `animation-retargeting-readyplayer`     |
-| `webgpu_backdrop`                          | HAVE          | `backdrop`                              |
-| `webgpu_backdrop_area`                     | HAVE          | `backdrop-area`                         |
-| `webgpu_backdrop_water`                    | HAVE          | `backdrop-water`                        |
-| `webgpu_camera`                            | HAVE          | `camera`                                |
-| `webgpu_camera_array`                      | HAVE          | `camera-array`                          |
-| `webgpu_camera_logarithmicdepthbuffer`     | HAVE          | `camera-logarithmicdepthbuffer`         |
-| `webgpu_caustics`                          | HAVE          | `caustics`                              |
-| `webgpu_clearcoat`                         | HAVE          | `clearcoat`                             |
-| `webgpu_clipping`                          | HAVE          | `clipping`                              |
-| `webgpu_compute_birds`                     | HAVE          | `compute-birds`                         |
-| `webgpu_compute_cloth`                     | HAVE          | `compute-cloth`                         |
-| `webgpu_compute_geometry`                  | HAVE          | `compute-geometry`                      |
-| `webgpu_compute_particles`                 | HAVE          | `compute-particles`                     |
-| `webgpu_compute_particles_fluid`           | HAVE          | `compute-particles-fluid`               |
-| `webgpu_compute_particles_rain`            | HAVE          | `compute-particles-rain`                |
-| `webgpu_compute_particles_snow`            | HAVE          | `compute-particles-snow`                |
-| `webgpu_compute_points`                    | HAVE          | `compute-points`                        |
-| `webgpu_compute_rasterizer`                | HAVE          | `compute-rasterizer`                    |
-| `webgpu_compute_rasterizer_ibl`            | HAVE          | `compute-rasterizer-ibl`                |
-| `webgpu_compute_reduce`                    | HAVE          | `compute-reduce`                        |
-| `webgpu_compute_sort_bitonic`              | HAVE          | `compute-sort-bitonic`                  |
-| `webgpu_compute_texture`                   | HAVE          | `compute-texture`                       |
-| `webgpu_compute_texture_3d`                | HAVE          | `compute-texture-3d`                    |
-| `webgpu_compute_texture_pingpong`          | HAVE          | `compute-texture-pingpong`              |
-| `webgpu_compute_water`                     | HAVE          | `compute-water`                         |
-| `webgpu_cubemap_adjustments`               | HAVE          | `cubemap-adjustments`                   |
-| `webgpu_cubemap_dynamic`                   | HAVE          | `cubemap-dynamic`                       |
-| `webgpu_cubemap_mix`                       | HAVE          | `cubemap-mix`                           |
-| `webgpu_custom_fog`                        | HAVE          | `custom-fog`                            |
-| `webgpu_custom_fog_background`             | HAVE          | `custom-fog-background`                 |
-| `webgpu_custom_fog_scattering`             | HAVE          | `custom-fog-scattering`                 |
-| `webgpu_depth_texture`                     | HAVE          | `depth-texture`                         |
-| `webgpu_display_stereo`                    | HAVE          | `display-stereo`                        |
-| `webgpu_equirectangular`                   | HAVE          | `equirectangular`                       |
-| `webgpu_fog_height`                        | HAVE          | `fog-height`                            |
-| `webgpu_generator_building`                | HAVE          | `generator-building`                    |
-| `webgpu_generator_city`                    | HAVE          | `generator-city`                        |
-| `webgpu_geometry_loft`                     | HAVE          | `geometry-loft`                         |
-| `webgpu_hdr`                               | HAVE          | `hdr`                                   |
-| `webgpu_instance_mesh`                     | HAVE          | `instance-mesh`                         |
-| `webgpu_instance_path`                     | HAVE          | `instance-path`                         |
-| `webgpu_instance_points`                   | HAVE          | `instance-points`                       |
-| `webgpu_instance_sprites`                  | HAVE          | `instance-sprites`                      |
-| `webgpu_instance_uniform`                  | HAVE          | `instance-uniform`                      |
-| `webgpu_instancing_morph`                  | HAVE          | `instancing-morph`                      |
-| `webgpu_layers`                            | HAVE          | `layers`                                |
-| `webgpu_lensflares`                        | HAVE          | `lensflares`                            |
-| `webgpu_lightprobe`                        | HAVE          | `lightprobe`                            |
-| `webgpu_lightprobe_cubecamera`             | HAVE          | `lightprobe-cubecamera`                 |
-| `webgpu_lights_clustered`                  | HAVE          | `lights-clustered`                      |
-| `webgpu_lights_custom`                     | HAVE          | `lights-custom`                         |
-| `webgpu_lights_dynamic`                    | HAVE          | `lights-dynamic`                        |
-| `webgpu_lights_ies_spotlight`              | HAVE          | `lights-ies-spotlight`                  |
-| `webgpu_lights_phong`                      | HAVE          | `lights-phong`                          |
-| `webgpu_lights_physical`                   | HAVE          | `lights-physical`                       |
-| `webgpu_lights_pointlights`                | HAVE          | `lights-pointlights`                    |
-| `webgpu_lights_projector`                  | HAVE          | `lights-projector`                      |
-| `webgpu_lights_rectarealight`              | HAVE          | `lights-rectarealight`                  |
-| `webgpu_lights_selective`                  | HAVE          | `lights-selective`                      |
-| `webgpu_lights_spotlight`                  | HAVE          | `lights-spotlight`                      |
-| `webgpu_lines_fat`                         | HAVE          | `lines-fat`                             |
-| `webgpu_lines_fat_raycasting`              | HAVE          | `lines-fat-raycasting`                  |
-| `webgpu_lines_fat_wireframe`               | HAVE          | `lines-fat-wireframe`                   |
-| `webgpu_loader_gltf`                       | HAVE          | `loader-gltf`                           |
-| `webgpu_loader_gltf_anisotropy`            | HAVE          | `loader-gltf-anisotropy`                |
-| `webgpu_loader_gltf_compressed`            | HAVE          | `loader-gltf-compressed`                |
-| `webgpu_loader_gltf_dispersion`            | HAVE          | `loader-gltf-dispersion`                |
-| `webgpu_loader_gltf_iridescence`           | HAVE          | `loader-gltf-iridescence`               |
-| `webgpu_loader_gltf_sheen`                 | HAVE          | `loader-gltf-sheen`                     |
-| `webgpu_loader_gltf_transmission`          | HAVE          | `loader-gltf-transmission`              |
-| `webgpu_loader_materialx`                  | HAVE          | `loader-materialx`                      |
-| `webgpu_loader_texture_ktx2`               | HAVE          | `loader-texture-ktx2`                   |
-| `webgpu_materials`                         | HAVE          | `materials`                             |
-| `webgpu_materials_alphahash`               | HAVE          | `materials-alphahash`                   |
-| `webgpu_materials_arrays`                  | HAVE          | `materials-arrays`                      |
-| `webgpu_materials_basic`                   | HAVE          | `materials-basic`                       |
-| `webgpu_materials_cubemap_mipmaps`         | HAVE          | `materials-cubemap-mipmaps`             |
-| `webgpu_materials_displacementmap`         | HAVE          | `materials-displacementmap`             |
-| `webgpu_materials_envmaps`                 | HAVE          | `materials-envmaps`                     |
-| `webgpu_materials_envmaps_bpcem`           | HAVE          | `materials-envmaps-bpcem`               |
-| `webgpu_materials_envmaps_groundprojected` | HAVE          | `materials-envmaps-groundprojected`     |
-| `webgpu_materials_lightmap`                | HAVE          | `materials-lightmap`                    |
-| `webgpu_materials_matcap`                  | HAVE          | `materials-matcap`                      |
-| `webgpu_materials_sss`                     | HAVE          | `materials-sss`                         |
-| `webgpu_materials_texture_html`            | HAVE          | `materials-texture-html`                |
-| `webgpu_materials_texture_manualmipmap`    | HAVE          | `materials-texture-manualmipmap`        |
-| `webgpu_materials_toon`                    | HAVE          | `materials-toon`                        |
-| `webgpu_materials_transmission`            | HAVE          | `materials-transmission`                |
-| `webgpu_materials_video`                   | HAVE          | `materials-video`                       |
-| `webgpu_materialx_noise`                   | HAVE          | `materialx-noise`                       |
-| `webgpu_mesh_batch`                        | HAVE          | `mesh-batch`                            |
-| `webgpu_mirror`                            | HAVE          | `mirror`                                |
-| `webgpu_modifier_curve`                    | HAVE          | `modifier-curve`                        |
-| `webgpu_morphtargets`                      | HAVE          | `morphtargets`                          |
-| `webgpu_morphtargets_face`                 | HAVE          | `morphtargets-face`                     |
-| `webgpu_mrt`                               | HAVE          | `mrt`                                   |
-| `webgpu_mrt_mask`                          | HAVE          | `mrt-mask`                              |
-| `webgpu_multiple_canvas`                   | HAVE          | `multiple-canvas`                       |
-| `webgpu_multiple_elements`                 | HAVE          | `multiple-elements`                     |
-| `webgpu_multiple_rendertargets`            | HAVE          | `multiple-rendertargets`                |
-| `webgpu_multiple_rendertargets_readback`   | HAVE          | `multiple-rendertargets-readback`       |
-| `webgpu_occlusion`                         | HAVE          | `occlusion`                             |
-| `webgpu_ocean`                             | HAVE          | `ocean`                                 |
-| `webgpu_parallax_uv`                       | HAVE          | `parallax-uv`                           |
-| `webgpu_particles`                         | HAVE          | `particles`                             |
-| `webgpu_pmrem_cubemap`                     | HAVE          | `pmrem-cubemap`                         |
-| `webgpu_pmrem_equirectangular`             | HAVE          | `pmrem-equirectangular`                 |
-| `webgpu_pmrem_scene`                       | HAVE          | `pmrem-scene`                           |
-| `webgpu_portal`                            | HAVE          | `portal`                                |
-| `webgpu_postprocessing`                    | HAVE          | `postprocessing`                        |
-| `webgpu_postprocessing_3dlut`              | HAVE          | `postprocessing-3dlut`                  |
-| `webgpu_postprocessing_afterimage`         | HAVE          | `postprocessing-afterimage`             |
-| `webgpu_postprocessing_anamorphic`         | HAVE          | `postprocessing-anamorphic`             |
-| `webgpu_postprocessing_ao`                 | HAVE          | `postprocessing-ao`                     |
-| `webgpu_postprocessing_bloom`              | HAVE          | `postprocessing-bloom`                  |
-| `webgpu_postprocessing_bloom_emissive`     | HAVE          | `postprocessing-bloom-emissive`         |
-| `webgpu_postprocessing_bloom_selective`    | HAVE          | `postprocessing-bloom-selective`        |
-| `webgpu_postprocessing_ca`                 | HAVE          | `postprocessing-ca`                     |
-| `webgpu_postprocessing_difference`         | HAVE          | `postprocessing-difference`             |
-| `webgpu_postprocessing_dof`                | HAVE          | `postprocessing-dof`                    |
-| `webgpu_postprocessing_dof_basic`          | HAVE          | `postprocessing-dof-basic`              |
-| `webgpu_postprocessing_fxaa`               | HAVE          | `postprocessing-fxaa`                   |
-| `webgpu_postprocessing_godrays`            | HAVE          | `postprocessing-godrays`                |
-| `webgpu_postprocessing_lensflare`          | HAVE          | `postprocessing-lensflare`              |
-| `webgpu_postprocessing_masking`            | HAVE          | `postprocessing-masking`                |
-| `webgpu_postprocessing_motion_blur`        | HAVE          | `postprocessing-motion-blur`            |
-| `webgpu_postprocessing_outline`            | HAVE          | `postprocessing-outline`                |
-| `webgpu_postprocessing_pixel`              | HAVE          | `postprocessing-pixel`                  |
-| `webgpu_postprocessing_radial_blur`        | HAVE          | `postprocessing-radial-blur`            |
-| `webgpu_postprocessing_retro`              | HAVE          | `postprocessing-retro`                  |
-| `webgpu_postprocessing_smaa`               | HAVE          | `postprocessing-smaa`                   |
-| `webgpu_postprocessing_sobel`              | HAVE          | `postprocessing-sobel`                  |
-| `webgpu_postprocessing_ssaa`               | HAVE          | `postprocessing-ssaa`                   |
-| `webgpu_postprocessing_ssgi`               | HAVE          | `postprocessing-ssgi`                   |
-| `webgpu_postprocessing_ssgi_ballpool`      | HAVE          | `postprocessing-ssgi-ballpool`          |
-| `webgpu_postprocessing_ssr`                | HAVE          | `postprocessing-ssr`                    |
-| `webgpu_postprocessing_ssr_denoise`        | HAVE          | `postprocessing-ssr-denoise`            |
-| `webgpu_postprocessing_sss`                | HAVE          | `postprocessing-sss`                    |
-| `webgpu_postprocessing_traa`               | HAVE          | `postprocessing-traa`                   |
-| `webgpu_postprocessing_transition`         | HAVE          | `postprocessing-transition`             |
-| `webgpu_procedural_texture`                | HAVE          | `procedural-texture`                    |
-| `webgpu_reflection`                        | HAVE          | `reflection`                            |
-| `webgpu_reflection_blurred`                | HAVE          | `reflection-blurred`                    |
-| `webgpu_reflection_roughness`              | HAVE          | `reflection-roughness`                  |
-| `webgpu_refraction`                        | HAVE          | `refraction`                            |
-| `webgpu_rendertarget_2d-array_3d`          | HAVE          | `rendertarget-2d-array-3d`              |
-| `webgpu_rtt`                               | HAVE          | `rtt`                                   |
-| `webgpu_shadertoy`                         | HAVE          | `shadertoy`                             |
-| `webgpu_shadow_contact`                    | HAVE          | `shadow-contact`                        |
-| `webgpu_shadowmap`                         | HAVE          | `shadowmap`                             |
-| `webgpu_shadowmap_array`                   | HAVE          | `shadowmap-array`                       |
-| `webgpu_shadowmap_csm`                     | HAVE          | `shadowmap-csm`                         |
-| `webgpu_shadowmap_opacity`                 | HAVE          | `shadowmap-opacity`                     |
-| `webgpu_shadowmap_pointlight`              | HAVE          | `shadowmap-pointlight`                  |
-| `webgpu_shadowmap_progressive`             | HAVE          | `shadowmap-progressive`                 |
-| `webgpu_shadowmap_vsm`                     | HAVE          | `shadowmap-vsm`                         |
-| `webgpu_skinning`                          | HAVE          | `skinning`                              |
-| `webgpu_skinning_instancing`               | HAVE          | `skinning-instancing`                   |
-| `webgpu_skinning_instancing_individual`    | HAVE          | `skinning-instancing-individual`        |
-| `webgpu_skinning_points`                   | HAVE          | `skinning-points`                       |
-| `webgpu_sky`                               | HAVE          | `sky`                                   |
-| `webgpu_sprites`                           | HAVE          | `sprites`                               |
-| `webgpu_storage_buffer`                    | HAVE          | `storage-buffer`                        |
-| `webgpu_struct_drawindirect`               | HAVE          | `struct-drawindirect`                   |
-| `webgpu_texturegather`                     | HAVE          | `texturegather`                         |
-| `webgpu_texturegrad`                       | HAVE          | `texturegrad`                           |
-| `webgpu_textures_2d-array`                 | HAVE          | `textures-2d-array`                     |
-| `webgpu_textures_2d-array_compressed`      | HAVE          | `textures-2d-array-compressed`          |
-| `webgpu_textures_anisotropy`               | HAVE          | `textures-anisotropy`                   |
-| `webgpu_textures_partialupdate`            | HAVE          | `textures-partialupdate`                |
-| `webgpu_tonemapping`                       | HAVE          | `tonemapping`                           |
-| `webgpu_tsl_angular_slicing`               | HAVE          | `tsl-angular-slicing`                   |
-| `webgpu_tsl_compute_attractors_particles`  | HAVE          | `tsl-compute-attractors-particles`      |
-| `webgpu_tsl_earth`                         | HAVE          | `tsl-earth`                             |
-| `webgpu_tsl_galaxy`                        | HAVE          | `tsl-galaxy`                            |
-| `webgpu_tsl_halftone`                      | HAVE          | `tsl-halftone`                          |
-| `webgpu_tsl_interoperability`              | HAVE          | `tsl-interoperability`                  |
-| `webgpu_tsl_procedural_terrain`            | HAVE          | `tsl-procedural-terrain`                |
-| `webgpu_tsl_raging_sea`                    | HAVE          | `tsl-raging-sea`                        |
-| `webgpu_tsl_vfx_flames`                    | HAVE          | `tsl-vfx-flames`                        |
-| `webgpu_tsl_vfx_linkedparticles`           | HAVE          | `tsl-vfx-linkedparticles`               |
-| `webgpu_tsl_vfx_tornado`                   | HAVE          | `tsl-vfx-tornado`                       |
-| `webgpu_tsl_wood`                          | HAVE          | `tsl-wood`                              |
-| `webgpu_upscaling_fsr1`                    | HAVE          | `upscaling-fsr1`                        |
-| `webgpu_upscaling_taau`                    | HAVE          | `upscaling-taau`                        |
-| `webgpu_video_frame`                       | HAVE          | `video-frame`                           |
-| `webgpu_video_panorama`                    | HAVE          | `video-panorama`                        |
-| `webgpu_volume_caustics`                   | HAVE          | `volume-caustics`                       |
-| `webgpu_volume_cloud`                      | HAVE          | `volume-cloud`                          |
-| `webgpu_volume_fire`                       | HAVE          | `volume-fire`                           |
-| `webgpu_volume_lighting`                   | HAVE          | `volume-lighting`                       |
-| `webgpu_volume_lighting_rectarea`          | HAVE          | `volume-lighting-rectarea`              |
-| `webgpu_volume_lighting_traa`              | HAVE          | `volume-lighting-traa`                  |
-| `webgpu_volume_perlin`                     | HAVE          | `volume-perlin`                         |
-| `webgpu_water`                             | HAVE          | `water`                                 |
-| `misc_controls_arcball`                    | HAVE (folded) | inside a combined example               |
-| `misc_controls_fly`                        | HAVE (folded) | inside a combined example               |
-| `misc_controls_map`                        | HAVE (folded) | inside a combined example               |
-| `misc_controls_pointerlock`                | HAVE (folded) | inside a combined example               |
-| `misc_controls_trackball`                  | HAVE (folded) | inside a combined example               |
-| `misc_exporter_gltf_normals`               | HAVE (folded) | inside a combined example               |
-| `misc_exporter_obj`                        | HAVE (folded) | inside a combined example               |
-| `misc_exporter_ply`                        | HAVE (folded) | inside a combined example               |
-| `misc_exporter_stl`                        | HAVE (folded) | inside a combined example               |
-| `misc_exporter_usdz`                       | HAVE (folded) | inside a combined example               |
-| `webgl_loader_texture_hdr`                 | HAVE (folded) | inside a combined example               |
-| `webgl_loader_texture_ultrahdr`            | HAVE (folded) | inside a combined example               |
-| `webaudio_orientation`                     | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webaudio_sandbox`                         | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webaudio_timing`                          | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webaudio_visualizer`                      | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webgpu_compute_audio`                     | LATER         | deferred: TSL editor tooling (SPEC §3)  |
-| `webgpu_tsl_editor`                        | LATER         | deferred: TSL editor tooling (SPEC §3)  |
-| `webgpu_tsl_graph`                         | LATER         | deferred: TSL editor tooling (SPEC §3)  |
-| `webgpu_tsl_transpiler`                    | LATER         | deferred: TSL editor tooling (SPEC §3)  |
-| `webgpu_xr_cubes`                          | LATER         | deferred: TSL editor tooling (SPEC §3)  |
-| `webgpu_xr_native_layers`                  | LATER         | deferred: TSL editor tooling (SPEC §3)  |
-| `webgpu_xr_rollercoaster`                  | LATER         | deferred: TSL editor tooling (SPEC §3)  |
-| `webxr_ar_camera_access`                   | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_ar_cones`                           | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_ar_hittest`                         | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_ar_lighting`                        | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_ar_plane_detection`                 | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_handinput`                       | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_handinput_cubes`                 | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_handinput_pointerclick`          | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_handinput_pointerdrag`           | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_handinput_pressbutton`           | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_handinput_profiles`              | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_layers`                          | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_panorama`                        | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_panorama_depth`                  | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_rollercoaster`                   | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_sandbox`                         | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_teleport`                        | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_vr_video`                           | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_xr_ballshooter`                     | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_xr_controls_transform`              | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_xr_cubes`                           | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_xr_dragging`                        | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_xr_dragging_custom_depth`           | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_xr_haptics`                         | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_xr_marchingcubes`                   | LATER         | final phase: WebXR / webaudio (SPEC §3) |
-| `webxr_xr_paint`                           | LATER         | final phase: WebXR / webaudio (SPEC §3) |
+| original                                   | status        | slug / reason                                         |
+| ------------------------------------------ | ------------- | ----------------------------------------------------- |
+| `webgl_batch_lod_bvh`                      | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
+| `webgl_loader_3dtiles`                     | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
+| `webgl_loader_gltf_animation_pointer`      | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
+| `webgl_loader_gltf_progressive_lod`        | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
+| `webgl_morphtargets_webcam`                | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
+| `webgl_worker_offscreencanvas`             | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
+| `css2d_label`                              | HAVE          | `label`                                               |
+| `css3d_molecules`                          | HAVE          | `molecules`                                           |
+| `css3d_periodictable`                      | HAVE          | `periodictable`                                       |
+| `css3d_sprites`                            | HAVE          | `css3d-sprites`                                       |
+| `css3d_youtube`                            | HAVE          | `youtube`                                             |
+| `games_fps`                                | HAVE          | `fps`                                                 |
+| `misc_animation_groups`                    | HAVE          | `animation-groups`                                    |
+| `misc_animation_keys`                      | HAVE          | `animation-keys`                                      |
+| `misc_boxselection`                        | HAVE          | `boxselection`                                        |
+| `misc_controls_drag`                       | HAVE          | `controls-drag`                                       |
+| `misc_controls_orbit`                      | HAVE          | `controls`                                            |
+| `misc_controls_transform`                  | HAVE          | `controls-transform`                                  |
+| `misc_exporter_gltf`                       | HAVE          | `exporter`                                            |
+| `misc_raycaster_helper`                    | HAVE          | `raycaster-helper`                                    |
+| `physics_rapier_basic`                     | HAVE          | `rapier-basic`                                        |
+| `physics_rapier_character_controller`      | HAVE          | `rapier-character-controller`                         |
+| `physics_rapier_instancing`                | HAVE          | `rapier-instancing`                                   |
+| `physics_rapier_joints`                    | HAVE          | `rapier-joints`                                       |
+| `physics_rapier_terrain`                   | HAVE          | `rapier-terrain`                                      |
+| `physics_rapier_vehicle_controller`        | HAVE          | `rapier-vehicle-controller`                           |
+| `webgl_animation_skinning_blending`        | HAVE          | `animation-skinning-blending`                         |
+| `webgl_animation_skinning_ik`              | HAVE          | `animation-skinning-ik`                               |
+| `webgl_animation_walk`                     | HAVE          | `animation-walk`                                      |
+| `webgl_clipping_stencil`                   | HAVE          | `clipping-stencil`                                    |
+| `webgl_decals`                             | HAVE          | `decals`                                              |
+| `webgl_geometries`                         | HAVE          | `geometries`                                          |
+| `webgl_geometry_colors_lookuptable`        | HAVE          | `geometry-colors-lookuptable`                         |
+| `webgl_geometry_convex`                    | HAVE          | `geometry-convex`                                     |
+| `webgl_geometry_csg`                       | HAVE          | `geometry-csg`                                        |
+| `webgl_geometry_minecraft`                 | HAVE          | `geometry-minecraft`                                  |
+| `webgl_geometry_nurbs`                     | HAVE          | `geometry-nurbs`                                      |
+| `webgl_geometry_spline_editor`             | HAVE          | `geometry-spline-editor`                              |
+| `webgl_geometry_teapot`                    | HAVE          | `geometry-teapot`                                     |
+| `webgl_geometry_terrain_raycast`           | HAVE          | `geometry-terrain-raycast`                            |
+| `webgl_geometry_text`                      | HAVE          | `geometry-text`                                       |
+| `webgl_helpers`                            | HAVE          | `helpers`                                             |
+| `webgl_instancing_raycast`                 | HAVE          | `instancing-raycast`                                  |
+| `webgl_instancing_scatter`                 | HAVE          | `instancing-scatter`                                  |
+| `webgl_interactive_cubes`                  | HAVE          | `interactive-cubes`                                   |
+| `webgl_interactive_cubes_gpu`              | HAVE          | `interactive-cubes-gpu`                               |
+| `webgl_interactive_voxelpainter`           | HAVE          | `interactive-voxelpainter`                            |
+| `webgl_lines_dashed`                       | HAVE          | `lines-dashed`                                        |
+| `webgl_loader_collada_kinematics`          | HAVE          | `loader-collada-kinematics`                           |
+| `webgl_loader_gltf_instancing`             | HAVE          | `loader-gltf-instancing`                              |
+| `webgl_loader_gltf_variants`               | HAVE          | `loader-gltf-variants`                                |
+| `webgl_loader_ldraw`                       | HAVE          | `loader-ldraw`                                        |
+| `webgl_loader_md2_control`                 | HAVE          | `loader-md2-control`                                  |
+| `webgl_loader_pdb`                         | HAVE          | `loader-pdb`                                          |
+| `webgl_loader_svg`                         | HAVE          | `loader-svg`                                          |
+| `webgl_loader_texture_exr`                 | HAVE          | `texture-hdr-formats`                                 |
+| `webgl_loader_texture_lottie`              | HAVE          | `texture-lottie`                                      |
+| `webgl_lod`                                | HAVE          | `lod`                                                 |
+| `webgl_marchingcubes`                      | HAVE          | `marchingcubes`                                       |
+| `webgl_materials_blending`                 | HAVE          | `materials-blending`                                  |
+| `webgl_materials_car`                      | HAVE          | `materials-car`                                       |
+| `webgl_materials_texture_canvas`           | HAVE          | `materials-texture-canvas`                            |
+| `webgl_modifier_edgesplit`                 | HAVE          | `modifier-edgesplit`                                  |
+| `webgl_modifier_simplifier`                | HAVE          | `modifier-simplifier`                                 |
+| `webgl_modifier_subdivision`               | HAVE          | `modifier-subdivision`                                |
+| `webgl_modifier_tessellation`              | HAVE          | `modifier-tessellation`                               |
+| `webgl_multiple_scenes_comparison`         | HAVE          | `multiple-scenes-comparison`                          |
+| `webgl_multiple_views`                     | HAVE          | `multiple-views`                                      |
+| `webgl_postprocessing_glitch`              | HAVE          | `postprocessing-glitch`                               |
+| `webgl_raycaster_bvh`                      | HAVE          | `raycaster-bvh`                                       |
+| `webgl_raycaster_texture`                  | HAVE          | `raycaster-texture`                                   |
+| `webgpu_animation_retargeting`             | HAVE          | `animation-retargeting`                               |
+| `webgpu_animation_retargeting_readyplayer` | HAVE          | `animation-retargeting-readyplayer`                   |
+| `webgpu_backdrop`                          | HAVE          | `backdrop`                                            |
+| `webgpu_backdrop_area`                     | HAVE          | `backdrop-area`                                       |
+| `webgpu_backdrop_water`                    | HAVE          | `backdrop-water`                                      |
+| `webgpu_camera`                            | HAVE          | `camera`                                              |
+| `webgpu_camera_array`                      | HAVE          | `camera-array`                                        |
+| `webgpu_camera_logarithmicdepthbuffer`     | HAVE          | `camera-logarithmicdepthbuffer`                       |
+| `webgpu_caustics`                          | HAVE          | `caustics`                                            |
+| `webgpu_clearcoat`                         | HAVE          | `clearcoat`                                           |
+| `webgpu_clipping`                          | HAVE          | `clipping`                                            |
+| `webgpu_compute_birds`                     | HAVE          | `compute-birds`                                       |
+| `webgpu_compute_cloth`                     | HAVE          | `compute-cloth`                                       |
+| `webgpu_compute_geometry`                  | HAVE          | `compute-geometry`                                    |
+| `webgpu_compute_particles`                 | HAVE          | `compute-particles`                                   |
+| `webgpu_compute_particles_fluid`           | HAVE          | `compute-particles-fluid`                             |
+| `webgpu_compute_particles_rain`            | HAVE          | `compute-particles-rain`                              |
+| `webgpu_compute_particles_snow`            | HAVE          | `compute-particles-snow`                              |
+| `webgpu_compute_points`                    | HAVE          | `compute-points`                                      |
+| `webgpu_compute_rasterizer`                | HAVE          | `compute-rasterizer`                                  |
+| `webgpu_compute_rasterizer_ibl`            | HAVE          | `compute-rasterizer-ibl`                              |
+| `webgpu_compute_reduce`                    | HAVE          | `compute-reduce`                                      |
+| `webgpu_compute_sort_bitonic`              | HAVE          | `compute-sort-bitonic`                                |
+| `webgpu_compute_texture`                   | HAVE          | `compute-texture`                                     |
+| `webgpu_compute_texture_3d`                | HAVE          | `compute-texture-3d`                                  |
+| `webgpu_compute_texture_pingpong`          | HAVE          | `compute-texture-pingpong`                            |
+| `webgpu_compute_water`                     | HAVE          | `compute-water`                                       |
+| `webgpu_cubemap_adjustments`               | HAVE          | `cubemap-adjustments`                                 |
+| `webgpu_cubemap_dynamic`                   | HAVE          | `cubemap-dynamic`                                     |
+| `webgpu_cubemap_mix`                       | HAVE          | `cubemap-mix`                                         |
+| `webgpu_custom_fog`                        | HAVE          | `custom-fog`                                          |
+| `webgpu_custom_fog_background`             | HAVE          | `custom-fog-background`                               |
+| `webgpu_custom_fog_scattering`             | HAVE          | `custom-fog-scattering`                               |
+| `webgpu_depth_texture`                     | HAVE          | `depth-texture`                                       |
+| `webgpu_display_stereo`                    | HAVE          | `display-stereo`                                      |
+| `webgpu_equirectangular`                   | HAVE          | `equirectangular`                                     |
+| `webgpu_fog_height`                        | HAVE          | `fog-height`                                          |
+| `webgpu_generator_building`                | HAVE          | `generator-building`                                  |
+| `webgpu_generator_city`                    | HAVE          | `generator-city`                                      |
+| `webgpu_geometry_loft`                     | HAVE          | `geometry-loft`                                       |
+| `webgpu_hdr`                               | HAVE          | `hdr`                                                 |
+| `webgpu_instance_mesh`                     | HAVE          | `instance-mesh`                                       |
+| `webgpu_instance_path`                     | HAVE          | `instance-path`                                       |
+| `webgpu_instance_points`                   | HAVE          | `instance-points`                                     |
+| `webgpu_instance_sprites`                  | HAVE          | `instance-sprites`                                    |
+| `webgpu_instance_uniform`                  | HAVE          | `instance-uniform`                                    |
+| `webgpu_instancing_morph`                  | HAVE          | `instancing-morph`                                    |
+| `webgpu_layers`                            | HAVE          | `layers`                                              |
+| `webgpu_lensflares`                        | HAVE          | `lensflares`                                          |
+| `webgpu_lightprobe`                        | HAVE          | `lightprobe`                                          |
+| `webgpu_lightprobe_cubecamera`             | HAVE          | `lightprobe-cubecamera`                               |
+| `webgpu_lights_clustered`                  | HAVE          | `lights-clustered`                                    |
+| `webgpu_lights_custom`                     | HAVE          | `lights-custom`                                       |
+| `webgpu_lights_dynamic`                    | HAVE          | `lights-dynamic`                                      |
+| `webgpu_lights_ies_spotlight`              | HAVE          | `lights-ies-spotlight`                                |
+| `webgpu_lights_phong`                      | HAVE          | `lights-phong`                                        |
+| `webgpu_lights_physical`                   | HAVE          | `lights-physical`                                     |
+| `webgpu_lights_pointlights`                | HAVE          | `lights-pointlights`                                  |
+| `webgpu_lights_projector`                  | HAVE          | `lights-projector`                                    |
+| `webgpu_lights_rectarealight`              | HAVE          | `lights-rectarealight`                                |
+| `webgpu_lights_selective`                  | HAVE          | `lights-selective`                                    |
+| `webgpu_lights_spotlight`                  | HAVE          | `lights-spotlight`                                    |
+| `webgpu_lines_fat`                         | HAVE          | `lines-fat`                                           |
+| `webgpu_lines_fat_raycasting`              | HAVE          | `lines-fat-raycasting`                                |
+| `webgpu_lines_fat_wireframe`               | HAVE          | `lines-fat-wireframe`                                 |
+| `webgpu_loader_gltf`                       | HAVE          | `loader-gltf`                                         |
+| `webgpu_loader_gltf_anisotropy`            | HAVE          | `loader-gltf-anisotropy`                              |
+| `webgpu_loader_gltf_compressed`            | HAVE          | `loader-gltf-compressed`                              |
+| `webgpu_loader_gltf_dispersion`            | HAVE          | `loader-gltf-dispersion`                              |
+| `webgpu_loader_gltf_iridescence`           | HAVE          | `loader-gltf-iridescence`                             |
+| `webgpu_loader_gltf_sheen`                 | HAVE          | `loader-gltf-sheen`                                   |
+| `webgpu_loader_gltf_transmission`          | HAVE          | `loader-gltf-transmission`                            |
+| `webgpu_loader_materialx`                  | HAVE          | `loader-materialx`                                    |
+| `webgpu_loader_texture_ktx2`               | HAVE          | `loader-texture-ktx2`                                 |
+| `webgpu_materials`                         | HAVE          | `materials`                                           |
+| `webgpu_materials_alphahash`               | HAVE          | `materials-alphahash`                                 |
+| `webgpu_materials_arrays`                  | HAVE          | `materials-arrays`                                    |
+| `webgpu_materials_basic`                   | HAVE          | `materials-basic`                                     |
+| `webgpu_materials_cubemap_mipmaps`         | HAVE          | `materials-cubemap-mipmaps`                           |
+| `webgpu_materials_displacementmap`         | HAVE          | `materials-displacementmap`                           |
+| `webgpu_materials_envmaps`                 | HAVE          | `materials-envmaps`                                   |
+| `webgpu_materials_envmaps_bpcem`           | HAVE          | `materials-envmaps-bpcem`                             |
+| `webgpu_materials_envmaps_groundprojected` | HAVE          | `materials-envmaps-groundprojected`                   |
+| `webgpu_materials_lightmap`                | HAVE          | `materials-lightmap`                                  |
+| `webgpu_materials_matcap`                  | HAVE          | `materials-matcap`                                    |
+| `webgpu_materials_sss`                     | HAVE          | `materials-sss`                                       |
+| `webgpu_materials_texture_html`            | HAVE          | `materials-texture-html`                              |
+| `webgpu_materials_texture_manualmipmap`    | HAVE          | `materials-texture-manualmipmap`                      |
+| `webgpu_materials_toon`                    | HAVE          | `materials-toon`                                      |
+| `webgpu_materials_transmission`            | HAVE          | `materials-transmission`                              |
+| `webgpu_materials_video`                   | HAVE          | `materials-video`                                     |
+| `webgpu_materialx_noise`                   | HAVE          | `materialx-noise`                                     |
+| `webgpu_mesh_batch`                        | HAVE          | `mesh-batch`                                          |
+| `webgpu_mirror`                            | HAVE          | `mirror`                                              |
+| `webgpu_modifier_curve`                    | HAVE          | `modifier-curve`                                      |
+| `webgpu_morphtargets`                      | HAVE          | `morphtargets`                                        |
+| `webgpu_morphtargets_face`                 | HAVE          | `morphtargets-face`                                   |
+| `webgpu_mrt`                               | HAVE          | `mrt`                                                 |
+| `webgpu_mrt_mask`                          | HAVE          | `mrt-mask`                                            |
+| `webgpu_multiple_canvas`                   | HAVE          | `multiple-canvas`                                     |
+| `webgpu_multiple_elements`                 | HAVE          | `multiple-elements`                                   |
+| `webgpu_multiple_rendertargets`            | HAVE          | `multiple-rendertargets`                              |
+| `webgpu_multiple_rendertargets_readback`   | HAVE          | `multiple-rendertargets-readback`                     |
+| `webgpu_occlusion`                         | HAVE          | `occlusion`                                           |
+| `webgpu_ocean`                             | HAVE          | `ocean`                                               |
+| `webgpu_parallax_uv`                       | HAVE          | `parallax-uv`                                         |
+| `webgpu_particles`                         | HAVE          | `particles`                                           |
+| `webgpu_pmrem_cubemap`                     | HAVE          | `pmrem-cubemap`                                       |
+| `webgpu_pmrem_equirectangular`             | HAVE          | `pmrem-equirectangular`                               |
+| `webgpu_pmrem_scene`                       | HAVE          | `pmrem-scene`                                         |
+| `webgpu_portal`                            | HAVE          | `portal`                                              |
+| `webgpu_postprocessing`                    | HAVE          | `postprocessing`                                      |
+| `webgpu_postprocessing_3dlut`              | HAVE          | `postprocessing-3dlut`                                |
+| `webgpu_postprocessing_afterimage`         | HAVE          | `postprocessing-afterimage`                           |
+| `webgpu_postprocessing_anamorphic`         | HAVE          | `postprocessing-anamorphic`                           |
+| `webgpu_postprocessing_ao`                 | HAVE          | `postprocessing-ao`                                   |
+| `webgpu_postprocessing_bloom`              | HAVE          | `postprocessing-bloom`                                |
+| `webgpu_postprocessing_bloom_emissive`     | HAVE          | `postprocessing-bloom-emissive`                       |
+| `webgpu_postprocessing_bloom_selective`    | HAVE          | `postprocessing-bloom-selective`                      |
+| `webgpu_postprocessing_ca`                 | HAVE          | `postprocessing-ca`                                   |
+| `webgpu_postprocessing_difference`         | HAVE          | `postprocessing-difference`                           |
+| `webgpu_postprocessing_dof`                | HAVE          | `postprocessing-dof`                                  |
+| `webgpu_postprocessing_dof_basic`          | HAVE          | `postprocessing-dof-basic`                            |
+| `webgpu_postprocessing_fxaa`               | HAVE          | `postprocessing-fxaa`                                 |
+| `webgpu_postprocessing_godrays`            | HAVE          | `postprocessing-godrays`                              |
+| `webgpu_postprocessing_lensflare`          | HAVE          | `postprocessing-lensflare`                            |
+| `webgpu_postprocessing_masking`            | HAVE          | `postprocessing-masking`                              |
+| `webgpu_postprocessing_motion_blur`        | HAVE          | `postprocessing-motion-blur`                          |
+| `webgpu_postprocessing_outline`            | HAVE          | `postprocessing-outline`                              |
+| `webgpu_postprocessing_pixel`              | HAVE          | `postprocessing-pixel`                                |
+| `webgpu_postprocessing_radial_blur`        | HAVE          | `postprocessing-radial-blur`                          |
+| `webgpu_postprocessing_retro`              | HAVE          | `postprocessing-retro`                                |
+| `webgpu_postprocessing_smaa`               | HAVE          | `postprocessing-smaa`                                 |
+| `webgpu_postprocessing_sobel`              | HAVE          | `postprocessing-sobel`                                |
+| `webgpu_postprocessing_ssaa`               | HAVE          | `postprocessing-ssaa`                                 |
+| `webgpu_postprocessing_ssgi`               | HAVE          | `postprocessing-ssgi`                                 |
+| `webgpu_postprocessing_ssgi_ballpool`      | HAVE          | `postprocessing-ssgi-ballpool`                        |
+| `webgpu_postprocessing_ssr`                | HAVE          | `postprocessing-ssr`                                  |
+| `webgpu_postprocessing_ssr_denoise`        | HAVE          | `postprocessing-ssr-denoise`                          |
+| `webgpu_postprocessing_sss`                | HAVE          | `postprocessing-sss`                                  |
+| `webgpu_postprocessing_traa`               | HAVE          | `postprocessing-traa`                                 |
+| `webgpu_postprocessing_transition`         | HAVE          | `postprocessing-transition`                           |
+| `webgpu_procedural_texture`                | HAVE          | `procedural-texture`                                  |
+| `webgpu_reflection`                        | HAVE          | `reflection`                                          |
+| `webgpu_reflection_blurred`                | HAVE          | `reflection-blurred`                                  |
+| `webgpu_reflection_roughness`              | HAVE          | `reflection-roughness`                                |
+| `webgpu_refraction`                        | HAVE          | `refraction`                                          |
+| `webgpu_rendertarget_2d-array_3d`          | HAVE          | `rendertarget-2d-array-3d`                            |
+| `webgpu_rtt`                               | HAVE          | `rtt`                                                 |
+| `webgpu_shadertoy`                         | HAVE          | `shadertoy`                                           |
+| `webgpu_shadow_contact`                    | HAVE          | `shadow-contact`                                      |
+| `webgpu_shadowmap`                         | HAVE          | `shadowmap`                                           |
+| `webgpu_shadowmap_array`                   | HAVE          | `shadowmap-array`                                     |
+| `webgpu_shadowmap_csm`                     | HAVE          | `shadowmap-csm`                                       |
+| `webgpu_shadowmap_opacity`                 | HAVE          | `shadowmap-opacity`                                   |
+| `webgpu_shadowmap_pointlight`              | HAVE          | `shadowmap-pointlight`                                |
+| `webgpu_shadowmap_progressive`             | HAVE          | `shadowmap-progressive`                               |
+| `webgpu_shadowmap_vsm`                     | HAVE          | `shadowmap-vsm`                                       |
+| `webgpu_skinning`                          | HAVE          | `skinning`                                            |
+| `webgpu_skinning_instancing`               | HAVE          | `skinning-instancing`                                 |
+| `webgpu_skinning_instancing_individual`    | HAVE          | `skinning-instancing-individual`                      |
+| `webgpu_skinning_points`                   | HAVE          | `skinning-points`                                     |
+| `webgpu_sky`                               | HAVE          | `sky`                                                 |
+| `webgpu_sprites`                           | HAVE          | `sprites`                                             |
+| `webgpu_storage_buffer`                    | HAVE          | `storage-buffer`                                      |
+| `webgpu_struct_drawindirect`               | HAVE          | `struct-drawindirect`                                 |
+| `webgpu_texturegather`                     | HAVE          | `texturegather`                                       |
+| `webgpu_texturegrad`                       | HAVE          | `texturegrad`                                         |
+| `webgpu_textures_2d-array`                 | HAVE          | `textures-2d-array`                                   |
+| `webgpu_textures_2d-array_compressed`      | HAVE          | `textures-2d-array-compressed`                        |
+| `webgpu_textures_anisotropy`               | HAVE          | `textures-anisotropy`                                 |
+| `webgpu_textures_partialupdate`            | HAVE          | `textures-partialupdate`                              |
+| `webgpu_tonemapping`                       | HAVE          | `tonemapping`                                         |
+| `webgpu_tsl_angular_slicing`               | HAVE          | `tsl-angular-slicing`                                 |
+| `webgpu_tsl_compute_attractors_particles`  | HAVE          | `tsl-compute-attractors-particles`                    |
+| `webgpu_tsl_earth`                         | HAVE          | `tsl-earth`                                           |
+| `webgpu_tsl_galaxy`                        | HAVE          | `tsl-galaxy`                                          |
+| `webgpu_tsl_halftone`                      | HAVE          | `tsl-halftone`                                        |
+| `webgpu_tsl_interoperability`              | HAVE          | `tsl-interoperability`                                |
+| `webgpu_tsl_procedural_terrain`            | HAVE          | `tsl-procedural-terrain`                              |
+| `webgpu_tsl_raging_sea`                    | HAVE          | `tsl-raging-sea`                                      |
+| `webgpu_tsl_vfx_flames`                    | HAVE          | `tsl-vfx-flames`                                      |
+| `webgpu_tsl_vfx_linkedparticles`           | HAVE          | `tsl-vfx-linkedparticles`                             |
+| `webgpu_tsl_vfx_tornado`                   | HAVE          | `tsl-vfx-tornado`                                     |
+| `webgpu_tsl_wood`                          | HAVE          | `tsl-wood`                                            |
+| `webgpu_upscaling_fsr1`                    | HAVE          | `upscaling-fsr1`                                      |
+| `webgpu_upscaling_taau`                    | HAVE          | `upscaling-taau`                                      |
+| `webgpu_video_frame`                       | HAVE          | `video-frame`                                         |
+| `webgpu_video_panorama`                    | HAVE          | `video-panorama`                                      |
+| `webgpu_volume_caustics`                   | HAVE          | `volume-caustics`                                     |
+| `webgpu_volume_cloud`                      | HAVE          | `volume-cloud`                                        |
+| `webgpu_volume_fire`                       | HAVE          | `volume-fire`                                         |
+| `webgpu_volume_lighting`                   | HAVE          | `volume-lighting`                                     |
+| `webgpu_volume_lighting_rectarea`          | HAVE          | `volume-lighting-rectarea`                            |
+| `webgpu_volume_lighting_traa`              | HAVE          | `volume-lighting-traa`                                |
+| `webgpu_volume_perlin`                     | HAVE          | `volume-perlin`                                       |
+| `webgpu_water`                             | HAVE          | `water`                                               |
+| `misc_controls_arcball`                    | HAVE (folded) | inside a combined example                             |
+| `misc_controls_fly`                        | HAVE (folded) | inside a combined example                             |
+| `misc_controls_map`                        | HAVE (folded) | inside a combined example                             |
+| `misc_controls_pointerlock`                | HAVE (folded) | inside a combined example                             |
+| `misc_controls_trackball`                  | HAVE (folded) | inside a combined example                             |
+| `misc_exporter_gltf_normals`               | HAVE (folded) | inside a combined example                             |
+| `misc_exporter_obj`                        | HAVE (folded) | inside a combined example                             |
+| `misc_exporter_ply`                        | HAVE (folded) | inside a combined example                             |
+| `misc_exporter_stl`                        | HAVE (folded) | inside a combined example                             |
+| `misc_exporter_usdz`                       | HAVE (folded) | inside a combined example                             |
+| `webgl_loader_texture_hdr`                 | HAVE (folded) | inside a combined example                             |
+| `webgl_loader_texture_ultrahdr`            | HAVE (folded) | inside a combined example                             |
+| `webaudio_orientation`                     | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webaudio_sandbox`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webaudio_timing`                          | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webaudio_visualizer`                      | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webgpu_compute_audio`                     | LATER         | final phase — webaudio — SPEC §4 out of scope for now |
+| `webgpu_xr_cubes`                          | LATER         | final phase — WebXR — SPEC §4 out of scope for now    |
+| `webgpu_xr_native_layers`                  | LATER         | final phase — WebXR — SPEC §4 out of scope for now    |
+| `webgpu_xr_rollercoaster`                  | LATER         | final phase — WebXR — SPEC §4 out of scope for now    |
+| `webxr_ar_camera_access`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_ar_cones`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_ar_hittest`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_ar_lighting`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_ar_plane_detection`                 | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_handinput`                       | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_handinput_cubes`                 | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_handinput_pointerclick`          | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_handinput_pointerdrag`           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_handinput_pressbutton`           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_handinput_profiles`              | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_layers`                          | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_panorama`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_panorama_depth`                  | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_rollercoaster`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_sandbox`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_teleport`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_vr_video`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_xr_ballshooter`                     | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_xr_controls_transform`              | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_xr_cubes`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_xr_dragging`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_xr_dragging_custom_depth`           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_xr_haptics`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_xr_marchingcubes`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| `webxr_xr_paint`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
 
-## Not worth a page — the other 271
+## Not worth a page — the other 274
 
-| original                                           | why                                                        |
-| -------------------------------------------------- | ---------------------------------------------------------- |
-| `css3d_mixed`                                      | skipped with a recorded reason (Phase 2 backlog)           |
-| `css3d_orthographic`                               | skipped with a recorded reason (Phase 2 backlog)           |
-| `css3d_sandbox`                                    | skipped with a recorded reason (Phase 2 backlog)           |
-| `misc_exporter_draco`                              | skipped with a recorded reason (Phase 2 backlog)           |
-| `misc_exporter_exr`                                | skipped with a recorded reason (Phase 2 backlog)           |
-| `misc_exporter_gcode`                              | skipped with a recorded reason (Phase 2 backlog)           |
-| `misc_exporter_ktx2`                               | skipped with a recorded reason (Phase 2 backlog)           |
-| `misc_uv_tests`                                    | skipped with a recorded reason (Phase 2 backlog)           |
-| `physics_ammo_break`                               | skipped with a recorded reason (Phase 2 backlog)           |
-| `physics_ammo_cloth`                               | skipped with a recorded reason (Phase 2 backlog)           |
-| `physics_ammo_instancing`                          | skipped with a recorded reason (Phase 2 backlog)           |
-| `physics_ammo_rope`                                | skipped with a recorded reason (Phase 2 backlog)           |
-| `physics_ammo_terrain`                             | skipped with a recorded reason (Phase 2 backlog)           |
-| `physics_ammo_volume`                              | skipped with a recorded reason (Phase 2 backlog)           |
-| `physics_jolt_instancing`                          | skipped with a recorded reason (Phase 2 backlog)           |
-| `svg_lines`                                        | skipped with a recorded reason (Phase 2 backlog)           |
-| `svg_sandbox`                                      | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_animation_keyframes`                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_animation_multiple`                         | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_animation_skinning_additive_blending`       | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_animation_skinning_morph`                   | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_buffergeometry`                             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_buffergeometry_attributes_integer`          | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_attributes_none`             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_buffergeometry_custom_attributes_particles` | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_buffergeometry_drawrange`                   | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_glbufferattribute`           | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_indexed`                     | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_instancing`                  | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_buffergeometry_instancing_billboards`       | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_buffergeometry_instancing_interleaved`      | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_buffergeometry_lines`                       | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_lines_indexed`               | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_points`                      | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_buffergeometry_points_interleaved`          | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_rawshader`                   | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_selective_draw`              | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_buffergeometry_uint`                        | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_camera`                                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_camera_array`                               | duplicate — its webgpu_ twin is ported                     |
-| `webgl_camera_logarithmicdepthbuffer`              | duplicate — its webgpu_ twin is ported                     |
-| `webgl_clipculldistance`                           | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_clipping`                                   | duplicate — its webgpu_ twin is ported                     |
-| `webgl_clipping_advanced`                          | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_clipping_intersection`                      | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_custom_attributes`                          | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_custom_attributes_lines`                    | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_custom_attributes_points`                   | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_custom_attributes_points2`                  | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_custom_attributes_points3`                  | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_depth_texture`                              | duplicate — its webgpu_ twin is ported                     |
-| `webgl_effects_anaglyph`                           | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_effects_ascii`                              | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_effects_parallaxbarrier`                    | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_effects_stereo`                             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_framebuffer_texture`                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_furnace_test`                               | duplicate — its webgpu_ twin is ported                     |
-| `webgl_geometry_colors`                            | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_geometry_cube`                              | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_geometry_extrude_shapes`                    | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_geometry_extrude_splines`                   | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_geometry_shapes`                            | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_geometry_terrain`                           | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_geometry_text_shapes`                       | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_geometry_text_stroke`                       | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_gpgpu_birds`                                | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_gpgpu_birds_gltf`                           | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_gpgpu_protoplanet`                          | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_gpgpu_water`                                | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_instancing_dynamic`                         | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_instancing_morph`                           | duplicate — its webgpu_ twin is ported                     |
-| `webgl_instancing_performance`                     | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_interactive_buffergeometry`                 | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_interactive_cubes_ortho`                    | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_interactive_lines`                          | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_interactive_points`                         | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_interactive_raycasting_points`              | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_lensflares`                                 | duplicate — its webgpu_ twin is ported                     |
-| `webgl_lightprobe`                                 | duplicate — its webgpu_ twin is ported                     |
-| `webgl_lightprobe_cubecamera`                      | duplicate — its webgpu_ twin is ported                     |
-| `webgl_lightprobes`                                | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_lightprobes_complex`                        | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_lightprobes_sponza`                         | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_lights_hemisphere`                          | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_lights_physical`                            | duplicate — its webgpu_ twin is ported                     |
-| `webgl_lights_rectarealight`                       | duplicate — its webgpu_ twin is ported                     |
-| `webgl_lights_spotlight`                           | duplicate — its webgpu_ twin is ported                     |
-| `webgl_lights_spotlights`                          | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_lines_colors`                               | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_lines_fat`                                  | duplicate — its webgpu_ twin is ported                     |
-| `webgl_lines_fat_raycasting`                       | duplicate — its webgpu_ twin is ported                     |
-| `webgl_lines_fat_wireframe`                        | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_3dm`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_3ds`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_3mf`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_3mf_materials`                       | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_amf`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_bvh`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_collada`                             | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_collada_skinning`                    | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_draco`                               | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_fbx`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_fbx_nurbs`                           | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_gcode`                               | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_gltf`                                | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_gltf_anisotropy`                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_gltf_avif`                           | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_gltf_compressed`                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_gltf_dispersion`                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_gltf_iridescence`                    | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_gltf_sheen`                          | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_gltf_transmission`                   | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_ifc`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_imagebitmap`                         | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_kmz`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_md2`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_mdd`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_nrrd`                                | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_obj`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_pcd`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_ply`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_stl`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_texture_dds`                         | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_texture_ktx`                         | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_texture_ktx2`                        | duplicate — its webgpu_ twin is ported                     |
-| `webgl_loader_texture_pvrtc`                       | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_texture_tga`                         | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_texture_tiff`                        | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_ttf`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_usdz`                                | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_vox`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_vrml`                                | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_loader_xyz`                                 | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_materials_alphahash`                        | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_blending_custom`                  | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_materials_bumpmap`                          | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_channels`                         | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_materials_cubemap`                          | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_cubemap_dynamic`                  | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_cubemap_mipmaps`                  | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_cubemap_refraction`               | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_cubemap_render_to_mipmaps`        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_displacementmap`                  | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_envmaps`                          | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_envmaps_exr`                      | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_envmaps_fasthdr`                  | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_envmaps_groundprojected`          | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_envmaps_hdr`                      | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_matcap`                           | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_modified`                         | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_materials_normalmap`                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_normalmap_object_space`           | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_materials_physical_clearcoat`               | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_physical_transmission`            | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_physical_transmission_alpha`      | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_subsurface_scattering`            | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_texture_anisotropy`               | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_texture_filters`                  | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_materials_texture_html`                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_texture_manualmipmap`             | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_texture_partialupdate`            | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_texture_rotation`                 | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_materials_toon`                             | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_video`                            | duplicate — its webgpu_ twin is ported                     |
-| `webgl_materials_video_webcam`                     | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_materials_wireframe`                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_math_obb`                                   | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_math_orientation_transform`                 | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_mesh_batch`                                 | duplicate — its webgpu_ twin is ported                     |
-| `webgl_mirror`                                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_modifier_curve`                             | duplicate — its webgpu_ twin is ported                     |
-| `webgl_modifier_curve_instanced`                   | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_morphtargets`                               | duplicate — its webgpu_ twin is ported                     |
-| `webgl_morphtargets_face`                          | duplicate — its webgpu_ twin is ported                     |
-| `webgl_morphtargets_horse`                         | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_morphtargets_sphere`                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_multiple_elements`                          | duplicate — its webgpu_ twin is ported                     |
-| `webgl_multiple_elements_text`                     | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_multiple_rendertargets`                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_multisampled_renderbuffers`                 | duplicate — its webgpu_ twin is ported                     |
-| `webgl_panorama_cube`                              | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_panorama_equirectangular`                   | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_performance`                                | duplicate — its webgpu_ twin is ported                     |
-| `webgl_pmrem_cubemap`                              | duplicate — its webgpu_ twin is ported                     |
-| `webgl_pmrem_equirectangular`                      | duplicate — its webgpu_ twin is ported                     |
-| `webgl_pmrem_test`                                 | duplicate — its webgpu_ twin is ported                     |
-| `webgl_points_billboards`                          | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_points_dynamic`                             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_points_sprites`                             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_points_waves`                               | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_portal`                                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing`                             | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_3dlut`                       | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_advanced`                    | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_afterimage`                  | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_backgrounds`                 | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_dof`                         | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_dof2`                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_fxaa`                        | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_godrays`                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_gtao`                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_masking`                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_outline`                     | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_pixel`                       | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_procedural`                  | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_rgb_halftone`                | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_sao`                         | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_smaa`                        | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_sobel`                       | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_ssaa`                        | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_ssao`                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_ssr`                         | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_taa`                         | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_transition`                  | duplicate — its webgpu_ twin is ported                     |
-| `webgl_postprocessing_unreal_bloom`                | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_postprocessing_unreal_bloom_selective`      | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_random_uv`                                  | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_raycaster_sprite`                           | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_read_float_buffer`                          | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_refraction`                                 | duplicate — its webgpu_ twin is ported                     |
-| `webgl_renderer_pathtracer`                        | skipped with a recorded reason (Phase 2 backlog)           |
-| `webgl_rendertarget_texture2darray`                | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_reversed_depth_buffer`                      | duplicate — its webgpu_ twin is ported                     |
-| `webgl_rtt`                                        | duplicate — its webgpu_ twin is ported                     |
-| `webgl_shader`                                     | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_shader_lava`                                | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_shaders_ocean`                              | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_shaders_sky`                                | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_shadow_contact`                             | duplicate — its webgpu_ twin is ported                     |
-| `webgl_shadowmap`                                  | duplicate — its webgpu_ twin is ported                     |
-| `webgl_shadowmap_csm`                              | duplicate — its webgpu_ twin is ported                     |
-| `webgl_shadowmap_pcss`                             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_shadowmap_performance`                      | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_shadowmap_pointlight`                       | duplicate — its webgpu_ twin is ported                     |
-| `webgl_shadowmap_progressive`                      | duplicate — its webgpu_ twin is ported                     |
-| `webgl_shadowmap_viewer`                           | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_shadowmap_vsm`                              | duplicate — its webgpu_ twin is ported                     |
-| `webgl_shadowmesh`                                 | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_simple_gi`                                  | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_sprites`                                    | duplicate — its webgpu_ twin is ported                     |
-| `webgl_test_memory`                                | duplicate — its webgpu_ twin is ported                     |
-| `webgl_test_memory2`                               | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_test_wide_gamut`                            | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_texture2darray`                             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_texture2darray_compressed`                  | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_texture2darray_layerupdate`                 | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_texture3d`                                  | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_texture3d_partialupdate`                    | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_tonemapping`                                | duplicate — its webgpu_ twin is ported                     |
-| `webgl_tsl_clearcoat`                              | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_tsl_instancing`                             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_tsl_shadowmap`                              | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_tsl_skinning`                               | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_ubo`                                        | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_ubo_arrays`                                 | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_video_kinect`                               | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgl_video_panorama_equirectangular`             | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_volume_cloud`                               | duplicate — its webgpu_ twin is ported                     |
-| `webgl_volume_instancing`                          | duplicate — same technique under a webgpu_ name (audit B)  |
-| `webgl_volume_perlin`                              | duplicate — its webgpu_ twin is ported                     |
-| `webgl_watch`                                      | low value — legacy API / stress / trivial toggle (audit C) |
-| `webgpu_centroid_sampling`                         | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_compile_async`                             | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_furnace_test`                              | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_multisampled_renderbuffers`                | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_performance`                               | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_performance_renderbundle`                  | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_pmrem_test`                                | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_reversed_depth_buffer`                     | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_sandbox`                                   | internal / benchmark / sandbox (SPEC §4)                   |
-| `webgpu_test_memory`                               | internal / benchmark / sandbox (SPEC §4)                   |
+Reasons are quoted from the backlog item that made the call — edit them there, not here.
+
+| original                                           | why                                                                                                                                                                                                                                                                        |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `css3d_mixed`                                      | skipped (Phase 2 backlog): camera-type / mixed-renderer variants of the same `<Html transform>` technique the five above show                                                                                                                                              |
+| `css3d_orthographic`                               | skipped (Phase 2 backlog): camera-type / mixed-renderer variants of the same `<Html transform>` technique the five above show                                                                                                                                              |
+| `css3d_sandbox`                                    | skipped (Phase 2 backlog): sandbox, no stable subject                                                                                                                                                                                                                      |
+| `misc_exporter_draco`                              | skipped (Phase 2 backlog): covered by the one exporter example; these add a codec, not a pattern                                                                                                                                                                           |
+| `misc_exporter_exr`                                | skipped (Phase 2 backlog): covered by the one exporter example; these add a codec, not a pattern                                                                                                                                                                           |
+| `misc_exporter_gcode`                              | skipped (Phase 2 backlog): covered by the one exporter example; these add a codec, not a pattern                                                                                                                                                                           |
+| `misc_exporter_ktx2`                               | skipped (Phase 2 backlog): covered by the one exporter example; these add a codec, not a pattern                                                                                                                                                                           |
+| `misc_uv_tests`                                    | skipped (Phase 2 backlog): a UV test-pattern generator for checking texture mapping on the built-in geometries; renderer-agnostic utility with no R3F content (found 2026-09-03 by a full r185 reconciliation — the only name no document had mentioned)                   |
+| `physics_ammo_break`                               | skipped (Phase 2 backlog): Ammo is the legacy engine loaded from a CDN WASM URL; rapier demos cover instancing/terrain, and cloth/rope/break are Ammo-specific soft-body features with no rapier equivalent worth a second engine                                          |
+| `physics_ammo_cloth`                               | skipped (Phase 2 backlog): Ammo is the legacy engine loaded from a CDN WASM URL; rapier demos cover instancing/terrain, and cloth/rope/break are Ammo-specific soft-body features with no rapier equivalent worth a second engine                                          |
+| `physics_ammo_instancing`                          | skipped (Phase 2 backlog): Ammo is the legacy engine loaded from a CDN WASM URL; rapier demos cover instancing/terrain, and cloth/rope/break are Ammo-specific soft-body features with no rapier equivalent worth a second engine                                          |
+| `physics_ammo_rope`                                | skipped (Phase 2 backlog): Ammo is the legacy engine loaded from a CDN WASM URL; rapier demos cover instancing/terrain, and cloth/rope/break are Ammo-specific soft-body features with no rapier equivalent worth a second engine                                          |
+| `physics_ammo_terrain`                             | skipped (Phase 2 backlog): Ammo is the legacy engine loaded from a CDN WASM URL; rapier demos cover instancing/terrain, and cloth/rope/break are Ammo-specific soft-body features with no rapier equivalent worth a second engine                                          |
+| `physics_ammo_volume`                              | skipped (Phase 2 backlog): Ammo is the legacy engine loaded from a CDN WASM URL; rapier demos cover instancing/terrain, and cloth/rope/break are Ammo-specific soft-body features with no rapier equivalent worth a second engine                                          |
+| `physics_jolt_instancing`                          | skipped (Phase 2 backlog): rapier instancing covers the same demo; Jolt has no pmndrs binding and would be a second engine for one page                                                                                                                                    |
+| `svg_lines`                                        | skipped (Phase 2 backlog): SVGRenderer output, not WebGPU                                                                                                                                                                                                                  |
+| `svg_sandbox`                                      | skipped (Phase 2 backlog): SVGRenderer output, not WebGPU                                                                                                                                                                                                                  |
+| `webgl_animation_keyframes`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_animation_multiple`                         | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_animation_skinning_additive_blending`       | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_animation_skinning_morph`                   | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_buffergeometry`                             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_buffergeometry_attributes_integer`          | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_attributes_none`             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_buffergeometry_custom_attributes_particles` | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_buffergeometry_drawrange`                   | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_glbufferattribute`           | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_indexed`                     | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_instancing`                  | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_buffergeometry_instancing_billboards`       | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_buffergeometry_instancing_interleaved`      | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_buffergeometry_lines`                       | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_lines_indexed`               | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_points`                      | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_buffergeometry_points_interleaved`          | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_rawshader`                   | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_selective_draw`              | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_buffergeometry_uint`                        | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_camera`                                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_camera_array`                               | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_camera_logarithmicdepthbuffer`              | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_clipculldistance`                           | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_clipping`                                   | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_clipping_advanced`                          | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_clipping_intersection`                      | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_custom_attributes`                          | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_custom_attributes_lines`                    | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_custom_attributes_points`                   | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_custom_attributes_points2`                  | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_custom_attributes_points3`                  | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_depth_texture`                              | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_effects_anaglyph`                           | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_effects_ascii`                              | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_effects_parallaxbarrier`                    | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_effects_stereo`                             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_framebuffer_texture`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_furnace_test`                               | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_geometry_colors`                            | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_geometry_cube`                              | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_geometry_extrude_shapes`                    | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_geometry_extrude_splines`                   | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_geometry_shapes`                            | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_geometry_terrain`                           | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_geometry_text_shapes`                       | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_geometry_text_stroke`                       | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_gpgpu_birds`                                | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_gpgpu_birds_gltf`                           | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_gpgpu_protoplanet`                          | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_gpgpu_water`                                | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_instancing_dynamic`                         | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_instancing_morph`                           | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_instancing_performance`                     | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_interactive_buffergeometry`                 | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_interactive_cubes_ortho`                    | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_interactive_lines`                          | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_interactive_points`                         | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_interactive_raycasting_points`              | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_lensflares`                                 | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_lightprobe`                                 | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_lightprobe_cubecamera`                      | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_lightprobes`                                | skipped (Phase 2 backlog): same SH light-probe technique as the shipped `lightprobe` / `lightprobe-cubecamera`; their `webgpu_lightprobes*` twins are new in three `dev` and land with the next three bump (2E)                                                            |
+| `webgl_lightprobes_complex`                        | skipped (Phase 2 backlog): same SH light-probe technique as the shipped `lightprobe` / `lightprobe-cubecamera`; their `webgpu_lightprobes*` twins are new in three `dev` and land with the next three bump (2E)                                                            |
+| `webgl_lightprobes_sponza`                         | skipped (Phase 2 backlog): same SH light-probe technique as the shipped `lightprobe` / `lightprobe-cubecamera`; their `webgpu_lightprobes*` twins are new in three `dev` and land with the next three bump (2E)                                                            |
+| `webgl_lights_hemisphere`                          | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_lights_physical`                            | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_lights_rectarealight`                       | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_lights_spotlight`                           | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_lights_spotlights`                          | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_lines_colors`                               | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_lines_fat`                                  | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_lines_fat_raycasting`                       | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_lines_fat_wireframe`                        | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_3dm`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_3ds`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_3mf`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_3mf_materials`                       | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_amf`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_bvh`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_collada`                             | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_collada_skinning`                    | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_draco`                               | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_fbx`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_fbx_nurbs`                           | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_gcode`                               | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_gltf`                                | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_gltf_anisotropy`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_gltf_avif`                           | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_gltf_compressed`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_gltf_dispersion`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_gltf_iridescence`                    | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_gltf_sheen`                          | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_gltf_transmission`                   | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_ifc`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_imagebitmap`                         | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_kmz`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_md2`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_mdd`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_nrrd`                                | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_obj`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_pcd`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_ply`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_stl`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_texture_dds`                         | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_texture_ktx`                         | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_texture_ktx2`                        | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_texture_pvrtc`                       | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_texture_tga`                         | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_texture_tiff`                        | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_ttf`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_usdz`                                | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_vox`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_vrml`                                | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_xyz`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_materials_alphahash`                        | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_blending_custom`                  | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_materials_bumpmap`                          | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_channels`                         | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_materials_cubemap`                          | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_cubemap_dynamic`                  | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_cubemap_mipmaps`                  | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_cubemap_refraction`               | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_cubemap_render_to_mipmaps`        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_displacementmap`                  | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_envmaps`                          | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_envmaps_exr`                      | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_envmaps_fasthdr`                  | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_envmaps_groundprojected`          | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_envmaps_hdr`                      | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_matcap`                           | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_modified`                         | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_materials_normalmap`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_normalmap_object_space`           | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_materials_physical_clearcoat`               | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_physical_transmission`            | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_physical_transmission_alpha`      | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_subsurface_scattering`            | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_texture_anisotropy`               | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_texture_filters`                  | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_materials_texture_html`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_texture_manualmipmap`             | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_texture_partialupdate`            | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_texture_rotation`                 | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_materials_toon`                             | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_video`                            | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_materials_video_webcam`                     | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_materials_wireframe`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_math_obb`                                   | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_math_orientation_transform`                 | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_mesh_batch`                                 | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_mirror`                                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_modifier_curve`                             | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_modifier_curve_instanced`                   | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_morphtargets`                               | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_morphtargets_face`                          | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_morphtargets_horse`                         | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_morphtargets_sphere`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_multiple_elements`                          | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_multiple_elements_text`                     | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_multiple_rendertargets`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_multisampled_renderbuffers`                 | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_panorama_cube`                              | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_panorama_equirectangular`                   | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_performance`                                | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_pmrem_cubemap`                              | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_pmrem_equirectangular`                      | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_pmrem_test`                                 | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_points_billboards`                          | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_points_dynamic`                             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_points_sprites`                             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_points_waves`                               | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_portal`                                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing`                             | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_3dlut`                       | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_advanced`                    | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_afterimage`                  | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_backgrounds`                 | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_dof`                         | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_dof2`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_fxaa`                        | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_godrays`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_gtao`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_masking`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_outline`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_pixel`                       | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_procedural`                  | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_rgb_halftone`                | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_sao`                         | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_smaa`                        | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_sobel`                       | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_ssaa`                        | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_ssao`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_ssr`                         | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_taa`                         | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_transition`                  | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_postprocessing_unreal_bloom`                | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_postprocessing_unreal_bloom_selective`      | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_random_uv`                                  | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_raycaster_sprite`                           | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_read_float_buffer`                          | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_refraction`                                 | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_renderer_pathtracer`                        | skipped (Phase 2 backlog): three-gpu-pathtracer is WebGL 2 only (`WebGLPathTracer(new WebGLRenderer())`); no WebGPU backend exists                                                                                                                                         |
+| `webgl_rendertarget_texture2darray`                | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_reversed_depth_buffer`                      | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_rtt`                                        | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_shader`                                     | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_shader_lava`                                | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_shaders_ocean`                              | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_shaders_sky`                                | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_shadow_contact`                             | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_shadowmap`                                  | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_shadowmap_csm`                              | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_shadowmap_pcss`                             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_shadowmap_performance`                      | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_shadowmap_pointlight`                       | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_shadowmap_progressive`                      | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_shadowmap_viewer`                           | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_shadowmap_vsm`                              | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_shadowmesh`                                 | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_simple_gi`                                  | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_sprites`                                    | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_test_memory`                                | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_test_memory2`                               | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_test_wide_gamut`                            | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_texture2darray`                             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_texture2darray_compressed`                  | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_texture2darray_layerupdate`                 | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_texture3d`                                  | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_texture3d_partialupdate`                    | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_tonemapping`                                | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_tsl_clearcoat`                              | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_tsl_instancing`                             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_tsl_shadowmap`                              | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_tsl_skinning`                               | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_ubo`                                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_ubo_arrays`                                 | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_video_kinect`                               | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgl_video_panorama_equirectangular`             | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_volume_cloud`                               | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_volume_instancing`                          | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_volume_perlin`                              | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_watch`                                      | low value — legacy API / stress / trivial toggle (audit C)                                                                                                                                                                                                                 |
+| `webgpu_centroid_sampling`                         | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_compile_async`                             | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_furnace_test`                              | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_multisampled_renderbuffers`                | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_performance`                               | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_performance_renderbundle`                  | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_pmrem_test`                                | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_reversed_depth_buffer`                     | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_sandbox`                                   | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_test_memory`                               | excluded (Phase 1 backlog): internal/benchmark                                                                                                                                                                                                                             |
+| `webgpu_tsl_editor`                                | excluded (Phase 1 backlog): internal tooling — a Monaco editor / Inspector UI, not a scene; not porting — Dennis, 2026-09-03                                                                                                                                               |
+| `webgpu_tsl_graph`                                 | excluded (Phase 1 backlog): internal tooling — a Monaco editor / Inspector UI, not a scene; not porting — Dennis, 2026-09-03                                                                                                                                               |
+| `webgpu_tsl_transpiler`                            | excluded (Phase 1 backlog): internal tooling — a Monaco editor / Inspector UI, not a scene; not porting — Dennis, 2026-09-03                                                                                                                                               |
