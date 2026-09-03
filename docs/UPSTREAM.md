@@ -803,6 +803,30 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - Also noted: drei's `PointerLockControls` reads the deprecated `state.gl` alias
   internally — works today on `/webgpu`, will break when the alias goes.
 
+### B44 · fiber: `<threeLine>` mounts but crashes on its first prop update
+
+- **What**: `createInstance` resolves the element name with
+  `type = toPascalCase(type) in catalogue ? type : type.replace(PREFIX_REGEX, '')`, so
+  `threeLine` → `Line` and the mount succeeds. `commitUpdate(instance, type, …)` then calls
+  `validateInstance(type, newProps)` with the RAW `threeLine`; `toPascalCase` gives
+  `ThreeLine`, which is not in the catalogue, and it throws
+  `R3F: ThreeLine is not part of the THREE namespace`, unmounting the root. Any parent
+  re-render (a click that sets state) triggers it.
+- **Why the tiers miss it**: smoke and animates never cause a React re-render.
+- **Fix**: apply the same prefix strip in `commitUpdate` (or store the resolved type on
+  the instance at create time and validate that).
+- **Workaround here**: `src/assets/ThreeLine.ts` — `extend({ ThreeLine: Line })` — imported
+  by every `<threeLine>` user. Delete when fixed.
+- **Where it bites**: `decals`, `geometry-nurbs`, `lines-dashed`, `modifier-curve`.
+
+### B45 · drei: `<Hud>` renders the default scene twice per frame on v10
+
+- **What**: `RenderHud` assumes a prioritised `useFrame` disables fiber's auto-render (a
+  v9 behaviour) and renders the default scene itself when `renderPriority === 1`. On v10
+  the auto-render still happens, so the main scene is drawn twice. Correct picture, wasted
+  frame.
+- **Where it bites**: `geometry-colors-lookuptable` (legend overlay).
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from

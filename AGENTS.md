@@ -637,9 +637,23 @@ updateOnFrame: true })}` on the Canvas. Default events fire only on pointer move
   `translate([0,50,0])` → NaN geometry (`computeBoundingSphere(): Computed radius is NaN`
   in smoke). Single-arg forms (`rotateX={once(x)}`) are fine. Until B42 lands, transform
   multi-arg geometry in a `useMemo` (pattern: `geometry-terrain-raycast`).
-- **`<line>` is `<threeLine>`.** fiber omits `line`, `path`, `audio` and `source` from
-  `ThreeElements` (they collide with SVG/DOM intrinsics) and re-adds the first as
-  `threeLine`. `<line>` compiles as an SVG element and renders nothing.
+- **`<line>` is `<threeLine>` — and `<threeLine>` needs `import '../../assets/ThreeLine'`.**
+  fiber omits `line`, `path`, `audio` and `source` from `ThreeElements` (they collide with
+  SVG/DOM intrinsics) and re-adds the first as `threeLine`; `<line>` compiles as an SVG
+  element and renders nothing. But in alpha.4 `createInstance` strips the `three` prefix
+  and `commitUpdate` does not, so `<threeLine>` mounts fine and then throws
+  `R3F: ThreeLine is not part of the THREE namespace` on the first re-render of any parent,
+  unmounting the Canvas. Smoke and animates never re-render, so the tiers can't see it —
+  a click did. The shim registers the prefixed name so both paths agree (B44). Delete the
+  import when fiber fixes it.
+- **`<points>` always draws 1px on WebGPU.** `PointsNodeMaterial.setupVertex` takes the
+  plain path for any `isPoints` object — `size`/`sizeAttenuation` are ignored, and with
+  `map` + `alphaTest` the points are discarded entirely, silently. Sized or textured
+  points are `<sprite count={n}>` + `<pointsNodeMaterial positionNode={…}>` (pattern:
+  `skinning-points`, `geometry-convex`).
+- **`attach="material-0"` / `"material-1"` builds a material ARRAY** for multi-material
+  geometry (a `TextGeometry` front/side pair) — fiber auto-creates the array. First use:
+  `geometry-text`.
 - **Acronym class names lowercase only the FIRST character**: `IESSpotLight` is
   `<iESSpotLight>`, not `<iesSpotLight>`.
 - A light attached to the camera IS declarative:
