@@ -119,6 +119,25 @@ follow the same shape. Report which.
 - [x] ~~`svg_lines`~~ ~~`svg_sandbox`~~ — **SKIP**: SVGRenderer output, not WebGPU
 - **`webaudio_*` (4)** and **`webxr_*` (26)** — **final phase**, unchanged; see 2F
 
+## 2B½ — Folded originals (ported as part of a combined example)
+
+These originals have no page of their own by design; the backlog tick attributes them
+to the combined example's `original` anchor. Listed so a reconciliation of r185 finds
+every name.
+
+- [x] ~~`misc_controls_trackball`~~ ~~`misc_controls_arcball`~~ ~~`misc_controls_fly`~~
+      ~~`misc_controls_map`~~ ~~`misc_controls_pointerlock`~~ — ported inside `controls`
+      (anchor `misc_controls_orbit`)
+- [x] ~~`misc_exporter_gltf_normals`~~ ~~`misc_exporter_usdz`~~ ~~`misc_exporter_ply`~~
+      ~~`misc_exporter_stl`~~ ~~`misc_exporter_obj`~~ — ported inside `exporter` (anchor
+      `misc_exporter_gltf`)
+- [x] ~~`webgl_loader_texture_hdr`~~ ~~`webgl_loader_texture_ultrahdr`~~ — ported inside
+      `texture-hdr-formats` (anchor `webgl_loader_texture_exr`)
+- [x] ~~`misc_uv_tests`~~ — **SKIP**: a UV test-pattern generator for checking texture
+      mapping on the built-in geometries; renderer-agnostic utility with no R3F content
+      (found 2026-09-03 by a full r185 reconciliation — the only name no document had
+      mentioned)
+
 ## 2C — Loader gallery (47) — 10 port · 35 skip · 3 review
 
 Dennis's rule: _loaders that just load a model are not needed._ A loader earns a page
