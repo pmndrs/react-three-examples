@@ -792,6 +792,17 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Where it bites**: `geometry-terrain-raycast` (worked around with `useMemo`); any port
   translating/scaling a geometry with more than one argument.
 
+### B43 · @react-three/rapier: joint hooks reject React 19 refs; heightfield heights typed as `number[]`
+
+- **What**: `useSphericalJoint`/`useRevoluteJoint`/… take `RefObject<RapierRigidBody>`
+  (non-null) while React 19's `useRef(null)` yields `RefObject<T | null>`, so every joint
+  needs r3r's own `useRef<RapierRigidBody>(null!)` idiom. `HeightfieldArgs` types `heights`
+  as `number[]` while rapier's constructor takes `Float32Array`, forcing a plain-array copy
+  to stay cast-free.
+- **Where it bites**: `physics/rapier-joints`, `physics/rapier-terrain`.
+- Also noted: drei's `PointerLockControls` reads the deprecated `state.gl` alias
+  internally — works today on `/webgpu`, will break when the alias goes.
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from

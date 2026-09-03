@@ -614,6 +614,12 @@ ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
 - `useLoader(Loader, [urls])` takes N resources in one call and returns N results.
 - Derived textures (clone/mutate of a loader result) must be `useMemo`'d off the
   loader's stable return.
+- **`@react-three/rapier` auto-colliders wrap EVERY descendant mesh.** `<RigidBody
+colliders="cuboid">` around a chassis with child wheel meshes gives each wheel its own
+  collider too — visible only in the `debug` view, and it passes both test tiers. Write
+  `colliders={false}` and one explicit `<CuboidCollider>` (pattern:
+  `rapier-vehicle-controller`). r3r 2.2 runs on fiber v10 alpha.4 unchanged; it bundles
+  its own rapier WASM (0.19.2), so never import `@dimforge/rapier3d-compat` directly.
 - **sRGB is auto-assigned only when a colour map is a PROP** (`<meshStandardNodeMaterial
 map={tex} />` — fiber's `applyProps` checks `colorMaps.includes(key)`). A
   `<texture attach="map">` / `<canvasTexture attach="map">` CHILD goes through `attach`
