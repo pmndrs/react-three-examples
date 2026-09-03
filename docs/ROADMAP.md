@@ -175,18 +175,22 @@ the extraction instructions without guessing.
 
 ## Deliberately after 1.0 — and the decision it needs
 
-The old M4 bundled the **Patterns track** (12–20 app-scale examples) into launch. That
-is a second project: none of it exists, its subject is different (app architecture, not
-demo ports), and it needs its own conventions pass. **Recommendation: 1.0 is the examples
-site; Patterns is 1.1.** The gallery site itself is the first pattern (dogfooding) and
-can be documented as such without building the other 12–20 first. _Dennis decides._
+**Decided (Dennis, 2026-09-03): the Patterns track is out of 1.0 and probably out of
+this repo.** This project's job is to duplicate the existing three.js examples; Patterns
+is a different product (app architecture, no originals to compare against) and would
+likely live in its own source. SPEC §4's paragraph stays as the pointer. The gallery
+site remains the one dogfooded pattern and can be documented as such.
 
 Then, in the order SPEC §4 already sets:
 
-- **1.1 — Patterns track.**
-- **1.2 — Phase 2**: the 34 validated webgl-unique examples, ported to WebGPU where
-  feasible. The **loader gallery** (47 formats) is its own decision, still open in SPEC
-  §14: all formats, or a representative set.
+- **1.1 — Phase 2**: tracked in [PORTING-BACKLOG-PHASE2.md](PORTING-BACKLOG-PHASE2.md).
+  The webgl audit was re-verified 2026-09-03 and held, with two corrections: 77
+  non-`webgl_`/`webgpu_` examples (physics, controls, css3d, games) were never audited
+  and several are the highest-payoff R3F content in the corpus; and the audit's
+  "low-value" test was three.js-technique-centric where SPEC §2's test is "where is R3F
+  dramatically clearer". Realistic scope ~75–85 ports. The **loader gallery** decision
+  (SPEC §14) is still open — recommendation in the backlog.
+- **Patterns** — separate repo, when and if.
 - **Final phase**: the 7 deferred (`xr-cubes`, `xr-native-layers`, `xr-rollercoaster`,
   `compute-audio`, `tsl-editor`, `tsl-graph`, `tsl-transpiler`) — WebXR needs
   `@react-three/xr` on v10; TSL tooling is a separate product.

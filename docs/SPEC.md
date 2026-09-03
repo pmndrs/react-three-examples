@@ -73,8 +73,9 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   Patterns track wants a "renderer correctness" group. **Phase 1 target is therefore 75
   remaining ports, not 85.**
 
-- **Patterns track (not ports): ~12–20 app-scale examples** teaching what single-canvas
-  demos can't: canvas in a real layout, persistent canvas across routes, shared DOM↔scene
+- **Patterns track (not ports): ~12–20 app-scale examples** — _decided 2026-09-03: out of
+  1.0 and likely a separate repo; this project duplicates the existing three.js examples._
+  Kept here as the pointer. Teaching what single-canvas demos can't: canvas in a real layout, persistent canvas across routes, shared DOM↔scene
   state, suspense/loading orchestration, multiple views, DOM↔scene events, testing R3F
   components. The gallery site itself is built with these patterns (dogfooding).
 - **Phase 2: webgl-only examples — validated list only (research/webgl-unique-list.md).**
