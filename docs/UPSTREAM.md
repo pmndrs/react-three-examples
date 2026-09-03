@@ -838,6 +838,20 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Where it bites**: any example that swaps between two same-type material elements
   with different prop sets (`modifier-subdivision`, worked around with a `key`).
 
+### B46 · drei: `<TransformControls>` never mounts `getHelper()`, so on three ≥ r169 there is no gizmo and no drag
+
+- **What**: since r169 `TransformControls extends Controls` (not `Object3D`); the drawable
+  arrows/planes are `controls.getHelper()` (`this._root`), which the vanilla examples add
+  with `scene.add(transformControl.getHelper())`. drei's component constructs the
+  controls, calls `attach()`, wires `dragging-changed`/`change`/`mouseDown`/`mouseUp` —
+  and never adds the helper. The `/webgpu` bundle contains zero `getHelper` calls. Result:
+  nothing is drawn, the picker meshes have no world matrices, pointer hover/drag never
+  hit anything. Silent — the controls "work" in that events are wired to nothing.
+- **Fix**: render `<primitive object={controls.getHelper()} />` inside the component when
+  `getHelper` exists (keep the old path for < r169).
+- **Where it bites**: `geometry-spline-editor` (worked around), `modifier-curve` (same
+  fix applied 2026-09-03), and any future `<TransformControls>` user.
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from

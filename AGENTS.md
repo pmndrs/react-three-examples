@@ -614,6 +614,14 @@ ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
 - `useLoader(Loader, [urls])` takes N resources in one call and returns N results.
 - Derived textures (clone/mutate of a loader result) must be `useMemo`'d off the
   loader's stable return.
+- **drei's `<TransformControls>` draws NO gizmo on three ≥ r169, so drag cannot work.**
+  `TransformControls` is a `Controls` now, not an `Object3D`; the arrows live in
+  `controls.getHelper()`, which the original adds with `scene.add(…)` and drei never adds
+  (zero `getHelper` calls in the `/webgpu` bundle — verified). Without it the picker
+  meshes never get world matrices, so nothing is hit-testable. Until B46 lands:
+  `ref={setGizmo}` + `{gizmo && <primitive object={gizmo.getHelper()} />}`, marked
+  `TODO(drei-gap)` (pattern: `geometry-spline-editor`). Both test tiers pass without the
+  gizmo — only a drag probe or a screenshot catches it.
 - **Removing a prop resets it to literal `0` on any class whose constructor takes
   arguments** — which is every node material. fiber's `diffProps` restores a removed
   prop from the memoized prototype only when `constructor.length === 0`; otherwise
