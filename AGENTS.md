@@ -624,6 +624,13 @@ ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
 - `useLoader(Loader, [urls])` takes N resources in one call and returns N results.
 - Derived textures (clone/mutate of a loader result) must be `useMemo`'d off the
   loader's stable return.
+- **drei `<Html>` (non-`transform`) on a STATIC object vanishes in dev.** Its mount
+  layout effect writes the `translate3d(0,-9999px,0)` parking transform and StrictMode
+  re-runs it on the remount, but the `oldPosition` ref survives, and the frame callback
+  only rewrites `transform` when the projected position moved by more than `eps`
+  (1e-3). Nothing moves → nothing un-parks → the label sits at −9999px until the camera
+  drags. Pass `eps={-1}` to force the update every frame (pattern: `label`, marked
+  `REVIEW(drei-html-eps)`). Production is unaffected — StrictMode only. B50.
 - **`<Html transform distanceFactor={400}>` is the CSS3DRenderer scale** — drei's ratio
   is `(distanceFactor || 10) / 400`, so 400 makes 1 world unit = 1 CSS px, which is what
   every `css3d_*` original assumes. Without it the elements come out at 1/40 scale

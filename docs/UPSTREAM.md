@@ -871,6 +871,18 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   gizmo is requested.
 - **Where it bites**: `camera/controls` (Arcball mode shows no gizmo; stated in header).
 
+### B50 · drei: `<Html>` on a static object stays parked at −9999px under StrictMode
+
+- **What**: the mount `useLayoutEffect` sets `el.style.cssText` to the parking transform
+  `translate3d(0,-9999px,0)`. StrictMode's mount → unmount → remount re-runs it, but
+  `oldPosition` is a `useRef` that survives, and the per-frame update only writes
+  `el.style.transform` when `|oldPosition − vec| > eps` (default 1e-3). For an object that
+  never moves the gate never reopens, so the label is invisible until the camera moves.
+- **Fix**: reset `oldPosition.current` (and `oldZoom`) inside the same layout effect that
+  writes the parking transform, so the first frame after (re)mount always positions.
+- **Workaround**: `eps={-1}`.
+- **Where it bites**: `scene/label`; any `<Html>` on a static mesh, in dev only.
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from
