@@ -32,6 +32,7 @@ import { Flow } from 'three/addons/modifiers/CurveModifierGPU.js';
 import { Canvas, useFrame } from '@react-three/fiber/webgpu';
 import { TransformControls, useFont } from '@react-three/drei/webgpu';
 import type CameraControlsImpl from 'camera-controls';
+import '../../assets/ThreeLine';
 import { DemoHelpers } from '../../utils/DemoHelpers';
 
 const FONT_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/fonts/helvetiker_regular.typeface.json';
