@@ -21,7 +21,8 @@
     "generate:manifest": "node scripts/generate-manifest.mjs",
     "compare": "node scripts/compare-lines.mjs",
     "tick": "node scripts/tick-backlog.mjs",
-    "shot:original": "node scripts/shoot-original.mjs"
+    "shot:original": "node scripts/shoot-original.mjs",
+    "inventory": "node scripts/demo-inventory.mjs"
   },
   "dependencies": {
     "@perplexdotgg/bounce": "^1.10.0",

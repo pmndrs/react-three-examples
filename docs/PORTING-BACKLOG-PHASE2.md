@@ -45,14 +45,14 @@ experimental on v10, see 2B). Every three addon the 34 need exists in r185 excep
 - [x] ~~`webgl_interactive_voxelpainter`~~ — ported — raycast voxel editor → `scene/`
 - [x] ~~`webgl_raycaster_texture`~~ — ported — alpha-aware picking → `scene/`
 - [x] ~~`webgl_raycaster_bvh`~~ — ported — three-mesh-bvh → `scene/`
-- [ ] `webgl_batch_lod_bvh` — BatchedMesh + LOD + BVH culling → `scene/`
+- [x] ~~`webgl_batch_lod_bvh`~~ — **REVIEW**: `@three.ez/batched-mesh-extensions`' exports map hides its WebGPU build (B51); also needs `@three.ez/simplify-geometry` + `meshoptimizer`
 - [x] ~~`webgl_multiple_views`~~ — ported — split viewports (drei `<View>`) → `camera/`
 - [x] ~~`webgl_multiple_scenes_comparison`~~ — ported — scissor slider → `camera/`
 - [x] ~~`webgl_clipping_stencil`~~ — ported — stencil cap-filling → `materials/`
 - [x] ~~`webgl_materials_car`~~ — ported — car configurator → `materials/`
 - [x] ~~`webgl_materials_texture_canvas`~~ — ported — Canvas2D live texture → `textures/`
 - [x] ~~`webgl_lines_dashed`~~ — ported → `geometry/`
-- [ ] `webgl_morphtargets_webcam` — live face tracking → morphs → `animation/`
+- [x] ~~`webgl_morphtargets_webcam`~~ — **REVIEW**: needs `@mediapipe/tasks-vision` installed and a no-camera fallback; Dennis decides
 - [x] ~~`webgl_postprocessing_glitch`~~ — ported — hand-port GlitchPass to TSL → `postprocessing/`
 - [x] ~~`webgl_renderer_pathtracer`~~ — **SKIP**: three-gpu-pathtracer is WebGL 2 only
       (`WebGLPathTracer(new WebGLRenderer())`); no WebGPU backend exists
@@ -133,6 +133,10 @@ every name.
       `misc_exporter_gltf`)
 - [x] ~~`webgl_loader_texture_hdr`~~ ~~`webgl_loader_texture_ultrahdr`~~ — ported inside
       `texture-hdr-formats` (anchor `webgl_loader_texture_exr`)
+- [x] ~~`webgl_lightprobes`~~ ~~`webgl_lightprobes_complex`~~ ~~`webgl_lightprobes_sponza`~~ —
+      **SKIP**: same SH light-probe technique as the shipped `lightprobe` /
+      `lightprobe-cubecamera`; their `webgpu_lightprobes*` twins are new in three `dev` and
+      land with the next three bump (2E)
 - [x] ~~`misc_uv_tests`~~ — **SKIP**: a UV test-pattern generator for checking texture
       mapping on the built-in geometries; renderer-agnostic utility with no R3F content
       (found 2026-09-03 by a full r185 reconciliation — the only name no document had
@@ -144,10 +148,10 @@ Dennis's rule: _loaders that just load a model are not needed._ A loader earns a
 only when it demonstrates something beyond "the model appears".
 
 - [x] ~~`webgl_loader_gltf_variants`~~ — ported — KHR_materials_variants switcher → `loaders/`
-- [ ] `webgl_loader_gltf_progressive_lod` — streaming LOD → `loaders/`
+- [x] ~~`webgl_loader_gltf_progressive_lod`~~ — **REVIEW**: needs `@needle-tools/gltf-progressive`, and its assets live at cloud.needle.tools, not on the jsdelivr mirror
 - [x] ~~`webgl_loader_gltf_instancing`~~ — ported — EXT_mesh_gpu_instancing → `loaders/`
-- [ ] `webgl_loader_gltf_animation_pointer` — KHR_animation_pointer → `loaders/`
-- [ ] `webgl_loader_3dtiles` — tiled streaming → `loaders/`
+- [x] ~~`webgl_loader_gltf_animation_pointer`~~ — **REVIEW**: needs `@needle-tools/three-animation-pointer`; same off-mirror asset blocker
+- [x] ~~`webgl_loader_3dtiles`~~ — **REVIEW**: needs five packages (`3d-tiles-renderer`, `postprocessing`, `@takram/three-atmosphere`, `@takram/three-geospatial`, `@takram/three-geospatial-effects`)
 - [x] ~~`webgl_loader_collada_kinematics`~~ — ported — kinematic chain playback → `loaders/`
 - [x] ~~`webgl_loader_md2_control`~~ — ported — animation state control → `loaders/`
 - [x] ~~`webgl_loader_ldraw`~~ — ported — LEGO, build-step animation → `loaders/`
