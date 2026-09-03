@@ -2,7 +2,7 @@
 
 Generated from `research/data/files_r185.json` vs `src/examples.json`.
 
-**214 in r185 · 197 ported · 13 excluded · 4 deferred · 0 TO PORT — Phase 1 complete.**
+**214 in r185 · 198 ported · 13 excluded · 3 deferred · 0 TO PORT — Phase 1 complete.**
 
 > Checkboxes are the source of truth; the counts above are hand-updated. After a wave,
 > re-tick with `node scripts/tick-backlog.mjs` — anything present in `src/examples.json`
@@ -64,7 +64,7 @@ place the example elsewhere. Slugs drop the `webgpu_` prefix and kebab-case.
 
 ## compute (7)
 
-- [x] ~~`compute-audio`~~ — deferred (webaudio — SPEC §4 out of scope for now)
+- [x] ~~`compute-audio`~~ — ported (webaudio wave, 2026-09-03)
 - [x] ~~`compute-particles-fluid`~~ — ported
 - [x] ~~`compute-rasterizer`~~ — ported
 - [x] ~~`compute-rasterizer-ibl`~~ — ported

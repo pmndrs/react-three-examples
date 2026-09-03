@@ -200,12 +200,29 @@ Kinect).
 an XR example**: no headset, and the smoke/animates tiers can't enter a session. Porting
 26 examples nobody can run is not "covered". Filed in REVIEW-QUEUE: Dennis decides
 whether to port a representative 3–4 (`xr_cubes`, `xr_dragging`, `ar_hittest`,
-`vr_teleport`) and verify them himself, or hold the whole phase. webaudio (4) is
-renderer-agnostic and small; same review entry.
+`vr_teleport`) and verify them himself, or hold the whole phase.
+
+webaudio (4) — **greenlit and ported 2026-09-03**, plus `webgpu_compute_audio` (already
+webgpu/TSL) folded into the same wave. All five needed one new harness piece: a generic
+manifest `startClick` field (a CSS selector Playwright/the screenshot tool click right
+after navigation, before waiting on readiness) — `AudioContext` needs a real user gesture
+and none of the five have a muted-autoplay escape. `src/utils/StartOverlay.tsx` is the
+shared click-to-start overlay; `src/utils/resumeAudioContext.ts` works around a real
+`@types/three` gap (`AudioContext.getContext()` mistyped as returning THREE's own class —
+see REVIEW-QUEUE). WebXR (26) is unchanged, still REVIEW.
+
+- [x] ~~`webaudio_orientation`~~ — ported — PositionalAudio + directional-cone helper, static-by-design → `audio/`
+- [x] ~~`webaudio_sandbox`~~ — ported — FirstPersonControls soundscape, leva volume/oscillator GUI, static-by-design → `audio/`
+- [x] ~~`webaudio_timing`~~ — ported — bounce-impact-timed PositionalAudio → `audio/`
+- [x] ~~`webaudio_visualizer`~~ — ported — AudioAnalyser → DataTexture → `scene.backgroundNode` → `audio/`
+- [x] ~~`webgpu_compute_audio`~~ — ported — TSL compute pitch/echo kernel + GPU→CPU→GPU readback → `audio/`
 
 ## Counts
 
-**66 ported · 6 review-queued · 0 left** (2026-09-03, from actual checkbox state).
+**66 ported · 6 review-queued · 0 left in 2A-2E** (2026-09-03, from actual checkbox
+state). Plus 4 more from 2F's webaudio wave (below) — 70 total across this document.
+`webgpu_compute_audio`, the fifth port in that wave, is a Phase 1 `webgpu_*` item
+tracked in `docs/PORTING-BACKLOG.md`, not counted in this file's table.
 
 | section              |   port |  skip | review |  final |
 | -------------------- | -----: | ----: | -----: | -----: |
@@ -214,7 +231,8 @@ renderer-agnostic and small; same review entry.
 | 2C loader gallery    |     10 |     0 |      3 |        |
 | 2D Class-C re-check  |      5 |     2 |        |        |
 | 2E on next bump      |      6 |       |        |      1 |
-| **total**            | **72** | **8** |  **6** | **31** |
+| 2F webaudio          |      4 |       |        |     -4 |
+| **total**            | **76** | **8** |  **6** | **27** |
 
 66 ported so far (2A–2D; 6 more of the 72 wait on the next three.js bump in 2E) — about
 40% of Phase 1, and a far higher share of scene-graph/event demos where the R3F win is

@@ -1,5 +1,23 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
 
+## 2026-09-03 — webaudio wave: 5 examples, `audio` category, `startClick`
+
+Dennis greenlit webaudio after a Sonnet feasibility pass (XR stays deferred: no automated
+session verification, and `XRGPUBinding` is unshipped so even `webgpu_xr_*` runs through a
+WebGL renderer swap fiber can't express — REVIEW-QUEUE 1b has the detail). A Sonnet agent
+ported `orientation`, `sandbox`, `timing`, `visualizer` (WebGLRenderer originals → WebGPU)
+and `compute-audio` into new `src/examples/audio/`, all five green on tsc/lint/build/smoke/
+animates, screenshots checked here. Harness: manifest `startClick` (CSS selector clicked
+before readiness in smoke, animates and the contact sheet — a trusted Playwright click was
+enough, no autoplay flag). Shared `src/utils/StartOverlay.tsx` + `resumeAudioContext.ts`.
+Four real bugs the agent found by running, not reading: CORS-tainted `MediaElementSource`
+outputs zeros without `crossOrigin="anonymous"`; `setMediaElementSource` is once-per-element
+and StrictMode remounts call it twice (guard on `hasPlaybackControl`); `compute-audio`'s async
+effect deadlocked itself under StrictMode (replaced with latest-run-wins); `sandbox` was black
+because fiber's default `lookAt` poisons `<FirstPersonControls>` permanently. All four are now
+AGENTS.md bullets (v1.3). UPSTREAM **B53** filed (`@types/three` `AudioContext.getContext()`).
+Corpus **263 → 268**; AGENTS.md categories list was stale at 15 (never got `physics`) — now 17.
+
 ## 2026-09-03 — TSL tooling pages excluded; inventory now quotes reasons
 
 Dennis ruled `webgpu_tsl_editor`, `webgpu_tsl_transpiler` and `webgpu_tsl_graph` **internal

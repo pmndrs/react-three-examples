@@ -16,9 +16,10 @@ import { fileURLToPath } from 'node:url';
 
 const MANIFEST_PATH = fileURLToPath(new URL('../src/examples.json', import.meta.url));
 
-// The 16 categories (AGENTS.md § Files, routes, manifest), alphabetical.
+// The 17 categories (AGENTS.md § Files, routes, manifest), alphabetical.
 const CATEGORIES = [
   'animation',
+  'audio',
   'camera',
   'compute',
   'geometry',

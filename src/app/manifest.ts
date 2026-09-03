@@ -6,6 +6,7 @@ import examples from '../examples.json';
 // (see docs/SITE.md "Category data" for why).
 export const CATEGORIES = [
   'animation',
+  'audio',
   'camera',
   'compute',
   'geometry',
@@ -28,6 +29,7 @@ export type Category = (typeof CATEGORIES)[number];
 // Human-readable label for a category slug — home page + sidebar group headers.
 export const categoryLabels: Record<Category, string> = {
   animation: 'Animation',
+  audio: 'Audio',
   camera: 'Camera',
   compute: 'Compute',
   geometry: 'Geometry',
@@ -51,6 +53,7 @@ export const categoryLabels: Record<Category, string> = {
 // visual differentiator between categories instead of a thumbnail.
 export const categoryAccent: Record<Category, string> = {
   animation: '#f97316',
+  audio: '#fb923c',
   camera: '#eab308',
   compute: '#84cc16',
   geometry: '#22c55e',
@@ -84,6 +87,12 @@ export interface ExampleMeta {
   /** CI runs this example with ?nogrid (DemoHelpers grid suppressed) — SwiftShader
    * Grid+node-graph stall workaround that keeps smoke coverage. Value = reason. */
   ciNoGrid?: string;
+  /** CSS selector Playwright/the screenshot tool must click right after navigation,
+   * BEFORE waiting on the readiness signal — for demos that gate scene start behind
+   * a user-gesture overlay (AudioContext needs a real user gesture; there's no
+   * muted-autoplay escape like `video-panorama` uses). A real CDP click satisfies
+   * Chromium's user-activation gate. See `src/utils/StartOverlay.tsx`. */
+  startClick?: string;
 }
 
 export const exampleMeta = examples as ExampleMeta[];

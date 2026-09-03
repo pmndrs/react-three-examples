@@ -47,10 +47,16 @@ not a porting problem.
 - **`webgl_worker_offscreencanvas`** — fiber v10 ships only a type shim for
   `OffscreenCanvas`; there is no worker/`createRoot`-in-a-worker story. Porting it means
   building that. Recommendation: **skip for 1.0**, record as a fiber upstream ask.
-- **WebXR (26) + webaudio (4)** — `@react-three/xr` 6.6 installs against v10 (peer
+- **WebXR (26 + 3 `webgpu_xr_*`)** — `@react-three/xr` 6.6 installs against v10 (peer
   `>=8`), but nothing here can verify an XR example: no headset, and smoke/animates cannot
-  enter a session. Recommendation: **you port and verify a representative 3–4 by hand**
-  (`xr_cubes`, `xr_dragging`, `ar_hittest`, `vr_teleport`); agents don't touch the rest.
+  enter a session (Chromium's fake-device route is a MojoJS shim we'd have to build; the
+  Immersive Web Emulator extension is alpha and needs a headed persistent-context launch).
+  A third reason, found 2026-09-03: `XRGPUBinding` is not something stable browsers expose,
+  so even the `webgpu_xr_*` originals run sessions through `setupWebGLXRFallback`, which
+  swaps in a second WebGL-backend renderer at `setSession` time — a renderer swap fiber
+  cannot express. Recommendation: **leave for later; when it comes, you port and verify a
+  representative 3–4 by hand** (`xr_cubes`, `xr_dragging`, `ar_hittest`, `vr_teleport`).
+  (webaudio was in this bullet; Dennis greenlit it 2026-09-03 and it shipped — see Resolved.)
 - **`@react-three/rapier` on fiber v10** — declares peer `^9`. The `rapier-basic` probe
   will report whether it works; if it doesn't, the fallback (inlined three addon over the
   installed `@dimforge/rapier3d-compat`) is already specified. **No action unless the
@@ -363,6 +369,9 @@ delta <= 2`). Cost `geometry-spline-editor` a round of debugging; its selection 
 ---
 
 ## Resolved
+
+| 2026-09-03 | webaudio (from 1b) | **Greenlit and ported** — 5 examples in the new `audio/` category, `startClick` manifest field + `<StartOverlay>`; WebXR stays in 1b. |
+| 2026-09-03 | `@types/three` `AudioContext.getContext()` mistyped (was #16) | **Ledgered as UPSTREAM B53**; the documented cast stays in `src/utils/resumeAudioContext.ts` until it lands. |
 
 | decided    | what                                                                    | outcome                                                                                                                                                                                                                                                                                                                                                                                           |
 | ---------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

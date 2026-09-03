@@ -19,6 +19,11 @@ for (const { slug, ...meta } of selected) {
   // ciNoGrid: run the example in CI with DemoHelpers' grid suppressed (?nogrid) —
   // works around the SwiftShader Grid+node-graph stall WITHOUT losing smoke coverage.
   const ciNoGrid = 'ciNoGrid' in meta ? String(meta.ciNoGrid) : undefined;
+  // startClick (AGENTS.md § Verification, startClick): a click-to-start overlay gates scene
+  // start behind a user gesture (AudioContext). Click it right after navigation, BEFORE
+  // waiting on readiness — a real Playwright click is a trusted CDP input event, which
+  // satisfies Chromium's user-activation gate.
+  const startClick = 'startClick' in meta ? String(meta.startClick) : undefined;
   test(`${slug}: WebGPU context, readiness signal, non-black canvas`, async ({ page }) => {
     // Exception list (SPEC §10, three.js-CI prior art): examples too heavy for
     // SwiftShader declare ciSkip WITH A REASON in the manifest. They still run locally.
@@ -33,6 +38,7 @@ for (const { slug, ...meta } of selected) {
     });
 
     await page.goto(`/examples/${slug}${process.env.CI && ciNoGrid ? '?nogrid' : ''}`);
+    if (startClick) await page.click(startClick);
 
     // Readiness = loaders settled + clean frames (window.__exampleReady, set by
     // <ReadinessSignal> inside DemoHelpers). Poll instead of sleeping. CI gets a

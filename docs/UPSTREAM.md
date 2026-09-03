@@ -924,6 +924,20 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Where it bites**: latent — any `useFrame` body that iterates a collection with a loop
   variable named `clone`. AGENTS.md's advice: rename the variable rather than fight the rule.
 
+### B53 · `@types/three`: `AudioContext.getContext()` returns THREE's own class, not the native context
+
+- **What**: `@types/three/src/audio/AudioContext.d.ts` declares
+  `static getContext(): AudioContext;` — the class's OWN name, self-referentially — while its
+  JSDoc says `@return {Window.AudioContext}` and the runtime
+  (`three/src/audio/AudioContext.js`: `new (window.AudioContext || window.webkitAudioContext)()`)
+  returns the native context. So `.resume()` / `.state` / `createBufferSource()` don't
+  typecheck on the result, and every webaudio port needs a cast to reach them.
+- **Fix**: `static getContext(): globalThis.AudioContext;` (and `setContext(value: globalThis.AudioContext)`).
+  One-line `@types/three` PR.
+- **Where it bites**: `src/utils/resumeAudioContext.ts` carries the documented
+  `as unknown as globalThis.AudioContext` cast for all five `audio/` examples. Delete the cast
+  when the types land.
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from

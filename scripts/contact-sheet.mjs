@@ -52,6 +52,11 @@ try {
       // the example's coded defaults (AGENTS.md §Verification).
       await page.evaluate(() => localStorage.clear());
       await page.reload();
+      // startClick (AGENTS.md § Verification, startClick): click-to-start overlay gates scene
+      // start behind a user gesture (AudioContext) — click it before waiting on
+      // readiness, same as the two test tiers.
+      const startClick = bySlug.get(slug)?.startClick;
+      if (startClick) await page.click(startClick);
       await page.waitForFunction(() => window.__exampleReady === true, undefined, {
         timeout: READY_TIMEOUT_MS,
       });

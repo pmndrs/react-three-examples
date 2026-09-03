@@ -9,331 +9,331 @@ r185 ships **588** examples. **274 are not worth a page** — duplicated by a `w
 
 | status                                    |   count |
 | ----------------------------------------- | ------: |
-| HAVE — own page                           |     262 |
+| HAVE — own page                           |     267 |
 | HAVE — folded into a combined example     |      12 |
 | BLOCKED — review-queued, needs a decision |       6 |
-| LATER — final phase (WebXR / webaudio)    |      34 |
+| LATER — final phase (WebXR / webaudio)    |      29 |
 | GAP — no decision recorded                |       0 |
 | **worth porting**                         | **314** |
 
 ## The list
 
-| original                                   | status        | slug / reason                                         |
-| ------------------------------------------ | ------------- | ----------------------------------------------------- |
-| `webgl_batch_lod_bvh`                      | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
-| `webgl_loader_3dtiles`                     | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
-| `webgl_loader_gltf_animation_pointer`      | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
-| `webgl_loader_gltf_progressive_lod`        | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
-| `webgl_morphtargets_webcam`                | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
-| `webgl_worker_offscreencanvas`             | BLOCKED       | review-queued — REVIEW-QUEUE.md                       |
-| `css2d_label`                              | HAVE          | `label`                                               |
-| `css3d_molecules`                          | HAVE          | `molecules`                                           |
-| `css3d_periodictable`                      | HAVE          | `periodictable`                                       |
-| `css3d_sprites`                            | HAVE          | `css3d-sprites`                                       |
-| `css3d_youtube`                            | HAVE          | `youtube`                                             |
-| `games_fps`                                | HAVE          | `fps`                                                 |
-| `misc_animation_groups`                    | HAVE          | `animation-groups`                                    |
-| `misc_animation_keys`                      | HAVE          | `animation-keys`                                      |
-| `misc_boxselection`                        | HAVE          | `boxselection`                                        |
-| `misc_controls_drag`                       | HAVE          | `controls-drag`                                       |
-| `misc_controls_orbit`                      | HAVE          | `controls`                                            |
-| `misc_controls_transform`                  | HAVE          | `controls-transform`                                  |
-| `misc_exporter_gltf`                       | HAVE          | `exporter`                                            |
-| `misc_raycaster_helper`                    | HAVE          | `raycaster-helper`                                    |
-| `physics_rapier_basic`                     | HAVE          | `rapier-basic`                                        |
-| `physics_rapier_character_controller`      | HAVE          | `rapier-character-controller`                         |
-| `physics_rapier_instancing`                | HAVE          | `rapier-instancing`                                   |
-| `physics_rapier_joints`                    | HAVE          | `rapier-joints`                                       |
-| `physics_rapier_terrain`                   | HAVE          | `rapier-terrain`                                      |
-| `physics_rapier_vehicle_controller`        | HAVE          | `rapier-vehicle-controller`                           |
-| `webgl_animation_skinning_blending`        | HAVE          | `animation-skinning-blending`                         |
-| `webgl_animation_skinning_ik`              | HAVE          | `animation-skinning-ik`                               |
-| `webgl_animation_walk`                     | HAVE          | `animation-walk`                                      |
-| `webgl_clipping_stencil`                   | HAVE          | `clipping-stencil`                                    |
-| `webgl_decals`                             | HAVE          | `decals`                                              |
-| `webgl_geometries`                         | HAVE          | `geometries`                                          |
-| `webgl_geometry_colors_lookuptable`        | HAVE          | `geometry-colors-lookuptable`                         |
-| `webgl_geometry_convex`                    | HAVE          | `geometry-convex`                                     |
-| `webgl_geometry_csg`                       | HAVE          | `geometry-csg`                                        |
-| `webgl_geometry_minecraft`                 | HAVE          | `geometry-minecraft`                                  |
-| `webgl_geometry_nurbs`                     | HAVE          | `geometry-nurbs`                                      |
-| `webgl_geometry_spline_editor`             | HAVE          | `geometry-spline-editor`                              |
-| `webgl_geometry_teapot`                    | HAVE          | `geometry-teapot`                                     |
-| `webgl_geometry_terrain_raycast`           | HAVE          | `geometry-terrain-raycast`                            |
-| `webgl_geometry_text`                      | HAVE          | `geometry-text`                                       |
-| `webgl_helpers`                            | HAVE          | `helpers`                                             |
-| `webgl_instancing_raycast`                 | HAVE          | `instancing-raycast`                                  |
-| `webgl_instancing_scatter`                 | HAVE          | `instancing-scatter`                                  |
-| `webgl_interactive_cubes`                  | HAVE          | `interactive-cubes`                                   |
-| `webgl_interactive_cubes_gpu`              | HAVE          | `interactive-cubes-gpu`                               |
-| `webgl_interactive_voxelpainter`           | HAVE          | `interactive-voxelpainter`                            |
-| `webgl_lines_dashed`                       | HAVE          | `lines-dashed`                                        |
-| `webgl_loader_collada_kinematics`          | HAVE          | `loader-collada-kinematics`                           |
-| `webgl_loader_gltf_instancing`             | HAVE          | `loader-gltf-instancing`                              |
-| `webgl_loader_gltf_variants`               | HAVE          | `loader-gltf-variants`                                |
-| `webgl_loader_ldraw`                       | HAVE          | `loader-ldraw`                                        |
-| `webgl_loader_md2_control`                 | HAVE          | `loader-md2-control`                                  |
-| `webgl_loader_pdb`                         | HAVE          | `loader-pdb`                                          |
-| `webgl_loader_svg`                         | HAVE          | `loader-svg`                                          |
-| `webgl_loader_texture_exr`                 | HAVE          | `texture-hdr-formats`                                 |
-| `webgl_loader_texture_lottie`              | HAVE          | `texture-lottie`                                      |
-| `webgl_lod`                                | HAVE          | `lod`                                                 |
-| `webgl_marchingcubes`                      | HAVE          | `marchingcubes`                                       |
-| `webgl_materials_blending`                 | HAVE          | `materials-blending`                                  |
-| `webgl_materials_car`                      | HAVE          | `materials-car`                                       |
-| `webgl_materials_texture_canvas`           | HAVE          | `materials-texture-canvas`                            |
-| `webgl_modifier_edgesplit`                 | HAVE          | `modifier-edgesplit`                                  |
-| `webgl_modifier_simplifier`                | HAVE          | `modifier-simplifier`                                 |
-| `webgl_modifier_subdivision`               | HAVE          | `modifier-subdivision`                                |
-| `webgl_modifier_tessellation`              | HAVE          | `modifier-tessellation`                               |
-| `webgl_multiple_scenes_comparison`         | HAVE          | `multiple-scenes-comparison`                          |
-| `webgl_multiple_views`                     | HAVE          | `multiple-views`                                      |
-| `webgl_postprocessing_glitch`              | HAVE          | `postprocessing-glitch`                               |
-| `webgl_raycaster_bvh`                      | HAVE          | `raycaster-bvh`                                       |
-| `webgl_raycaster_texture`                  | HAVE          | `raycaster-texture`                                   |
-| `webgpu_animation_retargeting`             | HAVE          | `animation-retargeting`                               |
-| `webgpu_animation_retargeting_readyplayer` | HAVE          | `animation-retargeting-readyplayer`                   |
-| `webgpu_backdrop`                          | HAVE          | `backdrop`                                            |
-| `webgpu_backdrop_area`                     | HAVE          | `backdrop-area`                                       |
-| `webgpu_backdrop_water`                    | HAVE          | `backdrop-water`                                      |
-| `webgpu_camera`                            | HAVE          | `camera`                                              |
-| `webgpu_camera_array`                      | HAVE          | `camera-array`                                        |
-| `webgpu_camera_logarithmicdepthbuffer`     | HAVE          | `camera-logarithmicdepthbuffer`                       |
-| `webgpu_caustics`                          | HAVE          | `caustics`                                            |
-| `webgpu_clearcoat`                         | HAVE          | `clearcoat`                                           |
-| `webgpu_clipping`                          | HAVE          | `clipping`                                            |
-| `webgpu_compute_birds`                     | HAVE          | `compute-birds`                                       |
-| `webgpu_compute_cloth`                     | HAVE          | `compute-cloth`                                       |
-| `webgpu_compute_geometry`                  | HAVE          | `compute-geometry`                                    |
-| `webgpu_compute_particles`                 | HAVE          | `compute-particles`                                   |
-| `webgpu_compute_particles_fluid`           | HAVE          | `compute-particles-fluid`                             |
-| `webgpu_compute_particles_rain`            | HAVE          | `compute-particles-rain`                              |
-| `webgpu_compute_particles_snow`            | HAVE          | `compute-particles-snow`                              |
-| `webgpu_compute_points`                    | HAVE          | `compute-points`                                      |
-| `webgpu_compute_rasterizer`                | HAVE          | `compute-rasterizer`                                  |
-| `webgpu_compute_rasterizer_ibl`            | HAVE          | `compute-rasterizer-ibl`                              |
-| `webgpu_compute_reduce`                    | HAVE          | `compute-reduce`                                      |
-| `webgpu_compute_sort_bitonic`              | HAVE          | `compute-sort-bitonic`                                |
-| `webgpu_compute_texture`                   | HAVE          | `compute-texture`                                     |
-| `webgpu_compute_texture_3d`                | HAVE          | `compute-texture-3d`                                  |
-| `webgpu_compute_texture_pingpong`          | HAVE          | `compute-texture-pingpong`                            |
-| `webgpu_compute_water`                     | HAVE          | `compute-water`                                       |
-| `webgpu_cubemap_adjustments`               | HAVE          | `cubemap-adjustments`                                 |
-| `webgpu_cubemap_dynamic`                   | HAVE          | `cubemap-dynamic`                                     |
-| `webgpu_cubemap_mix`                       | HAVE          | `cubemap-mix`                                         |
-| `webgpu_custom_fog`                        | HAVE          | `custom-fog`                                          |
-| `webgpu_custom_fog_background`             | HAVE          | `custom-fog-background`                               |
-| `webgpu_custom_fog_scattering`             | HAVE          | `custom-fog-scattering`                               |
-| `webgpu_depth_texture`                     | HAVE          | `depth-texture`                                       |
-| `webgpu_display_stereo`                    | HAVE          | `display-stereo`                                      |
-| `webgpu_equirectangular`                   | HAVE          | `equirectangular`                                     |
-| `webgpu_fog_height`                        | HAVE          | `fog-height`                                          |
-| `webgpu_generator_building`                | HAVE          | `generator-building`                                  |
-| `webgpu_generator_city`                    | HAVE          | `generator-city`                                      |
-| `webgpu_geometry_loft`                     | HAVE          | `geometry-loft`                                       |
-| `webgpu_hdr`                               | HAVE          | `hdr`                                                 |
-| `webgpu_instance_mesh`                     | HAVE          | `instance-mesh`                                       |
-| `webgpu_instance_path`                     | HAVE          | `instance-path`                                       |
-| `webgpu_instance_points`                   | HAVE          | `instance-points`                                     |
-| `webgpu_instance_sprites`                  | HAVE          | `instance-sprites`                                    |
-| `webgpu_instance_uniform`                  | HAVE          | `instance-uniform`                                    |
-| `webgpu_instancing_morph`                  | HAVE          | `instancing-morph`                                    |
-| `webgpu_layers`                            | HAVE          | `layers`                                              |
-| `webgpu_lensflares`                        | HAVE          | `lensflares`                                          |
-| `webgpu_lightprobe`                        | HAVE          | `lightprobe`                                          |
-| `webgpu_lightprobe_cubecamera`             | HAVE          | `lightprobe-cubecamera`                               |
-| `webgpu_lights_clustered`                  | HAVE          | `lights-clustered`                                    |
-| `webgpu_lights_custom`                     | HAVE          | `lights-custom`                                       |
-| `webgpu_lights_dynamic`                    | HAVE          | `lights-dynamic`                                      |
-| `webgpu_lights_ies_spotlight`              | HAVE          | `lights-ies-spotlight`                                |
-| `webgpu_lights_phong`                      | HAVE          | `lights-phong`                                        |
-| `webgpu_lights_physical`                   | HAVE          | `lights-physical`                                     |
-| `webgpu_lights_pointlights`                | HAVE          | `lights-pointlights`                                  |
-| `webgpu_lights_projector`                  | HAVE          | `lights-projector`                                    |
-| `webgpu_lights_rectarealight`              | HAVE          | `lights-rectarealight`                                |
-| `webgpu_lights_selective`                  | HAVE          | `lights-selective`                                    |
-| `webgpu_lights_spotlight`                  | HAVE          | `lights-spotlight`                                    |
-| `webgpu_lines_fat`                         | HAVE          | `lines-fat`                                           |
-| `webgpu_lines_fat_raycasting`              | HAVE          | `lines-fat-raycasting`                                |
-| `webgpu_lines_fat_wireframe`               | HAVE          | `lines-fat-wireframe`                                 |
-| `webgpu_loader_gltf`                       | HAVE          | `loader-gltf`                                         |
-| `webgpu_loader_gltf_anisotropy`            | HAVE          | `loader-gltf-anisotropy`                              |
-| `webgpu_loader_gltf_compressed`            | HAVE          | `loader-gltf-compressed`                              |
-| `webgpu_loader_gltf_dispersion`            | HAVE          | `loader-gltf-dispersion`                              |
-| `webgpu_loader_gltf_iridescence`           | HAVE          | `loader-gltf-iridescence`                             |
-| `webgpu_loader_gltf_sheen`                 | HAVE          | `loader-gltf-sheen`                                   |
-| `webgpu_loader_gltf_transmission`          | HAVE          | `loader-gltf-transmission`                            |
-| `webgpu_loader_materialx`                  | HAVE          | `loader-materialx`                                    |
-| `webgpu_loader_texture_ktx2`               | HAVE          | `loader-texture-ktx2`                                 |
-| `webgpu_materials`                         | HAVE          | `materials`                                           |
-| `webgpu_materials_alphahash`               | HAVE          | `materials-alphahash`                                 |
-| `webgpu_materials_arrays`                  | HAVE          | `materials-arrays`                                    |
-| `webgpu_materials_basic`                   | HAVE          | `materials-basic`                                     |
-| `webgpu_materials_cubemap_mipmaps`         | HAVE          | `materials-cubemap-mipmaps`                           |
-| `webgpu_materials_displacementmap`         | HAVE          | `materials-displacementmap`                           |
-| `webgpu_materials_envmaps`                 | HAVE          | `materials-envmaps`                                   |
-| `webgpu_materials_envmaps_bpcem`           | HAVE          | `materials-envmaps-bpcem`                             |
-| `webgpu_materials_envmaps_groundprojected` | HAVE          | `materials-envmaps-groundprojected`                   |
-| `webgpu_materials_lightmap`                | HAVE          | `materials-lightmap`                                  |
-| `webgpu_materials_matcap`                  | HAVE          | `materials-matcap`                                    |
-| `webgpu_materials_sss`                     | HAVE          | `materials-sss`                                       |
-| `webgpu_materials_texture_html`            | HAVE          | `materials-texture-html`                              |
-| `webgpu_materials_texture_manualmipmap`    | HAVE          | `materials-texture-manualmipmap`                      |
-| `webgpu_materials_toon`                    | HAVE          | `materials-toon`                                      |
-| `webgpu_materials_transmission`            | HAVE          | `materials-transmission`                              |
-| `webgpu_materials_video`                   | HAVE          | `materials-video`                                     |
-| `webgpu_materialx_noise`                   | HAVE          | `materialx-noise`                                     |
-| `webgpu_mesh_batch`                        | HAVE          | `mesh-batch`                                          |
-| `webgpu_mirror`                            | HAVE          | `mirror`                                              |
-| `webgpu_modifier_curve`                    | HAVE          | `modifier-curve`                                      |
-| `webgpu_morphtargets`                      | HAVE          | `morphtargets`                                        |
-| `webgpu_morphtargets_face`                 | HAVE          | `morphtargets-face`                                   |
-| `webgpu_mrt`                               | HAVE          | `mrt`                                                 |
-| `webgpu_mrt_mask`                          | HAVE          | `mrt-mask`                                            |
-| `webgpu_multiple_canvas`                   | HAVE          | `multiple-canvas`                                     |
-| `webgpu_multiple_elements`                 | HAVE          | `multiple-elements`                                   |
-| `webgpu_multiple_rendertargets`            | HAVE          | `multiple-rendertargets`                              |
-| `webgpu_multiple_rendertargets_readback`   | HAVE          | `multiple-rendertargets-readback`                     |
-| `webgpu_occlusion`                         | HAVE          | `occlusion`                                           |
-| `webgpu_ocean`                             | HAVE          | `ocean`                                               |
-| `webgpu_parallax_uv`                       | HAVE          | `parallax-uv`                                         |
-| `webgpu_particles`                         | HAVE          | `particles`                                           |
-| `webgpu_pmrem_cubemap`                     | HAVE          | `pmrem-cubemap`                                       |
-| `webgpu_pmrem_equirectangular`             | HAVE          | `pmrem-equirectangular`                               |
-| `webgpu_pmrem_scene`                       | HAVE          | `pmrem-scene`                                         |
-| `webgpu_portal`                            | HAVE          | `portal`                                              |
-| `webgpu_postprocessing`                    | HAVE          | `postprocessing`                                      |
-| `webgpu_postprocessing_3dlut`              | HAVE          | `postprocessing-3dlut`                                |
-| `webgpu_postprocessing_afterimage`         | HAVE          | `postprocessing-afterimage`                           |
-| `webgpu_postprocessing_anamorphic`         | HAVE          | `postprocessing-anamorphic`                           |
-| `webgpu_postprocessing_ao`                 | HAVE          | `postprocessing-ao`                                   |
-| `webgpu_postprocessing_bloom`              | HAVE          | `postprocessing-bloom`                                |
-| `webgpu_postprocessing_bloom_emissive`     | HAVE          | `postprocessing-bloom-emissive`                       |
-| `webgpu_postprocessing_bloom_selective`    | HAVE          | `postprocessing-bloom-selective`                      |
-| `webgpu_postprocessing_ca`                 | HAVE          | `postprocessing-ca`                                   |
-| `webgpu_postprocessing_difference`         | HAVE          | `postprocessing-difference`                           |
-| `webgpu_postprocessing_dof`                | HAVE          | `postprocessing-dof`                                  |
-| `webgpu_postprocessing_dof_basic`          | HAVE          | `postprocessing-dof-basic`                            |
-| `webgpu_postprocessing_fxaa`               | HAVE          | `postprocessing-fxaa`                                 |
-| `webgpu_postprocessing_godrays`            | HAVE          | `postprocessing-godrays`                              |
-| `webgpu_postprocessing_lensflare`          | HAVE          | `postprocessing-lensflare`                            |
-| `webgpu_postprocessing_masking`            | HAVE          | `postprocessing-masking`                              |
-| `webgpu_postprocessing_motion_blur`        | HAVE          | `postprocessing-motion-blur`                          |
-| `webgpu_postprocessing_outline`            | HAVE          | `postprocessing-outline`                              |
-| `webgpu_postprocessing_pixel`              | HAVE          | `postprocessing-pixel`                                |
-| `webgpu_postprocessing_radial_blur`        | HAVE          | `postprocessing-radial-blur`                          |
-| `webgpu_postprocessing_retro`              | HAVE          | `postprocessing-retro`                                |
-| `webgpu_postprocessing_smaa`               | HAVE          | `postprocessing-smaa`                                 |
-| `webgpu_postprocessing_sobel`              | HAVE          | `postprocessing-sobel`                                |
-| `webgpu_postprocessing_ssaa`               | HAVE          | `postprocessing-ssaa`                                 |
-| `webgpu_postprocessing_ssgi`               | HAVE          | `postprocessing-ssgi`                                 |
-| `webgpu_postprocessing_ssgi_ballpool`      | HAVE          | `postprocessing-ssgi-ballpool`                        |
-| `webgpu_postprocessing_ssr`                | HAVE          | `postprocessing-ssr`                                  |
-| `webgpu_postprocessing_ssr_denoise`        | HAVE          | `postprocessing-ssr-denoise`                          |
-| `webgpu_postprocessing_sss`                | HAVE          | `postprocessing-sss`                                  |
-| `webgpu_postprocessing_traa`               | HAVE          | `postprocessing-traa`                                 |
-| `webgpu_postprocessing_transition`         | HAVE          | `postprocessing-transition`                           |
-| `webgpu_procedural_texture`                | HAVE          | `procedural-texture`                                  |
-| `webgpu_reflection`                        | HAVE          | `reflection`                                          |
-| `webgpu_reflection_blurred`                | HAVE          | `reflection-blurred`                                  |
-| `webgpu_reflection_roughness`              | HAVE          | `reflection-roughness`                                |
-| `webgpu_refraction`                        | HAVE          | `refraction`                                          |
-| `webgpu_rendertarget_2d-array_3d`          | HAVE          | `rendertarget-2d-array-3d`                            |
-| `webgpu_rtt`                               | HAVE          | `rtt`                                                 |
-| `webgpu_shadertoy`                         | HAVE          | `shadertoy`                                           |
-| `webgpu_shadow_contact`                    | HAVE          | `shadow-contact`                                      |
-| `webgpu_shadowmap`                         | HAVE          | `shadowmap`                                           |
-| `webgpu_shadowmap_array`                   | HAVE          | `shadowmap-array`                                     |
-| `webgpu_shadowmap_csm`                     | HAVE          | `shadowmap-csm`                                       |
-| `webgpu_shadowmap_opacity`                 | HAVE          | `shadowmap-opacity`                                   |
-| `webgpu_shadowmap_pointlight`              | HAVE          | `shadowmap-pointlight`                                |
-| `webgpu_shadowmap_progressive`             | HAVE          | `shadowmap-progressive`                               |
-| `webgpu_shadowmap_vsm`                     | HAVE          | `shadowmap-vsm`                                       |
-| `webgpu_skinning`                          | HAVE          | `skinning`                                            |
-| `webgpu_skinning_instancing`               | HAVE          | `skinning-instancing`                                 |
-| `webgpu_skinning_instancing_individual`    | HAVE          | `skinning-instancing-individual`                      |
-| `webgpu_skinning_points`                   | HAVE          | `skinning-points`                                     |
-| `webgpu_sky`                               | HAVE          | `sky`                                                 |
-| `webgpu_sprites`                           | HAVE          | `sprites`                                             |
-| `webgpu_storage_buffer`                    | HAVE          | `storage-buffer`                                      |
-| `webgpu_struct_drawindirect`               | HAVE          | `struct-drawindirect`                                 |
-| `webgpu_texturegather`                     | HAVE          | `texturegather`                                       |
-| `webgpu_texturegrad`                       | HAVE          | `texturegrad`                                         |
-| `webgpu_textures_2d-array`                 | HAVE          | `textures-2d-array`                                   |
-| `webgpu_textures_2d-array_compressed`      | HAVE          | `textures-2d-array-compressed`                        |
-| `webgpu_textures_anisotropy`               | HAVE          | `textures-anisotropy`                                 |
-| `webgpu_textures_partialupdate`            | HAVE          | `textures-partialupdate`                              |
-| `webgpu_tonemapping`                       | HAVE          | `tonemapping`                                         |
-| `webgpu_tsl_angular_slicing`               | HAVE          | `tsl-angular-slicing`                                 |
-| `webgpu_tsl_compute_attractors_particles`  | HAVE          | `tsl-compute-attractors-particles`                    |
-| `webgpu_tsl_earth`                         | HAVE          | `tsl-earth`                                           |
-| `webgpu_tsl_galaxy`                        | HAVE          | `tsl-galaxy`                                          |
-| `webgpu_tsl_halftone`                      | HAVE          | `tsl-halftone`                                        |
-| `webgpu_tsl_interoperability`              | HAVE          | `tsl-interoperability`                                |
-| `webgpu_tsl_procedural_terrain`            | HAVE          | `tsl-procedural-terrain`                              |
-| `webgpu_tsl_raging_sea`                    | HAVE          | `tsl-raging-sea`                                      |
-| `webgpu_tsl_vfx_flames`                    | HAVE          | `tsl-vfx-flames`                                      |
-| `webgpu_tsl_vfx_linkedparticles`           | HAVE          | `tsl-vfx-linkedparticles`                             |
-| `webgpu_tsl_vfx_tornado`                   | HAVE          | `tsl-vfx-tornado`                                     |
-| `webgpu_tsl_wood`                          | HAVE          | `tsl-wood`                                            |
-| `webgpu_upscaling_fsr1`                    | HAVE          | `upscaling-fsr1`                                      |
-| `webgpu_upscaling_taau`                    | HAVE          | `upscaling-taau`                                      |
-| `webgpu_video_frame`                       | HAVE          | `video-frame`                                         |
-| `webgpu_video_panorama`                    | HAVE          | `video-panorama`                                      |
-| `webgpu_volume_caustics`                   | HAVE          | `volume-caustics`                                     |
-| `webgpu_volume_cloud`                      | HAVE          | `volume-cloud`                                        |
-| `webgpu_volume_fire`                       | HAVE          | `volume-fire`                                         |
-| `webgpu_volume_lighting`                   | HAVE          | `volume-lighting`                                     |
-| `webgpu_volume_lighting_rectarea`          | HAVE          | `volume-lighting-rectarea`                            |
-| `webgpu_volume_lighting_traa`              | HAVE          | `volume-lighting-traa`                                |
-| `webgpu_volume_perlin`                     | HAVE          | `volume-perlin`                                       |
-| `webgpu_water`                             | HAVE          | `water`                                               |
-| `misc_controls_arcball`                    | HAVE (folded) | inside a combined example                             |
-| `misc_controls_fly`                        | HAVE (folded) | inside a combined example                             |
-| `misc_controls_map`                        | HAVE (folded) | inside a combined example                             |
-| `misc_controls_pointerlock`                | HAVE (folded) | inside a combined example                             |
-| `misc_controls_trackball`                  | HAVE (folded) | inside a combined example                             |
-| `misc_exporter_gltf_normals`               | HAVE (folded) | inside a combined example                             |
-| `misc_exporter_obj`                        | HAVE (folded) | inside a combined example                             |
-| `misc_exporter_ply`                        | HAVE (folded) | inside a combined example                             |
-| `misc_exporter_stl`                        | HAVE (folded) | inside a combined example                             |
-| `misc_exporter_usdz`                       | HAVE (folded) | inside a combined example                             |
-| `webgl_loader_texture_hdr`                 | HAVE (folded) | inside a combined example                             |
-| `webgl_loader_texture_ultrahdr`            | HAVE (folded) | inside a combined example                             |
-| `webaudio_orientation`                     | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webaudio_sandbox`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webaudio_timing`                          | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webaudio_visualizer`                      | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webgpu_compute_audio`                     | LATER         | final phase — webaudio — SPEC §4 out of scope for now |
-| `webgpu_xr_cubes`                          | LATER         | final phase — WebXR — SPEC §4 out of scope for now    |
-| `webgpu_xr_native_layers`                  | LATER         | final phase — WebXR — SPEC §4 out of scope for now    |
-| `webgpu_xr_rollercoaster`                  | LATER         | final phase — WebXR — SPEC §4 out of scope for now    |
-| `webxr_ar_camera_access`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_ar_cones`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_ar_hittest`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_ar_lighting`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_ar_plane_detection`                 | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_handinput`                       | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_handinput_cubes`                 | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_handinput_pointerclick`          | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_handinput_pointerdrag`           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_handinput_pressbutton`           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_handinput_profiles`              | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_layers`                          | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_panorama`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_panorama_depth`                  | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_rollercoaster`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_sandbox`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_teleport`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_vr_video`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_xr_ballshooter`                     | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_xr_controls_transform`              | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_xr_cubes`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_xr_dragging`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_xr_dragging_custom_depth`           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_xr_haptics`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_xr_marchingcubes`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
-| `webxr_xr_paint`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)              |
+| original                                   | status        | slug / reason                                      |
+| ------------------------------------------ | ------------- | -------------------------------------------------- |
+| `webgl_batch_lod_bvh`                      | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
+| `webgl_loader_3dtiles`                     | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
+| `webgl_loader_gltf_animation_pointer`      | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
+| `webgl_loader_gltf_progressive_lod`        | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
+| `webgl_morphtargets_webcam`                | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
+| `webgl_worker_offscreencanvas`             | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
+| `css2d_label`                              | HAVE          | `label`                                            |
+| `css3d_molecules`                          | HAVE          | `molecules`                                        |
+| `css3d_periodictable`                      | HAVE          | `periodictable`                                    |
+| `css3d_sprites`                            | HAVE          | `css3d-sprites`                                    |
+| `css3d_youtube`                            | HAVE          | `youtube`                                          |
+| `games_fps`                                | HAVE          | `fps`                                              |
+| `misc_animation_groups`                    | HAVE          | `animation-groups`                                 |
+| `misc_animation_keys`                      | HAVE          | `animation-keys`                                   |
+| `misc_boxselection`                        | HAVE          | `boxselection`                                     |
+| `misc_controls_drag`                       | HAVE          | `controls-drag`                                    |
+| `misc_controls_orbit`                      | HAVE          | `controls`                                         |
+| `misc_controls_transform`                  | HAVE          | `controls-transform`                               |
+| `misc_exporter_gltf`                       | HAVE          | `exporter`                                         |
+| `misc_raycaster_helper`                    | HAVE          | `raycaster-helper`                                 |
+| `physics_rapier_basic`                     | HAVE          | `rapier-basic`                                     |
+| `physics_rapier_character_controller`      | HAVE          | `rapier-character-controller`                      |
+| `physics_rapier_instancing`                | HAVE          | `rapier-instancing`                                |
+| `physics_rapier_joints`                    | HAVE          | `rapier-joints`                                    |
+| `physics_rapier_terrain`                   | HAVE          | `rapier-terrain`                                   |
+| `physics_rapier_vehicle_controller`        | HAVE          | `rapier-vehicle-controller`                        |
+| `webaudio_orientation`                     | HAVE          | `orientation`                                      |
+| `webaudio_sandbox`                         | HAVE          | `sandbox`                                          |
+| `webaudio_timing`                          | HAVE          | `timing`                                           |
+| `webaudio_visualizer`                      | HAVE          | `visualizer`                                       |
+| `webgl_animation_skinning_blending`        | HAVE          | `animation-skinning-blending`                      |
+| `webgl_animation_skinning_ik`              | HAVE          | `animation-skinning-ik`                            |
+| `webgl_animation_walk`                     | HAVE          | `animation-walk`                                   |
+| `webgl_clipping_stencil`                   | HAVE          | `clipping-stencil`                                 |
+| `webgl_decals`                             | HAVE          | `decals`                                           |
+| `webgl_geometries`                         | HAVE          | `geometries`                                       |
+| `webgl_geometry_colors_lookuptable`        | HAVE          | `geometry-colors-lookuptable`                      |
+| `webgl_geometry_convex`                    | HAVE          | `geometry-convex`                                  |
+| `webgl_geometry_csg`                       | HAVE          | `geometry-csg`                                     |
+| `webgl_geometry_minecraft`                 | HAVE          | `geometry-minecraft`                               |
+| `webgl_geometry_nurbs`                     | HAVE          | `geometry-nurbs`                                   |
+| `webgl_geometry_spline_editor`             | HAVE          | `geometry-spline-editor`                           |
+| `webgl_geometry_teapot`                    | HAVE          | `geometry-teapot`                                  |
+| `webgl_geometry_terrain_raycast`           | HAVE          | `geometry-terrain-raycast`                         |
+| `webgl_geometry_text`                      | HAVE          | `geometry-text`                                    |
+| `webgl_helpers`                            | HAVE          | `helpers`                                          |
+| `webgl_instancing_raycast`                 | HAVE          | `instancing-raycast`                               |
+| `webgl_instancing_scatter`                 | HAVE          | `instancing-scatter`                               |
+| `webgl_interactive_cubes`                  | HAVE          | `interactive-cubes`                                |
+| `webgl_interactive_cubes_gpu`              | HAVE          | `interactive-cubes-gpu`                            |
+| `webgl_interactive_voxelpainter`           | HAVE          | `interactive-voxelpainter`                         |
+| `webgl_lines_dashed`                       | HAVE          | `lines-dashed`                                     |
+| `webgl_loader_collada_kinematics`          | HAVE          | `loader-collada-kinematics`                        |
+| `webgl_loader_gltf_instancing`             | HAVE          | `loader-gltf-instancing`                           |
+| `webgl_loader_gltf_variants`               | HAVE          | `loader-gltf-variants`                             |
+| `webgl_loader_ldraw`                       | HAVE          | `loader-ldraw`                                     |
+| `webgl_loader_md2_control`                 | HAVE          | `loader-md2-control`                               |
+| `webgl_loader_pdb`                         | HAVE          | `loader-pdb`                                       |
+| `webgl_loader_svg`                         | HAVE          | `loader-svg`                                       |
+| `webgl_loader_texture_exr`                 | HAVE          | `texture-hdr-formats`                              |
+| `webgl_loader_texture_lottie`              | HAVE          | `texture-lottie`                                   |
+| `webgl_lod`                                | HAVE          | `lod`                                              |
+| `webgl_marchingcubes`                      | HAVE          | `marchingcubes`                                    |
+| `webgl_materials_blending`                 | HAVE          | `materials-blending`                               |
+| `webgl_materials_car`                      | HAVE          | `materials-car`                                    |
+| `webgl_materials_texture_canvas`           | HAVE          | `materials-texture-canvas`                         |
+| `webgl_modifier_edgesplit`                 | HAVE          | `modifier-edgesplit`                               |
+| `webgl_modifier_simplifier`                | HAVE          | `modifier-simplifier`                              |
+| `webgl_modifier_subdivision`               | HAVE          | `modifier-subdivision`                             |
+| `webgl_modifier_tessellation`              | HAVE          | `modifier-tessellation`                            |
+| `webgl_multiple_scenes_comparison`         | HAVE          | `multiple-scenes-comparison`                       |
+| `webgl_multiple_views`                     | HAVE          | `multiple-views`                                   |
+| `webgl_postprocessing_glitch`              | HAVE          | `postprocessing-glitch`                            |
+| `webgl_raycaster_bvh`                      | HAVE          | `raycaster-bvh`                                    |
+| `webgl_raycaster_texture`                  | HAVE          | `raycaster-texture`                                |
+| `webgpu_animation_retargeting`             | HAVE          | `animation-retargeting`                            |
+| `webgpu_animation_retargeting_readyplayer` | HAVE          | `animation-retargeting-readyplayer`                |
+| `webgpu_backdrop`                          | HAVE          | `backdrop`                                         |
+| `webgpu_backdrop_area`                     | HAVE          | `backdrop-area`                                    |
+| `webgpu_backdrop_water`                    | HAVE          | `backdrop-water`                                   |
+| `webgpu_camera`                            | HAVE          | `camera`                                           |
+| `webgpu_camera_array`                      | HAVE          | `camera-array`                                     |
+| `webgpu_camera_logarithmicdepthbuffer`     | HAVE          | `camera-logarithmicdepthbuffer`                    |
+| `webgpu_caustics`                          | HAVE          | `caustics`                                         |
+| `webgpu_clearcoat`                         | HAVE          | `clearcoat`                                        |
+| `webgpu_clipping`                          | HAVE          | `clipping`                                         |
+| `webgpu_compute_audio`                     | HAVE          | `compute-audio`                                    |
+| `webgpu_compute_birds`                     | HAVE          | `compute-birds`                                    |
+| `webgpu_compute_cloth`                     | HAVE          | `compute-cloth`                                    |
+| `webgpu_compute_geometry`                  | HAVE          | `compute-geometry`                                 |
+| `webgpu_compute_particles`                 | HAVE          | `compute-particles`                                |
+| `webgpu_compute_particles_fluid`           | HAVE          | `compute-particles-fluid`                          |
+| `webgpu_compute_particles_rain`            | HAVE          | `compute-particles-rain`                           |
+| `webgpu_compute_particles_snow`            | HAVE          | `compute-particles-snow`                           |
+| `webgpu_compute_points`                    | HAVE          | `compute-points`                                   |
+| `webgpu_compute_rasterizer`                | HAVE          | `compute-rasterizer`                               |
+| `webgpu_compute_rasterizer_ibl`            | HAVE          | `compute-rasterizer-ibl`                           |
+| `webgpu_compute_reduce`                    | HAVE          | `compute-reduce`                                   |
+| `webgpu_compute_sort_bitonic`              | HAVE          | `compute-sort-bitonic`                             |
+| `webgpu_compute_texture`                   | HAVE          | `compute-texture`                                  |
+| `webgpu_compute_texture_3d`                | HAVE          | `compute-texture-3d`                               |
+| `webgpu_compute_texture_pingpong`          | HAVE          | `compute-texture-pingpong`                         |
+| `webgpu_compute_water`                     | HAVE          | `compute-water`                                    |
+| `webgpu_cubemap_adjustments`               | HAVE          | `cubemap-adjustments`                              |
+| `webgpu_cubemap_dynamic`                   | HAVE          | `cubemap-dynamic`                                  |
+| `webgpu_cubemap_mix`                       | HAVE          | `cubemap-mix`                                      |
+| `webgpu_custom_fog`                        | HAVE          | `custom-fog`                                       |
+| `webgpu_custom_fog_background`             | HAVE          | `custom-fog-background`                            |
+| `webgpu_custom_fog_scattering`             | HAVE          | `custom-fog-scattering`                            |
+| `webgpu_depth_texture`                     | HAVE          | `depth-texture`                                    |
+| `webgpu_display_stereo`                    | HAVE          | `display-stereo`                                   |
+| `webgpu_equirectangular`                   | HAVE          | `equirectangular`                                  |
+| `webgpu_fog_height`                        | HAVE          | `fog-height`                                       |
+| `webgpu_generator_building`                | HAVE          | `generator-building`                               |
+| `webgpu_generator_city`                    | HAVE          | `generator-city`                                   |
+| `webgpu_geometry_loft`                     | HAVE          | `geometry-loft`                                    |
+| `webgpu_hdr`                               | HAVE          | `hdr`                                              |
+| `webgpu_instance_mesh`                     | HAVE          | `instance-mesh`                                    |
+| `webgpu_instance_path`                     | HAVE          | `instance-path`                                    |
+| `webgpu_instance_points`                   | HAVE          | `instance-points`                                  |
+| `webgpu_instance_sprites`                  | HAVE          | `instance-sprites`                                 |
+| `webgpu_instance_uniform`                  | HAVE          | `instance-uniform`                                 |
+| `webgpu_instancing_morph`                  | HAVE          | `instancing-morph`                                 |
+| `webgpu_layers`                            | HAVE          | `layers`                                           |
+| `webgpu_lensflares`                        | HAVE          | `lensflares`                                       |
+| `webgpu_lightprobe`                        | HAVE          | `lightprobe`                                       |
+| `webgpu_lightprobe_cubecamera`             | HAVE          | `lightprobe-cubecamera`                            |
+| `webgpu_lights_clustered`                  | HAVE          | `lights-clustered`                                 |
+| `webgpu_lights_custom`                     | HAVE          | `lights-custom`                                    |
+| `webgpu_lights_dynamic`                    | HAVE          | `lights-dynamic`                                   |
+| `webgpu_lights_ies_spotlight`              | HAVE          | `lights-ies-spotlight`                             |
+| `webgpu_lights_phong`                      | HAVE          | `lights-phong`                                     |
+| `webgpu_lights_physical`                   | HAVE          | `lights-physical`                                  |
+| `webgpu_lights_pointlights`                | HAVE          | `lights-pointlights`                               |
+| `webgpu_lights_projector`                  | HAVE          | `lights-projector`                                 |
+| `webgpu_lights_rectarealight`              | HAVE          | `lights-rectarealight`                             |
+| `webgpu_lights_selective`                  | HAVE          | `lights-selective`                                 |
+| `webgpu_lights_spotlight`                  | HAVE          | `lights-spotlight`                                 |
+| `webgpu_lines_fat`                         | HAVE          | `lines-fat`                                        |
+| `webgpu_lines_fat_raycasting`              | HAVE          | `lines-fat-raycasting`                             |
+| `webgpu_lines_fat_wireframe`               | HAVE          | `lines-fat-wireframe`                              |
+| `webgpu_loader_gltf`                       | HAVE          | `loader-gltf`                                      |
+| `webgpu_loader_gltf_anisotropy`            | HAVE          | `loader-gltf-anisotropy`                           |
+| `webgpu_loader_gltf_compressed`            | HAVE          | `loader-gltf-compressed`                           |
+| `webgpu_loader_gltf_dispersion`            | HAVE          | `loader-gltf-dispersion`                           |
+| `webgpu_loader_gltf_iridescence`           | HAVE          | `loader-gltf-iridescence`                          |
+| `webgpu_loader_gltf_sheen`                 | HAVE          | `loader-gltf-sheen`                                |
+| `webgpu_loader_gltf_transmission`          | HAVE          | `loader-gltf-transmission`                         |
+| `webgpu_loader_materialx`                  | HAVE          | `loader-materialx`                                 |
+| `webgpu_loader_texture_ktx2`               | HAVE          | `loader-texture-ktx2`                              |
+| `webgpu_materials`                         | HAVE          | `materials`                                        |
+| `webgpu_materials_alphahash`               | HAVE          | `materials-alphahash`                              |
+| `webgpu_materials_arrays`                  | HAVE          | `materials-arrays`                                 |
+| `webgpu_materials_basic`                   | HAVE          | `materials-basic`                                  |
+| `webgpu_materials_cubemap_mipmaps`         | HAVE          | `materials-cubemap-mipmaps`                        |
+| `webgpu_materials_displacementmap`         | HAVE          | `materials-displacementmap`                        |
+| `webgpu_materials_envmaps`                 | HAVE          | `materials-envmaps`                                |
+| `webgpu_materials_envmaps_bpcem`           | HAVE          | `materials-envmaps-bpcem`                          |
+| `webgpu_materials_envmaps_groundprojected` | HAVE          | `materials-envmaps-groundprojected`                |
+| `webgpu_materials_lightmap`                | HAVE          | `materials-lightmap`                               |
+| `webgpu_materials_matcap`                  | HAVE          | `materials-matcap`                                 |
+| `webgpu_materials_sss`                     | HAVE          | `materials-sss`                                    |
+| `webgpu_materials_texture_html`            | HAVE          | `materials-texture-html`                           |
+| `webgpu_materials_texture_manualmipmap`    | HAVE          | `materials-texture-manualmipmap`                   |
+| `webgpu_materials_toon`                    | HAVE          | `materials-toon`                                   |
+| `webgpu_materials_transmission`            | HAVE          | `materials-transmission`                           |
+| `webgpu_materials_video`                   | HAVE          | `materials-video`                                  |
+| `webgpu_materialx_noise`                   | HAVE          | `materialx-noise`                                  |
+| `webgpu_mesh_batch`                        | HAVE          | `mesh-batch`                                       |
+| `webgpu_mirror`                            | HAVE          | `mirror`                                           |
+| `webgpu_modifier_curve`                    | HAVE          | `modifier-curve`                                   |
+| `webgpu_morphtargets`                      | HAVE          | `morphtargets`                                     |
+| `webgpu_morphtargets_face`                 | HAVE          | `morphtargets-face`                                |
+| `webgpu_mrt`                               | HAVE          | `mrt`                                              |
+| `webgpu_mrt_mask`                          | HAVE          | `mrt-mask`                                         |
+| `webgpu_multiple_canvas`                   | HAVE          | `multiple-canvas`                                  |
+| `webgpu_multiple_elements`                 | HAVE          | `multiple-elements`                                |
+| `webgpu_multiple_rendertargets`            | HAVE          | `multiple-rendertargets`                           |
+| `webgpu_multiple_rendertargets_readback`   | HAVE          | `multiple-rendertargets-readback`                  |
+| `webgpu_occlusion`                         | HAVE          | `occlusion`                                        |
+| `webgpu_ocean`                             | HAVE          | `ocean`                                            |
+| `webgpu_parallax_uv`                       | HAVE          | `parallax-uv`                                      |
+| `webgpu_particles`                         | HAVE          | `particles`                                        |
+| `webgpu_pmrem_cubemap`                     | HAVE          | `pmrem-cubemap`                                    |
+| `webgpu_pmrem_equirectangular`             | HAVE          | `pmrem-equirectangular`                            |
+| `webgpu_pmrem_scene`                       | HAVE          | `pmrem-scene`                                      |
+| `webgpu_portal`                            | HAVE          | `portal`                                           |
+| `webgpu_postprocessing`                    | HAVE          | `postprocessing`                                   |
+| `webgpu_postprocessing_3dlut`              | HAVE          | `postprocessing-3dlut`                             |
+| `webgpu_postprocessing_afterimage`         | HAVE          | `postprocessing-afterimage`                        |
+| `webgpu_postprocessing_anamorphic`         | HAVE          | `postprocessing-anamorphic`                        |
+| `webgpu_postprocessing_ao`                 | HAVE          | `postprocessing-ao`                                |
+| `webgpu_postprocessing_bloom`              | HAVE          | `postprocessing-bloom`                             |
+| `webgpu_postprocessing_bloom_emissive`     | HAVE          | `postprocessing-bloom-emissive`                    |
+| `webgpu_postprocessing_bloom_selective`    | HAVE          | `postprocessing-bloom-selective`                   |
+| `webgpu_postprocessing_ca`                 | HAVE          | `postprocessing-ca`                                |
+| `webgpu_postprocessing_difference`         | HAVE          | `postprocessing-difference`                        |
+| `webgpu_postprocessing_dof`                | HAVE          | `postprocessing-dof`                               |
+| `webgpu_postprocessing_dof_basic`          | HAVE          | `postprocessing-dof-basic`                         |
+| `webgpu_postprocessing_fxaa`               | HAVE          | `postprocessing-fxaa`                              |
+| `webgpu_postprocessing_godrays`            | HAVE          | `postprocessing-godrays`                           |
+| `webgpu_postprocessing_lensflare`          | HAVE          | `postprocessing-lensflare`                         |
+| `webgpu_postprocessing_masking`            | HAVE          | `postprocessing-masking`                           |
+| `webgpu_postprocessing_motion_blur`        | HAVE          | `postprocessing-motion-blur`                       |
+| `webgpu_postprocessing_outline`            | HAVE          | `postprocessing-outline`                           |
+| `webgpu_postprocessing_pixel`              | HAVE          | `postprocessing-pixel`                             |
+| `webgpu_postprocessing_radial_blur`        | HAVE          | `postprocessing-radial-blur`                       |
+| `webgpu_postprocessing_retro`              | HAVE          | `postprocessing-retro`                             |
+| `webgpu_postprocessing_smaa`               | HAVE          | `postprocessing-smaa`                              |
+| `webgpu_postprocessing_sobel`              | HAVE          | `postprocessing-sobel`                             |
+| `webgpu_postprocessing_ssaa`               | HAVE          | `postprocessing-ssaa`                              |
+| `webgpu_postprocessing_ssgi`               | HAVE          | `postprocessing-ssgi`                              |
+| `webgpu_postprocessing_ssgi_ballpool`      | HAVE          | `postprocessing-ssgi-ballpool`                     |
+| `webgpu_postprocessing_ssr`                | HAVE          | `postprocessing-ssr`                               |
+| `webgpu_postprocessing_ssr_denoise`        | HAVE          | `postprocessing-ssr-denoise`                       |
+| `webgpu_postprocessing_sss`                | HAVE          | `postprocessing-sss`                               |
+| `webgpu_postprocessing_traa`               | HAVE          | `postprocessing-traa`                              |
+| `webgpu_postprocessing_transition`         | HAVE          | `postprocessing-transition`                        |
+| `webgpu_procedural_texture`                | HAVE          | `procedural-texture`                               |
+| `webgpu_reflection`                        | HAVE          | `reflection`                                       |
+| `webgpu_reflection_blurred`                | HAVE          | `reflection-blurred`                               |
+| `webgpu_reflection_roughness`              | HAVE          | `reflection-roughness`                             |
+| `webgpu_refraction`                        | HAVE          | `refraction`                                       |
+| `webgpu_rendertarget_2d-array_3d`          | HAVE          | `rendertarget-2d-array-3d`                         |
+| `webgpu_rtt`                               | HAVE          | `rtt`                                              |
+| `webgpu_shadertoy`                         | HAVE          | `shadertoy`                                        |
+| `webgpu_shadow_contact`                    | HAVE          | `shadow-contact`                                   |
+| `webgpu_shadowmap`                         | HAVE          | `shadowmap`                                        |
+| `webgpu_shadowmap_array`                   | HAVE          | `shadowmap-array`                                  |
+| `webgpu_shadowmap_csm`                     | HAVE          | `shadowmap-csm`                                    |
+| `webgpu_shadowmap_opacity`                 | HAVE          | `shadowmap-opacity`                                |
+| `webgpu_shadowmap_pointlight`              | HAVE          | `shadowmap-pointlight`                             |
+| `webgpu_shadowmap_progressive`             | HAVE          | `shadowmap-progressive`                            |
+| `webgpu_shadowmap_vsm`                     | HAVE          | `shadowmap-vsm`                                    |
+| `webgpu_skinning`                          | HAVE          | `skinning`                                         |
+| `webgpu_skinning_instancing`               | HAVE          | `skinning-instancing`                              |
+| `webgpu_skinning_instancing_individual`    | HAVE          | `skinning-instancing-individual`                   |
+| `webgpu_skinning_points`                   | HAVE          | `skinning-points`                                  |
+| `webgpu_sky`                               | HAVE          | `sky`                                              |
+| `webgpu_sprites`                           | HAVE          | `sprites`                                          |
+| `webgpu_storage_buffer`                    | HAVE          | `storage-buffer`                                   |
+| `webgpu_struct_drawindirect`               | HAVE          | `struct-drawindirect`                              |
+| `webgpu_texturegather`                     | HAVE          | `texturegather`                                    |
+| `webgpu_texturegrad`                       | HAVE          | `texturegrad`                                      |
+| `webgpu_textures_2d-array`                 | HAVE          | `textures-2d-array`                                |
+| `webgpu_textures_2d-array_compressed`      | HAVE          | `textures-2d-array-compressed`                     |
+| `webgpu_textures_anisotropy`               | HAVE          | `textures-anisotropy`                              |
+| `webgpu_textures_partialupdate`            | HAVE          | `textures-partialupdate`                           |
+| `webgpu_tonemapping`                       | HAVE          | `tonemapping`                                      |
+| `webgpu_tsl_angular_slicing`               | HAVE          | `tsl-angular-slicing`                              |
+| `webgpu_tsl_compute_attractors_particles`  | HAVE          | `tsl-compute-attractors-particles`                 |
+| `webgpu_tsl_earth`                         | HAVE          | `tsl-earth`                                        |
+| `webgpu_tsl_galaxy`                        | HAVE          | `tsl-galaxy`                                       |
+| `webgpu_tsl_halftone`                      | HAVE          | `tsl-halftone`                                     |
+| `webgpu_tsl_interoperability`              | HAVE          | `tsl-interoperability`                             |
+| `webgpu_tsl_procedural_terrain`            | HAVE          | `tsl-procedural-terrain`                           |
+| `webgpu_tsl_raging_sea`                    | HAVE          | `tsl-raging-sea`                                   |
+| `webgpu_tsl_vfx_flames`                    | HAVE          | `tsl-vfx-flames`                                   |
+| `webgpu_tsl_vfx_linkedparticles`           | HAVE          | `tsl-vfx-linkedparticles`                          |
+| `webgpu_tsl_vfx_tornado`                   | HAVE          | `tsl-vfx-tornado`                                  |
+| `webgpu_tsl_wood`                          | HAVE          | `tsl-wood`                                         |
+| `webgpu_upscaling_fsr1`                    | HAVE          | `upscaling-fsr1`                                   |
+| `webgpu_upscaling_taau`                    | HAVE          | `upscaling-taau`                                   |
+| `webgpu_video_frame`                       | HAVE          | `video-frame`                                      |
+| `webgpu_video_panorama`                    | HAVE          | `video-panorama`                                   |
+| `webgpu_volume_caustics`                   | HAVE          | `volume-caustics`                                  |
+| `webgpu_volume_cloud`                      | HAVE          | `volume-cloud`                                     |
+| `webgpu_volume_fire`                       | HAVE          | `volume-fire`                                      |
+| `webgpu_volume_lighting`                   | HAVE          | `volume-lighting`                                  |
+| `webgpu_volume_lighting_rectarea`          | HAVE          | `volume-lighting-rectarea`                         |
+| `webgpu_volume_lighting_traa`              | HAVE          | `volume-lighting-traa`                             |
+| `webgpu_volume_perlin`                     | HAVE          | `volume-perlin`                                    |
+| `webgpu_water`                             | HAVE          | `water`                                            |
+| `misc_controls_arcball`                    | HAVE (folded) | inside a combined example                          |
+| `misc_controls_fly`                        | HAVE (folded) | inside a combined example                          |
+| `misc_controls_map`                        | HAVE (folded) | inside a combined example                          |
+| `misc_controls_pointerlock`                | HAVE (folded) | inside a combined example                          |
+| `misc_controls_trackball`                  | HAVE (folded) | inside a combined example                          |
+| `misc_exporter_gltf_normals`               | HAVE (folded) | inside a combined example                          |
+| `misc_exporter_obj`                        | HAVE (folded) | inside a combined example                          |
+| `misc_exporter_ply`                        | HAVE (folded) | inside a combined example                          |
+| `misc_exporter_stl`                        | HAVE (folded) | inside a combined example                          |
+| `misc_exporter_usdz`                       | HAVE (folded) | inside a combined example                          |
+| `webgl_loader_texture_hdr`                 | HAVE (folded) | inside a combined example                          |
+| `webgl_loader_texture_ultrahdr`            | HAVE (folded) | inside a combined example                          |
+| `webgpu_xr_cubes`                          | LATER         | final phase — WebXR — SPEC §4 out of scope for now |
+| `webgpu_xr_native_layers`                  | LATER         | final phase — WebXR — SPEC §4 out of scope for now |
+| `webgpu_xr_rollercoaster`                  | LATER         | final phase — WebXR — SPEC §4 out of scope for now |
+| `webxr_ar_camera_access`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_ar_cones`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_ar_hittest`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_ar_lighting`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_ar_plane_detection`                 | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_handinput`                       | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_handinput_cubes`                 | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_handinput_pointerclick`          | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_handinput_pointerdrag`           | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_handinput_pressbutton`           | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_handinput_profiles`              | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_layers`                          | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_panorama`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_panorama_depth`                  | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_rollercoaster`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_sandbox`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_teleport`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_vr_video`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_xr_ballshooter`                     | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_xr_controls_transform`              | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_xr_cubes`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_xr_dragging`                        | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_xr_dragging_custom_depth`           | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_xr_haptics`                         | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_xr_marchingcubes`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
+| `webxr_xr_paint`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
 
 ## Not worth a page — the other 274
 

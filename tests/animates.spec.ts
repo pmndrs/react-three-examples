@@ -53,6 +53,9 @@ for (const { slug, ...meta } of selected) {
   // Ledgered defects (UPSTREAM.md brief) that this tier detects but which are
   // upstream's to fix — skip WITH the reason so they stay visible in reports.
   const animatesSkip = 'animatesSkip' in meta ? String(meta.animatesSkip) : undefined;
+  // startClick (AGENTS.md § Verification, startClick): see tests/smoke.spec.ts for why this needs
+  // a real click before readiness rather than any programmatic bypass.
+  const startClick = 'startClick' in meta ? String(meta.startClick) : undefined;
 
   test(`${slug}: ${isStatic ? 'static-by-design (live loop, clean console)' : 'animates'}`, async ({ page }) => {
     test.skip(Boolean(process.env.CI && ciSkip), ciSkip);
@@ -68,6 +71,7 @@ for (const { slug, ...meta } of selected) {
     });
 
     await page.goto(`/examples/${slug}`, { waitUntil: 'domcontentloaded' });
+    if (startClick) await page.click(startClick);
     await page.waitForFunction(() => window.__exampleReady === true, null, {
       timeout: process.env.CI ? 180_000 : 60_000,
     });

@@ -357,7 +357,10 @@ drei — no `import type { OrbitControls as Impl } from 'three/addons/…'` need
   prop to suppress the `lookAt`; that beats reaching for drei's
   `<PerspectiveCamera makeDefault>`, which adds a mount-order hazard against
   `useRenderPipeline` capturing `state.camera` (pattern: `postprocessing-ssgi-ballpool`).
-  Costs a screenshot round-trip to notice, because nothing errors.
+  Costs a screenshot round-trip to notice, because nothing errors. **It is permanent under
+  drei's `<FirstPersonControls>`**, which seeds its own look direction from the camera's
+  rotation at construction — `sandbox` (camera 25 units straight above the origin) rendered
+  black until the `rotation: [0, 0, 0]` escape hatch.
 - **Tone-mapping parity trap**: fiber defaults to ACESFilmic; three.js originals use
   the WebGPURenderer default (NoToneMapping) unless they set one. An unexamined
   default visibly mutes emissive palettes. Decide deliberately on every port and
@@ -707,6 +710,20 @@ updateOnFrame: true })}` on the Canvas. Default events fire only on pointer move
   `translate([0,50,0])` → NaN geometry (`computeBoundingSphere(): Computed radius is NaN`
   in smoke). Single-arg forms (`rotateX={once(x)}`) are fine. Until B42 lands, transform
   multi-arg geometry in a `useMemo` (pattern: `geometry-terrain-raycast`).
+- **`<audio>` lives OUTSIDE `<Canvas>`** — inside it fiber resolves the tag against the THREE
+  namespace (`Audio`), same collision family as `line`. Keep the DOM element a sibling of the
+  Canvas and hand a ref in. Two silent traps on the element: a `MediaElementAudioSourceNode`
+  outputs **zeros** unless the element has `crossOrigin="anonymous"` — the CDN sends CORS
+  headers, but a no-cors request taints the source and the only symptom is a console
+  warning; and `setMediaElementSource` may run ONCE per element, ever (a second call throws
+  `already connected to a different MediaElementSourceNode`), which StrictMode's remount
+  triggers on the same persisted element — guard on `audio.hasPlaybackControl`, which flips
+  to `false` after the first call (pattern: `orientation`, `visualizer`).
+- **`AudioContext` starts only from a trusted user gesture, and there is no muted escape**
+  like `video-panorama`'s `<video muted>`. Render the original's click-to-start overlay inside
+  the example with `<StartOverlay>` (`src/utils/StartOverlay.tsx`), resume the shared context
+  in its `onStart` (`resumeAudioContext()` — carries a documented cast, UPSTREAM B53), and
+  declare `"startClick"` in the manifest so the test tiers click it (§ Verification).
 - **`<line>` is `<threeLine>` — and `<threeLine>` needs `import '../../assets/ThreeLine'`.**
   fiber omits `line`, `path`, `audio` and `source` from `ThreeElements` (they collide with
   SVG/DOM intrinsics) and re-adds the first as `threeLine`; `<line>` compiles as an SVG
@@ -781,8 +798,8 @@ fn`, exactly like vanilla three's own `Object3D` API. Pattern: `clipping-stencil
   `src/examples/<category>/<slug>/<slug>.tsx` when the example needs several files
   (entry filename must match the folder). Routes stay `/examples/<slug>` — the slug is
   globally unique and the category never appears in the URL.
-- Categories (15): `animation` `camera` `compute` `geometry` `lights` `loaders`
-  `materials` `postprocessing` `reflections` `render-targets` `scene` `shadows`
+- Categories (17): `animation` `audio` `camera` `compute` `geometry` `lights` `loaders`
+  `materials` `physics` `postprocessing` `reflections` `render-targets` `scene` `shadows`
   `textures` `tsl` `volume`. Add one only if 3+ examples justify it.
 - A slug may equal its category (`camera`, `postprocessing`). Those live at
   `src/examples/camera/camera/camera.tsx` and
@@ -831,6 +848,12 @@ fn`, exactly like vanilla three's own `Object3D` API. Pattern: `clipping-stencil
 ## Verification
 
 Run for YOUR example only — `pnpm test:changed <slug>` (smoke + animates).
+
+An example gated behind a user-gesture overlay declares `"startClick": "<css selector>"` in
+the manifest; smoke, animates and `pnpm shot` click it right after navigation, BEFORE waiting
+on readiness. A real Playwright click is trusted input and satisfies Chromium's activation
+gate — no autoplay flag was needed (verified on the webaudio wave; `[data-start-click]` is
+`<StartOverlay>`'s selector).
 
 1. `npx tsc --noEmit && pnpm lint && pnpm build`
 2. **animates tier** — two-frame pixel diff + dual-root capture, catches freezes the
@@ -916,6 +939,14 @@ new patch, pin, or override lands with an UPSTREAM.md entry in the same commit.*
 
 ## Changelog
 
+- **2026-09-03 — v1.3, webaudio wave.** Dennis greenlit webaudio (SPEC §3/§4 had it with
+  WebXR as final-phase); five examples shipped in a new `audio` category, and the TSL editor /
+  transpiler / graph pages were excluded as internal tooling. Added: `<audio>` outside the
+  Canvas + the two silent `MediaElementSource` traps (CORS zeros, once-per-element under
+  StrictMode); `AudioContext` needs a real gesture → `<StartOverlay>` + the `startClick`
+  manifest field (§ Verification); fiber's default `lookAt` is permanent under
+  `<FirstPersonControls>`. Categories 15 → 17 (`physics` from wave 4 was never added here).
+  New UPSTREAM brief **B53** (`@types/three` `AudioContext.getContext()` return type).
 - **2026-09-02 — v1.2, amended by porting wave 3** (the last 31 examples; corpus 168 → 198).
   Three rules here were **wrong**, not merely incomplete, and each had already cost an agent:
   (1) _"addons with no `.d.ts` still typecheck, TS infers from JSDoc"_ — there is no

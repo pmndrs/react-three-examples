@@ -3960,5 +3960,76 @@
       "textures"
     ],
     "original": "https://threejs.org/examples/#webgl_loader_texture_lottie"
+  },
+  {
+    "slug": "orientation",
+    "title": "Audio / Orientation",
+    "category": "audio",
+    "tags": [
+      "audio",
+      "environment",
+      "fog",
+      "gltf",
+      "positional-audio",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#webaudio_orientation",
+    "credits": "music by skullbeatz; BoomBox model from the three.js examples",
+    "startClick": "[data-start-click]",
+    "static": true
+  },
+  {
+    "slug": "sandbox",
+    "title": "Audio / Sandbox",
+    "category": "audio",
+    "tags": [
+      "audio",
+      "fog",
+      "leva",
+      "positional-audio"
+    ],
+    "original": "https://threejs.org/examples/#webaudio_sandbox",
+    "credits": "music by larrylarrybb, skullbeatz and congusbongus",
+    "startClick": "[data-start-click]",
+    "static": true
+  },
+  {
+    "slug": "timing",
+    "title": "Audio / Timing",
+    "category": "audio",
+    "tags": [
+      "animation",
+      "audio",
+      "positional-audio",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#webaudio_timing",
+    "credits": "sound effect by michorvath",
+    "startClick": "[data-start-click]"
+  },
+  {
+    "slug": "visualizer",
+    "title": "Audio / Visualizer",
+    "category": "audio",
+    "tags": [
+      "audio",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webaudio_visualizer",
+    "credits": "music by skullbeatz",
+    "startClick": "[data-start-click]"
+  },
+  {
+    "slug": "compute-audio",
+    "title": "Audio / Compute Audio",
+    "category": "audio",
+    "tags": [
+      "audio",
+      "compute",
+      "instanced-array",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgpu_compute_audio",
+    "startClick": "[data-start-click]"
   }
 ]

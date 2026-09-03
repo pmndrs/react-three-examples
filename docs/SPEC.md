@@ -40,7 +40,8 @@ R3F is an AND with vanilla three.js, not an OR.
 - No ports of API/stress/capability tests, renderer internals, or the TSL editor /
   transpiler / graph pages — those are tooling UIs (Monaco, the Inspector), not scenes.
   Marked internal, not porting (Dennis, 2026-09-03; v1.1 had them as "later-phase").
-- WebXR and webaudio: explicitly out of scope for now — final-phase items if things go fast.
+- WebXR: explicitly out of scope for now — a final-phase item if things go fast. (webaudio was
+  in this clause until 2026-09-03; it is ported — `src/examples/audio/`.)
 - **Not pixel-parity with upstream.** Idiomatic-primary; divergence expected (§8).
 - Not a fork of the three.js examples — originals are linked, not vendored.
 
@@ -87,7 +88,8 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   **+ 47 loader-format gallery examples** (only glTF/KTX2/MaterialX have webgpu ports).
   Phase 2 = curate from the 34; the loader gallery is its own decision (❓ port all formats,
   or a representative set?). Ported to WebGPURenderer where feasible.
-- **Final phase (aspirational): WebXR (@react-three/xr), webaudio.** The TSL editor/
+- **Final phase (aspirational): WebXR (@react-three/xr).** webaudio shipped 2026-09-03
+  (5 examples, new `audio` category, `startClick` manifest field). The TSL editor/
   transpiler/graph pages are excluded outright (§3), not deferred.
 
 ## 5. Example format
@@ -310,4 +312,5 @@ name-matched webgpu counterpart — semantic dedup in progress, expected to shri
   `webgpu_tsl_transpiler`, `webgpu_tsl_graph`) moved from "later-phase project" to
   **excluded as internal tooling** — their UI (a Monaco editor, the Inspector's node graph)
   is the demo, so a port would be an editor product, not an example. The transpiler
-  runtime is already exercised by `shadertoy`. Final phase is now WebXR + webaudio only.
+  runtime is already exercised by `shadertoy`. Same day, webaudio was greenlit and ported
+  (§3/§4): final phase is now WebXR only.
