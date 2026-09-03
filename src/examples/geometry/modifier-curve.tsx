@@ -29,8 +29,8 @@ import { Suspense, useCallback, useLayoutEffect, useMemo, useRef, useState } fro
 import { CatmullRomCurve3, Mesh, MeshStandardNodeMaterial, NoToneMapping } from 'three/webgpu';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
 import { Flow } from 'three/addons/modifiers/CurveModifierGPU.js';
-import { Canvas, useFrame } from '@react-three/fiber/webgpu';
 import type { TransformControls as TransformControlsImpl } from 'three/addons/controls/TransformControls.js';
+import { Canvas, useFrame } from '@react-three/fiber/webgpu';
 import { TransformControls, useFont } from '@react-three/drei/webgpu';
 import type CameraControlsImpl from 'camera-controls';
 import '../../assets/ThreeLine';
