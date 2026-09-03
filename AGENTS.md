@@ -624,6 +624,10 @@ ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
 - `useLoader(Loader, [urls])` takes N resources in one call and returns N results.
 - Derived textures (clone/mutate of a loader result) must be `useMemo`'d off the
   loader's stable return.
+- **`<Html transform distanceFactor={400}>` is the CSS3DRenderer scale** — drei's ratio
+  is `(distanceFactor || 10) / 400`, so 400 makes 1 world unit = 1 CSS px, which is what
+  every `css3d_*` original assumes. Without it the elements come out at 1/40 scale
+  (pattern: `periodictable`, `molecules`).
 - **drei's `<TransformControls>` draws NO gizmo on three ≥ r169, so drag cannot work.**
   `TransformControls` is a `Controls` now, not an `Object3D`; the arrows live in
   `controls.getHelper()`, which the original adds with `scene.add(…)` and drei never adds
