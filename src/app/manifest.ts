@@ -1,6 +1,6 @@
 import examples from '../examples.json';
 
-// The 15 example categories (AGENTS.md § Files, routes, manifest). Examples live
+// The 16 example categories (AGENTS.md § Files, routes, manifest). Examples live
 // FLAT under src/examples/<slug>(/<slug>).tsx — there is no category folder to read
 // this from, so it's assigned in examples.json by scripts/generate-manifest.mjs
 // (see docs/SITE.md "Category data" for why).
@@ -12,6 +12,7 @@ export const CATEGORIES = [
   'lights',
   'loaders',
   'materials',
+  'physics',
   'postprocessing',
   'reflections',
   'render-targets',
@@ -33,6 +34,7 @@ export const categoryLabels: Record<Category, string> = {
   lights: 'Lights',
   loaders: 'Loaders',
   materials: 'Materials',
+  physics: 'Physics',
   postprocessing: 'Postprocessing',
   reflections: 'Reflections',
   'render-targets': 'Render Targets',
@@ -55,6 +57,7 @@ export const categoryAccent: Record<Category, string> = {
   lights: '#10b981',
   loaders: '#14b8a6',
   materials: '#06b6d4',
+  physics: '#0891b2',
   postprocessing: '#0ea5e9',
   reflections: '#3b82f6',
   'render-targets': '#6366f1',

@@ -508,6 +508,23 @@
     "original": "https://threejs.org/examples/#webgpu_clipping"
   },
   {
+    "slug": "exporter",
+    "title": "Exporter",
+    "category": "loaders",
+    "tags": [
+      "export",
+      "gltf",
+      "leva",
+      "obj",
+      "ply",
+      "shadows",
+      "stl",
+      "usdz"
+    ],
+    "original": "https://threejs.org/examples/#misc_exporter_gltf",
+    "static": true
+  },
+  {
     "slug": "loader-gltf",
     "title": "Loader / glTF",
     "category": "loaders",
@@ -1865,6 +1882,20 @@
     "static": true
   },
   {
+    "slug": "postprocessing-glitch",
+    "title": "Postprocessing / Glitch",
+    "category": "postprocessing",
+    "tags": [
+      "glitch",
+      "instancing",
+      "leva",
+      "postprocessing",
+      "render-pipeline",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgl_postprocessing_glitch"
+  },
+  {
     "slug": "postprocessing-fxaa",
     "title": "Postprocessing / FXAA",
     "category": "postprocessing",
@@ -2465,6 +2496,31 @@
     "original": "https://threejs.org/examples/#webgpu_camera_logarithmicdepthbuffer"
   },
   {
+    "slug": "multiple-views",
+    "title": "Multiple Views",
+    "category": "camera",
+    "tags": [
+      "camera",
+      "phase-render",
+      "viewport"
+    ],
+    "original": "https://threejs.org/examples/#webgl_multiple_views",
+    "static": true
+  },
+  {
+    "slug": "multiple-scenes-comparison",
+    "title": "Multiple Scenes Comparison",
+    "category": "camera",
+    "tags": [
+      "camera",
+      "orbit-controls",
+      "phase-render",
+      "wireframe"
+    ],
+    "original": "https://threejs.org/examples/#webgl_multiple_scenes_comparison",
+    "static": true
+  },
+  {
     "slug": "custom-fog-background",
     "title": "Custom Fog Background",
     "category": "scene",
@@ -2672,6 +2728,35 @@
     "static": true
   },
   {
+    "slug": "geometry-spline-editor",
+    "title": "Geometry / Spline Editor",
+    "category": "geometry",
+    "tags": [
+      "geometry",
+      "interaction",
+      "leva",
+      "shadows",
+      "transform-controls"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_spline_editor",
+    "static": true
+  },
+  {
+    "slug": "marchingcubes",
+    "title": "Marching Cubes",
+    "category": "geometry",
+    "tags": [
+      "cubemap",
+      "geometry",
+      "leva",
+      "node-material",
+      "toon",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgl_marchingcubes",
+    "credits": "MarchingCubes addon by alteredq; Swedish Royal Castle cube map and UV grid from the three.js examples"
+  },
+  {
     "slug": "modifier-curve",
     "title": "Modifier / Curve",
     "category": "geometry",
@@ -2685,6 +2770,62 @@
     ],
     "original": "https://threejs.org/examples/#webgpu_modifier_curve",
     "credits": "CurveModifierGPU (Flow) addon and helvetiker font from the three.js examples"
+  },
+  {
+    "slug": "modifier-edgesplit",
+    "title": "Modifier / Edge Split",
+    "category": "geometry",
+    "tags": [
+      "geometry",
+      "leva",
+      "loader",
+      "node-material",
+      "obj"
+    ],
+    "original": "https://threejs.org/examples/#webgl_modifier_edgesplit",
+    "credits": "Cerberus model by Andrew Maximov, from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "modifier-simplifier",
+    "title": "Modifier / Simplifier",
+    "category": "geometry",
+    "tags": [
+      "geometry",
+      "gltf",
+      "loader"
+    ],
+    "original": "https://threejs.org/examples/#webgl_modifier_simplifier",
+    "credits": "Lee Perry-Smith head scan (Infinite Realities), from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "modifier-subdivision",
+    "title": "Modifier / Subdivision",
+    "category": "geometry",
+    "tags": [
+      "geometry",
+      "leva",
+      "node-material",
+      "wireframe"
+    ],
+    "original": "https://threejs.org/examples/#webgl_modifier_subdivision",
+    "credits": "Loop subdivision by three-subdivide (Stephens Nunnally); UV grid texture from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "modifier-tessellation",
+    "title": "Modifier / Tessellation",
+    "category": "geometry",
+    "tags": [
+      "displacement",
+      "geometry",
+      "node-material",
+      "text",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgl_modifier_tessellation",
+    "credits": "helvetiker font from the three.js examples"
   },
   {
     "slug": "particles",
@@ -3073,5 +3214,751 @@
     ],
     "original": "https://threejs.org/examples/#webgpu_postprocessing_transition",
     "credits": "transition wipe textures from the three.js examples; original implementation by fernandojsg"
+  },
+  {
+    "slug": "interactive-cubes",
+    "title": "Interactive / Cubes",
+    "category": "scene",
+    "tags": [
+      "interaction",
+      "pointer",
+      "raycasting",
+      "scene"
+    ],
+    "original": "https://threejs.org/examples/#webgl_interactive_cubes"
+  },
+  {
+    "slug": "rapier-basic",
+    "title": "Physics / Rapier Basic",
+    "category": "physics",
+    "tags": [
+      "leva",
+      "physics",
+      "rapier",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#physics_rapier_basic"
+  },
+  {
+    "slug": "instancing-scatter",
+    "title": "Instancing Scatter",
+    "category": "scene",
+    "tags": [
+      "gltf",
+      "instancing",
+      "leva"
+    ],
+    "original": "https://threejs.org/examples/#webgl_instancing_scatter",
+    "credits": "Flower model from the three.js examples"
+  },
+  {
+    "slug": "instancing-raycast",
+    "title": "Instancing Raycast",
+    "category": "scene",
+    "tags": [
+      "instancing",
+      "interaction",
+      "leva",
+      "pointer",
+      "raycasting"
+    ],
+    "original": "https://threejs.org/examples/#webgl_instancing_raycast",
+    "static": true
+  },
+  {
+    "slug": "rapier-instancing",
+    "title": "Physics / Rapier Instancing",
+    "category": "physics",
+    "tags": [
+      "instancing",
+      "leva",
+      "physics",
+      "rapier",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#physics_rapier_instancing"
+  },
+  {
+    "slug": "rapier-joints",
+    "title": "Physics / Rapier Joints",
+    "category": "physics",
+    "tags": [
+      "leva",
+      "physics",
+      "rapier",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#physics_rapier_joints"
+  },
+  {
+    "slug": "interactive-cubes-gpu",
+    "title": "Interactive / Cubes GPU",
+    "category": "scene",
+    "tags": [
+      "gpu-cpu",
+      "interaction",
+      "readback",
+      "render-target",
+      "tsl"
+    ],
+    "original": "https://threejs.org/examples/#webgl_interactive_cubes_gpu",
+    "static": true
+  },
+  {
+    "slug": "interactive-voxelpainter",
+    "title": "Interactive / Voxel Painter",
+    "category": "scene",
+    "tags": [
+      "interaction",
+      "pointer",
+      "raycasting",
+      "scene"
+    ],
+    "original": "https://threejs.org/examples/#webgl_interactive_voxelpainter",
+    "static": true
+  },
+  {
+    "slug": "raycaster-texture",
+    "title": "Raycaster / Texture",
+    "category": "scene",
+    "tags": [
+      "canvas-texture",
+      "interaction",
+      "leva",
+      "pointer",
+      "raycasting",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgl_raycaster_texture",
+    "static": true
+  },
+  {
+    "slug": "decals",
+    "title": "Decals",
+    "category": "geometry",
+    "tags": [
+      "drei",
+      "geometry",
+      "gltf",
+      "interaction",
+      "leva",
+      "pointer"
+    ],
+    "original": "https://threejs.org/examples/#webgl_decals",
+    "credits": "Lee Perry-Smith head scan (CC-BY 3.0), from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "geometry-text",
+    "title": "Geometry / Text",
+    "category": "geometry",
+    "tags": [
+      "drei",
+      "fog",
+      "geometry",
+      "interaction",
+      "leva",
+      "text"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_text",
+    "static": true
+  },
+  {
+    "slug": "geometries",
+    "title": "Geometries",
+    "category": "geometry",
+    "tags": [
+      "basics",
+      "geometry",
+      "phong",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometries"
+  },
+  {
+    "slug": "geometry-convex",
+    "title": "Geometry / Convex",
+    "category": "geometry",
+    "tags": [
+      "geometry",
+      "points",
+      "sprites"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_convex"
+  },
+  {
+    "slug": "geometry-nurbs",
+    "title": "Geometry / NURBS",
+    "category": "geometry",
+    "tags": [
+      "geometry",
+      "lines",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_nurbs",
+    "static": true
+  },
+  {
+    "slug": "geometry-csg",
+    "title": "Geometry / CSG",
+    "category": "geometry",
+    "tags": [
+      "animation",
+      "geometry",
+      "leva",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_csg",
+    "credits": "three-bvh-csg by Garrett Johnson (MIT)"
+  },
+  {
+    "slug": "geometry-colors-lookuptable",
+    "title": "Geometry / Colors Lookup Table",
+    "category": "geometry",
+    "tags": [
+      "canvas-texture",
+      "drei",
+      "geometry",
+      "leva",
+      "loader",
+      "sprites"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_colors_lookuptable",
+    "static": true
+  },
+  {
+    "slug": "geometry-teapot",
+    "title": "Geometry / Teapot",
+    "category": "geometry",
+    "tags": [
+      "cubemap",
+      "geometry",
+      "leva",
+      "phong",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_teapot",
+    "credits": "Teapot geometry from Udacity Interactive 3D Graphics, via the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "lines-dashed",
+    "title": "Lines / Dashed",
+    "category": "geometry",
+    "tags": [
+      "fog",
+      "geometry",
+      "line-material",
+      "lines"
+    ],
+    "original": "https://threejs.org/examples/#webgl_lines_dashed"
+  },
+  {
+    "slug": "rapier-character-controller",
+    "title": "Physics / Rapier Character Controller",
+    "category": "physics",
+    "tags": [
+      "keyboard",
+      "leva",
+      "physics",
+      "rapier",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#physics_rapier_character_controller"
+  },
+  {
+    "slug": "rapier-vehicle-controller",
+    "title": "Physics / Rapier Vehicle Controller",
+    "category": "physics",
+    "tags": [
+      "keyboard",
+      "leva",
+      "physics",
+      "rapier",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#physics_rapier_vehicle_controller"
+  },
+  {
+    "slug": "rapier-terrain",
+    "title": "Physics / Rapier Terrain",
+    "category": "physics",
+    "tags": [
+      "physics",
+      "rapier",
+      "shadows",
+      "terrain"
+    ],
+    "original": "https://threejs.org/examples/#physics_rapier_terrain",
+    "animationWindowMs": 5000
+  },
+  {
+    "slug": "raycaster-bvh",
+    "title": "Raycaster / BVH",
+    "category": "scene",
+    "tags": [
+      "fbx",
+      "instancing",
+      "leva",
+      "lines",
+      "performance",
+      "raycasting"
+    ],
+    "original": "https://threejs.org/examples/#webgl_raycaster_bvh",
+    "credits": "Stanford bunny FBX from the three.js examples; three-mesh-bvh by Garrett Johnson"
+  },
+  {
+    "slug": "geometry-terrain-raycast",
+    "title": "Geometry / Terrain Raycast",
+    "category": "geometry",
+    "tags": [
+      "canvas-texture",
+      "geometry",
+      "interaction",
+      "noise",
+      "pointer",
+      "raycasting",
+      "terrain"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_terrain_raycast",
+    "static": true
+  },
+  {
+    "slug": "fps",
+    "title": "Physics / FPS",
+    "category": "physics",
+    "tags": [
+      "collision",
+      "fog",
+      "gltf",
+      "instancing",
+      "keyboard",
+      "leva",
+      "physics",
+      "pointer",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#games_fps",
+    "credits": "collision-world.glb from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "geometry-minecraft",
+    "title": "Geometry / Minecraft",
+    "category": "geometry",
+    "tags": [
+      "drei",
+      "geometry",
+      "geometry-groups",
+      "noise",
+      "terrain",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgl_geometry_minecraft",
+    "credits": "Painterly Pack texture atlas, from the three.js examples",
+    "static": true
+  },
+  {
+    "slug": "animation-walk",
+    "title": "Animation / Walk",
+    "category": "animation",
+    "tags": [
+      "animation",
+      "environment",
+      "gltf",
+      "keyboard",
+      "leva",
+      "shadows",
+      "skinning"
+    ],
+    "original": "https://threejs.org/examples/#webgl_animation_walk",
+    "credits": "Soldier model from mixamo.com"
+  },
+  {
+    "slug": "controls",
+    "title": "Camera / Controls",
+    "category": "camera",
+    "tags": [
+      "camera",
+      "controls",
+      "drei",
+      "instancing",
+      "keyboard",
+      "leva"
+    ],
+    "original": "https://threejs.org/examples/#misc_controls_orbit",
+    "static": true
+  },
+  {
+    "slug": "controls-transform",
+    "title": "Camera / Transform Controls",
+    "category": "camera",
+    "tags": [
+      "camera",
+      "drei",
+      "keyboard",
+      "leva",
+      "textures",
+      "transform-controls"
+    ],
+    "original": "https://threejs.org/examples/#misc_controls_transform",
+    "static": true
+  },
+  {
+    "slug": "label",
+    "title": "CSS2D Label",
+    "category": "scene",
+    "tags": [
+      "animation",
+      "drei",
+      "html",
+      "leva",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#css2d_label",
+    "credits": "Earth and Moon textures from the three.js examples"
+  },
+  {
+    "slug": "controls-drag",
+    "title": "Scene / Drag Controls",
+    "category": "scene",
+    "tags": [
+      "drei",
+      "interaction",
+      "pointer",
+      "scene",
+      "shadows",
+      "spot-light"
+    ],
+    "original": "https://threejs.org/examples/#misc_controls_drag",
+    "static": true
+  },
+  {
+    "slug": "boxselection",
+    "title": "Scene / Box Selection",
+    "category": "scene",
+    "tags": [
+      "drei",
+      "interaction",
+      "pointer",
+      "scene",
+      "shadows",
+      "spot-light"
+    ],
+    "original": "https://threejs.org/examples/#misc_boxselection",
+    "static": true
+  },
+  {
+    "slug": "raycaster-helper",
+    "title": "Scene / Raycaster Helper",
+    "category": "scene",
+    "tags": [
+      "animation",
+      "instancing",
+      "lines",
+      "raycasting",
+      "scene"
+    ],
+    "original": "https://threejs.org/examples/#misc_raycaster_helper"
+  },
+  {
+    "slug": "lod",
+    "title": "Scene / Level of Detail",
+    "category": "scene",
+    "tags": [
+      "drei",
+      "fog",
+      "lod",
+      "scene",
+      "wireframe"
+    ],
+    "original": "https://threejs.org/examples/#webgl_lod",
+    "static": true
+  },
+  {
+    "slug": "helpers",
+    "title": "Scene / Helpers",
+    "category": "scene",
+    "tags": [
+      "animation",
+      "drei",
+      "gltf",
+      "normals",
+      "point-light",
+      "scene",
+      "wireframe"
+    ],
+    "original": "https://threejs.org/examples/#webgl_helpers",
+    "credits": "Lee Perry-Smith head model (CC-BY 3.0), from the three.js examples"
+  },
+  {
+    "slug": "periodictable",
+    "title": "CSS3D Periodic Table",
+    "category": "scene",
+    "tags": [
+      "animation",
+      "drei",
+      "html",
+      "leva"
+    ],
+    "original": "https://threejs.org/examples/#css3d_periodictable",
+    "static": true
+  },
+  {
+    "slug": "materials-blending",
+    "title": "Materials / Blending",
+    "category": "materials",
+    "tags": [
+      "blending",
+      "canvas-texture",
+      "materials",
+      "textures",
+      "transparency"
+    ],
+    "original": "https://threejs.org/examples/#webgl_materials_blending"
+  },
+  {
+    "slug": "molecules",
+    "title": "CSS3D Molecules",
+    "category": "scene",
+    "tags": [
+      "animation",
+      "drei",
+      "html",
+      "leva",
+      "loader"
+    ],
+    "original": "https://threejs.org/examples/#css3d_molecules",
+    "credits": "PDB models and ball sprite from the three.js examples"
+  },
+  {
+    "slug": "css3d-sprites",
+    "title": "CSS3D Sprites",
+    "category": "scene",
+    "tags": [
+      "animation",
+      "drei",
+      "html",
+      "sprites"
+    ],
+    "original": "https://threejs.org/examples/#css3d_sprites",
+    "credits": "sprite.png from the three.js examples"
+  },
+  {
+    "slug": "materials-car",
+    "title": "Materials / Car",
+    "category": "materials",
+    "tags": [
+      "clearcoat",
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "materials",
+      "physical",
+      "transmission"
+    ],
+    "original": "https://threejs.org/examples/#webgl_materials_car",
+    "credits": "Ferrari 458 Italia model by vicent091036, HDR by Poly Haven — both from the three.js examples"
+  },
+  {
+    "slug": "clipping-stencil",
+    "title": "Clipping / Stencil",
+    "category": "materials",
+    "tags": [
+      "clipping",
+      "leva",
+      "shadows",
+      "stencil"
+    ],
+    "original": "https://threejs.org/examples/#webgl_clipping_stencil"
+  },
+  {
+    "slug": "animation-skinning-ik",
+    "title": "Animation / Skinning / IK",
+    "category": "animation",
+    "tags": [
+      "animation",
+      "cube-camera",
+      "gltf",
+      "interaction",
+      "leva",
+      "skinning",
+      "transform-controls"
+    ],
+    "original": "https://threejs.org/examples/#webgl_animation_skinning_ik",
+    "credits": "Kira model from the three.js examples"
+  },
+  {
+    "slug": "youtube",
+    "title": "CSS3D YouTube",
+    "category": "scene",
+    "tags": [
+      "drei",
+      "html",
+      "interaction"
+    ],
+    "original": "https://threejs.org/examples/#css3d_youtube",
+    "static": true
+  },
+  {
+    "slug": "loader-gltf-variants",
+    "title": "Loaders / glTF Material Variants",
+    "category": "loaders",
+    "tags": [
+      "environment",
+      "gltf",
+      "hdr",
+      "leva",
+      "loader",
+      "materials"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_gltf_variants",
+    "credits": "MaterialsVariantsShoe by Shopify (CC-BY 4.0), from the glTF Sample Assets",
+    "static": true
+  },
+  {
+    "slug": "loader-gltf-instancing",
+    "title": "Loaders / glTF GPU Instancing",
+    "category": "loaders",
+    "tags": [
+      "environment",
+      "gltf",
+      "hdr",
+      "instancing",
+      "loader",
+      "ultrahdr"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_gltf_instancing",
+    "credits": "Damaged Helmet by theblueturtle_ (CC-BY-NC), from the glTF Sample Assets; Royal Esplanade HDRI from Poly Haven",
+    "static": true
+  },
+  {
+    "slug": "materials-texture-canvas",
+    "title": "Materials / Texture Canvas",
+    "category": "textures",
+    "tags": [
+      "canvas-texture",
+      "interaction",
+      "pointer",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgl_materials_texture_canvas"
+  },
+  {
+    "slug": "loader-ldraw",
+    "title": "Loaders / LDraw",
+    "category": "loaders",
+    "tags": [
+      "environment",
+      "leva",
+      "loader"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_ldraw",
+    "credits": "LDraw Parts Library, CC BY 2.0 (ldraw.org)",
+    "static": true
+  },
+  {
+    "slug": "loader-collada-kinematics",
+    "title": "Loaders / COLLADA Kinematics",
+    "category": "loaders",
+    "tags": [
+      "animation",
+      "collada",
+      "kinematics",
+      "loader"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_collada_kinematics",
+    "credits": "ABB IRB 52 robot model from the three.js examples"
+  },
+  {
+    "slug": "loader-md2-control",
+    "title": "Loaders / MD2 Control",
+    "category": "loaders",
+    "tags": [
+      "animation",
+      "loader",
+      "morph-targets",
+      "shadows"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_md2_control",
+    "credits": "Ogro MD2 model from id Software, via the three.js examples"
+  },
+  {
+    "slug": "loader-pdb",
+    "title": "Loaders / PDB Molecules",
+    "category": "loaders",
+    "tags": [
+      "animation",
+      "drei",
+      "html",
+      "leva",
+      "loader"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_pdb",
+    "credits": "PDB molecule models from the three.js examples"
+  },
+  {
+    "slug": "loader-svg",
+    "title": "Loaders / SVG",
+    "category": "loaders",
+    "tags": [
+      "leva",
+      "loader",
+      "svg"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_svg",
+    "static": true
+  },
+  {
+    "slug": "texture-hdr-formats",
+    "title": "Textures / HDR Formats",
+    "category": "textures",
+    "tags": [
+      "environment",
+      "exr",
+      "hdr",
+      "leva",
+      "loader",
+      "textures",
+      "ultrahdr"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_texture_exr",
+    "credits": "Memorial HDR/EXR images by Paul Debevec; Spruit Sunrise HDRI from Poly Haven, converted to UltraHDR",
+    "static": true
+  },
+  {
+    "slug": "animation-groups",
+    "title": "Animation / Groups",
+    "category": "animation",
+    "tags": [
+      "animation",
+      "basics"
+    ],
+    "original": "https://threejs.org/examples/#misc_animation_groups"
+  },
+  {
+    "slug": "animation-keys",
+    "title": "Animation / Keys",
+    "category": "animation",
+    "tags": [
+      "animation",
+      "basics"
+    ],
+    "original": "https://threejs.org/examples/#misc_animation_keys"
+  },
+  {
+    "slug": "texture-lottie",
+    "title": "Textures / Lottie",
+    "category": "textures",
+    "tags": [
+      "canvas-texture",
+      "environment",
+      "loader",
+      "lottie",
+      "pmrem",
+      "textures"
+    ],
+    "original": "https://threejs.org/examples/#webgl_loader_texture_lottie"
   }
 ]

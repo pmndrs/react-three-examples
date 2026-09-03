@@ -111,6 +111,16 @@ frame. Drive those from a uniform and leave the panel out of it.
 Corollary: several `useEffect`s pointed at the same object is a smell. It usually
 means state was lifted too far and is being reassembled.
 
+**leva's `button()` callback's `get` is `store.get` directly** (verified:
+`leva/dist/leva.esm.js:1379,1425` — `onClick: () => onClick(store.get)`), NOT the
+folder-aware `get` that `useControls`'s object-return form gives you (that one maps a
+bare sibling key through `mappedPaths` first). Inside a NAMED folder
+(`useControls('Export', () => ({ format: …, export: button((get) => …) }))`), the bare
+key `get('format')` resolves to `undefined` — silently, no error — because the store's
+real path is `'Export.format'`. Use the fully-qualified path inside a `button()` callback
+whenever the schema lives in a named folder. Cost `exporter` a real bug: every click of
+Export silently no-opped (found by the interactive click-through, not either test tier).
+
 **When TWO siblings consume the same value**, it stays at their shared parent — one hop
 up, passed down. Do not duplicate the `useControls` call: the same leva key registered
 twice renders two sliders. "Next to its consumer" means _as close as it can go_, not
@@ -203,6 +213,10 @@ We are comparing _this demo_ to _that demo_. A leva selector that triples the co
 a net loss even if it's fun. Add controls only where the original had GUI, or where
 one slider makes a hidden constant explorable. If a control forces state lifting,
 registries, or instance plumbing, it is not worth it — drop it.
+
+**A read-only leva "info" field (`editable: false`) is not covered by the constant-explorable
+clause.** That clause is for a slider the visitor can move; a display-only readout is a new
+UI element with no corpus precedent. If the original shows nothing there, we show nothing.
 
 ## 5. Types come from the elements, never hand-written
 
@@ -362,6 +376,16 @@ drei — no `import type { OrbitControls as Impl } from 'three/addons/…'` need
 - `setViewport`/`setScissor` y-origin is **TOP-left** on WebGPU, unlike WebGL.
   Originals doing bottom-origin inset math land in the wrong corner — recompute
   (pattern: `lines-fat/InsetView.tsx`).
+- **Scissor/viewport state must be re-asserted every frame inside a `phase: 'render'`
+  callback.** `setScissorTest`/`setScissor`/`setViewport` are plain mutable fields on the
+  renderer's `CanvasTarget` (`renderers/common/CanvasTarget.js:78,269-314`) that three
+  reads fresh at the top of every `render()` call (`renderers/common/Renderer.js:1617-1648`)
+  — nothing in three auto-resets them between frames. What DOES turn `scissorTest` back off
+  is a multi-region compositor's own end-of-loop `setScissorTest(false)` (both
+  `multiple-scenes-comparison` and `multiple-views` call it once after their per-view
+  render loop, matching the vanilla originals) — so the NEXT frame has to turn it back on
+  itself. A one-time `useEffect` `setScissorTest(true)` only ever covers frame 1;
+  `lines-fat/InsetView.tsx` already re-asserts every frame.
 - **`state.pointer` is (0,0) until the first pointer event.** For fields that must be
   off-scene when idle, track the pointer from events instead (invisible plane +
   `onPointerMove`) — otherwise "no signal yet" reads as "at the origin".
@@ -421,6 +445,11 @@ drei — no `import type { OrbitControls as Impl } from 'three/addons/…'` need
   WebGPU renderer — **prefer it**. Only a custom TSL fog graph needs `scene.fogNode`
   (which needs a documented cast — `@types/three` doesn't declare it).
 - Node materials are auto-extended: `<meshStandardNodeMaterial>` just works.
+- **`material.clippingPlanes` is inert on the WebGPU renderer.** `ClippingContext.update()`
+  reads `clippingGroup.clippingPlanes` (`renderers/common/ClippingContext.js:188`) —
+  nothing in `renderers/common/*` ever reads `material.clippingPlanes`; that field is only
+  consulted by the legacy `renderers/webgl/WebGLClipping.js`. Only a `<clippingGroup>`
+  ancestor clips on WebGPU. Pattern: `clipping-stencil`, `camera/clipping`.
 
 ### Known typed-TSL gaps (cast, with a comment, and check UPSTREAM first)
 
@@ -725,6 +754,22 @@ declaration file`. (Verified — an earlier version of this bullet claimed the o
   Install and remove it symmetrically in a `useLayoutEffect` on a small component inside
   the Canvas (pattern: `postprocessing-ssr-denoise`'s `<NoEnvSpecular />`, which zeroes
   `PhysicalLightingModel.prototype.indirectSpecular` so SSR supplies the specular instead).
+- **`onAfterRender`/`onBeforeRender` work as plain JSX props.** fiber's event-prop gate is
+  `EVENT_REGEX = /^on(Pointer|Drag|Drop|Click|DoubleClick|ContextMenu|Wheel)/`
+  (`@react-three/fiber/dist/webgpu/index.mjs:550`), tested in `applyProps` before anything
+  else runs (`:640`). Neither name matches, so both fall through to the general
+  `resolve()` + assign path — `<mesh onAfterRender={fn}>` just sets `mesh.onAfterRender =
+fn`, exactly like vanilla three's own `Object3D` API. Pattern: `clipping-stencil`.
+- **`@react-three/eslint-plugin`'s `no-clone-in-loop` matches the IDENTIFIER `clone`, not
+  `.clone()` calls.** The rule's selector is
+  `CallExpression[callee.name=useFrame] CallExpression MemberExpression Identifier[name=clone]`
+  (`@react-three/eslint-plugin/dist/index.mjs:34`) — an esquery descendant match on any
+  `clone`-named identifier inside a `MemberExpression` inside a call inside `useFrame`.
+  That matches the intended `positions.clone()` (property position) but ALSO
+  `clone.position` where `clone` is a loop variable (object position) — e.g.
+  `useFrame(() => { for (const clone of clones) mesh.position.copy(clone.position); })`
+  false-positives with zero `.clone()` call in sight. Rename the loop variable rather than
+  fight the lint rule.
 
 ---
 
@@ -801,6 +846,15 @@ Run for YOUR example only — `pnpm test:changed <slug>` (smoke + animates).
    `browser.close()`.
 5. Look at the screenshot. Both test tiers passed `shadowmap-csm`'s tone-mapping bug;
    only the screenshot caught it.
+
+**A control-heavy port needs ONE interactive click-through** — a scratchpad Playwright
+script reusing `scripts/contact-sheet.mjs`'s launch recipe (`channel: 'chromium'`,
+`--enable-unsafe-webgpu`), driven headed so you can watch it. Three wave-4 batches found
+real bugs both test tiers passed clean: `loader-ldraw`'s merge toggle blanked the canvas
+with zero console errors; drei `<TransformControls>` mounted with no gizmo and no drag
+(B46); `<threeLine>` crashed on its first prop update on any parent re-render (B44). The
+default-state screenshot only ever exercises the FIRST state — anything with a toggle,
+a drag handle, or a re-render path needs its buttons actually clicked once.
 
 **Multi-`<Canvas>`: `renderer.domElement` is the PRIMARY canvas.** In fiber's
 multi-canvas mode every root shares one `WebGPURenderer`, whose `domElement` is fixed at

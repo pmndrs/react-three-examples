@@ -7,7 +7,7 @@ The official [three.js examples](https://threejs.org/examples/), rebuilt in idio
 Same GPU, same techniques, less ceremony. A port that ends up longer, more indirect or
 more imperative than the original has failed, even if it renders perfectly.
 
-199 examples across 15 categories. Every one links back to its three.js original — this
+263 examples across 16 categories. Every one links back to its three.js original — this
 is a companion to the three.js examples, not a fork of them.
 
 ## Run it
@@ -59,7 +59,10 @@ depth can change without touching routing.
   exercise renderer internals or measure throughput rather than teaching a visual
   technique, so a React port of them would demonstrate nothing about R3F. Rationale and
   the two arguable cases are in [docs/SPEC.md](docs/SPEC.md) §4.
-- Phase 2 (webgl-only examples, curated) and the Patterns track are described in the spec.
+- **Phase 2 (webgl-only examples, curated): 66 of 72 ported so far, 6 review-queued**
+  ([docs/PORTING-BACKLOG-PHASE2.md](docs/PORTING-BACKLOG-PHASE2.md)). WebXR (26) + webaudio
+  (4) are a separate final phase Dennis verifies by hand — nothing here can enter an XR
+  session. The Patterns track is described in the spec.
 
 ## Docs
 

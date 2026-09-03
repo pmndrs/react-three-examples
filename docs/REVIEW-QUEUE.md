@@ -56,6 +56,47 @@ not a porting problem.
   installed `@dimforge/rapier3d-compat`) is already specified. **No action unless the
   probe fails in a way the fallback doesn't cover.** Listed so you know it's a known risk.
 
+### 1c. `webgl_morphtargets_webcam` needs a dependency + degrades ungracefully with none
+
+Not ported. The original runs live face-landmark detection
+(`@mediapipe/tasks-vision`'s `FaceLandmarker`) over `getUserMedia` webcam video to drive
+52 morph-target influences in real time. Two separate blockers, not one:
+
+- `@mediapipe/tasks-vision` isn't in `package.json` and agents on this task can't
+  `pnpm install`.
+- Even installed, the demo has no meaning without a camera and a face in front of it —
+  smoke/animates can't grant camera permission, and there's no scripted/pre-recorded
+  fallback input in the original to substitute.
+
+**What I'd do:** install the dependency when this is prioritized, and pair it with a
+recorded-video fallback (a short clip run through the same landmarker, looping) so the
+example has something to show in CI and in the gallery for a visitor with no webcam —
+that's new code, not in the original, so it wants a deliberate yes before an agent
+builds it. Until then, leave it off the corpus rather than shipping a demo that only
+works with in-person webcam access.
+
+### 1d. Loader gallery (2C): four ports blocked on missing packages / missing assets
+
+Checked against `node_modules` and the jsdelivr r185 mirror 2026-09-03. All four have a
+real, working three.js original — nothing here is a bad demo, just a dependency an agent
+can't add.
+
+- **`webgl_loader_gltf_progressive_lod`** — needs `@needle-tools/gltf-progressive`
+  (not installed), AND its three model URLs are hosted at `https://cloud.needle.tools/...`,
+  not on the jsdelivr three.js mirror — no substitute asset exists. Installing the
+  package alone wouldn't unblock this one. **What I'd do:** skip unless you want to host
+  replacement assets yourself; the package is real and small if you do.
+- **`webgl_loader_gltf_animation_pointer`** — needs `@needle-tools/three-animation-pointer`
+  (not installed), same `cloud.needle.tools`-hosted model problem (the DragonDispersion
+  sample isn't on the three.js mirror either). Same call as above.
+- **`webgl_loader_3dtiles`** — needs FIVE packages not installed:
+  `3d-tiles-renderer`, `postprocessing`, `@takram/three-atmosphere`,
+  `@takram/three-geospatial`, `@takram/three-geospatial-effects`. The demo also likely
+  needs a Cesium Ion API key for real tile data (not checked further once the package
+  count made this an easy skip). **What I'd do:** this is the biggest lift of the four —
+  worth doing only if 3D geospatial tiles becomes a named goal for the corpus, not as a
+  routine port.
+
 ### 2. Rule 4: sliders for constants the original hard-codes
 
 Rule 4 allows a slider that "makes a hidden constant explorable", and that clause is the
@@ -200,9 +241,84 @@ unaffected. Arguably it should filter too. Small change, purely a taste call.
 
 ---
 
----
+### 13. drei `<Html>` (non-transform) loses a label on a STATIC object under StrictMode
+
+Found porting `css2d_label` (`scene/label.tsx`): the Earth's two labels never appeared; the
+Moon's did. Probed the DOM — the Earth labels sat at drei's parking transform
+`translate3d(0,-9999px,0)`, and a single camera drag brought them back.
+
+Mechanism (verified, `drei/webgpu/index.mjs` `Html`): the per-frame DOM write is gated on
+`|oldPosition - projected| > eps`, with `oldPosition` in a ref. StrictMode's dev-only effect
+re-run happens in the PASSIVE flush, i.e. after fiber's first RAF frames have already
+written the transform and filled `oldPosition`. The re-run unmounts and recreates Html's
+React root and resets `el.style.cssText` to the parking transform — but the ref survives,
+so an object that never moves never passes the eps gate again. Anything that moves (the
+Moon, a camera being orbited by `target=`) recovers on its next frame, which is why
+`loader-texture-ktx2`'s static labels never showed it: its DemoHelpers `target` nudges the
+camera. `transform` mode is unaffected (it writes unconditionally).
+
+Shipped: `eps={-1}` on the four labels, with a `REVIEW(drei-html-eps):` comment — forces
+the write every frame, which for four labels is free. Production builds don't need it.
+
+**Needs you:** an UPSTREAM B-entry for drei — either reset `oldPosition` where `cssText`
+is reset (`if (!root.current)` branch), or skip the cssText reset on remount. **What I'd
+do:** file it; keep the `eps={-1}` workaround until the fix lands, and add one line to
+AGENTS.md § React and the ecosystem so the next `<Html>` port on a static object doesn't
+spend the round-trip.
+
+### 14. `css3d_sprites` → slug `css3d-sprites` (prefix kept)
+
+The rule is "slug = original name minus the prefix", which gives `sprites` — already
+taken by `webgpu_sprites`. Kept the prefix as the disambiguator for this one only
+(`label`, `periodictable`, `molecules`, `youtube` follow the rule). **What I'd do:** accept
+it and add the collision rule to AGENTS.md § Files, routes, manifest: "when the bare name
+collides, keep the original's prefix".
+
+### 15. `webgl_batch_lod_bvh` — blocked, not ported (Phase 2)
+
+Two independent, stacked blockers, checked directly against what's installed:
+
+1. **`@three.ez/batched-mesh-extensions`'s WebGPU build is not importable.** The installed
+   package (0.0.12) DOES ship a WebGPU build (`build/webgpu.js`, `src/index.webgpu.js`,
+   `src/patch/ExtendBatchedMeshPrototype.webgpu.js` all exist on disk) — but its
+   `package.json` `"exports"` field maps `"."` to `build/webgl.js`/`.cjs` ONLY; there is no
+   `"webgpu"` export condition and no subpath export at all. Node/Vite's `"exports"`
+   resolution refuses any path not listed there, so a plain
+   `import '@three.ez/batched-mesh-extensions'` gets the WebGL build (which patches
+   `BatchedMesh.prototype` with WebGL-specific internals), and there is no sanctioned way
+   to reach `build/webgpu.js` instead — a deep `/build/webgpu.js` import would need to
+   bypass package resolution entirely (a bare relative `node_modules/...` import), which
+   isn't a real fix, just a private-path hack against someone else's package layout.
+   This is an upstream packaging gap (the exports map is almost certainly just a
+   published-package oversight — the source clearly builds both targets), not something
+   portable to work around from here.
+2. **Two more dependencies the original needs aren't installed**: `@three.ez/simplify-geometry`
+   (generates the demo's 4 extra LOD levels from the base mesh) and `meshoptimizer` (the
+   simplifier's backend). Neither is in `package.json` — adding them needs `pnpm install`,
+   which is outside an agent's rules of engagement this wave.
+
+Also note (not a blocker, just evidence this was checked, not assumed): the original is
+itself `WebGLRenderer`-only despite the `webgl_` prefix pattern holding here too — it
+explicitly imports the `@three.ez/batched-mesh-extensions@0.0.11/build/webgl.js` CDN URL,
+i.e. even upstream picks the WebGL build on purpose.
+
+**What I'd do:** (a) file an issue/PR upstream against `@three.ez/batched-mesh-extensions`
+adding a `"webgpu"` export condition — cheap, and unblocks this immediately once released;
+(b) in the meantime, `pnpm add @three.ez/simplify-geometry meshoptimizer` and a local
+`declare module` shim reaching `build/webgpu.js` by relative path would technically work
+but is exactly the kind of fragile, non-portable hack AGENTS.md's "no dependency patches"
+rule exists to keep out — I'd rather wait for (a) or skip the example than ship it. **Not
+touched**, no partial file on disk.
 
 ## ⚪️ FYI — known, tracked, no decision needed
+
+- **Per-object `onPointerMissed` is not "click on nothing".** fiber calls it for every
+  interactive object a pointer event did not hit — including on `pointerover`, before any
+  click — so `<mesh onPointerMissed={deselect}>` fires the instant a hover selects the mesh.
+  Only the Canvas-level `onPointerMissed` is click-gated (`isClickEvent && !hits.length &&
+delta <= 2`). Cost `geometry-spline-editor` a round of debugging; its selection state now
+  lives with the `<Canvas>` for that reason. Worth one sentence under § React and the
+  ecosystem.
 
 - **The whole corpus, measured both ways** (`pnpm compare --all`, 196 examples with an
   `original` URL): **29,788 vs 34,069 code lines (−12.6%)** and **925,251 vs 1,197,585
@@ -257,3 +373,6 @@ unaffected. Arguably it should filter too. Small change, purely a taste call.
 | 2026-09-02 | Action-bar buttons                                                      | **Real brand icons**, not text monograms.                                                                                                                                                                                                                                                                                                                                                         |
 | 2026-09-02 | `materials-texture-html`'s runtime CDN import of `three-html-render`    | **Keep the CDN import, matching the original.** The rule Dennis set: a stable library gets installed properly; a shim for an unshipped browser API does what upstream does. WICG HTML-in-Canvas ships nowhere stable, so the polyfill stays a pinned, feature-detected runtime import rather than a 0.1.x lockfile entry we'd remove once the API lands. AGENTS.md § Repo format now states this. |
 | 2026-09-02 | `skinning-instancing-individual` at "+44%, worst overrun in the corpus" | **Closed — the premise was a measurement artifact.** +44.4% by line but **+3.9% by content**; `pnpm compare` now prints both. Corpus-wide, 191 of 196 examples are smaller than their original by content and only 5 are genuinely larger. Compute-instanced skinning at +3.9% is squarely the irreducible-work category.                                                                         |
+| 2026-09-03 | `<threeLine>` crashes on its first prop update (fiber alpha.4)          | **Fixed in code + filed as B44.** `src/assets/ThreeLine.ts` shims `extend({ ThreeLine: Line })`; imported by `decals`, `geometry-nurbs`, `lines-dashed`, `modifier-curve`.                                                                                                                                                                                                                        |
+| 2026-09-03 | drei `<TransformControls>` never mounts `getHelper()` — no gizmo        | **Fixed in code + filed as B46.** `geometry-spline-editor` and `modifier-curve` both render `{gizmo && <primitive object={gizmo.getHelper()} />}` via the setter-as-ref pattern, marked `TODO(drei-gap):`.                                                                                                                                                                                        |
+| 2026-09-03 | fiber `diffProps` resets a dropped node-material prop to `0`            | **Fixed in code + filed as B47.** `BlobMaterial.tsx` remounts on switch (`<Fragment key={name}>`) instead of relying on the diff; AGENTS.md § React and the ecosystem documents the trap.                                                                                                                                                                                                         |

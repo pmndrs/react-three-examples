@@ -68,6 +68,14 @@ happens.
   - Deferred cleanups: `tsl-vfx-flames`/`-tornado` still build materials imperatively;
     `volume-caustics` `useUniforms`-after-suspend ordering wants an audit; tag vocabulary
     grew to ~170 with many singletons.
+- **2026-09-03 (wave 4 close)**: **263 examples**, 16 categories (`physics` added).
+  262 measured against an original: **37439 vs 45126 lines (−17.0%), 1154680 vs 1537734
+  chars (−24.9%)**; 217/262 smaller by line, 251/262 smaller by content. Phase 2 stands at
+  **66 of 72 ported, 6 review-queued, 0 left undecided**
+  ([PORTING-BACKLOG-PHASE2.md](PORTING-BACKLOG-PHASE2.md)). Local Metal: tsc 0, lint 0,
+  build clean, smoke 261/263 (both failures are the B28 `PMREM.cubeUv` flake, re-run
+  clean). [REVIEW-QUEUE.md](REVIEW-QUEUE.md): **5 🔴 + 13 🟡**. [UPSTREAM.md](UPSTREAM.md):
+  **52 briefs** (B1–B52).
 
 ---
 

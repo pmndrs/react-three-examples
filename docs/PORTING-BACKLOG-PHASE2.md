@@ -20,60 +20,60 @@ original name minus the `webgl_`/`misc_`/`physics_`/`css3d_`/`css2d_`/`games_` p
 experimental on v10, see 2B). Every three addon the 34 need exists in r185 except
 `tsl/display/GlitchNode.js` (the glitch pass is hand-ported to TSL).
 
-## 2A — Unique techniques (audit Class A.2) — 32 port · 2 review
+## 2A — Unique techniques (audit Class A.2) — 30 port · 1 skip · 3 review
 
-- [ ] `webgl_animation_walk` — keyboard controller, follow camera → `animation/`
-- [ ] `webgl_animation_skinning_ik` — CCDIKSolver → `animation/`
-- [ ] `webgl_decals` — DecalGeometry on click (drei `<Decal>`) → `geometry/`
-- [ ] `webgl_geometry_text` — TextGeometry (drei `<Text3D>`) → `geometry/`
-- [ ] `webgl_geometries` — every primitive gallery → `geometry/`
-- [ ] `webgl_geometry_convex` — QuickHull → `geometry/`
-- [ ] `webgl_geometry_nurbs` — NURBS curve/surface → `geometry/`
-- [ ] `webgl_geometry_csg` — three-bvh-csg → `geometry/`
-- [ ] `webgl_geometry_colors_lookuptable` — Lut heatmap → `geometry/`
-- [ ] `webgl_geometry_spline_editor` — draggable control points → `geometry/`
-- [ ] `webgl_geometry_terrain_raycast` — snap to terrain → `geometry/`
-- [ ] `webgl_geometry_minecraft` — merged voxels + atlas, interactive → `geometry/`
-- [ ] `webgl_marchingcubes` — metaballs → `geometry/`
-- [ ] `webgl_modifier_edgesplit` → `geometry/`
-- [ ] `webgl_modifier_simplifier` → `geometry/`
-- [ ] `webgl_modifier_subdivision` (three-subdivide) → `geometry/`
-- [ ] `webgl_modifier_tessellation` → `geometry/`
-- [ ] `webgl_instancing_raycast` — per-instance picking via fiber events → `scene/`
-- [ ] `webgl_instancing_scatter` — surface scatter (drei `<Sampler>`) → `scene/`
-- [ ] `webgl_interactive_cubes_gpu` — GPU color-ID picking → `scene/`
-- [ ] `webgl_interactive_voxelpainter` — raycast voxel editor → `scene/`
-- [ ] `webgl_raycaster_texture` — alpha-aware picking → `scene/`
-- [ ] `webgl_raycaster_bvh` — three-mesh-bvh → `scene/`
+- [x] ~~`webgl_animation_walk`~~ — ported — keyboard controller, follow camera → `animation/`
+- [x] ~~`webgl_animation_skinning_ik`~~ — ported — CCDIKSolver → `animation/`
+- [x] ~~`webgl_decals`~~ — ported — DecalGeometry on click (drei `<Decal>`) → `geometry/`
+- [x] ~~`webgl_geometry_text`~~ — ported — TextGeometry (drei `<Text3D>`) → `geometry/`
+- [x] ~~`webgl_geometries`~~ — ported — every primitive gallery → `geometry/`
+- [x] ~~`webgl_geometry_convex`~~ — ported — QuickHull → `geometry/`
+- [x] ~~`webgl_geometry_nurbs`~~ — ported — NURBS curve/surface → `geometry/`
+- [x] ~~`webgl_geometry_csg`~~ — ported — three-bvh-csg → `geometry/`
+- [x] ~~`webgl_geometry_colors_lookuptable`~~ — ported — Lut heatmap → `geometry/`
+- [x] ~~`webgl_geometry_spline_editor`~~ — ported — draggable control points → `geometry/`
+- [x] ~~`webgl_geometry_terrain_raycast`~~ — ported — snap to terrain → `geometry/`
+- [x] ~~`webgl_geometry_minecraft`~~ — ported — merged voxels + atlas, interactive → `geometry/`
+- [x] ~~`webgl_marchingcubes`~~ — ported — metaballs → `geometry/`
+- [x] ~~`webgl_modifier_edgesplit`~~ — ported → `geometry/`
+- [x] ~~`webgl_modifier_simplifier`~~ — ported → `geometry/`
+- [x] ~~`webgl_modifier_subdivision`~~ — ported (three-subdivide) → `geometry/`
+- [x] ~~`webgl_modifier_tessellation`~~ — ported → `geometry/`
+- [x] ~~`webgl_instancing_raycast`~~ — ported — per-instance picking via fiber events → `scene/`
+- [x] ~~`webgl_instancing_scatter`~~ — ported — surface scatter (drei `<Sampler>`) → `scene/`
+- [x] ~~`webgl_interactive_cubes_gpu`~~ — ported — GPU color-ID picking → `scene/`
+- [x] ~~`webgl_interactive_voxelpainter`~~ — ported — raycast voxel editor → `scene/`
+- [x] ~~`webgl_raycaster_texture`~~ — ported — alpha-aware picking → `scene/`
+- [x] ~~`webgl_raycaster_bvh`~~ — ported — three-mesh-bvh → `scene/`
 - [ ] `webgl_batch_lod_bvh` — BatchedMesh + LOD + BVH culling → `scene/`
-- [ ] `webgl_multiple_views` — split viewports (drei `<View>`) → `camera/`
-- [ ] `webgl_multiple_scenes_comparison` — scissor slider → `camera/`
-- [ ] `webgl_clipping_stencil` — stencil cap-filling → `materials/`
-- [ ] `webgl_materials_car` — car configurator → `materials/`
-- [ ] `webgl_materials_texture_canvas` — Canvas2D live texture → `textures/`
-- [ ] `webgl_lines_dashed` → `geometry/`
+- [x] ~~`webgl_multiple_views`~~ — ported — split viewports (drei `<View>`) → `camera/`
+- [x] ~~`webgl_multiple_scenes_comparison`~~ — ported — scissor slider → `camera/`
+- [x] ~~`webgl_clipping_stencil`~~ — ported — stencil cap-filling → `materials/`
+- [x] ~~`webgl_materials_car`~~ — ported — car configurator → `materials/`
+- [x] ~~`webgl_materials_texture_canvas`~~ — ported — Canvas2D live texture → `textures/`
+- [x] ~~`webgl_lines_dashed`~~ — ported → `geometry/`
 - [ ] `webgl_morphtargets_webcam` — live face tracking → morphs → `animation/`
-- [ ] `webgl_postprocessing_glitch` — hand-port GlitchPass to TSL → `postprocessing/`
+- [x] ~~`webgl_postprocessing_glitch`~~ — ported — hand-port GlitchPass to TSL → `postprocessing/`
 - [x] ~~`webgl_renderer_pathtracer`~~ — **SKIP**: three-gpu-pathtracer is WebGL 2 only
       (`WebGLPathTracer(new WebGLRenderer())`); no WebGPU backend exists
 - [x] ~~`webgl_worker_offscreencanvas`~~ — **REVIEW**: fiber v10 has only a type shim for
       OffscreenCanvas, no worker story; Dennis decides whether to build one (REVIEW-QUEUE)
 
-## 2B — Never audited (77 with other prefixes) — 22 port · 12 skip · 3 review · 30 final
+## 2B — Never audited (77 with other prefixes) — 21 port · 5 skip · 30 final
 
 ### `misc_` (22)
 
-- [ ] `misc_controls_orbit` + `_trackball` + `_arcball` + `_fly` + `_map` +
+- [x] ~~`misc_controls_orbit`~~ — ported + `_trackball` + `_arcball` + `_fly` + `_map` +
       `_pointerlock` → **ONE example** `controls` in `camera/`, leva switcher over the six
       drei controls. Six originals are ~60 lines each around one constructor; six pages
       would be six copies of `<OrbitControls />`.
-- [ ] `misc_controls_transform` — `<TransformControls>` → `camera/`
-- [ ] `misc_controls_drag` — `<DragControls>` → `scene/`
-- [ ] `misc_boxselection` — SelectionBox/SelectionHelper → `scene/`
-- [ ] `misc_animation_groups` — AnimationObjectGroup → `animation/`
-- [ ] `misc_animation_keys` — keyframe tracks from scratch → `animation/`
-- [ ] `misc_raycaster_helper` → `scene/`
-- [ ] `misc_exporter_gltf` + `_gltf_normals` + `_usdz` + `_ply` + `_stl` + `_obj` →
+- [x] ~~`misc_controls_transform`~~ — ported — `<TransformControls>` → `camera/`
+- [x] ~~`misc_controls_drag`~~ — ported — `<DragControls>` → `scene/`
+- [x] ~~`misc_boxselection`~~ — ported — SelectionBox/SelectionHelper → `scene/`
+- [x] ~~`misc_animation_groups`~~ — ported — AnimationObjectGroup → `animation/`
+- [x] ~~`misc_animation_keys`~~ — ported — keyframe tracks from scratch → `animation/`
+- [x] ~~`misc_raycaster_helper`~~ — ported → `scene/`
+- [x] ~~`misc_exporter_gltf`~~ — ported + `_gltf_normals` + `_usdz` + `_ply` + `_stl` + `_obj` →
       **ONE example** `exporter` in `loaders/`, format dropdown; export is
       renderer-agnostic, one page shows the pattern
 - [x] ~~`misc_exporter_draco`~~ ~~`_gcode`~~ ~~`_exr`~~ ~~`_ktx2`~~ — **SKIP**: covered by
@@ -89,13 +89,13 @@ is the probe**: try `@react-three/rapier` first; if it breaks on v10, fall back 
 `@dimforge/rapier3d-compat`, per the runtime-CDN-JS rule. Whichever wins, the other five
 follow the same shape. Report which.
 
-- [ ] `physics_rapier_basic` — **the probe** → `physics/` (new category; 7 justify it)
-- [ ] `physics_rapier_instancing` → `physics/`
-- [ ] `physics_rapier_joints` → `physics/`
-- [ ] `physics_rapier_character_controller` → `physics/`
-- [ ] `physics_rapier_vehicle_controller` → `physics/`
-- [ ] `physics_rapier_terrain` → `physics/`
-- [ ] `games_fps` — Octree + Capsule, no physics lib → `physics/`
+- [x] ~~`physics_rapier_basic`~~ — ported — **the probe** → `physics/` (new category; 7 justify it)
+- [x] ~~`physics_rapier_instancing`~~ — ported → `physics/`
+- [x] ~~`physics_rapier_joints`~~ — ported → `physics/`
+- [x] ~~`physics_rapier_character_controller`~~ — ported → `physics/`
+- [x] ~~`physics_rapier_vehicle_controller`~~ — ported → `physics/`
+- [x] ~~`physics_rapier_terrain`~~ — ported → `physics/`
+- [x] ~~`games_fps`~~ — ported — Octree + Capsule, no physics lib → `physics/`
 - [x] ~~`physics_jolt_instancing`~~ — **SKIP**: rapier instancing covers the same demo; Jolt
       has no pmndrs binding and would be a second engine for one page
 - [x] ~~`physics_ammo_break`~~ ~~`_cloth`~~ ~~`_instancing`~~ ~~`_rope`~~ ~~`_terrain`~~
@@ -105,11 +105,11 @@ follow the same shape. Report which.
 
 ### `css2d_` / `css3d_` (8) — drei `<Html>`
 
-- [ ] `css2d_label` → `scene/`
-- [ ] `css3d_periodictable` — the classic → `scene/`
-- [ ] `css3d_molecules` → `scene/`
-- [ ] `css3d_sprites` → `scene/`
-- [ ] `css3d_youtube` → `scene/`
+- [x] ~~`css2d_label`~~ — ported → `scene/`
+- [x] ~~`css3d_periodictable`~~ — ported — the classic → `scene/`
+- [x] ~~`css3d_molecules`~~ — ported → `scene/`
+- [x] ~~`css3d_sprites`~~ — ported → `scene/`
+- [x] ~~`css3d_youtube`~~ — ported → `scene/`
 - [x] ~~`css3d_orthographic`~~ ~~`css3d_mixed`~~ — **SKIP**: camera-type / mixed-renderer
       variants of the same `<Html transform>` technique the five above show
 - [x] ~~`css3d_sandbox`~~ — **SKIP**: sandbox, no stable subject
@@ -119,24 +119,24 @@ follow the same shape. Report which.
 - [x] ~~`svg_lines`~~ ~~`svg_sandbox`~~ — **SKIP**: SVGRenderer output, not WebGPU
 - **`webaudio_*` (4)** and **`webxr_*` (26)** — **final phase**, unchanged; see 2F
 
-## 2C — Loader gallery (47) — 12 port · 35 skip
+## 2C — Loader gallery (47) — 10 port · 35 skip · 3 review
 
 Dennis's rule: _loaders that just load a model are not needed._ A loader earns a page
 only when it demonstrates something beyond "the model appears".
 
-- [ ] `webgl_loader_gltf_variants` — KHR_materials_variants switcher → `loaders/`
+- [x] ~~`webgl_loader_gltf_variants`~~ — ported — KHR_materials_variants switcher → `loaders/`
 - [ ] `webgl_loader_gltf_progressive_lod` — streaming LOD → `loaders/`
-- [ ] `webgl_loader_gltf_instancing` — EXT_mesh_gpu_instancing → `loaders/`
+- [x] ~~`webgl_loader_gltf_instancing`~~ — ported — EXT_mesh_gpu_instancing → `loaders/`
 - [ ] `webgl_loader_gltf_animation_pointer` — KHR_animation_pointer → `loaders/`
 - [ ] `webgl_loader_3dtiles` — tiled streaming → `loaders/`
-- [ ] `webgl_loader_collada_kinematics` — kinematic chain playback → `loaders/`
-- [ ] `webgl_loader_md2_control` — animation state control → `loaders/`
-- [ ] `webgl_loader_ldraw` — LEGO, build-step animation → `loaders/`
-- [ ] `webgl_loader_pdb` — molecules + labels → `loaders/`
-- [ ] `webgl_loader_texture_exr` + `_hdr` + `_ultrahdr` → **ONE example**
+- [x] ~~`webgl_loader_collada_kinematics`~~ — ported — kinematic chain playback → `loaders/`
+- [x] ~~`webgl_loader_md2_control`~~ — ported — animation state control → `loaders/`
+- [x] ~~`webgl_loader_ldraw`~~ — ported — LEGO, build-step animation → `loaders/`
+- [x] ~~`webgl_loader_pdb`~~ — ported — molecules + labels → `loaders/`
+- [x] ~~`webgl_loader_texture_exr`~~ — ported + `_hdr` + `_ultrahdr` → **ONE example**
       `texture-hdr-formats` in `textures/`: three HDR pipelines side by side
-- [ ] `webgl_loader_svg` — vector → geometry → `loaders/`
-- [ ] `webgl_loader_texture_lottie` — animated vector texture → `textures/`
+- [x] ~~`webgl_loader_svg`~~ — ported — vector → geometry → `loaders/`
+- [x] ~~`webgl_loader_texture_lottie`~~ — ported — animated vector texture → `textures/`
 - [x] ~~`3dm`~~ ~~`3ds`~~ ~~`3mf`~~ ~~`3mf_materials`~~ ~~`amf`~~ ~~`bvh`~~ ~~`collada`~~
       ~~`collada_skinning`~~ ~~`draco`~~ ~~`fbx`~~ ~~`fbx_nurbs`~~ ~~`gcode`~~ ~~`gltf_avif`~~
       ~~`ifc`~~ ~~`imagebitmap`~~ ~~`kmz`~~ ~~`md2`~~ ~~`mdd`~~ ~~`nrrd`~~ ~~`obj`~~ ~~`pcd`~~
@@ -152,11 +152,11 @@ only when it demonstrates something beyond "the model appears".
 The audit's "low-value" test was _"distinct three.js technique"_; SPEC §2's is _"where is
 R3F dramatically clearer"_, which is exactly trivial-interaction demos.
 
-- [ ] `webgl_interactive_cubes` — `onPointerOver`/`onClick`: THE R3F wow demo → `scene/`
-- [ ] `webgl_lod` — drei `<Detailed>` → `scene/`
-- [ ] `webgl_helpers` — drei `<Helper>` / `useHelper` gallery → `scene/`
-- [ ] `webgl_geometry_teapot` — iconic; trivial → `geometry/`
-- [ ] `webgl_materials_blending` — leva over `blending` → `materials/`
+- [x] ~~`webgl_interactive_cubes`~~ — ported — `onPointerOver`/`onClick`: THE R3F wow demo → `scene/`
+- [x] ~~`webgl_lod`~~ — ported — drei `<Detailed>` → `scene/`
+- [x] ~~`webgl_helpers`~~ — ported — drei `<Helper>` / `useHelper` gallery → `scene/`
+- [x] ~~`webgl_geometry_teapot`~~ — ported — iconic; trivial → `geometry/`
+- [x] ~~`webgl_materials_blending`~~ — ported — leva over `blending` → `materials/`
 - [x] ~~`webgl_effects_ascii`~~ — **SKIP**: `AsciiEffect` takes a `WebGLRenderer` and reads
       pixels back through it; drei's `<AsciiRenderer>` is not on the `/webgpu` entry
 - [x] ~~`webgl_lights_hemisphere`~~ — **SKIP**: one JSX line; `lights-phong` and the light
@@ -182,14 +182,20 @@ renderer-agnostic and small; same review entry.
 
 ## Counts
 
-| section              |   port |   skip | review |  final |
-| -------------------- | -----: | -----: | -----: | -----: |
-| 2A unique techniques |     32 |      1 |      1 |        |
-| 2B never audited     |     22 |     12 |        |     30 |
-| 2C loader gallery    |     12 |     35 |        |        |
-| 2D Class-C re-check  |      5 |      2 |        |        |
-| 2E on next bump      |      6 |        |        |      1 |
-| **total**            | **77** | **50** |  **1** | **31** |
+**66 ported · 6 review-queued · 0 left** (2026-09-03, from actual checkbox state).
 
-77 ports (2A–2D, 71 now + 6 on bump) — about 40% of Phase 1, and a far higher share of
-scene-graph/event demos where the R3F win is largest.
+| section              |   port |  skip | review |  final |
+| -------------------- | -----: | ----: | -----: | -----: |
+| 2A unique techniques |     30 |     1 |      3 |        |
+| 2B never audited     |     21 |     5 |        |     30 |
+| 2C loader gallery    |     10 |     0 |      3 |        |
+| 2D Class-C re-check  |      5 |     2 |        |        |
+| 2E on next bump      |      6 |       |        |      1 |
+| **total**            | **72** | **8** |  **6** | **31** |
+
+66 ported so far (2A–2D; 6 more of the 72 wait on the next three.js bump in 2E) — about
+40% of Phase 1, and a far higher share of scene-graph/event demos where the R3F win is
+largest. The 6 review-queued items are every currently-unchecked row (`webgl_batch_lod_bvh`,
+`webgl_morphtargets_webcam`, `webgl_loader_gltf_progressive_lod`,
+`webgl_loader_gltf_animation_pointer`, `webgl_loader_3dtiles`) plus the one checked-but-blocked
+`webgl_worker_offscreencanvas` — all five REVIEW-QUEUE entries (#15, #1c, #1d ×3, #1b).

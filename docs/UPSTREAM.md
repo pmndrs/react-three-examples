@@ -883,6 +883,47 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Workaround**: `eps={-1}`.
 - **Where it bites**: `scene/label`; any `<Html>` on a static mesh, in dev only.
 
+### B51 · `@three.ez/batched-mesh-extensions`: `package.json` `exports` maps only the WebGL build
+
+- **What**: the installed package (0.0.12) ships a real WebGPU build on disk —
+  `build/webgpu.js`/`.cjs`, `src/index.webgpu.js`, `src/patch/ExtendBatchedMeshPrototype.webgpu.js`
+  all exist — but `package.json`'s `exports` field is:
+  ```json
+  "exports": {
+    ".": {
+      "import": { "types": "./src/index.webgl.d.ts", "default": "./build/webgl.js" },
+      "require": { "types": "./src/index.webgl.d.ts", "default": "./build/webgl.cjs" }
+    }
+  }
+  ```
+  There is no `"webgpu"` export condition and no subpath export, so a plain
+  `import '@three.ez/batched-mesh-extensions'` always resolves the WebGL build (which
+  patches `BatchedMesh.prototype` with WebGL-specific internals) — Node/Vite's `exports`
+  resolution refuses any path not listed there, so `build/webgpu.js` is unreachable short
+  of a private relative `node_modules/...` import into someone else's package layout.
+  Almost certainly a publishing oversight, not an intentional WebGL-only package — the
+  source clearly builds both targets.
+- **Fix**: add a `"webgpu"` export condition (or a `./webgpu` subpath export) pointing at
+  `build/webgpu.js`/`.cjs`.
+- **Where it bites**: `webgl_batch_lod_bvh` (Phase 2, not ported — REVIEW-QUEUE #18) plus
+  two more missing dependencies (`@three.ez/simplify-geometry`, `meshoptimizer`) stacked on
+  top; the exports gap alone blocks it even once those are installed.
+
+### B52 · `@react-three/eslint-plugin`'s `no-clone-in-loop` matches the identifier `clone`, not `.clone()` calls
+
+- **What**: the rule's selector is
+  `CallExpression[callee.name=useFrame] CallExpression MemberExpression Identifier[name=clone]`
+  (`@react-three/eslint-plugin/dist/index.mjs:34`), an esquery descendant match with no
+  constraint on which side of a `MemberExpression` the `clone`-named identifier sits. It
+  correctly flags `positions.clone()` (property position) but also flags a plain loop
+  variable named `clone` used as `clone.position` (object position) inside any nested call
+  within `useFrame` — zero `.clone()` invocation required.
+- **Fix**: constrain the selector to the property position of a call
+  (`CallExpression > MemberExpression.callee > Identifier.property[name=clone]`), or check
+  `node.parent.type === 'MemberExpression' && node.parent.property === node`.
+- **Where it bites**: latent — any `useFrame` body that iterates a collection with a loop
+  variable named `clone`. AGENTS.md's advice: rename the variable rather than fight the rule.
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from

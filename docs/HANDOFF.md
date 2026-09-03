@@ -1,5 +1,89 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
 
+## Wave 4 — Phase 2 end-of-wave compile (2026-09-03)
+
+Every porting agent from "Phase 2 greenlit" (below) finished; this session ran the
+mechanical close-out — environment, one last port, full verification, measurement,
+docs, review-queue tidy. It did not see the individual batch transcripts, so the
+per-batch narrative below is reconstructed from what the repo shows (examples.json,
+REVIEW-QUEUE.md, UPSTREAM.md, the backlog checkboxes), not from agent self-reports.
+
+**Corpus**: 198 → **263** examples (+65, all Phase 2 — Phase 1's 197 `webgpu_*` ports +
+`hello-webgpu` were already complete going into this wave). 16 categories (`physics` was
+added). Backlog: **66 of 72 planned ports done, 8 skipped, 6 review-queued, 0 rows left
+undecided** ([PORTING-BACKLOG-PHASE2.md](PORTING-BACKLOG-PHASE2.md)) — geometry addons,
+modifiers/marching-cubes, interaction/picking, the six `physics/rapier-*` + `games_fps`
+probe, `misc_controls_*` (collapsed to one `controls` page), `misc_exporter_*` (collapsed
+to one `exporter` page), `css2d_`/`css3d_` → drei `<Html>`, and the loader-gallery/Class-C
+re-check batches all landed. Measured whole (`pnpm compare --all`, 262 of 263 examples
+carry an `original` anchor): **37439 vs 45126 lines (−17.0%), 1,154,680 vs 1,537,734
+chars (−24.9%)**; 217/262 smaller by line, **251/262 smaller by content**. The Phase-2-only
+slice (65 examples, non-`webgpu_` anchor) reads leaner than Phase 1's: **−32.1% lines,
+−34.2% chars** — expected, since Phase 2 was picked for exactly the scene-graph/event
+demos where R3F collapses hardest.
+
+**This session's own close-out work**: ported the last easy Phase 2 item,
+`texture-lottie` (`webgl_loader_texture_lottie` → `src/examples/textures/`) — `lottie-web`
+installed as an ordinary dependency (not a CDN import; it's a real library, not an
+unshipped-API polyfill) per REVIEW-QUEUE's prior call, RoomEnvironment + RoundedBoxGeometry
+reused from existing corpus precedent, +11.8% lines / **−12.4% chars** against the
+original. Full smoke sweep: **261/263**, both failures the known B28 `PMREM.cubeUv` flake
+(`tsl-wood` reproduced consistently this run — this machine had several other concurrent
+Claude Code sessions competing for the GPU at the time, a plausible aggravating factor;
+`materials-car`, not previously a documented B28 site, passed clean on a scoped re-run,
+confirming a one-off hit rather than a regression).
+
+**B44–B52 filed or closed this wave** (one clause each): **B44** `<threeLine>` crashes on
+its first prop update, shimmed (`src/assets/ThreeLine.ts`) — **fixed in code**. **B45**
+drei `<Hud>` double-renders the default scene on v10. **B46** drei `<TransformControls>`
+never mounts `getHelper()`, no gizmo/drag — **fixed in code** (`geometry-spline-editor`,
+`modifier-curve`). **B47** fiber `diffProps` resets a dropped node-material prop to `0`,
+not its default — **fixed in code** (`BlobMaterial.tsx` remounts on switch instead).
+**B48** drei `<ArcballControls>` built without `scene`, gizmo can never appear. **B49**
+drei's `/webgpu` build reads the deprecated `state.gl` alias in 33 places. **B50** drei
+`<Html>` parks at −9999px forever on a static object under StrictMode, workaround
+`eps={-1}`. **B51** `@three.ez/batched-mesh-extensions`'s `package.json` `exports` maps
+only the WebGL build though a WebGPU one ships on disk — blocks `webgl_batch_lod_bvh`.
+**B52** `@react-three/eslint-plugin`'s `no-clone-in-loop` matches the bare identifier
+`clone`, not `.clone()` calls — a `for (const clone of clones)` loop variable false-
+positives.
+
+**Every batch's real bugs were found by an interactive probe, not by either test tier** —
+this is now the clearest pattern across the whole Phase 2 wave, and it's the reason
+AGENTS.md § Verification now requires one click-through for any control-heavy port.
+Evidence, all from this wave: `<threeLine>` (B44) only crashes on a parent RE-RENDER,
+which neither smoke nor animates ever causes; drei `<TransformControls>` (B46) mounts
+clean and reports the right hover/select state while silently drawing no gizmo and
+accepting no drag; `fiber diffProps` (B47) only shows up when a material element's PROP
+SET changes between two renders, not on any single render; drei `<Html>` (B50) only fails
+under StrictMode on an object that never moves, which a static screenshot can't
+distinguish from working. This session added a seventh: `exporter`'s Export button
+silently no-opped on **every** format, every click, because leva's `button()` callback
+hands you `store.get` directly (`leva/dist/leva.esm.js:1379,1425`) — not the folder-aware
+`get()` `useControls`'s object form gives you — so the bare sibling key `get('format')`
+resolved to `undefined` inside the named `'Export'` folder with no error anywhere. Found
+only because this compile explicitly clicked all 8 format buttons and asserted a real
+`download` event; fixed by qualifying the path (`get('Export.format')`). Six drei/fiber
+issues plus this one leva issue are the set that would have shipped silently broken behind
+a green two-tier CI and a clean default-state screenshot: `<threeLine>`, `<TransformControls>`
+gizmo, `diffProps`→`0`, `<Html>` eps, `<ArcballControls>` gizmo (B48, not yet worked
+around in `camera/controls`), `material.clippingPlanes` (inert on WebGPU — see AGENTS.md),
+and leva's unqualified-`get()` footgun.
+
+**What's left**: the 6 review-queued Phase 2 items (`webgl_batch_lod_bvh` — packaging gap,
+B51; `webgl_morphtargets_webcam` — needs `@mediapipe/tasks-vision` + a recorded-video
+fallback; the three needle-tools/3D-tiles loader blockers; `webgl_worker_offscreencanvas`
+— no fiber worker-root story) all have a REVIEW-QUEUE entry with a recommendation, none
+need more agent time to resolve — they need Dennis's yes/no. The XR (26) + webaudio (4)
+final phase is unstarted by design (SPEC/backlog 2F): nothing in this environment can
+enter an XR session to verify one, so REVIEW-QUEUE recommends Dennis port and hand-verify
+3–4 representative examples himself rather than agents shipping 30 unverifiable pages.
+
+_A note this session can't independently confirm: whether later Phase 2 batches ran on a
+different underlying model than earlier ones. Nothing in this session's context (repo
+state, docs, REVIEW-QUEUE) carries that information — if it's true and relevant, the
+agent or session that ran those batches is the source for it, not this compile._
+
 ## Phase 2 greenlit — wave 4 group 1 in flight (2026-09-03)
 
 Dennis: _"continue on the list until we have as much covered as we can; stuck > a few
