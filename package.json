@@ -24,15 +24,21 @@
     "shot:original": "node scripts/shoot-original.mjs"
   },
   "dependencies": {
+    "@dimforge/rapier3d-compat": "^0.20.0",
     "@perplexdotgg/bounce": "^1.10.0",
     "@react-three/drei": "11.0.0-alpha.6",
     "@react-three/fiber": "10.0.0-alpha.4",
+    "@react-three/rapier": "^2.2.0",
+    "@three.ez/batched-mesh-extensions": "^0.0.12",
     "camera-controls": "^3.1.2",
     "leva": "^0.10.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^7.18.1",
-    "three": "^0.185.1"
+    "three": "^0.185.1",
+    "three-bvh-csg": "^0.0.18",
+    "three-mesh-bvh": "^0.9.14",
+    "three-subdivide": "^1.1.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.0",

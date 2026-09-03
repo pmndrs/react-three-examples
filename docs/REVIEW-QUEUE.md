@@ -39,6 +39,23 @@ convention, so it's yours to set.
 Related: `storage-buffer` (below) dropped `trackTimestamp` readouts for the same reason,
 so a decision here covers both.
 
+### 1b. Phase 2 — three things an agent cannot decide
+
+Filed 2026-09-03 when Phase 2 was greenlit. Each is a "do we build a capability" call,
+not a porting problem.
+
+- **`webgl_worker_offscreencanvas`** — fiber v10 ships only a type shim for
+  `OffscreenCanvas`; there is no worker/`createRoot`-in-a-worker story. Porting it means
+  building that. Recommendation: **skip for 1.0**, record as a fiber upstream ask.
+- **WebXR (26) + webaudio (4)** — `@react-three/xr` 6.6 installs against v10 (peer
+  `>=8`), but nothing here can verify an XR example: no headset, and smoke/animates cannot
+  enter a session. Recommendation: **you port and verify a representative 3–4 by hand**
+  (`xr_cubes`, `xr_dragging`, `ar_hittest`, `vr_teleport`); agents don't touch the rest.
+- **`@react-three/rapier` on fiber v10** — declares peer `^9`. The `rapier-basic` probe
+  will report whether it works; if it doesn't, the fallback (inlined three addon over the
+  installed `@dimforge/rapier3d-compat`) is already specified. **No action unless the
+  probe fails in a way the fallback doesn't cover.** Listed so you know it's a known risk.
+
 ### 2. Rule 4: sliders for constants the original hard-codes
 
 Rule 4 allows a slider that "makes a hidden constant explorable", and that clause is the
