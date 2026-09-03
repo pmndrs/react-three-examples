@@ -861,6 +861,16 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Fix**: `state.renderer` (v10) with a `gl` fallback for v9.
 - **Where it bites**: latent; every example using drei controls on `/webgpu`.
 
+### B48 · drei: `<ArcballControls>` is constructed without `scene`, so its gizmos can never appear
+
+- **What**: three's `ArcballControls(camera, domElement = null, scene = null)` adds its
+  trackball gizmo group with `this.scene.add(this._gizmos)` only when `scene` is passed
+  at construction. drei does `new ArcballControls$1(explCamera)` — camera only — and there
+  is no later way to add them. The `scene` prop drei exposes only enables the pan grid.
+- **Fix**: pass `scene` (from `useThree`) as the third constructor argument when the
+  gizmo is requested.
+- **Where it bites**: `camera/controls` (Arcball mode shows no gizmo; stated in header).
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from

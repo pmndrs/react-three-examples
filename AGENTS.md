@@ -331,6 +331,11 @@ drei — no `import type { OrbitControls as Impl } from 'three/addons/…'` need
   `<color attach="background">`. `shadows` takes variant strings.
   `flat`/`linear`/`colorSpace`/`toneMapping` Canvas props are gone — use
   `renderer={{ toneMapping, outputColorSpace }}`.
+- **Canvas `shadows` variants map by NAME, not by resemblance**: `"basic"` →
+  `BasicShadowMap`, `"percentage"` → `PCFShadowMap` (the three default an original gets
+  from `shadowMap.enabled = true`), `"variance"` → `VSMShadowMap`; `"soft"` is a deprecated
+  alias of PCF. An original's `PCFShadowMap` is `shadows="percentage"`, not `"basic"` —
+  verified in fiber's dist; an agent nearly shipped the wrong one.
 - **fiber aims the default camera at the ORIGIN.**
   `if (!state.camera && !cameraOptions?.rotation) camera.lookAt(0, 0, 0)` — so an original
   whose camera sits above the origin but looks LEVEL (`camera.lookAt(0, height/2, 0)`)
