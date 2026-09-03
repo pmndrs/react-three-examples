@@ -1,135 +1,209 @@
-# Roadmap / Launch Checklist
+# Roadmap — the Road to 1.0
 
-> Companion to SPEC.md. Milestones are gates, not dates — each one has an explicit
-> "done when" so agent batches don't run ahead of an unvalidated foundation.
+> Companion to [SPEC.md](SPEC.md). Milestones are gates, not dates — each has an explicit
+> "done when". **Rewritten 2026-09-03** after an audit found the previous version claiming
+> M2/M3 were open while the porting was finished, and nothing said the remote was seven
+> weeks behind. The audit itself is the first section, because "is it done?" has a
+> different answer depending on whether you mean the working tree or GitHub.
 
-## M0 — Foundations
+## Where the phases live
 
-- [x] Pick name: **r3f-examples** (may fold into pmndrs/examples someday)
-- [ ] Create `pmndrs/r3f-examples` repo (Dennis); MIT license; branch protection
-- [x] SPEC v1.0 finalized (2026-07-26)
-- [x] Acquire resources locally: three.js sparse (26M, src + example sources, no assets),
-      r3f `v10` branch incl. `.mdx` docs (docs/webgpu, docs/migration), drei (v11 work
-      lives on `master` — no separate branch). TODO: pmndrs/examples `packages/e2e`
-      (read the Canvas-monkeypatch Vite plugin)
-- [x] Scaffold: Vite 8 + react-router 7 + TS strict + Tailwind 4; glob-routed examples;
-      fiber pinned to `10.0.0-alpha.2` (NOT canary — canary is broken against three
-      ≥0.183: imports removed `WebGLCubeRenderTarget` from three.webgpu; upstream fix
-      needed), three 0.185.1 + @types/three
-- [x] `examples.json` manifest (minimal — schema hardens in M1)
-- [ ] `AGENTS.md` skeleton; `CLAUDE.md` (`@AGENTS.md`)
-- [ ] ESLint base + custom conventions-plugin scaffold (rules accrete from M1 on)
+Two vocabularies are in use and they are not the same axis:
 
-**Done when:** repo builds, one placeholder route renders on WebGPU locally.
-**GATE MET 2026-07-26**: verified in a real browser — canvas context is `webgpu` (real
-adapter, not WebGL2 fallback), console clean. AGENTS.md + eslint scaffolds folded into M1
-since they're seeded by example #1 anyway.
+- **Phases** (SPEC §4) are _what gets ported_: **Phase 1** = the `webgpu_*` set;
+  **Patterns track** = 12–20 app-scale examples; **Phase 2** = curated webgl-only
+  examples + the loader gallery; **Final phase** = WebXR, webaudio, TSL tooling.
+- **Milestones** (this file) are _what ships_: M0 foundations → M1 golden path → M2
+  pilot batch + site v1 → M3 full WebGPU set → M4 launch.
 
-## M1 — Golden path (built together, Dennis + Fable)
+"Phase 1 complete" means the porting content of M2+M3 is done. It does not mean M2 or M3
+are done — both carry site, CI and deploy items that are not.
 
-- [x] First example built pair-style → establishes the baseline: `<DemoHelpers>`
-      (infinite grid, CameraControls, Inspector/perf slot, toggleable), ACES tonemap,
-      header-comment schema, metadata shape (2026-07-26; Dennis look-review pending;
-      TPose-blend bug found+fixed by contact sheet 07-27)
-- [x] Conventions doc v1 seeded from that example (AGENTS.md, two layers + changelog;
-      CLAUDE.md slimmed to @AGENTS.md) (2026-07-27)
-- [x] Render-readiness signal (`window.__exampleReady` via ReadinessSignal in
-      DemoHelpers: loaders settled + 30 clean frames) (2026-07-27)
-- [x] Playwright harness: smoke tier live (readiness + webgpu-context + non-black
-      pixel check), ci.yml headed-under-Xvfb + SwiftShader, sharding-ready
-      (2026-07-27 — green locally; first real GH Actions run still pending)
-- [x] Contact-sheet generator (`pnpm contact-sheet` → screenshots/index.html)
-      (2026-07-27)
-- [x] Examples #2–3 ported BY AGENTS (Sonnet/Opus) against the conventions doc — this
-      validates that the doc actually steers agents before we scale it
-      (#2 `skinning-instancing` + #3 `postprocessing-bloom-emissive`, both single-Sonnet
-      zero-human-edit ports, 2026-07-27; #3 ran ~35% cheaper against the amended doc —
-      the co-evolution loop measurably works)
+---
 
-**Gate status 2026-07-27**: machine checks + Fable visual review green on both agent
-ports. Remaining for gate: **Dennis sign-off without touching the code.**
+## Audit — state on 2026-09-03
 
-**Done when:** an agent-ported example passes lint/build/smoke/screenshot and Dennis
-signs off on it without needing to touch the code.
+### The one thing that matters most
 
-## M2 — Pilot batch: the 77 dual-renderer examples
+**`origin/main` is at `07c34b6` (2026-07-28, 131 examples). Local `main` is 17 commits
+ahead and has never been pushed.** Everything since July 28 — the corpus-wide restyle,
+prettier, the site shell (home, grouped sidebar, search, action bar), and all three
+porting waves (131 → 199) — exists on one machine. Nightly CI has been running against
+the July corpus and failing every night since at least 2026-08-14 on one known flake
+(B28, `PMREM.cubeUv`), so it currently carries no signal. Last green run of any kind:
+2026-07-28.
 
-- [ ] Batch pipeline live (Workflow orchestration): port → self-verify → screenshot →
-      Fable review → contact-sheet to Dennis
-- [ ] Co-evolution loop running: divergences → doc amendments or example fixes; lint
-      rules extracted from repeated review notes
-- [ ] Site v1: gallery grid, searchable/filterable sidebar (tags from manifest),
-      per-example page (demo, code view, button row: GitHub / Claude Code / StackBlitz /
-      Codespaces / Cursor), original-example link
-- [ ] GH Pages deploy pipeline (static export)
+Pushing is Dennis's call (it is outward-facing), but nothing below it is real until it
+happens.
 
-**Done when:** 77 ports merged, site deployed to Pages, CI green on tiers 1–2.
+### Milestone audit
 
-**Verification policy (Dennis, 2026-07-27): local Metal smoke is the M2 oracle.**
-Ports ship when they pass tsc/lint/build/smoke locally + visual review. CI's
-SwiftShader smoke stays advisory; SwiftShader stalls are logged (`ciSkip` + HANDOFF
-matrix) and their resolution is a later-phase item — do NOT block or bisect during
-the porting push.
+| milestone | claimed | actual                                                                                                                                                                                                                                                                                                                                                                        |
+| --------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **M0**    | done    | Done except: **no `LICENSE` file** (repo shows `licenseInfo: null`), no branch protection recorded. `package.json` is `0.0.0`.                                                                                                                                                                                                                                                |
+| **M1**    | done    | Done. Dennis's sign-off happened in practice (he reviewed the first 16 by hand and drove the v1.0 style rewrite).                                                                                                                                                                                                                                                             |
+| **M2**    | open    | **Ports: done** (the 77 dual-renderer examples are in). **Site v1: ~70%** — home, category grouping, substring search, 6-button action row shipped; **no tag filter, no code view on the example page, no thumbnails**. **Pages deploy: not started** — no Pages site, no `base` in vite config, no deploy job. **CI tiers 1–2: tier 1 exists but is red; tier 2 not built.** |
+| **M3**    | open    | **Ports: done** — 197 of 214 r185 `webgpu_*` examples; 10 excluded by SPEC §4, 7 deferred by SPEC §3. **The rest of M3 is not**: no nightly screenshot tier, no real-GPU dispatch. `utils/` has 5 pieces with upstream briefs (41 in UPSTREAM.md).                                                                                                                            |
+| **M4**    | open    | Nothing started: no Patterns track (0 of 12–20), no for-agents page, no `llms.txt`, no in-repo skill, no thumbnails, no OG/meta tags, no domain.                                                                                                                                                                                                                              |
 
-## M3 — Full WebGPU set (~144 webgpu-only: compute, TSL, MRT…)
+### Corpus health (the part that IS done, measured)
 
-- [ ] Stricter review tier for thin-training-data territory (TSL/compute)
-- [ ] `utils/` drei-gap components accumulate; each ships with an upstream brief
-      (candidate drei component spec)
-- [ ] Blocked/divergent pipeline states tracked and burned down
-- [ ] Nightly full-corpus screenshot run (CI tier 3) + manual GPU-runner dispatch (tier 4)
+- **199 examples** in the manifest, fully accounted for: **197** r185 `webgpu_*` ports +
+  `hello-webgpu` (ours, no original) + `animation-skinning-blending` (a **webgl**
+  original — the M1 golden-path example, effectively a Phase 2 port shipped early). Both
+  metrics vs the originals: **−12.6% code lines, −22.7% non-whitespace chars**; 191 of
+  196 smaller by content.
+- Local verification on Metal: tsc 0, lint 0 (eslint + prettier + 3 corpus rules at
+  error level), build clean, smoke **198/199** (the 1 is B28), animates green.
+- **Known debts, all tracked, none hidden**:
+  - [REVIEW-QUEUE.md](REVIEW-QUEUE.md): **2 🔴 + 10 🟡** waiting on Dennis.
+  - [UPSTREAM.md](UPSTREAM.md): **41 briefs** (B1–B41). Open and _load-bearing_: **B28**
+    (`PMREM.cubeUv` destroyed-texture flake — fails `tsl-wood` ~1 in 5 and turns every
+    CI run red), **B41** (`Lighting.getNode` module-level cache — the silent-substitution
+    class; only `lights-clustered` is known affected, others unaudited).
+  - **4 `ciSkip`** examples that cannot reach readiness on SwiftShader
+    (`geometry-loft`, `volume-fire`, `custom-fog`, `compute-birds`) — pass on Metal.
+  - **54 examples have no `credits`** in the manifest (the titleblock renders nothing for
+    them). Mostly examples whose original credits nobody; needs a pass to confirm.
+  - Deferred cleanups: `tsl-vfx-flames`/`-tornado` still build materials imperatively;
+    `volume-caustics` `useUniforms`-after-suspend ordering wants an audit; tag vocabulary
+    grew to ~170 with many singletons.
 
-**Done when:** 100% of teaching-value `webgpu_*` set merged (stress tests excluded).
+---
 
-## M4 — Launch
+## Road to 1.0
 
-- [ ] Patterns track (~12–20 app-scale examples); gallery site documented as meta-example
-- [ ] `AGENTS.md` finalized; `examples.json` complete; agent launch-task page + top-level
-      HTML pointer on every example page; in-repo Claude Code skill; llms.txt generated
-- [ ] Thumbnails (+ hover videos?) for gallery; OG/meta tags; custom domain
-- [ ] Launch review pass: full nightly green, spot-check on real GPU, link check
-- [ ] Announcement coordinated with r3f v10 release timing (blog/tweet thread/demos)
+**Definition of 1.0**: the Phase 1 corpus, publicly deployed, with CI that means
+something, the site's SPEC §9 feature list complete, and the agent-facing surface from
+SPEC §6 in place. **Not** in 1.0: the Patterns track, Phase 2, the final phase — see
+"Deliberately after 1.0" and the decision it needs.
 
-**Done when:** public URL live, announcement out.
+Ordered by dependency. Each gate is cheap to check.
 
-## Agent economics (how model budget gets spent — keep it boring)
+### R1 — Make the repo real again
 
-Principle: **the cheapest verifier wins.** Machines (tsc/lint/build/Playwright
-screenshots) verify; models port and review. Escalate model capability only when the
-tier below demonstrably fails, and record the escalation.
+- [ ] **Push `main`** (Dennis). 17 commits, 68 examples, the whole restyle.
+- [ ] **`LICENSE` (MIT)** — M0 said it, it never landed. Blocks any public link.
+- [ ] **Make nightly green so it can go red meaningfully.** B28 is the whole reason it's
+      red. Two acceptable outcomes: root-cause B28 (it is a three/drei `<Environment>`
+      teardown race — 27 examples can hit it), or teach the smoke tier to retry the
+      _specific_ `PMREM.cubeUv` signature once and report it as a flake, not a failure.
+      Root cause is better; the retry is fine for 1.0 if the brief stays open.
+- [ ] Nightly then runs the **199-example corpus** (it has only ever seen 131). Expect
+      new SwiftShader stalls in the wave-3 compute examples; `ciSkip` them with a reason,
+      as the four existing ones are.
 
-- **M1 (now)**: pair-style inline work (Fable in the IDE), no orchestration. Subagents
-  only for one-off research/scouting. The gate ports (#2–3) are ONE Sonnet agent each,
-  steered by the conventions doc alone — if a port fails, fix the doc, not the port;
-  that's the product being tested.
-- **M2 (batch of 77)**: Workflow waves of ~10 ports, one Sonnet agent per port +
-  machine checks. No per-port model review — Fable reviews the contact sheet and
-  divergence flags only. Between waves, fold repeated review notes into AGENTS.md/lint
-  rules so each wave is cheaper than the last. No wave 2 until wave 1's lessons land.
-- **M3 (TSL/compute)**: same pipeline; only examples flagged thin-training-data
-  (TSL, compute, MRT) get an added Opus/Fable review pass. Porter stays Sonnet-first;
-  escalate a specific example only after 2 failed attempts.
-- **Standing rules**: never buy a second model pass where a lint rule or screenshot
-  diff catches the same class of error; each batch PR notes agents run/retries/
-  escalations so cost drift is visible; adversarial multi-agent review is reserved for
-  the launch pass (M4), not routine ports.
+**Done when:** `origin/main` == local, nightly is green two nights running on the full
+corpus, LICENSE present.
 
-## Later phase: CI hardening (deferred from M2, 2026-07-27)
+### R2 — Dennis's review gate (the thing REVIEW-QUEUE exists for)
 
-- SwiftShader stall bisection (HANDOFF matrix + frame-count instrumentation ready)
-- Flip smoke back to blocking once the exception list is stable
-- Screenshot-regression tier 2 goldens (SwiftShader-path, changed-examples-only)
-- Manual real-GPU dispatch runner (tier 4)
+- [ ] Resolve the **2 🔴**: `compute-reduce`'s dropped timing readout (does an example
+      ever get to render its own DOM?) and the rule-4 slider clause.
+- [ ] Skim the **10 🟡**. Most are yes/no.
+- [ ] Contact-sheet pass over all 199 (`pnpm contact-sheet`). The wave-3 ports were
+      screenshot-reviewed by agents, and I spot-checked ~6; Dennis has not seen them.
 
-## Post-launch (standing)
+**Done when:** REVIEW-QUEUE has no 🔴 and every 🟡 has a decision row.
 
-- Monthly: re-diff three.js `files.json` → port new webgpu examples; three version bump PR
-- Drei gap-closure watch: when drei ships a stubbed component, migrate examples, retire util
-- Phase 2 curation: the 34 unique webgl examples + loader-gallery subset decision
-- Later phases: WebXR (@react-three/xr), webaudio, TSL editor tooling
+### R3 — Corpus polish
 
-## Open decisions
+- [ ] **Credits pass** for the 54 blank entries — confirm "original credits nobody" vs
+      "we dropped it".
+- [ ] **B41 audit**: grep every example that assigns onto `renderer.*` from a Canvas
+      child and ask whether anything reads it before the first render list. The
+      `lights-clustered` failure was the loud case of a silent class.
+- [ ] Deferred cleanups above (flames/tornado, volume-caustics, tag vocabulary).
+- [ ] Decide the 4 `ciSkip`s stay skipped (they are compute-bound; SwiftShader is not a
+      fair oracle) — record it as a decision, not a TODO.
 
-- Repo name (suggestions with Dennis)
-- Loader gallery scope (all 47 formats vs representative subset) — decide at Phase 2
-- Asset hosting revisit when swapping in alternate models (then self-host)
+**Done when:** zero blank credits, B41 audit written up, tag count has a rationale.
+
+### R4 — Site v1 complete (the open half of M2)
+
+SPEC §9 promises: gallery + sidebar with **search and tag filters**; **thumbnail** per
+example; per-example page with **live demo, code view, links**. Shipped: search, links,
+live demo. Missing:
+
+- [ ] **Tag filter** in the sidebar (the manifest already carries normalised tags).
+- [ ] **Code view** on the example page — the file is already known via
+      `exampleFilePaths`; a read-only pane with copy is enough (the action row covers
+      "open in editor").
+- [ ] **Thumbnails**: `screenshots/` is gitignored and not served. Either commit a
+      `public/thumbs/` set generated by `pnpm contact-sheet` at a fixed size, or generate
+      at build in CI. `Home.tsx` already has the `onError` gradient fallback wired.
+- [ ] **OG/meta tags** on `index.html` + per-route title.
+
+**Done when:** every SPEC §9 noun exists on the site.
+
+### R5 — Deploy
+
+- [ ] GitHub Pages: `base` in `vite.config.ts`, a deploy job on push to `main`, SPA
+      fallback (`404.html` copy of `index.html` — react-router needs it on Pages).
+- [ ] Assets stay hotlinked from jsdelivr@r185 (SPEC §14) — but the CDN 403'd us once
+      under load. Note the risk; no action for 1.0.
+- [ ] `package.json` version `1.0.0` at tag time; a `CHANGELOG.md` seeded from the
+      HANDOFF wave sections.
+
+**Done when:** a public URL renders the corpus on WebGPU, from a tagged commit.
+
+### R6 — Agent-facing surface (SPEC §6, the M4 half that isn't Patterns)
+
+- [ ] **For-agents page** with the extraction story (where the file lives, the starter
+      shell, how to wire deps) + the top-level HTML pointer on every example page.
+- [ ] **In-repo Claude Code skill** — "lift this example into my project".
+- [ ] `llms.txt` generated from the manifest (cheap, decorative — SPEC says so).
+- [ ] The Claude Code / Cursor action-row prompts get reviewed against the real page
+      (they were written before the page existed).
+
+**Done when:** an agent given only the public URL can find the source, the manifest and
+the extraction instructions without guessing.
+
+### R7 — Launch pass
+
+- [ ] Full nightly green on the final corpus; one real-GPU spot check (tier 4 can be a
+      person with a laptop for 1.0).
+- [ ] Link check (every `original` URL, every action-row target, every asset).
+- [ ] Prune `AGENTS.md` on the dependency state at tag time (SPEC §7 — a rule that
+      outlives its bug is worse than none). Fiber alpha.4 / drei alpha.6 / three 0.185.1
+      are the pins; if any moves before 1.0, the prune happens first.
+- [ ] Announcement timed with r3f v10 (SPEC context).
+
+**Done when:** tag `v1.0.0`, public URL live, announcement out.
+
+---
+
+## Deliberately after 1.0 — and the decision it needs
+
+The old M4 bundled the **Patterns track** (12–20 app-scale examples) into launch. That
+is a second project: none of it exists, its subject is different (app architecture, not
+demo ports), and it needs its own conventions pass. **Recommendation: 1.0 is the examples
+site; Patterns is 1.1.** The gallery site itself is the first pattern (dogfooding) and
+can be documented as such without building the other 12–20 first. _Dennis decides._
+
+Then, in the order SPEC §4 already sets:
+
+- **1.1 — Patterns track.**
+- **1.2 — Phase 2**: the 34 validated webgl-unique examples, ported to WebGPU where
+  feasible. The **loader gallery** (47 formats) is its own decision, still open in SPEC
+  §14: all formats, or a representative set.
+- **Final phase**: the 7 deferred (`xr-cubes`, `xr-native-layers`, `xr-rollercoaster`,
+  `compute-audio`, `tsl-editor`, `tsl-graph`, `tsl-transpiler`) — WebXR needs
+  `@react-three/xr` on v10; TSL tooling is a separate product.
+- **Standing**: monthly three `files.json` re-diff (SPEC §11); drei gap-closure watch —
+  when drei ships something in `utils/`, migrate and retire.
+
+## CI hardening (unchanged from before, still deferred)
+
+- Screenshot-regression tier 2 (SwiftShader goldens, changed-examples-only).
+- Nightly full-corpus screenshot tier 3.
+- Real-GPU dispatch runner (tier 4).
+- Animates tier on CI (needs the window retuned for SwiftShader frame rates).
+
+## Agent economics (kept — it held)
+
+The cheapest verifier wins. Machines verify; models port and review. Wave 3 confirmed
+the shape: one agent per cluster batch, machine checks, a screenshot the agent LOOKS at,
+and the doc absorbs every divergence. Three AGENTS.md rules turned out to be wrong during
+the last wave and each was caught by a probe, not a review — keep paying for probes, not
+for second model passes.
