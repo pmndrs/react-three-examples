@@ -614,6 +614,23 @@ ktx2: <transcoder path> })`. drei wires KTX2 itself (shared loader,
 - `useLoader(Loader, [urls])` takes N resources in one call and returns N results.
 - Derived textures (clone/mutate of a loader result) must be `useMemo`'d off the
   loader's stable return.
+- **sRGB is auto-assigned only when a colour map is a PROP** (`<meshStandardNodeMaterial
+map={tex} />` — fiber's `applyProps` checks `colorMaps.includes(key)`). A
+  `<texture attach="map">` / `<canvasTexture attach="map">` CHILD goes through `attach`
+  and skips it — the texture stays linear and renders washed out, with no error. Set
+  `colorSpace={SRGBColorSpace}` on the child explicitly. Caught only by screenshot
+  (`raycaster-texture`).
+- **Hover that must update while the camera moves under a still cursor** needs fiber's
+  per-frame re-raycast: `events={(store) => ({ ...createPointerEvents(store),
+updateOnFrame: true })}` on the Canvas. Default events fire only on pointer movement
+  (pattern: `interactive-cubes`).
+- **`once()` with a multi-arg geometry method does not typecheck in the working form.**
+  `once<T>(...args: T[]): T` — so `translate={once(0, 50, 0)}` (runtime-correct: the
+  reconciler spreads `args` into `translate(x, y, z)`) types as `number` against
+  `translate?: [x, y, z]`, while `once([0, 50, 0])` typechecks and calls
+  `translate([0,50,0])` → NaN geometry (`computeBoundingSphere(): Computed radius is NaN`
+  in smoke). Single-arg forms (`rotateX={once(x)}`) are fine. Until B42 lands, transform
+  multi-arg geometry in a `useMemo` (pattern: `geometry-terrain-raycast`).
 - **`<line>` is `<threeLine>`.** fiber omits `line`, `path`, `audio` and `source` from
   `ThreeElements` (they collide with SVG/DOM intrinsics) and re-adds the first as
   `threeLine`. `<line>` compiles as an SVG element and renders nothing.

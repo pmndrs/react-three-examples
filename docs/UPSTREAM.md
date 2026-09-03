@@ -777,6 +777,21 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   is early enough. Measured ordering, which is the reverse of what you'd guess:
   **layout effect runs BEFORE `onCreated`**, and the node is already cached before both.
 
+### B42 · fiber: `once()` is typed `<T>(...args: T[]) => T`, which rejects every multi-arg use
+
+- **What**: `once()` exists so a geometry method like `translate(x, y, z)` runs once at
+  construction. The runtime stores `{ [ONCE]: args }` and the reconciler SPREADS `args`
+  into the call — so `once(0, 50, 0)` is the correct form. But the declaration
+  `once<T>(...args: T[]): T` types that call as `number`, and `GeometryTransformProps`
+  declares `translate?: [x: number, y: number, z: number]`, so it fails typecheck. The form
+  that typechecks — `once([0, 50, 0])` — calls `translate([0,50,0])` at runtime and produces
+  NaN geometry. The type-correct call is runtime-wrong and the runtime-correct call is
+  type-wrong.
+- **Fix**: `once<A extends unknown[]>(...args: A): A` (a tuple), and the transform props
+  accept `A | Once<A>`.
+- **Where it bites**: `geometry-terrain-raycast` (worked around with `useMemo`); any port
+  translating/scaling a geometry with more than one argument.
+
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
 - **What**: `@react-three/drei/webgpu` exports `CurveModifier`, which imports `Flow` from
