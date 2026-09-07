@@ -10,8 +10,16 @@ every upstream bug we've verified. Two audiences:
   @types/three repos: self-contained fix briefs with evidence and suggested fixes.
   Each is independently actionable.
 
-Last verified: 2026-07-27 against fiber `v10` branch HEAD (`dc6bbd7`, up to date with
-origin), drei `11.0.0-alpha.5`, three `0.185.1`.
+Last verified: 2026-09-07 against `@react-three/fiber@10.0.0-alpha.4`,
+`@react-three/drei@11.0.0-alpha.7`, `three@0.185.1`, `@types/three@0.185.1`,
+`@react-three/eslint-plugin@1.0.0-alpha.2`, `@react-three/rapier@2.2.0`. (Previously
+2026-07-27 against fiber `v10` branch HEAD `dc6bbd7`, drei `11.0.0-alpha.5`.) Every
+Part A pin and every Part B brief was re-verified this cycle and carries a
+`Status 2026-09-07` line; see the Filing plan below Part B's heading for what's queued
+to go upstream. The 2026-09-07 audit's working notes were a session-scoped scratchpad
+(not checked in) — `docs/upstream-issues/` is the durable output: paste-ready issue
+drafts plus an index of what's ready to file, cross-link-instead, or needs a
+milestone check.
 
 ---
 
@@ -29,12 +37,82 @@ origin), drei `11.0.0-alpha.5`, three `0.185.1`.
 | A8                            | pnpm pinned via `packageManager`                                                                                                            | `package.json`                                                                                                                     | Hygiene, not a shim; keep                                                                                                                                                                                                                                                                                          |
 | A9                            | **fiber `useUniforms` return type patched locally** so uniforms keep three's real types (no cast, typed `.value`, checked keys)             | `scripts/patch-fiber-types.mjs`, run from `postinstall` — rewrites `dist/webgpu/index.d.{ts,mts,cts}` ONLY, types-only, idempotent | fiber ships the B1 fix (both halves). The script FAILS LOUDLY with exit 1 if its anchor string is gone — that error is the removal reminder: delete the script, the postinstall hook, and the remaining A7 casts. Not `pnpm patch` because fiber installs from a `file:` tarball, which `pnpm patch` can't resolve |
 
+**Status 2026-09-07 (re-verification cycle)** — no Part A pin unwinds this cycle. A1/A2
+were already unwound before this audit and remain correctly retired; A7 is opportunistic
+cleanup, not an unwind-condition pin, and wasn't re-checked.
+
+- **A3**: NOT MET — `node_modules/@react-three/fiber/package.json`'s exports map
+  confirms `.` → `dist/index.mjs` and `./webgpu` → `dist/webgpu/index.mjs` are still two
+  fully separate bundle files with no shared chunk (corroborated by B2's own re-check:
+  two independent module-scope reconciler singletons). Keep the alias.
+- **A4**: NOT MET — `npm view typescript-eslint peerDependencies` still caps at
+  `"typescript": ">=4.8.4 <6.1.0"` (checked 2026-09-07); typescript-eslint#10940 is still
+  open, active discussion of `tsgo`/WASM sync-API prototyping, no resolution timeline.
+  Keep the pin.
+- **A5**: Unchanged by design — `package.json` has `"react-router": "^7.18.1"`
+  (`version-7` dist-tag resolves to `7.18.3`); npm `latest` is `8.3.1`. No unwind
+  expected until a deliberate v8 migration is scoped.
+- **A6**: Still needed — the gitignored `reference/react-three-fiber` clone is confirmed
+  present on disk.
+- **A8**: No unwind expected — `package.json` has `"packageManager": "pnpm@10.33.0"`.
+  Hygiene, not a shim.
+- **A9**: NOT MET (depends on B1, confirmed still open) — B1's raw pre-patch
+  `useUniforms<T>(...)` signature and the `UniformNode<T>` alias pinning `TNodeType` to
+  `unknown` are both unchanged in alpha.4; the three issues that would fix it
+  (`pmndrs/react-three-fiber#3769`, `#3886`, `#3887`) are all still open. Keep the local
+  patch.
+
 House rule: **every new patch/override/pin lands with an entry here in the same
 commit** (AGENTS.md points agents at this file).
 
 ---
 
 ## Part B — Upstream fix briefs
+
+### Filing plan (2026-09-07)
+
+Every brief below was re-verified against the versions listed at the top of this file
+and now carries a `Status 2026-09-07` line. 27 issue drafts came out of that pass, in
+`docs/upstream-issues/` (index + full table there). Counts:
+
+| Package                      | Briefs re-verified | Drafts (incl. B54)                                   | Ready to paste | Cross-link instead (do not refile) |
+| ---------------------------- | ------------------ | ---------------------------------------------------- | -------------- | ---------------------------------- |
+| `@react-three/fiber`         | 19                 | 15 (incl. B54)                                       | 14             | 1 (B1)                             |
+| `@react-three/drei`          | 12                 | 10                                                   | 9              | 1 (B45)                            |
+| `three.js` / `@types/three`  | 19                 | 0 (not poimandres — no drafts filed for this family) | 0              | —                                  |
+| `@react-three/eslint-plugin` | 1                  | 1                                                    | 1              | —                                  |
+| `@react-three/rapier`        | 1                  | 1                                                    | 1              | —                                  |
+| **Total**                    | **52** (+ B54 new) | **27**                                               | **25**         | **2**                              |
+
+drei's 9 "ready" drafts still need the milestone check below before filing.
+
+**Do NOT file — cross-link to an existing issue instead:**
+
+- **B1** → [pmndrs/react-three-fiber#3769](https://github.com/pmndrs/react-three-fiber/issues/3769),
+  [#3886](https://github.com/pmndrs/react-three-fiber/issues/3886),
+  [#3887](https://github.com/pmndrs/react-three-fiber/issues/3887) (all open) already
+  cover this exactly. Draft kept at `docs/upstream-issues/B1-fiber.md` for reference/
+  reuse if those close without a real fix, marked do-not-file.
+- **B45** → [pmndrs/drei#2820](https://github.com/pmndrs/drei/issues/2820) (open, filed
+  2026-09-02 by `DennisSmolek` — confirm with Dennis whether that's him; if so, he
+  already has a direct line to this fix). Draft kept at
+  `docs/upstream-issues/B45-drei.md`, marked do-not-file.
+
+**Before filing anything drei-side**: check it against Dennis's own in-flight
+"WebGPU Correctness" push — [pmndrs/drei#2801–#2828](https://github.com/pmndrs/drei/issues/2801)
+(very recent, 2026-09-01 through 09-05, driven by a systematic `scripts/audit-components.js`
+sweep, several issues authored by `DennisSmolek`). B45's exact match (#2820) came out of
+that batch; the other 9 drei drafts here (B5, B6, B8, B20, B36, B46, B48, B49, B50) may
+already be covered by an issue in that range that a keyword search here didn't surface —
+five-minute check before filing, not a reason to hold the drafts. (B13 has no draft at
+all — see its entry below; filing it as literally written would be wrong.)
+
+Everything else in the table above ("Drafts ready to paste") has no matching open
+upstream issue found via `gh search issues`/`gh search prs` with multiple keyword
+variants per brief (recorded per-brief in the Status line below each one) — genuinely
+unfiled as of 2026-09-07.
+
+---
 
 ### B1 · fiber: `UniformNode<T>` alias discards the TSL node type → strict-tsc failures
 
@@ -132,6 +210,8 @@ corpus, ~111 are uniform casts caused by THIS bug and become deletable
 `…In as unknown as Node` and are the unrelated B10 family (Fn destructured params) —
 do not count those as fixed.
 
+- **Status 2026-09-07**: OPEN — postinstall-patch anchor confirms the raw (pre-patch) `useUniforms<T>(...): UniformsWithUtils<UniformRecord<UniformNode>>` and the `UniformNode<T> = three_webgpu.UniformNode<unknown, T>` alias are both unchanged in alpha.4; an unmerged fix commit (`00c846ab`) exists but has diverged from v10 HEAD. **Do not file a 4th issue** — already covered exactly by [pmndrs/react-three-fiber#3769](https://github.com/pmndrs/react-three-fiber/issues/3769), [#3886](https://github.com/pmndrs/react-three-fiber/issues/3886), [#3887](https://github.com/pmndrs/react-three-fiber/issues/3887) (all open) — cross-link instead. Workaround: `scripts/patch-fiber-types.mjs` (A9).
+
 ### B2 · fiber: `.` and `./webgpu` entries are two separate builds of one runtime
 
 - **Where**: `packages/fiber` build config / exports map.
@@ -141,6 +221,7 @@ do not count those as fixed.
 - **Evidence**: reproduced in this repo (M0); shim is a Vite resolve alias (A3).
 - **Suggested fix**: root entry re-exports from a shared chunk (or `/webgpu` becomes
   the superset entry the root aliases to), so double-import is harmless.
+- **Status 2026-09-07**: OPEN — `.` and `./webgpu` remain two independently-bundled esbuild outputs, each with its own module-scope `createReconciler`/`reconciler` singleton (confirmed at `index.mjs:13540/13874` vs `webgpu/index.mjs:13548/13882`). No matching upstream issue found. Workaround: `vite.config.ts` resolve alias (A3).
 
 ### B3 · fiber: npm canary broken against three ≥0.183
 
@@ -148,6 +229,7 @@ do not count those as fixed.
   three r183 renamed it `CubeRenderTarget` → import error at install/build time.
 - **Fix**: rename in source (already correct on the v10 branch — needs a fresh
   publish); this is why A1 exists.
+- **Status 2026-09-07**: FIXED, reconfirmed — `webgpu/index.mjs` imports `CubeRenderTarget` from `three/webgpu` correctly; `WebGLCubeRenderTarget` is now a gated legacy-only stub. Zero broken imports. Workaround: none needed.
 
 ### B4 · drei: `/webgpu` build references `WebGLCubeRenderTarget` (three ≥0.183 rename) — **FIXED in 11.0.0-alpha.6**
 
@@ -160,6 +242,7 @@ do not count those as fixed.
 - **Fix**: identifier rename (source-level: import rename in the cube-camera /
   env-map paths) + publish fresh alpha. Our exact working patch:
   `patches/@react-three__drei@11.0.0-alpha.5.patch` (mechanical rename, verified).
+- **Status 2026-09-07**: FIXED, confirmed no regression on the alpha.6→alpha.7 bump — 0 `WebGLCubeRenderTarget`, 6 `CubeRenderTarget`, byte-identical between the two tarballs. Workaround: none needed.
 
 ### B5 · drei: CameraControls missing from `/core` & `/webgpu` subpath exports
 
@@ -171,6 +254,7 @@ do not count those as fixed.
   `connect`/`disconnect` effect, NEVER `dispose()` of a memoized instance in cleanup),
   camera-controls v3 notes (constructor `(camera, domElement?)`, `setTarget` returns a
   Promise), and `target`/`minDistance`/`maxDistance` props.
+- **Status 2026-09-07**: OPEN — `CameraControls` moved to `/external` via [pmndrs/drei#2548](https://github.com/pmndrs/drei/pull/2548) (merged, closing [#2547](https://github.com/pmndrs/drei/issues/2547)), but `/external` imports bare `'@react-three/fiber'`/`'three'` — not renderer-split — and there is still zero `CameraControls` export from `/webgpu` or `/core`. The PR moved the export path, it didn't add one. Unchanged between alpha.6 and alpha.7. Workaround: `src/utils/CameraControls.tsx`.
 
 ### B6 · drei: Grid (TSL port) thin-line shimmer under WGSL coarse derivatives
 
@@ -183,6 +267,7 @@ do not count those as fixed.
   clamp effective line thickness to ≥1px in screen space.
 - **Our mitigation** (works, not a fix): thickness ≥1, `fadeDistance` tuned to die
   before moiré range — see `src/utils/DemoHelpers.tsx`.
+- **Status 2026-09-07**: OPEN, severity CANNOT VERIFY without a visual repro — `getGrid` still divides by `fwidth(r)`, byte-identical between alpha.6 and alpha.7. No upstream issue found (`Grid fwidth`, `Grid shimmer`, `Grid webgpu` all came up empty). Workaround: none (cosmetic; thickness/fadeDistance tuning in `src/utils/DemoHelpers.tsx`).
 
 ### B7 · fiber docs: `render-pipeline.mdx` snippets fail strict TypeScript
 
@@ -190,6 +275,7 @@ do not count those as fixed.
   typed nullable but no snippet guards it; and the bloom-uniform snippet hits B1.
   Fix the snippets (add `if (!renderPipeline) return`, add the cast or land B1) or
   wire snippets into a typecheck.
+- **Status 2026-09-07**: PARTIALLY STALE — the `mainCB` param `renderPipeline` is already typed non-null in installed alpha.4 (`index.d.ts:1345`), so that half of the brief no longer holds; the bloom-uniform doc snippet still hits B1 as long as B1 stands. No upstream issue specific to this beyond B1's. Workaround: none.
 
 ### B9 · ~~FIXED in fiber alpha.4~~ · fiber: `/webgpu` entry types `renderer` as the WebGL|WebGPU union
 
@@ -207,16 +293,46 @@ do not count those as fixed.
 - **Local workaround**: single documented `as WebGPURenderer` cast per file.
 - **Same family**: `RootState.camera` types as base `Camera` — `.near`/`.fov` etc.
   need the analogous cast (hit in `backdrop-water/RenderPipelineFX.tsx`).
+- **Status 2026-09-07**: RETIRED, reconfirmed FIXED — `WebGPURootState.renderer: WebGPURenderer` at `index.d.ts:4168`, no union, on alpha.4. Workaround: none (24 casts already swept repo-wide).
 
-### B10 · three.js: TSL `Fn` destructured params lose their node type
+### B10 · @types/three: TSL `Fn` destructured params lose their node type — mechanism changed, now a SILENT gap
 
-- **What**: params of `Fn(([count, color]) => …)` type as bare
-  `ShaderNodeObject<Node>` — no `'float'`/`'vec3'` parameter — so typed TSL overloads
-  (`rotate()` notably) fail to resolve on them under strict tsc.
-- **Evidence**: hit porting `webgpu_tsl_halftone` (tsl-halftone/halftoneEffect.ts —
-  eight casts). Same cast family as fiber's B1, but this one is three's typings.
-- **Suggested fix**: let `Fn`'s type accept a tuple of node-typed params (generic
-  parameter per arg, or a `Fn<[Node<'float'>, Node<'vec3'>]>` signature).
+> **REWRITTEN 2026-09-07** — the brief as originally filed describes a blocking type
+> error; that is no longer what happens. `three/tsl`'s typed surface was substantially
+> rewritten since this was first written (real generics/mapped types —
+> `ProxiedTuple`/`Proxied<T>` — replacing the flatter `ShaderNodeObject<Node>` shape).
+> Empirically re-verified with a `tsc --strict` probe against the installed
+> `@types/three`: `Fn(([co, angle]) => { co.dot(vec2(1,1)); const bad: string = angle;
+co.anyNonexistentMethod(); })` produces **zero** type errors. `Fn`'s array-destructured
+> overload is `Fn<TArgs extends readonly unknown[], TReturn>(jsFunc: (args: TArgs,
+builder) => TReturn, …)` (`@types/three/src/nodes/tsl/TSLCore.d.ts:1785-1788`) — `TArgs`
+> is unconstrained by anything at the call site, so TS can't infer it from the
+> destructuring pattern and defaults to `any[]`. So `co`/`angle` are `any`, not "bare
+> `ShaderNodeObject<Node>`" — nothing needs a cast for this reason anymore, but there is
+> also no type safety at all on a destructured `Fn` param: a typo'd method name or a
+> wrong-shape argument compiles clean and fails only at runtime.
+
+- **What**: params of `Fn(([count, color]) => …)` infer as `any` — not the typed
+  `Node<'float'>`/`Node<'vec3'>` the runtime actually passes — so nothing about them is
+  checked. The root cause (no per-position node typing for destructured `Fn` params) is
+  the same gap the original brief named; only the SYMPTOM changed, from a loud compile
+  error to a silent hole.
+- **Evidence**: `tsl-halftone/halftoneEffect.ts`'s original 8 casts are no longer needed
+  for this reason (the `tsl-halftone` port in this corpus doesn't use the destructured-
+  array form today). The stale repo comment this brief left behind —
+  `src/examples/postprocessing/postprocessing-glitch/glitchNode.ts:19-20` ("co's param
+  type is a bare Node... `dot()` called as standalone") — was itself inaccurate for the
+  current `@types/three` and has been corrected in the same pass as this brief (`co` is
+  `any`; both the standalone and chained forms compile).
+- **Suggested fix**: constrain `TArgs` per-call via an explicit type argument, or give
+  `Fn` an overload that accepts a tuple of node-typed params
+  (`Fn<[Node<'float'>, Node<'vec3'>]>(…)`) so destructuring infers real types instead of
+  defaulting to `any[]`.
+- **Status 2026-09-07**: STALE/WRONG as originally written (mechanism changed, see
+  above) — root gap persists, now as a silent `any` rather than a blocking error.
+  Workaround: none currently needed (no cast blocks compilation today); not fixable by a
+  local `.d.ts` augmentation (a call-site-generic gap can't be narrowed without changing
+  every call site to pass explicit type args).
 
 ### B12 · ~~FIXED in fiber alpha.4~~ · fiber: `useUniforms` scope/name strings flow unvalidated into WGSL identifiers
 
@@ -232,8 +348,21 @@ do not count those as fixed.
 - **Suggested fix**: sanitize the generated identifier (replace non-`[A-Za-z0-9_]`
   chars) or throw early from `useUniforms` with a clear message naming the offending
   scope/key. Silent pass-through into codegen is the worst of the options.
+- **Status 2026-09-07**: RETIRED, reconfirmed FIXED — `scopedNodeName()` (`index.mjs:15511`) replaces non-`[A-Za-z0-9_]` characters with `_` and prefixes an invalid leading char. Workaround: none needed.
 
 ### B11 · @types/three: duck-typed `*Node` properties undeclared (fogNode, backgroundNode, emissiveNode…)
+
+> **NARROWED 2026-09-07** — `Scene.fogNode` / `backgroundNode` / `environmentNode` ARE
+> declared as of `@types/three` 0.185.1, but not in `Scene.d.ts`: they arrive through a
+> `declare module "../../scenes/Scene.js"` augmentation in
+> `renderers/common/Renderer.d.ts:31-37`, which is why a read of `Scene.d.ts` alone says
+> "undeclared". Proven by the R3 sweep the same day: all 34 corpus `scene as unknown as
+{ backgroundNode… }` casts were removed and `tsc --noEmit` is clean. `emissiveNode` is
+> declared on `MeshStandardNodeMaterial` (`MeshStandardNodeMaterial.d.ts:20`) but still
+> absent from the shared `NodeMaterial` base and `MeshPhongNodeMaterial`, so
+> `ReflectiveFloor.tsx`'s cast stays. What is left of this brief: `emissiveNode` /
+> `clearcoatNode` on the base, `light.colorNode`, `PassNode.options` (B39), and
+> `colorNode` on a classic-`Material`-typed variable — 7 casts corpus-wide.
 
 - **What**: the WebGPU renderer reads several `*Node` properties generically at
   runtime that `@types/three` declares narrowly or not at all:
@@ -248,8 +377,26 @@ do not count those as fixed.
 - **Suggested fix**: declare `fogNode`/`backgroundNode` on `Scene` and move
   `emissiveNode` (and friends read by `setupOutgoingLight`) up to the shared
   `NodeMaterial` declaration.
+- **Status 2026-09-07**: STILL OPEN but narrowed — the Scene half is FIXED upstream
+  (`Renderer.d.ts:31-37` augmentation, 0.185.1); the material half remains. Workaround:
+  7 documented casts (`ReflectiveFloor.tsx`, `materials-video`, `shadowmap-opacity`,
+  `WoodShowcase`, `PortalModels`, `lights-projector`, `materials-alphahash`). A local
+  `declare module 'three/webgpu' { interface NodeMaterial { emissiveNode?: Node | null } }`
+  in `src/types/` would clear most of them; not applied.
 
 ### B13 · drei: `/webgpu` `Environment` doesn't wire `UltraHDRLoader`
+
+> **STALE 2026-09-07** — the brief's literal claim ("Environment only wires HDR/EXR
+> loaders") is false on both alpha.6 and alpha.7: `getLoader()` also wires
+> `HDRJPGLoader` (from `@monogrid/gainmap-js`, a DIFFERENT library than three's own
+> `UltraHDRLoader` addon) for `.jpg`/`.jpeg`, and this predates the alpha.6→.7 bump
+> entirely — it is not something drei just added. The real open question is whether
+> `HDRJPGLoader`'s single-file gainmap decode is format-compatible with the specific
+> `*.hdr.jpg` assets the four affected examples need — an asset-level browser test,
+> not a source-reading question, and unresolved either way. **Not filed upstream**:
+> an issue saying "UltraHDR isn't wired" would be wrong and would likely get closed
+> on sight. Resolve the asset-compatibility question locally first, then decide
+> whether a narrower, accurate issue is warranted.
 
 - **What**: three.js's newer examples ship UltraHDR JPEG environments
   (`*.hdr.jpg`, loaded via `UltraHDRLoader`); drei's `Environment` only wires
@@ -264,6 +411,9 @@ do not count those as fixed.
 - **Sharpened (wave 11)**: `useLoader(UltraHDRLoader, url)` works cleanly on
   `/webgpu` (`pmrem-equirectangular` uses the original UltraHDR asset directly) —
   the gap is strictly Environment's loader selection, not the loader or renderer.
+- **Status 2026-09-07**: STALE/WRONG as literally written (see correction above) —
+  CANNOT FULLY VERIFY beyond that without an asset-level browser test. Workaround: 4
+  examples fell back to a plain `.hdr` asset. Not filed upstream — see the correction.
 
 ### B14 · @types/three: TSL `Loop()` typed surface lags the runtime
 
@@ -277,6 +427,7 @@ do not count those as fixed.
   and by dropping the optional layout argument.
 - **Suggested fix**: type the `name` option and deeper overloads on `Loop`; fix the
   `Fn` layout-arg overload resolution.
+- **Status 2026-09-07**: OPEN — `LoopNode.d.ts`'s `Loop` interface still has exactly 3 overloads (unnamed count, single named-object, hardcoded double `{i,j}`); the file carries its own DefinitelyTyped `// TODO Expand to other types` comments confirming DT knows this lags the runtime. No local workaround cited. `@types/three`'s to fix, not three.js's.
 
 ### B15 · three: env-change rebuild unreliable for custom-node materials (0.185.1)
 
@@ -295,6 +446,7 @@ do not count those as fixed.
   `scene.environment` changes for materials with custom vertex-stage nodes;
   the needsUpdate path appears to miss the env-map define/graph refresh when a
   shadow pass variant exists.
+- **Status 2026-09-07**: CANNOT VERIFY (runtime-only race) — `NodeMaterialObserver.js:611-620`'s refresh check is unchanged; source shape still plausible for the race, no matching upstream issue found on a targeted `gh` search. Workaround: Suspense-gate the scene on the HDR load (`tsl-procedural-terrain` pattern).
 
 ### B16 · ~~FIXED in fiber alpha.4~~ · fiber: scoped `useNodes`/`useBuffers`/`useGPUStorage` debug name (`${scope}.${name}`) breaks WGSL codegen
 
@@ -328,6 +480,7 @@ do not count those as fixed.
   src/examples/compute-particles/Particles.tsx.
 - **Suggested fix**: use a WGSL-safe separator (`_`, matching useUniforms) and
   sanitize both parts (shared fix with B12's validator).
+- **Status 2026-09-07**: RETIRED, reconfirmed FIXED — the same `scopedNodeName()` sanitizer is used by `useUniforms`/`useNodes`/`useBuffers`/`useGPUStorage` (setName call sites at `index.mjs:15714,15781,15922,15995`); separator is `_`, never `.`. Upstream: [pmndrs/react-three-fiber#3848](https://github.com/pmndrs/react-three-fiber/issues/3848) (closed, merged). Workaround: none needed.
 
 ### B17 · ~~FIXED in fiber alpha.4~~ · fiber: Canvas-boundary suspension re-runs createRoot and freezes TSL `time`
 
@@ -367,8 +520,18 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
   Canvas-boundary suspension triggers (likely the Canvas component re-running its
   init on the suspense retry); at minimum, make the createRoot warning an error so
   the failure is loud.
+- **Status 2026-09-07**: RETIRED (original mechanism), reconfirmed FIXED — `createRoot()` now reuses `prevFiber`/`prevStore` on repeat calls against the same canvas element instead of tearing down. Upstream: [pmndrs/react-three-fiber#3850](https://github.com/pmndrs/react-three-fiber/issues/3850) (closed) covers this mechanism only. **The `geometry-loft` open anomaly below is still live** — no suspending hook present at all, yet the same warning fires — and has no matching upstream issue; filed as `docs/upstream-issues/B17-regression-fiber.md` despite the retirement, since it's a distinct, currently-unresolved thread. Workaround: many `{/* B17 gate */}` Suspense boundaries repo-wide (still harmless to keep).
 
-### B18 · fiber: creator-mode `useUniforms` setState-during-render on post-suspense creation
+### B18 · ~~FIXED in fiber alpha.4~~ · fiber: creator-mode `useUniforms` setState-during-render on post-suspense creation
+
+> **RETIRED 2026-09-07 (fiber alpha.4, already installed — nobody had marked it)** —
+> `useUniforms`'s creator path no longer calls `store.setState` during render.
+> `useScopedResource` now STAGES fresh entries into a plain `Map` inside the `useMemo`
+> (`stageEntries`, pure JS, no store write) and only calls `store.setState` from
+> `flushStagedScope`, invoked by `useIsomorphicLayoutEffect` — after render, not during
+> it. Found while re-verifying every brief 2026-09-07; verified by reading
+> `@react-three/fiber/dist/webgpu/index.mjs:15580-15612`. Kept for history; do NOT cite
+> this brief in new code.
 
 - **What**: `useUniforms` creator mode calls `store.setState` inside `useMemo`
   during render when a uniform is first created. If the component suspends BEFORE
@@ -390,6 +553,8 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
   microtask/effect-phase flush), or narrow `useRenderPipeline`'s subscription; the
   B8 family (setState-in-render from hooks) keeps growing — a lint-able contract
   ("no store writes during render") would kill the class.
+- **Status 2026-09-07**: RETIRED (see blockquote above) — found fixed while
+  re-verifying every brief; nobody had marked it before now. Workaround: none needed.
 
 ### B19 · fiber: `StorageLike` union misses `Storage3DTexture`
 
@@ -402,6 +567,7 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
 - **Suggested fix**: add `Storage3DTexture` (and audit for other storage classes,
   e.g. `StorageInstancedBufferAttribute`) to the union; a type-level test against
   the compute.mdx snippets would catch drift.
+- **Status 2026-09-07**: OPEN — `StorageLike = StorageTexture | Data3DTexture | Node` unchanged, on both installed alpha.4 and v10 HEAD; runtime's `Storage3DTexture` is a genuinely distinct class (not a `Data3DTexture` subtype), and `StorageArrayTexture` is also uncovered. No upstream issue found. Workaround: `as unknown as StorageTexture` in `volume-fire`.
 
 ### B20 · fiber + drei: `Environment`/`useEnvironment` can't load HDR cubemaps
 
@@ -416,6 +582,7 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
 - **Suggested fix**: sniff the first entry's extension before the cube branch;
   `.hdr` → `HDRCubeTextureLoader` (and `.exr` → EXR equivalent). B13 family
   (Environment loader-selection gaps).
+- **Status 2026-09-07**: OPEN, unaffected by the drei bump — `getExtension()`'s `isCubemap` short-circuit before extension sniffing is identical in drei alpha.6/alpha.7 AND in fiber's own (still alpha.4) copy of the same logic — the gap is on both sides. No upstream issue found. Workaround: `useLoader(HDRCubeTextureLoader, [...])` directly (`clearcoat`).
 
 ### B21 · fiber: `declare module 'three/tsl'` augmentation shadows @types' `Fn` overloads
 
@@ -431,6 +598,7 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
 - **Suggested fix**: make fiber's augmentation additive (re-declare the upstream
   overloads alongside, or interface-merge instead of value shadowing); add a
   compile test that `Fn(fn, 'void')` still typechecks with fiber installed.
+- **Status 2026-09-07**: OPEN, reproduced live via a `tsc` probe in this repo — importing `Fn` from `three/tsl` anywhere makes `Fn(fn, 'void')` fail (`Type '"void"' has no properties in common with type '{ layout?: unknown; }'`); fiber's `declare module 'three/tsl'` block still declares exactly 4 `Fn` overloads, none accepting a string 2nd arg, shadowing `@types/three`'s own 3 overloads that do. No upstream issue found. Workaround: `skinning-points` inlines a plain JS closure emitting the same statements instead of the statement-call form.
 
 ### B22 · three.js: `MRTNode.setup()` silently drops outputs whose names don't match the bound target
 
@@ -448,6 +616,7 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
 - **Suggested fix**: warn instead of silently `continue`ing on an unmatched output, or
   fall back to positional/index binding when the bound target's textures are unnamed.
   Fixing the shipped example is a separate, smaller PR.
+- **Status 2026-09-07**: OPEN — `MRTNode.setup()` (`nodes/core/MRTNode.js`) still `continue`s past an unmatched output name with only a code comment, no warning, confirmed unchanged. Not a local workaround target here (`multiple-rendertargets-readback`'s port names both targets' textures correctly, avoiding the landmine rather than working around a thrown error).
 
 ### B23 · @types/three: `Points` doesn't declare `count`
 
@@ -456,6 +625,7 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
   needs an undeclared-property cast.
 - **Evidence**: `compute-points` (300k-point storage buffer, drawn via `<points>`).
 - **Suggested fix**: DefinitelyTyped PR adding `count?: number` to `Points`.
+- **Status 2026-09-07**: OPEN — `objects/Points.d.ts` still has no `count` field (`Sprite.d.ts:72` does). Workaround: `compute-points.tsx:177` cast; also covered by B34's proposed consolidated `three-instanced-count.d.ts` fix (not yet applied).
 
 ### B24 · @types/three: `BloomNode.highPassFn` declared to return `void`
 
@@ -465,6 +635,7 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
 - **Evidence**: `postprocessing-anamorphic` (horizontal-only high-pass via `rtt()` +
   `Loop()`). Distinct from B21, though both bite the same assignment.
 - **Suggested fix**: DefinitelyTyped PR correcting the return type to `Node`.
+- **Status 2026-09-07**: OPEN — `BloomNode.d.ts:11-16` still declares `highPassFn` returning `void`, while the runtime (including the addon's own default `luminosityHighPass`) calls `.context(...)` on its return, proving it must return a `Node`. Workaround: `postprocessing-anamorphic.tsx:180` cast.
 
 ### B25 · three.js (OPEN QUESTION): compute-driven `geometryNode` seeding race
 
@@ -480,6 +651,7 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
   unexplained; the reentrant-compute path completes with zero console errors while the
   seed doesn't reliably land. Needs someone with WebGPU-backend source access before
   this becomes a rule. Documented in the example's header, deliberately not promoted.
+- **Status 2026-09-07**: CANNOT VERIFY — open research question, acknowledged as-is; not something a static read can root-cause. No change from prior state; stays documented in the example's header, deliberately not promoted.
 
 ### B26 · fiber: `useTexture`'s `onLoad` receives `useLoader`'s raw ARRAY, not the mapped record
 
@@ -505,6 +677,7 @@ be called once!` and every TSL `time`-driven node graph freezes permanently at
   pass THAT to `onLoad`, so runtime matches the declaration. (The mapping already
   exists for the return value; reuse it.) Failing that, correct the declared parameter
   type to the array for Record inputs, which is worse ergonomics but at least honest.
+- **Status 2026-09-07**: OPEN — `useTexture`'s `onLoad` still fires (`index.mjs:1354`) with the RAW `useLoader` array output (`loadedTextures`) before the keyed `mappedTextures` record is built at `index.mjs:1374` — distinct from the CLOSED infinite-loop bug [#3849](https://github.com/pmndrs/react-three-fiber/issues/3849) in the same function, which is a different bug. No upstream issue found for this shape specifically. Workaround: none in this repo (the array form is used instead, relying on `Object.values` ordering).
 
 ### B27 · fiber: `fromRef` can resolve a sibling but cannot TRANSFORM it
 
@@ -544,6 +717,7 @@ for Object` (the marker is not a Light, and never becomes one).
   until the shader BUILDS on the first frame. So `lights([])` during render plus a
   `useLayoutEffect` that calls `setLights([ref.current])` lands before anything reads
   it — no state, no `needsUpdate`, no cast. Delete that shape when B27 ships.
+- **Status 2026-09-07**: OPEN — `fromRef<T>(ref)` (`index.d.ts:3683`) still has no transform param; `commitMount` (`index.mjs:13935`) still only scans TOP-LEVEL props for `isFromRef(value)` and assigns verbatim, no recursion into nested values. No upstream issue found. Workaround: `lights-phong`'s ref + `useLayoutEffect` `setLights()` pattern (exploits `LightsNode.setLights()` being a bare reference assignment read only at first shader build).
 
 ### B28 · three/drei (OPEN): `PMREM.cubeUv` disposed mid-submit — recurring, not the cold-start transient
 
@@ -596,6 +770,7 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
 - The failure is console-only: the canvas renders and the non-black assertion passes; it
   is the `expect(errors).toEqual([])` console-clean assertion that fails. So it degrades
   the test signal rather than the demo.
+- **Status 2026-09-07**: CANNOT VERIFY (flaky runtime race), source shape unchanged — `extras/PMREMGenerator.js:779` still names the texture `'PMREM.cubeUv'`; the dispose-and-reuse shape at the size-change path is unchanged since the 2026-09-01 rescope. Workaround: documented as an accepted flake in this file, not silenced.
 
 ### B29 · three.js: TSL display passes discard supplied `UniformNode` identity
 
@@ -618,6 +793,15 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
   Leva edits update the live effect without a pipeline rebuild or synchronization
   effect.
 - **Upstream**: [three.js#34416](https://github.com/mrdoob/three.js/issues/34416).
+- **Status 2026-09-07**: FIXED UPSTREAM, unreleased — `#34416` is CLOSED (2026-09-01),
+  milestone **r186** (due 2026-09-07); maintainer `Mugen87` confirmed the gap and merged
+  [PR #34417](https://github.com/mrdoob/three.js/pull/34417) ("DotScreenNode/RGBShiftNode:
+  Make ctor more flexible") the same day. Still OPEN in installed `three@0.185.1` (r185) —
+  `DotScreenNode.js`/`RGBShiftNode.js` still call bare `uniform(angle)` with no guard —
+  this self-resolves automatically on the next `three` bump to r186+. **No local change
+  needed now; drop the "construct with defaults, assign onto field" workaround note above
+  once bumped**, though that pattern is harmless to keep as a general habit for other
+  node-class passes (AGENTS.md § Post-processing (b)).
 
 ### B30 · fiber: `useRenderPipeline` should be generic over its mainCB return type
 
@@ -636,6 +820,7 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
 - **Where it bites**: any structural toggle — a leva boolean swapping `outputNode`
   between two graphs has no uniform field to assign onto, so the read-back is the ONLY
   available pattern (AGENTS.md § Post-processing (d)).
+- **Status 2026-09-07**: OPEN in published alpha.4 (`PassRecord = Record<string, any>`, non-generic); PARTIALLY addressed on unpublished v10 HEAD — merged [PR #3901](https://github.com/pmndrs/react-three-fiber/pull/3901) ("Harden render and node types", unreleased) binds `PassRecord`/`RegisteredPasses` to three's `Node` instead of `any`, but the maintainers deliberately stopped short of full per-key genericity ("`Node` is the common base, so that is the bound" — doc comment). Cite the PR when filing rather than asking for the originally-suggested full generic — that ask has already been considered and bounded. Workaround: `passes.xPass as ReturnType<typeof x> | undefined` casts (house-style exempted).
 
 ### B31 · fiber: `RootState.camera` is the base `Camera`, so every lens read needs a cast
 
@@ -652,6 +837,7 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
   could carry that through a generic, or default to `PerspectiveCamera` (what fiber
   actually creates unless told otherwise), with `OrthographicCamera` narrowing when
   `orthographic` is set.
+- **Status 2026-09-07**: PARTIALLY FIXED — `RootState.camera` is now `ThreeCamera = (OrthographicCamera | PerspectiveCamera) & {manual?}` (`index.d.ts:572`), not bare `Camera`; verified via `tsc`: `.near`/`.far` now typecheck with NO cast, `.fov`/`.aspect` still error (Ortho lacks them) and need one. Unchanged on v10 HEAD. Workaround: cast narrowed to just the Perspective-only fields in `RenderPipelineFX.tsx`.
 
 ### B32 · @types/three: `demuxer_mp4.js` addon ships no type declarations at all
 
@@ -663,6 +849,7 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
   `src/types/demuxer-mp4.d.ts`, narrowed to what `video-frame` actually uses.
 - **Where it bites**: `textures/video-frame` — the WebCodecs `VideoDecoder` path that
   `VideoFrameTexture` is designed for.
+- **Status 2026-09-07**: OPEN, unchanged — `demuxer_mp4.js` still ships with no adjacent `.d.ts` anywhere (npm package or `@types/three`). Workaround already in place and accurate: `src/types/demuxer-mp4.d.ts`.
 
 ### B33 · @types/three: `VideoFrameTexture.image` is `VideoFrame | {}`, so `.close()` never narrows
 
@@ -674,6 +861,7 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
 - **Where it bites**: `textures/video-frame` (`closeIfFrame`).
 - **Fix**: type `image` as `VideoFrame` on `VideoFrameTexture`, which is what the class
   actually holds.
+- **Status 2026-09-07**: OPEN, unchanged — `VideoFrameTexture.d.ts:11` still types `.image` as `VideoFrame | {}`. Workaround already in place: `video-frame.tsx`'s `closeIfFrame` helper.
 
 ### B34 · @types/three: `count` is declared on `Mesh` but not `Points` / `Line`
 
@@ -689,6 +877,7 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
   in 0.185.1. Only the points/line half remains.
 - **Fix**: declare `count` wherever the renderer reads it — most simply on the shared
   geometry-bearing base rather than per subclass.
+- **Status 2026-09-07**: OPEN (Points/Line half); Mesh half confirmed fixed — `objects/Mesh.d.ts:85` has `count: number` (the earlier fix holds); `Points.d.ts` and `Line.d.ts` still declare neither. Workaround already in place: `compute-points.tsx:177` and `VerletWireframe.tsx:43` casts. Consolidated fix drafted (`three-instanced-count.d.ts`, covers this and B23) but not yet applied.
 
 ### B35 · @types/three: fields typed as a bare `Node` lose the whole fluent TSL surface
 
@@ -706,6 +895,7 @@ texture [Texture "PMREM.cubeUv"] used in a submit.` AGENTS.md documents this as 
 - **Same family as B10** (`Fn` params type as bare `ShaderNodeObject<Node>`): the fluent
   surface is attached by node TYPE, and every interface that stores a node untyped drops
   it. Fixing the storage types is more valuable than fixing them one call site at a time.
+- **Status 2026-09-07**: OPEN, unchanged — `LightingModelReflectedLight` fields (`directDiffuse` etc.) are still bare `Node`, not `Node<'vec3'>`, so the chain-method extension interfaces don't apply. Workaround already in place: `lights-custom*`'s cast / standalone `context()` pattern.
 
 ### B37 · @types/three: `NodeBuilder.context` is declared `unknown`
 
@@ -718,6 +908,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Where it bites**: `postprocessing/postprocessing-ssr-denoise`.
 - **Same family as B11** (duck-typed `*Node` fields). A declared `NodeContext` interface
   would fix it once.
+- **Status 2026-09-07**: OPEN, unchanged — `NodeBuilder.d.ts:11` still types `context` as `unknown`. Workaround already in place: `postprocessing-ssr-denoise`'s cast.
 
 ### B38 · @types/three: the r185 meshopt clusterizer and simplifier ship no declarations
 
@@ -729,6 +920,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   `compute-rasterizer-ibl` uses (`buildMeshlets`, bounds, the packed buffer shapes).
   **Unwind condition**: delete the file when `@types/three` ships declarations for both.
 - **Where it bites**: `compute/compute-rasterizer-ibl` — meshlet LOD generation.
+- **Status 2026-09-07**: OPEN, unchanged — `meshopt_clusterizer.module.js` / `meshopt_simplifier.module.js` still ship as plain runtime `.js` with zero adjacent `.d.ts`, confirmed asymmetric against the typed `meshopt_decoder`. Workaround already in place and accurate: `src/types/meshopt.d.ts`; unwind condition correctly stated.
 
 ### B39 · @types/three: `PassNode.options` is undeclared, so `samples` can't be set after construction
 
@@ -741,6 +933,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   pass instance does not get that.
 - **Where it bites**: `postprocessing-ssaa`, `postprocessing-traa` (both must force
   single-sampled targets or WebGPU throws a sample-count validation error).
+- **Status 2026-09-07**: OPEN in `@types/three`, not currently forcing a cast here — `PassNode.d.ts:49` still declares `options` only as a constructor parameter, never a public field, though the runtime assigns `this.options` and reads `this.options.samples` in `setup()`. Every call site in this repo reaches it through fiber's `any`-typed `passes` record (B30), which happens to mask the gap. Workaround: none needed today.
 
 ### B40 · fiber: `onCreated`'s `RootState` types `renderer` as the WebGL/WebGPU union
 
@@ -754,6 +947,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - Note `onCreated` turned out to be the wrong hook for `lights-clustered` anyway (see
   B41) — but the typing gap stands for anything else that legitimately uses it.
 - **Where it bites**: `lights/lights-clustered`.
+- **Status 2026-09-07**: OPEN, unchanged — `Canvas.onCreated`'s `RootState.renderer` is still the WebGL/WebGPU union (`index.d.ts:835,398,567`), distinct from `useThree()`'s narrowed return on `/webgpu`. Unchanged on v10 HEAD. No upstream issue found. Workaround: none (an `instanceof` narrow works where needed).
 
 ### B41 · three: `Lighting.getNode()` caches into a MODULE-level WeakMap, so the first manager to touch a scene wins forever
 
@@ -776,6 +970,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   what the vanilla original does. Neither a Canvas child's layout effect nor `onCreated`
   is early enough. Measured ordering, which is the reverse of what you'd guess:
   **layout effect runs BEFORE `onCreated`**, and the node is already cached before both.
+- **Status 2026-09-07**: OPEN, unchanged — `Lighting.js:4`'s module-scope `_weakMap` is still read/written keyed only by `scene` in `getNode()`, confirmed unchanged. Workaround: install the lighting manager at renderer-FACTORY time, before any render list is built (`lights-clustered` pattern) — neither a layout effect nor `onCreated` is early enough.
 
 ### B42 · fiber: `once()` is typed `<T>(...args: T[]) => T`, which rejects every multi-arg use
 
@@ -791,6 +986,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   accept `A | Once<A>`.
 - **Where it bites**: `geometry-terrain-raycast` (worked around with `useMemo`); any port
   translating/scaling a geometry with more than one argument.
+- **Status 2026-09-07**: OPEN, unchanged — `once<T>(...args: T[]): T` and `GeometryTransformProps.translate?: [x,y,z]` both confirmed unchanged in installed alpha.4 AND v10 HEAD `three.d.ts`. No upstream issue found. Workaround: `useMemo` transform (`geometry-terrain-raycast` pattern).
 
 ### B43 · @react-three/rapier: joint hooks reject React 19 refs; heightfield heights typed as `number[]`
 
@@ -802,6 +998,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Where it bites**: `physics/rapier-joints`, `physics/rapier-terrain`.
 - Also noted: drei's `PointerLockControls` reads the deprecated `state.gl` alias
   internally — works today on `/webgpu`, will break when the alias goes.
+- **Status 2026-09-07**: OPEN, unchanged — `joints.d.ts:8-46` still types joint-hook refs as non-null `RefObject<RapierRigidBody>`, incompatible with React 19's `useRef(null)`; `HeightfieldArgs.heights` still `number[]` vs the runtime's `Float32Array`. [dimforge/rapier.js#771](https://github.com/dimforge/rapier.js/issues/771) (open) is partially adjacent (React 19 related) but matches neither sub-issue exactly — file fresh, citing #771 as related prior art rather than a duplicate. Workaround: r3r's own `useRef<RapierRigidBody>(null!)` idiom; a plain-array copy for the heightfield.
 
 ### B44 · fiber: `<threeLine>` mounts but crashes on its first prop update
 
@@ -818,6 +1015,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Workaround here**: `src/assets/ThreeLine.ts` — `extend({ ThreeLine: Line })` — imported
   by every `<threeLine>` user. Delete when fixed.
 - **Where it bites**: `decals`, `geometry-nurbs`, `lines-dashed`, `modifier-curve`.
+- **Status 2026-09-07**: OPEN, traced precisely and unchanged — `commitUpdate` (`index.mjs:13913`) still re-validates using the RAW unresolved type string (`toPascalCase("threeLine")` = `"ThreeLine"`, not in the catalogue) on every re-render of any ancestor. No exact matching upstream issue found. Workaround: `src/assets/ThreeLine.ts` (`extend({ ThreeLine: Line })`).
 
 ### B45 · drei: `<Hud>` renders the default scene twice per frame on v10
 
@@ -826,6 +1024,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   the auto-render still happens, so the main scene is drawn twice. Correct picture, wasted
   frame.
 - **Where it bites**: `geometry-colors-lookuptable` (legend overlay).
+- **Status 2026-09-07**: OPEN — `RenderHud` is byte-identical between alpha.6/alpha.7, still uses `{ after: "render", priority }` instead of `{ phase: "render" }`, so v10's auto-render is never actually suppressed. **Already filed upstream — do not refile**: [pmndrs/drei#2820](https://github.com/pmndrs/drei/issues/2820) (open, filed 2026-09-02 by `DennisSmolek`) is a near-exact match and links the WebGL twin #2402. Cross-link instead. Workaround: none in this repo (`geometry-colors-lookuptable` pays the double-render cost silently).
 
 ### B47 · fiber: `diffProps` resets a removed prop to `0` when the constructor takes arguments
 
@@ -837,6 +1036,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   read `new Ctor()`'s field) for any class, or leave the property untouched.
 - **Where it bites**: any example that swaps between two same-type material elements
   with different prop sets (`modifier-subdivision`, worked around with a `key`).
+- **Status 2026-09-07**: OPEN, unchanged — `diffProps`'s `root.constructor.length === 0` guard is unchanged; every node-material constructor has length 1, so a removed prop still resets to `0`. Only old, unrelated v9-era issues found (#2755, #981 — different mechanism). Workaround: this repo avoids ever REMOVING the prop — `modifier-subdivision` swaps values (`map: textured ? map : null`) instead of removing the prop; the AGENTS.md text describing a keyed-remount workaround doesn't match what's actually in that file — worth a follow-up correction to AGENTS.md itself.
 
 ### B46 · drei: `<TransformControls>` never mounts `getHelper()`, so on three ≥ r169 there is no gizmo and no drag
 
@@ -851,6 +1051,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   `getHelper` exists (keep the old path for < r169).
 - **Where it bites**: `geometry-spline-editor` (worked around), `modifier-curve` (same
   fix applied 2026-09-03), and any future `<TransformControls>` user.
+- **Status 2026-09-07**: OPEN, unchanged — `grep -c getHelper` is still 0 in `/webgpu` on both alpha.6 and alpha.7. No upstream issue found across 6 keyword variants. Workaround: `TODO(drei-gap)` + `{gizmo && <primitive object={gizmo.getHelper()} />}` in 4 examples (`controls-transform`, `animation-skinning-ik`, `geometry-spline-editor`, `modifier-curve`).
 
 ### B49 · drei: the `/webgpu` build reads the deprecated `state.gl` alias in 33 places
 
@@ -860,6 +1061,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   removed — across every drei control at once.
 - **Fix**: `state.renderer` (v10) with a `gl` fallback for v9.
 - **Where it bites**: latent; every example using drei controls on `/webgpu`.
+- **Status 2026-09-07**: OPEN, count changed materially — 33 (alpha.6, matched the original brief) → **32** on alpha.7 (`state.gl` reads dropped by one; `state.renderer` reads rose 23→24 in the same file — one call site quietly migrated off the deprecated alias between releases). 32 remain. No upstream issue found. Workaround: none needed (the `gl` alias still works).
 
 ### B48 · drei: `<ArcballControls>` is constructed without `scene`, so its gizmos can never appear
 
@@ -869,7 +1071,9 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   is no later way to add them. The `scene` prop drei exposes only enables the pan grid.
 - **Fix**: pass `scene` (from `useThree`) as the third constructor argument when the
   gizmo is requested.
-- **Where it bites**: `camera/controls` (Arcball mode shows no gizmo; stated in header).
+- **Where it bites**: `camera/controls` (Arcball mode showed no gizmo until the local
+  workaround below was applied 2026-09-07; still true for anyone who doesn't add it).
+- **Status 2026-09-07**: OPEN upstream, unaffected by the drei bump — `new ArcballControls$1(explCamera)` is still camera-only, identical alpha.6/alpha.7. No upstream issue found. **Fixed locally today**: `src/examples/camera/controls.tsx`'s `ArcballScheme` now grabs the controls ref and adds `controls._gizmos` (undocumented but present on every instance) to the scene itself in a `TODO(drei-gap)`-marked effect — verified visually (trackball rings render). The pan grid needed no fix; its `this.scene != null` check runs at update time, by which point drei's plain `scene` prop assignment has already landed.
 
 ### B50 · drei: `<Html>` on a static object stays parked at −9999px under StrictMode
 
@@ -882,6 +1086,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   writes the parking transform, so the first frame after (re)mount always positions.
 - **Workaround**: `eps={-1}`.
 - **Where it bites**: `scene/label`; any `<Html>` on a static mesh, in dev only.
+- **Status 2026-09-07**: OPEN, unchanged — the `oldPosition` ref / `eps`-gated write / `-9999px` parking transform are all unchanged between alpha.6 and alpha.7 (line numbers only shifted). No upstream issue found. Workaround: `eps={-1}` + `REVIEW(drei-html-eps)` in `scene/label.tsx`.
 
 ### B51 · `@three.ez/batched-mesh-extensions`: `package.json` `exports` maps only the WebGL build
 
@@ -908,6 +1113,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Where it bites**: `webgl_batch_lod_bvh` (Phase 2, not ported — REVIEW-QUEUE #18) plus
   two more missing dependencies (`@three.ez/simplify-geometry`, `meshoptimizer`) stacked on
   top; the exports gap alone blocks it even once those are installed.
+- **Status 2026-09-07**: NOT RE-VERIFIED this cycle — `@three.ez/batched-mesh-extensions` is a different package outside the fiber/drei/three.js/@types/three/eslint-plugin/rapier scope this audit covered. No change assumed; re-check separately if this example is revisited.
 
 ### B52 · `@react-three/eslint-plugin`'s `no-clone-in-loop` matches the identifier `clone`, not `.clone()` calls
 
@@ -923,6 +1129,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
   `node.parent.type === 'MemberExpression' && node.parent.property === node`.
 - **Where it bites**: latent — any `useFrame` body that iterates a collection with a loop
   variable named `clone`. AGENTS.md's advice: rename the variable rather than fight the rule.
+- **Status 2026-09-07**: OPEN, unchanged — the selector `CallExpression[callee.name=useFrame] CallExpression MemberExpression Identifier[name=clone]` (`dist/index.mjs:34`) still has no property-position constraint. No matching upstream issue (only a tangential RFC [#2701](https://github.com/pmndrs/react-three-fiber/issues/2701) in fiber's own monorepo — there is no separate `pmndrs/eslint-plugin` repo). Workaround: rename the loop variable rather than fight the rule (AGENTS.md guidance).
 
 ### B53 · `@types/three`: `AudioContext.getContext()` returns THREE's own class, not the native context
 
@@ -937,6 +1144,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Where it bites**: `src/utils/resumeAudioContext.ts` carries the documented
   `as unknown as globalThis.AudioContext` cast for all five `audio/` examples. Delete the cast
   when the types land.
+- **Status 2026-09-07**: OPEN, unchanged — `AudioContext.d.ts` still declares `static getContext(): AudioContext` (self-referential to THREE's own class) against a JSDoc/runtime that both point at the native context. Workaround already in place: `src/utils/resumeAudioContext.ts`.
 
 ### B36 · drei: `<CurveModifier>` is exported from `/webgpu` but is WebGL-only
 
@@ -952,6 +1160,7 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - **Caveat for whoever takes this**: `CurveModifierGPU`'s `.d.ts` declares four helper
   exports the shipped `.js` does not have (see B-adjacent note in AGENTS.md § Environment
   gotchas). Only `Flow` is real at runtime.
+- **Status 2026-09-07**: OPEN, unaffected by the drei bump — `webgpu/index.mjs:24` still imports `Flow` from the WebGL-only `CurveModifier.js`, identical alpha.6/alpha.7; the `CurveModifierGPU` `.d.ts`/`.js` export mismatch (types declare 5 exports, runtime has only `Flow`) independently reconfirmed. No upstream issue found (only old, unrelated WebGL-era issues turned up). Workaround: `geometry/modifier-curve.tsx` imports `CurveModifierGPU.js`'s `Flow` directly, bypassing drei's component.
 
 ### B8 · drei (minor, docs-level): `useProgress` subscription can setState during render
 
@@ -961,3 +1170,65 @@ vec3(0)` — cannot be written without a cast. The runtime object is a plain rec
 - Worth a docs note: for frame-loop consumers, read `useProgress.getState()`
   non-reactively instead of subscribing (our `src/utils/ReadinessSignal.tsx` shows
   the pattern).
+- **Status 2026-09-07**: OPEN, minor/docs-level, unchanged — `useProgress` is still a plain zustand store; `.getState()` escape hatch exists but is undocumented. No upstream issue found. Workaround: none needed (`src/utils/ReadinessSignal.tsx` already reads it non-reactively for frame-loop consumers).
+
+### B54 · fiber (feature request): no documented worker/`OffscreenCanvas` `createRoot` story
+
+**Note on brief type**: unlike every other Part B entry, this is not a confirmed bug
+against a shipped example — it's a **capability-gap / feature-request brief** for a demo
+category this corpus does not have yet (`webgl_worker_offscreencanvas` has no port).
+Filed at Dennis's explicit request, 2026-09-07: **he wants this capability** — a
+worker/OffscreenCanvas rendering story is something the gallery should eventually offer,
+not something being skipped. See `docs/REVIEW-QUEUE.md` §1b, which stays blocked on this
+brief landing somewhere upstream.
+
+- **What**: fiber's raw `createRoot()` is already `OffscreenCanvas`-typed
+  (`createRoot<TCanvas extends HTMLCanvasElement | OffscreenCanvas>`) and genuinely
+  `OffscreenCanvas`-aware at runtime — `computeInitialSize()` branches on
+  `canvas instanceof OffscreenCanvas` and reads `.width`/`.height` directly instead of
+  requiring `getBoundingClientRect()`. `useIsomorphicLayoutEffect` and the DPR default
+  both guard `typeof window !== "undefined"` and degrade safely. This traces to real,
+  already-merged upstream work: [PR #2770](https://github.com/pmndrs/react-three-fiber/pull/2770)
+  ("fix: play nice with OffscreenCanvas"), [#2495](https://github.com/pmndrs/react-three-fiber/pull/2495)
+  ("don't updateStyle on offscreen canvas"), [#2493](https://github.com/pmndrs/react-three-fiber/pull/2493)
+  (`self`-before-`window` in `getEventPriority`).
+- **What's genuinely missing**: (1) no docs page surfacing `createRoot(offscreenCanvas)`
+  as a supported worker entry point, and no verification that `WebGPURenderer`
+  construction against `OffscreenCanvas.getContext('webgpu')` succeeds inside a dedicated
+  Worker; (2) no event-forwarding story — a transferred canvas never receives real
+  DOM pointer/resize events, and nothing in fiber serializes/synthesizes them across a
+  `postMessage` boundary (`createPointerEvents`/`createEvents` expect a target that
+  actually receives browser-dispatched events); (3) size plumbing — a worker-side root
+  has no `ResizeObserver` on a detached, transferred canvas, so live resize needs a
+  `postMessage`-driven call into fiber's internal `_sizeProps` path
+  (`webgpu/index.mjs:14313-14322`), which exists but isn't exposed as a documented API.
+- **Correction to the assumed shape of the demo this would port**: the actual r185
+  original, `webgl_worker_offscreencanvas.html`, does NOT forward live pointer/resize
+  events at all — it transfers the canvas and sends size/pixelRatio ONCE at construction,
+  then the worker drives its own `requestAnimationFrame` loop independently. So a
+  faithful port of THIS SPECIFIC demo needs only one-shot canvas transfer + init payload,
+  not a live event bridge. The event-forwarding gap above is real for _interactive_
+  worker demos in general, just not exercised by this particular original.
+- **Existing ecosystem answer, unaudited for v10**: [`@react-three/offscreen`](https://github.com/pmndrs/react-three-offscreen)
+  (npm `@react-three/offscreen`) already provides worker creation, canvas transfer, event
+  forwarding, and a `document`/`window` shim via `<Canvas worker={worker} fallback={<Scene/>}>`.
+  Its `peerDependencies` pin `@react-three/fiber: ">=8.0.0"` with no v10 upper-bound
+  awareness, latest stable is `0.0.8` (a `1.0.0-rc.1` prerelease also exists), last
+  published 2025-01-30 — plausibly stale against fiber v10 `/webgpu`, and **not verified
+  against this repo's stack at all** in this investigation.
+- **Suggested framing for the upstream ask**: this reads as "the low-level primitive
+  already exists and is more capable than advertised; the missing piece is userland glue,
+  which already has a reference implementation that needs a v10/WebGPU audit" — not "fiber
+  core needs new work." Two framings, cheapest first: (1) a short fiber docs page
+  documenting the `createRoot(offscreenCanvas)` shape plus a pointer to
+  `@react-three/offscreen` with an explicit statement of whether it's confirmed against
+  v10/`/webgpu` (it currently isn't, either way); (2) audit/update
+  `@react-three/offscreen` itself for fiber v10's `/webgpu` entry (peer range bump,
+  WebGPU context transfer verified end to end, `navigator.gpu` availability inside a
+  dedicated Worker confirmed) so it becomes the documented answer.
+- **Where it would bite**: no example in this corpus yet — a capability gap for a demo
+  that doesn't exist, not a workaround for one that does.
+- **Status 2026-09-07**: NEW — filed as a feature request, not a bug. Draft ready to
+  paste: `docs/upstream-issues/B54-fiber-offscreencanvas.md`. Recommend filing as an
+  RFC/audit issue rather than a small PR, since the actual code risk (does
+  `@react-three/offscreen` work against `/webgpu`?) is unknown until someone tries it.

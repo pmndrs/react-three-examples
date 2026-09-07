@@ -44,10 +44,25 @@ so a decision here covers both.
 Filed 2026-09-03 when Phase 2 was greenlit. Each is a "do we build a capability" call,
 not a porting problem.
 
-- **`webgl_worker_offscreencanvas`** — fiber v10 ships only a type shim for
-  `OffscreenCanvas`; there is no worker/`createRoot`-in-a-worker story. Porting it means
-  building that. **Dennis, 2026-09-07: wanted, not skipped** — an OffscreenCanvas story would
-  be useful. Stays blocked until fiber has one; the upstream audit drafts the fiber ask.
+- **`webgl_worker_offscreencanvas`** — **Finding (2026-09-07 upstream audit, UPSTREAM.md
+  B54): the gap is narrower than this bullet originally assumed.** `createRoot()` already
+  handles `OffscreenCanvas` — it's typed for it AND has a genuine runtime-aware branch
+  (`computeInitialSize()` reads `.width`/`.height` directly when there's no DOM element to
+  measure), tracing back to already-merged fiber PRs (#2770, #2495, #2493). What's
+  actually missing is userland glue: (1) no documented worker entry point / no
+  confirmation `WebGPURenderer` construction succeeds against a transferred canvas inside
+  a dedicated Worker, and (2) no event/resize forwarding across the `postMessage`
+  boundary — a transferred canvas never receives real DOM events itself. A pre-existing
+  sibling package, `@react-three/offscreen`, already does exactly this but is unverified
+  against fiber v10's `/webgpu` entry (peer range doesn't even cap below v10; last
+  published 2025-01-30). **Also**: the actual r185 original,
+  `webgl_worker_offscreencanvas.html`, does not forward live pointer/resize events at all
+  — it's a one-shot canvas transfer + init payload, non-interactive by design — so a
+  faithful port of THIS SPECIFIC demo would need only the "documented entry point" half,
+  not the event-bridge half. **Dennis, 2026-09-07: wanted, not skipped** — an
+  OffscreenCanvas story would be useful. Stays blocked until fiber/`@react-three/offscreen`
+  has one; issue draft ready at `docs/upstream-issues/B54-fiber-offscreencanvas.md`, filed
+  as a feature-request/audit ask rather than a bug.
 - **WebXR (26 + 3 `webgpu_xr_*`)** — `@react-three/xr` 6.6 installs against v10 (peer
   `>=8`), but nothing here can verify an XR example: no headset, and smoke/animates cannot
   enter a session (Chromium's fake-device route is a MojoJS shim we'd have to build; the

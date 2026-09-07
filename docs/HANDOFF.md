@@ -1,5 +1,19 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
 
+## 2026-09-07 — Pages live, upstream audit folded in, B48 fixed
+
+Site deployed: https://pmndrs.github.io/react-three-examples/ (`deploy.yml`, BASE_PATH
+variable, 404 fallback; first run green, live URL curl-checked). Upstream audit (Sonnet,
+four sub-checks) folded into UPSTREAM.md: every brief has a `Status 2026-09-07` line; B18
+retired (fixed in alpha.4, nobody had marked it); B13 stale; B10 reshaped (`Fn` params are
+silent `any`); B29 fixed upstream, lands with r186; B1/B45 already filed (do not refile);
+B54 new (fiber OffscreenCanvas story, Dennis wants it). 27 drafts in `docs/upstream-issues/`
+with an index; drei drafts must be checked against Dennis's own drei "WebGPU Correctness"
+milestone (#2801–#2828) first. B48 fixed in `camera/controls.tsx` (ArcballControls gizmo
+added to the scene by hand, `TODO(drei-gap)`). One agent claim was wrong and corrected:
+`Scene.*Node` IS typed in 0.185.1 via a `declare module` augmentation in `Renderer.d.ts`,
+not `Scene.d.ts` — reading only `Scene.d.ts` misleads.
+
 ## 2026-09-07 — R3 + R4 landed on Sonnet agents
 
 **R4 site v1** (`4b2d669`): sidebar tag filter (`?tag=`), code view (`ExamplePage.tsx` +

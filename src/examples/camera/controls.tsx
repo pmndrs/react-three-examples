@@ -26,12 +26,15 @@
  *   gun and the FPS box maze were scene dressing around the same constructor call
  * - PointerLock walk keeps the original's WASD/arrow movement but drops its gravity,
  *   jumping and box-collision raycast — that was a mini game loop, not the controls demo
- * - Arcball: drei builds the controls without the `scene` constructor argument, so its
- *   trackball gizmos cannot be shown; the pan grid still works because `scene` is a
- *   plain writable field. The original's 17-slider GUI is trimmed to four
+ * - Arcball: drei constructs `ArcballControls` without the `scene` argument (UPSTREAM B48), so
+ *   three's constructor-time `this.scene.add(this._gizmos)` never runs and the trackball gizmo
+ *   group is never parented anywhere; this port adds it to the scene itself in a
+ *   `TODO(drei-gap)`-marked effect. The pan grid needed no such fix — its scene check runs at
+ *   update time, by which point drei's plain `scene` prop assignment has already landed. The
+ *   original's 17-slider GUI is trimmed to four
  * - Trackball's perspective/orthographic toggle and Orbit's arrow-key panning are dropped
  */
-import { useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { NoToneMapping, Object3D } from 'three/webgpu';
 import type { InstancedMesh } from 'three/webgpu';
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu';
@@ -104,14 +107,31 @@ function MapScheme() {
 
 function ArcballScheme() {
   const scene = useThree((state) => state.scene);
+  const controlsRef = useRef<React.ComponentRef<typeof ArcballControls>>(null);
   const { enableGrid, cursorZoom, enableAnimations, dampingFactor } = useControls('Arcball controls', {
     enableGrid: false,
     cursorZoom: false,
     enableAnimations: true,
     dampingFactor: { value: 25, min: 0, max: 100, step: 1 },
   });
+
+  // TODO(drei-gap): drei builds `new ArcballControls(camera)` with no `scene` argument, so
+  // three's constructor-time `this.scene.add(this._gizmos)` never runs — the gizmo group
+  // (`_gizmos`, undocumented but present on every instance) exists but is parented nowhere.
+  // Add it ourselves. (UPSTREAM B48)
+  useEffect(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    const gizmos = (controls as unknown as { _gizmos: Object3D })._gizmos;
+    scene.add(gizmos);
+    return () => {
+      scene.remove(gizmos);
+    };
+  }, [scene]);
+
   return (
     <ArcballControls
+      ref={controlsRef}
       scene={scene}
       enableGrid={enableGrid}
       cursorZoom={cursorZoom}

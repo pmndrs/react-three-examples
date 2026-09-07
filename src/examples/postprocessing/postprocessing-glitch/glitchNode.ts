@@ -19,8 +19,10 @@ export interface GlitchUniforms {
 }
 
 // Cheap hash noise for the "snow" static — same constants as the original's `rand()`.
-// `co`'s param type is a bare Node (AGENTS.md B10: Fn(([a]) => …) params don't infer),
-// so `dot()` is called as a standalone function rather than a chained method.
+// `co`'s destructured param types as `any` (AGENTS.md B10: `Fn(([a]) => …)` params don't
+// infer — as of the current @types/three this is a silent `any`, not a blocking type
+// error, so both `dot(co, …)` and `co.dot(…)` compile; the standalone form here is just
+// a style choice, not a workaround).
 const rand = Fn(([co]) => {
   return fract(sin(dot(co, vec2(12.9898, 78.233))).mul(43758.5453));
 });
