@@ -1,14 +1,18 @@
 import { Link } from 'react-router';
 import { CATEGORIES, categoryAccent, categoryLabels, exampleMeta, type ExampleMeta } from './manifest';
 import { repoUrl } from './agentLinks';
+import { Thumb } from './Thumb';
+import { useDocumentMeta } from './useDocumentMeta';
 
 // Landing page at "/" (SPEC §9: "Gallery + sidebar"). Replaces the old redirect-to-
 // first-example — this is a reader's first stop, so it leads with what the repo IS
 // before the gallery: R3F v10 ports of the official three.js examples, WebGPU-first,
-// proving the same demo reads clearer in React. No screenshots are committed
-// (screenshots/ is gitignored), so cards use a category accent color instead of a
-// thumbnail — see docs/SITE.md.
+// proving the same demo reads clearer in React. Cards show a generated thumbnail (`pnpm
+// thumbs` — docs/SITE.md "Thumbnails") and fall back to a category-accent tile for any
+// example that doesn't have one yet.
 export function Home() {
+  useDocumentMeta(); // no arg -> site defaults, resets the previous example's <title>/description
+
   const byCategory = new Map<string, ExampleMeta[]>();
   for (const example of exampleMeta) {
     const list = byCategory.get(example.category) ?? [];
@@ -76,10 +80,13 @@ function ExampleCard({ example }: { example: ExampleMeta }) {
     <Link
       to={`/examples/${example.slug}`}
       className="group block overflow-hidden rounded-lg border border-neutral-800 bg-neutral-900/50 transition-colors hover:border-neutral-600 hover:bg-neutral-900">
-      <div
-        className="h-16 w-full opacity-70 transition-opacity group-hover:opacity-100"
-        style={{ background: `linear-gradient(135deg, ${accent}55, ${accent}11)` }}
-      />
+      <div className="aspect-[8/5] w-full overflow-hidden bg-neutral-900">
+        <Thumb
+          slug={example.slug}
+          accent={accent}
+          className="h-full w-full object-cover opacity-90 transition-opacity group-hover:opacity-100"
+        />
+      </div>
       <div className="p-3">
         <h3 className="truncate text-sm font-medium text-neutral-100">{example.title}</h3>
         {example.tags.length > 0 && (

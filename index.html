@@ -7,7 +7,32 @@
     <link
       rel="icon"
       href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' rx='3' fill='%23111'/><text x='8' y='12' font-size='9' font-family='monospace' fill='white' text-anchor='middle'>r3</text></svg>" />
-    <title>r3f-examples</title>
+    <title>r3f-examples — React Three Fiber v10 ports of the three.js examples</title>
+
+    <!-- Static defaults for a crawler that never runs JS (a bot, an unfurl service). A
+         route change updates document.title + these same names client-side via
+         useDocumentMeta.ts, but that only helps a REAL browser — see docs/SITE.md "OG /
+         meta tags" for what per-route OG for crawlers would take (prerendering). -->
+    <meta
+      name="description"
+      content="WebGPU-first React Three Fiber v10 ports of the official three.js examples — the same demo, proving it reads clearer in idiomatic React than in vanilla three.js." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="r3f-examples — React Three Fiber v10 ports of the three.js examples" />
+    <meta
+      property="og:description"
+      content="WebGPU-first React Three Fiber v10 ports of the official three.js examples — the same demo, proving it reads clearer in idiomatic React than in vanilla three.js." />
+    <!-- Relative on purpose: R5 (deploy) hasn't picked the GitHub Pages base URL yet, so
+         there's no absolute origin to hardcode. Most unfurlers resolve this against the
+         page URL, but this should become an absolute URL once R5 lands (docs/SITE.md). -->
+    <meta property="og:image" content="/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="r3f-examples — React Three Fiber v10 ports of the three.js examples" />
+    <meta
+      name="twitter:description"
+      content="WebGPU-first React Three Fiber v10 ports of the official three.js examples — the same demo, proving it reads clearer in idiomatic React than in vanilla three.js." />
+    <meta name="twitter:image" content="/og.jpg" />
   </head>
   <body>
     <div id="root"></div>

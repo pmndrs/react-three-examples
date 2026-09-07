@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Routes } from 'react-router';
 import { Layout } from './Layout';
 import { exampleRoutes } from './routes';
 import { metaBySlug } from './manifest';
-import { Titleblock } from './Titleblock';
+import { ExamplePage } from './ExamplePage';
 import { Home } from './Home';
 
 export function App() {
@@ -19,12 +19,15 @@ export function App() {
                 key={slug}
                 path={`/examples/${slug}`}
                 element={
-                  <div className="relative h-full w-full">
-                    <Suspense fallback={<div className="p-6 text-sm text-neutral-500">Loading…</div>}>
-                      <Component />
-                    </Suspense>
-                    {meta && <Titleblock meta={meta} />}
-                  </div>
+                  meta ? (
+                    <ExamplePage meta={meta} Component={Component} />
+                  ) : (
+                    <div className="relative h-full w-full">
+                      <Suspense fallback={<div className="p-6 text-sm text-neutral-500">Loading…</div>}>
+                        <Component />
+                      </Suspense>
+                    </div>
+                  )
                 }
               />
             );

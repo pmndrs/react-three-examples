@@ -11,7 +11,9 @@ export function Titleblock({ meta }: { meta: ExampleMeta }) {
   const path = exampleFilePaths.get(meta.slug);
 
   return (
-    <div className="pointer-events-none absolute bottom-4 left-4 z-10 flex max-w-xs flex-col gap-2 rounded-lg border border-white/10 bg-neutral-950/70 px-3.5 py-2.5 backdrop-blur-sm">
+    <div
+      data-chrome-overlay
+      className="pointer-events-none absolute bottom-4 left-4 z-10 flex max-w-xs flex-col gap-2 rounded-lg border border-white/10 bg-neutral-950/70 px-3.5 py-2.5 backdrop-blur-sm">
       <div className="flex items-center gap-3">
         {/* Logo slot — placeholder mark until we have real art. */}
         <div className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white/10 text-[10px] font-bold tracking-tight text-white/80">

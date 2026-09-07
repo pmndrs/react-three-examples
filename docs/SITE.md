@@ -11,9 +11,19 @@
 - `src/app/Home.tsx` — landing page at `/` (previously a bare redirect to the first
   example). Leads with what the repo is, links to GitHub, then the full gallery
   grouped by category.
-- `src/app/Layout.tsx` — sidebar: grouped-by-category nav + live substring search.
+- `src/app/Layout.tsx` — sidebar: grouped-by-category nav + live substring search,
+  composable with a tag multi-select (see "Tag filter").
 - `src/app/Titleblock.tsx` — per-example overlay: title, three.js original link,
   credits, and the "open in ..." action row.
+- `src/app/ExamplePage.tsx` — the `/examples/<slug>` route element: the live demo,
+  `Titleblock`, and the "Code" toggle that opens `CodePanel` (see "Code view").
+- `src/app/CodePanel.tsx` / `src/app/exampleSources.ts` — the code view's panel and its
+  lazy source loader.
+- `src/app/Thumb.tsx` — `<img>` onto `/thumbs/<slug>.jpg` with a category-accent
+  fallback; shared by `Home.tsx`'s cards and `Layout.tsx`'s sidebar rows (see
+  "Thumbnails").
+- `src/app/useDocumentMeta.ts` — per-route `document.title` + meta description/OG sync
+  (see "OG / meta tags").
 - `src/app/manifest.ts` — typed view over `examples.json`, now including `CATEGORIES`,
   `categoryLabels`, and `categoryAccent`.
 - `src/app/routes.ts` — glob-routes examples; also exports `exampleFilePaths` (slug ->
@@ -24,6 +34,7 @@
 - `scripts/generate-manifest.mjs` — generates `category` and normalises `tags` in
   `examples.json`. Re-run after adding examples: `pnpm generate:manifest`. `--check`
   exits 1 if the file is out of date (wire into CI if this repo wants that gate).
+- `scripts/thumbs.mjs` — generates `public/thumbs/<slug>.jpg` (see "Thumbnails").
 
 ## Category data: why it's a hand-written map, not a folder read
 
@@ -80,27 +91,102 @@ throughout the existing vocabulary (`environment` + `hdr`, `loader` + `gltf`/`ob
 `ply`/`fbx`, `lines` + `line2`) — collapsing those would lose a real filter
 distinction, not just a spelling.
 
-## Home page: no screenshot dependency
+## Thumbnails
 
-`screenshots/` (written by `pnpm shot`) is git-ignored and not served by Vite (no
-`public/` directory copies it in) — so it exists locally for the contact-sheet
-review workflow but is **not available at build time or on a deployed site**. The
-task brief anticipated this ("if not, a clean text/card grid is fine"). The home
-page and sidebar therefore use a flat color accent per category
-(`categoryAccent` in `manifest.ts`, one hex per category spread across the wheel)
-instead of a thumbnail. If screenshots get committed or built into `public/` later,
-swap `ExampleCard`'s gradient div for an `<img src={`/screenshots/${slug}.png`}>`
-with the gradient as an `onError` fallback — nothing else needs to change.
+R4 replaced the category-accent placeholder with real per-example thumbnails.
+`scripts/thumbs.mjs` (`pnpm thumbs`) captures `public/thumbs/<slug>.jpg` — a
+480x300 JPEG (quality ~70) — by reusing `contact-sheet.mjs`'s launch recipe exactly
+(real Chromium channel, `--enable-unsafe-webgpu`, leva hidden, `localStorage.clear()`,
+`startClick` honored, `SHOT_DELAY_MS` settle, hard per-example timeout, browser always
+closes). It also hides the shell's own overlays — Titleblock and the Code toggle,
+both marked `data-chrome-overlay` — so the thumbnail is the demo, not the site chrome
+sitting on top of it (a real bug caught by looking at the first captures: without this
+the "Code" button and the titleblock card were baked into every image).
 
-## Sidebar search
+**Viewport math, not a round number**: the capture viewport is `960 + 256` wide, not
+960 — `Layout.tsx`'s sidebar is a fixed 256px (`w-64`) on every route including
+examples, so the canvas itself (what gets screenshotted — `locator('canvas').first()`,
+same as `contact-sheet.mjs`) only spans `viewport width - 256`. At `deviceScaleFactor:
+0.5` that lands the canvas screenshot at exactly 480x300.
+
+By default `pnpm thumbs` skips any slug that already has a thumb on disk — cheap to
+re-run after adding a few examples. `--force` regenerates everything; `<slug> [slug...]`
+scopes to specific examples (and implies regeneration, matching `pnpm shot`'s
+convention). `--check-black` re-opens every existing thumb in the SAME browser
+(`<img>` + `<canvas>`, no image-decoding dependency), computes its mean luma, and
+re-shoots anything under a near-black threshold — the situation the R4 brief called out
+by name: this repo has another agent editing examples concurrently, and an HMR reload
+racing a capture can produce a black frame. Anything still black after one re-shoot is
+reported, not silently retried forever.
+
+`Thumb.tsx` is the read side: an `<img src="/thumbs/<slug>.jpg">` with an `onError`
+fallback to the same category-accent gradient tile the site used before thumbnails
+existed — an example added since the last `pnpm thumbs` run (or before the very first
+run) degrades gracefully instead of showing a broken-image icon. Shared by `Home.tsx`'s
+gallery cards (`aspect-[8/5]`, matching the 480x300 ratio) and `Layout.tsx`'s sidebar
+rows (a small `h-4 w-6` swatch next to the title).
+
+## Sidebar search and tag filter
 
 Plain substring match over title, slug, tags, and category — no search library, no
-fuzzy matching, no index; 131 items is nowhere near where that would matter
+fuzzy matching, no index; 268 items is nowhere near where that would matter
 (`Layout.tsx`, `useMemo`d on the query string). Matching groups collapse to zero
 entries rather than staying open empty. The active example's `NavLink` gets a ref
 that's scrolled into view (`scrollIntoView({ block: 'nearest' })`) on navigation —
 deliberately _not_ on every keystroke, so typing a search query doesn't yank the
 scroll position around.
+
+**Tag filter** (R4) composes with search rather than replacing it: a collapsible
+"Tags" panel below the search box lists every distinct tag across the manifest
+(alphabetical, in a scrollable `max-h-40` box so ~160 tags don't blow out the sidebar),
+each one a toggle button. Selecting more than one tag is AND — every pick narrows
+further, matching how a faceted filter reads. Selected tags also render as removable
+chips above the panel, and a "Clear" control resets them in one click. The result count
+("N results") now shows whenever EITHER a search query or a tag selection is active,
+not just search.
+
+Selection is synced to `?tag=` — a single comma-separated, alphabetically-sorted param
+(`?tag=gltf,shadows`, not repeated `tag=` keys) via `useSearchParams`, so a filtered
+sidebar view is one copy-pasteable URL. The search box's own query is deliberately
+**not** URL-synced (matching the pre-R4 behavior) — only the tag selection was asked to
+be shareable.
+
+## Code view
+
+`ExamplePage.tsx` (the `/examples/<slug>` route element, split out of `App.tsx` once it
+needed local state) renders a "Code" toggle button that opens `CodePanel.tsx` — a
+read-only source viewer over the right side of the canvas. Sources come from
+`exampleSources.ts`, which wraps
+`import.meta.glob('../examples/**/*.tsx', { query: '?raw', import: 'default' })`: every
+file is a lazy `() => Promise<string>`, so opening the panel is the first time any
+example's source text is actually fetched, and switching tabs on a multi-file example
+fetches only the tab clicked.
+
+A flat example (`src/examples/<category>/<slug>.tsx`) gets one tab. A folder-based
+example is detected the same way `routes.ts`'s glob doesn't need to but this does: the
+entry file's PARENT DIRECTORY NAME matches the slug
+(`src/examples/compute/compute-water/compute-water.tsx`) — when it does, every `.tsx`
+file in that folder becomes a tab (entry first, then alphabetical), not just the entry.
+
+The panel itself is plain `<pre>` + a manual line-number gutter (a `<div>` per line,
+sticky-positioned number column) — **no syntax highlighter**: neither `shiki` nor
+`prismjs` is currently a dependency, and the task was explicitly no-new-dependencies.
+Worth adding if this repo wants real highlighting — `shiki` over `prismjs` for its
+TextMate-grammar fidelity on TSX/GLSL-in-template-strings, at the cost of a larger
+bundle (mitigated by shiki's WASM-free "fine-grained" bundles, lazy-loadable the same
+way the source text already is here).
+
+Each tab has its own "view on GitHub" link (`githubBlobUrl`, reused from the action
+row) and a "Copy" button (`navigator.clipboard.writeText`, with a 1.5s "Copied ✓"
+confirmation).
+
+**leva collision, found by the interactive click-through**: leva mounts into its own
+portal at a very high z-index (the same reason `contact-sheet.mjs` has to hide it with
+CSS rather than out-stacking it), so a normal in-tree panel can never cover it with
+`z-index` alone — the Code toggle button and, on any example with visible leva
+controls, the Copy button were both unclickable behind leva's panel. Fixed by hiding
+leva (`display: none` via an injected `<style>`) for as long as the code panel is
+open, the same technique `thumbs.mjs`/`contact-sheet.mjs` use for screenshots.
 
 ## Action row: what shipped and what didn't
 
@@ -129,6 +215,41 @@ code live" — StackBlitz opens the _containing folder_ of that path (its import
 takes a directory; for a flat single-file example that's `src/examples/`, for a
 folder-based example it's that example's own folder), GitHub/vscode.dev open the file
 directly.
+
+## OG / meta tags
+
+Two layers, because this is a client-rendered SPA with no per-route HTML:
+
+- **`index.html`** carries static `description`/`og:*`/`twitter:*` tags — what a
+  crawler that never runs JavaScript sees, for every URL on the site (there's only one
+  real HTML document). `og:image` points at `/og.jpg`, a 1200x630 mosaic of example
+  thumbnails, generated once via a throwaway Playwright script reusing `thumbs.mjs`'s
+  launch recipe against a small HTML mosaic page rather than a single screenshot, since
+  no one example represents the whole gallery. Not a committed script — regenerating
+  it only matters when the thumbnail set changes substantially, and doing so is a
+  five-minute rebuild from this description, not a maintained tool.
+- **`useDocumentMeta.ts`** keeps `document.title` and the same meta names in sync on
+  the client as the route changes — `ExamplePage.tsx` calls it with the current
+  example's `ExampleMeta` (title -> `"<Title> — r3f-examples"`, description mentions
+  the three.js original), `Home.tsx` calls it with no argument to reset to the site
+  defaults. This is what makes the browser tab title and a same-tab share (e.g. a
+  browser's own "Copy Link" / reading-list features that re-read `<head>` at share
+  time) correct per example.
+
+**What this does NOT fix**: a link unfurled by Slack, Discord, Twitter/X, etc. fetches
+the URL with a plain HTTP client — no JS execution — so every `/examples/<slug>` link
+unfurls with the SAME site-wide `index.html` tags, never the per-example ones. Real
+per-route OG needs the HTML to differ per route at the HTTP-response level, which means
+prerendering (or SSR, which this Vite SPA doesn't have). The smallest path to that on
+GitHub Pages: a build step that, for each slug, renders the route (Playwright headless,
+same recipe already in this repo) and writes the resulting `<head>` — or a static
+`<meta>` block templated from `examples.json` — into a real
+`examples/<slug>/index.html` file, so Pages serves distinct static HTML per example
+without a server. `vite-plugin-ssr`/`vite-react-ssg`-style prerendering plugins do this
+generically; given this repo builds its own Playwright-driven tooling already
+(`contact-sheet.mjs`, `thumbs.mjs`), a small custom script following the same recipe is
+more consistent with the rest of the toolchain than adding a prerendering framework
+dependency.
 
 ## A note on doc drift
 
