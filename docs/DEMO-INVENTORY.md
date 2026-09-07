@@ -5,26 +5,22 @@
 > and `src/examples.json`. Do not edit by hand — change a backlog decision and regenerate.
 > Answers one question: **of the demos worth porting, how many do we have, and why not all?**
 
-r185 ships **588** examples. **274 are not worth a page** — duplicated by a `webgpu_` example, low-value, internal/sandbox, or skipped with a recorded reason (all listed at the bottom, with the reason). **314 are worth porting.**
+r185 ships **588** examples. **278 are not worth a page** — duplicated by a `webgpu_` example, low-value, internal/sandbox, or skipped with a recorded reason (all listed at the bottom, with the reason). **310 are worth porting.**
 
 | status                                    |   count |
 | ----------------------------------------- | ------: |
 | HAVE — own page                           |     267 |
 | HAVE — folded into a combined example     |      12 |
-| BLOCKED — review-queued, needs a decision |       6 |
+| BLOCKED — review-queued, needs a decision |       2 |
 | LATER — final phase (WebXR / webaudio)    |      29 |
 | GAP — no decision recorded                |       0 |
-| **worth porting**                         | **314** |
+| **worth porting**                         | **310** |
 
 ## The list
 
 | original                                   | status        | slug / reason                                      |
 | ------------------------------------------ | ------------- | -------------------------------------------------- |
 | `webgl_batch_lod_bvh`                      | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
-| `webgl_loader_3dtiles`                     | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
-| `webgl_loader_gltf_animation_pointer`      | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
-| `webgl_loader_gltf_progressive_lod`        | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
-| `webgl_morphtargets_webcam`                | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
 | `webgl_worker_offscreencanvas`             | BLOCKED       | review-queued — REVIEW-QUEUE.md                    |
 | `css2d_label`                              | HAVE          | `label`                                            |
 | `css3d_molecules`                          | HAVE          | `molecules`                                        |
@@ -335,7 +331,7 @@ r185 ships **588** examples. **274 are not worth a page** — duplicated by a `w
 | `webxr_xr_marchingcubes`                   | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
 | `webxr_xr_paint`                           | LATER         | final phase — WebXR / webaudio (SPEC §3)           |
 
-## Not worth a page — the other 274
+## Not worth a page — the other 278
 
 Reasons are quoted from the backlog item that made the call — edit them there, not here.
 
@@ -435,6 +431,7 @@ Reasons are quoted from the backlog item that made the call — edit them there,
 | `webgl_lines_fat_wireframe`                        | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
 | `webgl_loader_3dm`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
 | `webgl_loader_3ds`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
+| `webgl_loader_3dtiles`                             | skipped (Phase 2 backlog): (Dennis, 2026-09-07; geospatial tiles is not a corpus goal): needs five packages (`3d-tiles-renderer`, `postprocessing`, `@takram/three-atmosphere`, `@takram/three-geospatial`, `@takram/three-geospatial-effects`)                            |
 | `webgl_loader_3mf`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
 | `webgl_loader_3mf_materials`                       | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
 | `webgl_loader_amf`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
@@ -446,11 +443,13 @@ Reasons are quoted from the backlog item that made the call — edit them there,
 | `webgl_loader_fbx_nurbs`                           | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
 | `webgl_loader_gcode`                               | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
 | `webgl_loader_gltf`                                | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_gltf_animation_pointer`              | skipped (Phase 2 backlog): needs `@needle-tools/three-animation-pointer`; same off-mirror asset blocker (Dennis, 2026-09-07)                                                                                                                                               |
 | `webgl_loader_gltf_anisotropy`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
 | `webgl_loader_gltf_avif`                           | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
 | `webgl_loader_gltf_compressed`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
 | `webgl_loader_gltf_dispersion`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
 | `webgl_loader_gltf_iridescence`                    | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
+| `webgl_loader_gltf_progressive_lod`                | skipped (Phase 2 backlog): needs `@needle-tools/gltf-progressive`, and its assets live at cloud.needle.tools, not on the jsdelivr mirror (Dennis, 2026-09-07)                                                                                                              |
 | `webgl_loader_gltf_sheen`                          | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
 | `webgl_loader_gltf_transmission`                   | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
 | `webgl_loader_ifc`                                 | skipped (Phase 2 backlog): just loads a model/texture; `useLoader(XLoader, url)` is the same one line for every one of them and the shipped `loader-gltf`/`loader-texture-ktx2` already show it (`ttf` overlaps `geometry_text`; `vox` is fun but is still "load a model") |
@@ -517,6 +516,7 @@ Reasons are quoted from the backlog item that made the call — edit them there,
 | `webgl_morphtargets_face`                          | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
 | `webgl_morphtargets_horse`                         | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
 | `webgl_morphtargets_sphere`                        | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
+| `webgl_morphtargets_webcam`                        | skipped (Phase 2 backlog): needs `@mediapipe/tasks-vision` plus a live webcam and face; no recorded-input fallback exists in the original, so the tiers and most visitors would see nothing (Dennis, 2026-09-07)                                                           |
 | `webgl_multiple_elements`                          | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |
 | `webgl_multiple_elements_text`                     | duplicate — same technique under a webgpu_ name (audit B)                                                                                                                                                                                                                  |
 | `webgl_multiple_rendertargets`                     | duplicate — its webgpu_ twin is ported                                                                                                                                                                                                                                     |

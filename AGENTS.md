@@ -41,7 +41,7 @@ canvas context, console clean), registered in the manifest, header block present
 ## Stack pins (Sept 2026 — alpha era, versions matter)
 
 - `@react-three/fiber` **10.0.0-alpha.4** (npm) · `@react-three/drei`
-  **11.0.0-alpha.6** (npm) · `three` **0.185.1** · React 19.2 (fiber peer is
+  **11.0.0-alpha.7** (npm) · `three` **0.185.1** · React 19.2 (fiber peer is
   `>=19.0 <19.3`)
 - `leva`, `camera-controls` v3, react-router **7** (pinned `version-7` dist-tag; npm
   latest is v8 — do not bump), TypeScript strict, Tailwind v4, single flat tsconfig
@@ -211,8 +211,10 @@ count — the demo has to still be the demo.
 
 We are comparing _this demo_ to _that demo_. A leva selector that triples the code is
 a net loss even if it's fun. Add controls only where the original had GUI, or where
-one slider makes a hidden constant explorable. If a control forces state lifting,
-registries, or instance plumbing, it is not worth it — drop it.
+**one** slider makes a hidden constant explorable — one slider, on a constant the demo is
+about, costing a handful of lines (`pmrem-cubemap`'s PMREM blur level is the shape; a panel
+of them is not — Dennis, 2026-09-07). If a control forces state lifting, registries, or
+instance plumbing, it is not worth it — drop it.
 
 **A read-only leva "info" field (`editable: false`) is not covered by the constant-explorable
 clause.** That clause is for a slider the visitor can move; a display-only readout is a new
@@ -939,6 +941,10 @@ new patch, pin, or override lands with an UPSTREAM.md entry in the same commit.*
 
 ## Changelog
 
+- **2026-09-07 — drei alpha.6 → alpha.7; rule 4 slider clause pinned down.** Dennis ruled the
+  hidden-constant slider allowed at ONE per example. Review-queue 1c/1d skipped (MediaPipe,
+  Needle, 3D Tiles), XR deferred, OffscreenCanvas wanted (fiber ask). Repo pushed and MIT
+  licensed. drei bumped after `tsc`/lint/build and scoped smoke on drei-heavy examples.
 - **2026-09-03 — v1.3, webaudio wave.** Dennis greenlit webaudio (SPEC §3/§4 had it with
   WebXR as final-phase); five examples shipped in a new `audio` category, and the TSL editor /
   transpiler / graph pages were excluded as internal tooling. Added: `<audio>` outside the

@@ -52,7 +52,7 @@ experimental on v10, see 2B). Every three addon the 34 need exists in r185 excep
 - [x] ~~`webgl_materials_car`~~ — ported — car configurator → `materials/`
 - [x] ~~`webgl_materials_texture_canvas`~~ — ported — Canvas2D live texture → `textures/`
 - [x] ~~`webgl_lines_dashed`~~ — ported → `geometry/`
-- [x] ~~`webgl_morphtargets_webcam`~~ — **REVIEW**: needs `@mediapipe/tasks-vision` installed and a no-camera fallback; Dennis decides
+- [x] ~~`webgl_morphtargets_webcam`~~ — **SKIP**: needs `@mediapipe/tasks-vision` plus a live webcam and face; no recorded-input fallback exists in the original, so the tiers and most visitors would see nothing (Dennis, 2026-09-07)
 - [x] ~~`webgl_postprocessing_glitch`~~ — ported — hand-port GlitchPass to TSL → `postprocessing/`
 - [x] ~~`webgl_renderer_pathtracer`~~ — **SKIP**: three-gpu-pathtracer is WebGL 2 only
       (`WebGLPathTracer(new WebGLRenderer())`); no WebGPU backend exists
@@ -148,10 +148,10 @@ Dennis's rule: _loaders that just load a model are not needed._ A loader earns a
 only when it demonstrates something beyond "the model appears".
 
 - [x] ~~`webgl_loader_gltf_variants`~~ — ported — KHR_materials_variants switcher → `loaders/`
-- [x] ~~`webgl_loader_gltf_progressive_lod`~~ — **REVIEW**: needs `@needle-tools/gltf-progressive`, and its assets live at cloud.needle.tools, not on the jsdelivr mirror
+- [x] ~~`webgl_loader_gltf_progressive_lod`~~ — **SKIP**: needs `@needle-tools/gltf-progressive`, and its assets live at cloud.needle.tools, not on the jsdelivr mirror (Dennis, 2026-09-07)
 - [x] ~~`webgl_loader_gltf_instancing`~~ — ported — EXT_mesh_gpu_instancing → `loaders/`
-- [x] ~~`webgl_loader_gltf_animation_pointer`~~ — **REVIEW**: needs `@needle-tools/three-animation-pointer`; same off-mirror asset blocker
-- [x] ~~`webgl_loader_3dtiles`~~ — **REVIEW**: needs five packages (`3d-tiles-renderer`, `postprocessing`, `@takram/three-atmosphere`, `@takram/three-geospatial`, `@takram/three-geospatial-effects`)
+- [x] ~~`webgl_loader_gltf_animation_pointer`~~ — **SKIP**: needs `@needle-tools/three-animation-pointer`; same off-mirror asset blocker (Dennis, 2026-09-07)
+- [x] ~~`webgl_loader_3dtiles`~~ — **SKIP** (Dennis, 2026-09-07; geospatial tiles is not a corpus goal): needs five packages (`3d-tiles-renderer`, `postprocessing`, `@takram/three-atmosphere`, `@takram/three-geospatial`, `@takram/three-geospatial-effects`)
 - [x] ~~`webgl_loader_collada_kinematics`~~ — ported — kinematic chain playback → `loaders/`
 - [x] ~~`webgl_loader_md2_control`~~ — ported — animation state control → `loaders/`
 - [x] ~~`webgl_loader_ldraw`~~ — ported — LEGO, build-step animation → `loaders/`

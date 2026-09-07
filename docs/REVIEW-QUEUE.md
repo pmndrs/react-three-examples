@@ -46,7 +46,8 @@ not a porting problem.
 
 - **`webgl_worker_offscreencanvas`** — fiber v10 ships only a type shim for
   `OffscreenCanvas`; there is no worker/`createRoot`-in-a-worker story. Porting it means
-  building that. Recommendation: **skip for 1.0**, record as a fiber upstream ask.
+  building that. **Dennis, 2026-09-07: wanted, not skipped** — an OffscreenCanvas story would
+  be useful. Stays blocked until fiber has one; the upstream audit drafts the fiber ask.
 - **WebXR (26 + 3 `webgpu_xr_*`)** — `@react-three/xr` 6.6 installs against v10 (peer
   `>=8`), but nothing here can verify an XR example: no headset, and smoke/animates cannot
   enter a session (Chromium's fake-device route is a MojoJS shim we'd have to build; the
@@ -56,69 +57,12 @@ not a porting problem.
   swaps in a second WebGL-backend renderer at `setSession` time — a renderer swap fiber
   cannot express. Recommendation: **leave for later; when it comes, you port and verify a
   representative 3–4 by hand** (`xr_cubes`, `xr_dragging`, `ar_hittest`, `vr_teleport`).
+  **Dennis, 2026-09-07: deferred, confirmed.**
   (webaudio was in this bullet; Dennis greenlit it 2026-09-03 and it shipped — see Resolved.)
 - **`@react-three/rapier` on fiber v10** — declares peer `^9`. The `rapier-basic` probe
   will report whether it works; if it doesn't, the fallback (inlined three addon over the
   installed `@dimforge/rapier3d-compat`) is already specified. **No action unless the
   probe fails in a way the fallback doesn't cover.** Listed so you know it's a known risk.
-
-### 1c. `webgl_morphtargets_webcam` needs a dependency + degrades ungracefully with none
-
-Not ported. The original runs live face-landmark detection
-(`@mediapipe/tasks-vision`'s `FaceLandmarker`) over `getUserMedia` webcam video to drive
-52 morph-target influences in real time. Two separate blockers, not one:
-
-- `@mediapipe/tasks-vision` isn't in `package.json` and agents on this task can't
-  `pnpm install`.
-- Even installed, the demo has no meaning without a camera and a face in front of it —
-  smoke/animates can't grant camera permission, and there's no scripted/pre-recorded
-  fallback input in the original to substitute.
-
-**What I'd do:** install the dependency when this is prioritized, and pair it with a
-recorded-video fallback (a short clip run through the same landmarker, looping) so the
-example has something to show in CI and in the gallery for a visitor with no webcam —
-that's new code, not in the original, so it wants a deliberate yes before an agent
-builds it. Until then, leave it off the corpus rather than shipping a demo that only
-works with in-person webcam access.
-
-### 1d. Loader gallery (2C): four ports blocked on missing packages / missing assets
-
-Checked against `node_modules` and the jsdelivr r185 mirror 2026-09-03. All four have a
-real, working three.js original — nothing here is a bad demo, just a dependency an agent
-can't add.
-
-- **`webgl_loader_gltf_progressive_lod`** — needs `@needle-tools/gltf-progressive`
-  (not installed), AND its three model URLs are hosted at `https://cloud.needle.tools/...`,
-  not on the jsdelivr three.js mirror — no substitute asset exists. Installing the
-  package alone wouldn't unblock this one. **What I'd do:** skip unless you want to host
-  replacement assets yourself; the package is real and small if you do.
-- **`webgl_loader_gltf_animation_pointer`** — needs `@needle-tools/three-animation-pointer`
-  (not installed), same `cloud.needle.tools`-hosted model problem (the DragonDispersion
-  sample isn't on the three.js mirror either). Same call as above.
-- **`webgl_loader_3dtiles`** — needs FIVE packages not installed:
-  `3d-tiles-renderer`, `postprocessing`, `@takram/three-atmosphere`,
-  `@takram/three-geospatial`, `@takram/three-geospatial-effects`. The demo also likely
-  needs a Cesium Ion API key for real tile data (not checked further once the package
-  count made this an easy skip). **What I'd do:** this is the biggest lift of the four —
-  worth doing only if 3D geospatial tiles becomes a named goal for the corpus, not as a
-  routine port.
-
-### 2. Rule 4: sliders for constants the original hard-codes
-
-Rule 4 allows a slider that "makes a hidden constant explorable", and that clause is the
-one that historically produced bloat. Three ports leaned on it:
-
-| example              | added            | original GUI      |
-| -------------------- | ---------------- | ----------------- |
-| `pmrem-cubemap`      | PMREM blur level | none — hard-coded |
-| `cubemap-mix`        | PMREM blur level | none — hard-coded |
-| `compute-texture-3d` | `animationSpeed` | none — hard-coded |
-
-All three follow the precedent already set by the shipped `pmrem-equirectangular`, and each
-costs a handful of lines. **What I'd do:** allow it, and tighten rule 4 to say "one slider,
-for a constant the demo is _about_" — otherwise the clause keeps getting stretched.
-
----
 
 ## 🟡 Worth a look
 
@@ -370,6 +314,10 @@ delta <= 2`). Cost `geometry-spline-editor` a round of debugging; its selection 
 
 ## Resolved
 
+| 2026-09-07 | 1c `webgl_morphtargets_webcam` (MediaPipe + webcam) | **Skip.** Not ported; struck in the Phase 2 backlog with the reason. |
+| 2026-09-07 | 1d loader gallery: `gltf_progressive_lod`, `gltf_animation_pointer` (Needle packages + off-mirror assets), `loader_3dtiles` (five packages, Cesium key) | **Skip.** Struck in the Phase 2 backlog with the reason. |
+| 2026-09-07 | 2 — a slider for a constant the original hard-codes (`pmrem-cubemap`, `cubemap-mix`, `compute-texture-3d`) | **Allowed.** The three keep their slider; rule 4 now says ONE slider, on a constant the demo is about, a handful of lines. |
+| 2026-09-07 | 1 `compute-reduce` DOM timing readout | **Dennis takes it himself**; the in-example DOM readout path is agreed as the likely shape. Entry stays open until he does. |
 | 2026-09-03 | webaudio (from 1b) | **Greenlit and ported** — 5 examples in the new `audio/` category, `startClick` manifest field + `<StartOverlay>`; WebXR stays in 1b. |
 | 2026-09-03 | `@types/three` `AudioContext.getContext()` mistyped (was #16) | **Ledgered as UPSTREAM B53**; the documented cast stays in `src/utils/resumeAudioContext.ts` until it lands. |
 

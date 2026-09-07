@@ -1,5 +1,6 @@
 {
   "name": "r3f-examples",
+  "license": "MIT",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -26,7 +27,7 @@
   },
   "dependencies": {
     "@perplexdotgg/bounce": "^1.10.0",
-    "@react-three/drei": "11.0.0-alpha.6",
+    "@react-three/drei": "11.0.0-alpha.7",
     "@react-three/fiber": "10.0.0-alpha.4",
     "@react-three/rapier": "^2.2.0",
     "@three.ez/batched-mesh-extensions": "^0.0.12",

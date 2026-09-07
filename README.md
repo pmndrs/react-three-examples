@@ -7,7 +7,7 @@ The official [three.js examples](https://threejs.org/examples/), rebuilt in idio
 Same GPU, same techniques, less ceremony. A port that ends up longer, more indirect or
 more imperative than the original has failed, even if it renders perfectly.
 
-263 examples across 16 categories. Every one links back to its three.js original — this
+268 examples across 17 categories. Every one links back to its three.js original — this
 is a companion to the three.js examples, not a fork of them.
 
 ## Run it

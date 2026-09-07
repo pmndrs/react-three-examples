@@ -1,5 +1,16 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
 
+## 2026-09-07 — pushed, MIT, drei alpha.7, decisions recorded
+
+Dennis's status audit (artifact "Road to 1.0") led to: `main` pushed (39 commits, first push
+since Jul 28), `LICENSE` MIT, `package.json` license field, README count fixed. Decisions:
+XR deferred; OffscreenCanvas WANTED (stays blocked on a fiber worker/createRoot story — the
+upstream audit drafts the ask); MediaPipe webcam + Needle loaders + 3D Tiles skipped;
+rule-4 slider allowed at one per example. `compute-reduce` Dennis takes himself. drei bumped
+to 11.0.0-alpha.7 (no dev server was running; `node_modules/.vite` wiped; tsc/lint/build
+clean; scoped smoke on `controls`, `geometry-spline-editor`, `label`, `orientation`,
+`loader-gltf`). Next: R3 corpus polish + R4 site v1 + upstream/types audit on Sonnet agents.
+
 ## 2026-09-03 — webaudio wave: 5 examples, `audio` category, `startClick`
 
 Dennis greenlit webaudio after a Sonnet feasibility pass (XR stays deferred: no automated
