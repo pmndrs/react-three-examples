@@ -166,7 +166,7 @@ function ProjectorRig() {
     if (type === 'procedural') {
       nodeLight.colorNode = causticEffect;
     } else if (type === 'video') {
-      light.map = videoTexture as unknown as Texture;
+      light.map = videoTexture;
       videoTexture.image.play().catch(() => {});
     } else {
       light.map = colorsTexture as Texture;

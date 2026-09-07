@@ -3004,7 +3004,8 @@
       "wgsl"
     ],
     "original": "https://threejs.org/examples/#webgpu_compute_reduce",
-    "animationWindowMs": 4000
+    "animationWindowMs": 4000,
+    "credits": "Parallel reduction reference implementations by Richard Ansorge (Programming in Parallel with CUDA), zcbenz (betann) and b0nes164 (GPUPrefixSums)"
   },
   {
     "slug": "water",
@@ -3179,7 +3180,8 @@
       "ssaa",
       "tsl"
     ],
-    "original": "https://threejs.org/examples/#webgpu_postprocessing_ssaa"
+    "original": "https://threejs.org/examples/#webgpu_postprocessing_ssaa",
+    "credits": "SSAA pass by Ben Houston"
   },
   {
     "slug": "postprocessing-traa",

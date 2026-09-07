@@ -27,12 +27,10 @@
  *   additional leva controls the original hard-codes
  * - DemoHelpers grid disabled (`grid={false}`) — the original scene is a fogged void
  *   with no floor
- * - `scene.fogNode` is set through a cast — `@types/three`'s `Scene` interface doesn't
- *   declare `fogNode` (same duck-typed field as `sprites`, see its header note)
  */
 import { Suspense, useEffect, useMemo, useRef, type RefObject } from 'react';
 import { MeshStandardNodeMaterial, NoToneMapping, RepeatWrapping, SphereGeometry } from 'three/webgpu';
-import type { Node, PointLight, Texture } from 'three/webgpu';
+import type { PointLight, Texture } from 'three/webgpu';
 import { color, fog, lights, normalMap, rangeFogFactor, texture } from 'three/tsl';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber/webgpu';
@@ -51,13 +49,13 @@ const ROUGHNESS_URL = `${TEXTURE_BASE}roughness_map.jpg`;
 // lights-pointlights' own markerGeometry).
 const markerGeometry = new SphereGeometry(0.1, 16, 8);
 
-// Scene-level TSL fog. Cast: `@types/three`'s `Scene` doesn't declare `fogNode` — see
-// header DIVERGENCE (same pattern as `sprites`).
+// Scene-level TSL fog. `@types/three` declares `fogNode` on `Scene` directly
+// (0.185.1), so no cast is needed — see header DIVERGENCE.
 function SceneFog() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const fogged = scene as unknown as { fogNode: Node | null };
+    const fogged = scene;
     fogged.fogNode = fog(color('#ff00ff'), rangeFogFactor(12, 30));
     return () => {
       fogged.fogNode = null;

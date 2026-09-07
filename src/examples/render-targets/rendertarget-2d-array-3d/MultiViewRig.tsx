@@ -17,7 +17,7 @@ import {
   RenderTarget3D,
   Scene,
 } from 'three/webgpu';
-import type { Node, WebGPURenderer } from 'three/webgpu';
+import type { WebGPURenderer } from 'three/webgpu';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { TextureHelper } from 'three/addons/helpers/TextureHelperGPU.js';
 import { useFrame, useThree } from '@react-three/fiber/webgpu';
@@ -70,9 +70,9 @@ class ViewportScene {
     const viewportCenter = vec2(spec.left + spec.width * 0.5, spec.top + spec.height * 0.5);
     const distanceEffect = smoothstep(normalizedUV.distance(viewportCenter), 0, 0.2);
     const backgroundEffect = color(spec.top > 0 ? 0x212121 : 0x616161).sub(distanceEffect.pow(0.3).mul(0.1));
-    // Cast: duck-typed `backgroundNode` — the runtime reads it generically
-    // (NodeManager) but @types/three doesn't declare it on Scene (AGENTS.md B11).
-    (this.scene as unknown as { backgroundNode: Node }).backgroundNode = backgroundEffect;
+    // @types/three declares `backgroundNode` on Scene directly (0.185.1), so no
+    // cast is needed.
+    this.scene.backgroundNode = backgroundEffect;
 
     this.controls = new OrbitControls(this.camera, domElement);
     this.controls.minDistance = 1;

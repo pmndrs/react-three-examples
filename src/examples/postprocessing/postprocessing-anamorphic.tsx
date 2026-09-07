@@ -67,11 +67,11 @@ const gradientBackgroundNode = Fn(() => {
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
-  // `scene.backgroundNode` is duck-typed by the WebGPU renderer but not declared on
-  // `@types/three`'s `Scene` (AGENTS.md B11). Set in a layout effect — read at
-  // first-render shader-graph build time.
+  // `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no
+  // cast is needed. Set in a layout effect — read at first-render shader-graph build
+  // time.
   useLayoutEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = gradientBackgroundNode;
     return () => {
       withBackgroundNode.backgroundNode = null;

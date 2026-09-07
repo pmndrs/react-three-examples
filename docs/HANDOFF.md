@@ -1,5 +1,19 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
 
+## 2026-09-07 — R3 + R4 landed on Sonnet agents
+
+**R4 site v1** (`4b2d669`): sidebar tag filter (`?tag=`), code view (`ExamplePage.tsx` +
+`CodePanel.tsx`, `?raw` glob, leva hidden while open), `pnpm thumbs` → `public/thumbs/*.jpg`
+(268/268, 3.6MB, 8 flagged dark were real dark scenes), OG tags + `public/og.jpg`,
+`useDocumentMeta`. Per-route OG for crawlers still needs a prerender step (SITE.md). Wanted
+dependency: `shiki`.
+**R3 corpus polish**: credits — 2 of 93 blank entries filled (`compute-reduce`,
+`postprocessing-ssaa`), 91 confirmed unattributed in the original. B41 audit: `lights-dynamic`
+was a second live case (DynamicLighting never engaged; moved to the renderer factory,
+before/after screenshot proves it). Casts 97 → 60, families in AGENTS.md; `scene.*Node` is
+typed in `@types/three` 0.185.1 so B11 narrows. 38 touched examples green on smoke+animates.
+Agent added REVIEW-QUEUE #16 (double-hop vs single casts) and flagged #11's file table stale.
+
 ## 2026-09-07 — pushed, MIT, drei alpha.7, decisions recorded
 
 Dennis's status audit (artifact "Road to 1.0") led to: `main` pushed (39 commits, first push

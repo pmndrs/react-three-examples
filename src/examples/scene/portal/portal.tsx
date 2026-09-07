@@ -39,7 +39,6 @@
 import { Suspense, useEffect, useMemo } from 'react';
 import { color, mx_worley_noise_float, normalWorld, time, vec2 } from 'three/tsl';
 import { LinearToneMapping, Scene } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 
 import { Canvas, createPortal, useThree } from '@react-three/fiber/webgpu';
 import { useControls } from 'leva';
@@ -51,15 +50,13 @@ import { PortalWindow } from './PortalWindow';
 // original: camera.position.set(2.5, 1, 3); camera.position.multiplyScalar(0.8)
 const CAMERA_POSITION: [number, number, number] = [2, 0.8, 2.4];
 
-// Main scene's TSL background: a view-direction gradient. Cast: `@types/three`'s
-// `Scene` doesn't declare `backgroundNode` even though the webgpu renderer reads it
-// directly off the live scene instance (documented duck-typed gap, see
-// reflection.tsx/sprites.tsx headers).
+// Main scene's TSL background: a view-direction gradient. `@types/three` declares
+// `backgroundNode` on `Scene` directly (0.185.1), so no cast is needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = normalWorld.y.mix(color(0x0066ff), color(0xff0066));
     return () => {
       withBackgroundNode.backgroundNode = null;
@@ -92,7 +89,7 @@ export default function Portal() {
   const scenePortal = useMemo(() => {
     const scene = new Scene();
     scene.name = 'Portal Scene';
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = mx_worley_noise_float(normalWorld.mul(20).add(vec2(0, time.oneMinus()))).mul(
       color(0x0066ff),
     );

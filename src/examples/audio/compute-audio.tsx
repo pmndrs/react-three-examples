@@ -101,10 +101,10 @@ function ComputeAudioScene({ waveBuffer, sampleRate, reprocessTick }: DecodedAud
     };
   }, 'computeAudio');
 
-  // Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
-  // WebGPU renderer reads it off the live scene (duck-typed *Node gap, UPSTREAM B11).
+  // `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no
+  // cast is needed.
   useLayoutEffect(() => {
-    const withNode = scene as unknown as { backgroundNode: Node | null };
+    const withNode = scene;
     withNode.backgroundNode = backgroundNode;
     return () => void (withNode.backgroundNode = null);
   }, [scene, backgroundNode]);

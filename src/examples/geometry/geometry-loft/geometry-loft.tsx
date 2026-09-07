@@ -53,20 +53,18 @@
 import { useEffect } from 'react';
 import { color, screenUV } from 'three/tsl';
 import { NeutralToneMapping } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { Environment } from '@react-three/drei/webgpu';
 import { DemoHelpers } from '../../../utils/DemoHelpers';
 import { Exhibits } from './Exhibits';
 
-// A vignette in the background. Cast: `@types/three`'s `Scene` doesn't declare
-// `backgroundNode` even though the webgpu renderer reads it directly off the live
-// scene instance (same documented duck-typed gap as `reflection.tsx`/`sprites.tsx`).
+// A vignette in the background. `@types/three` declares `backgroundNode` on `Scene`
+// directly (0.185.1), so no cast is needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = screenUV.distance(0.5).mix(color(0x5d5d84), color(0x2e2e44));
     return () => {
       withBackgroundNode.backgroundNode = null;

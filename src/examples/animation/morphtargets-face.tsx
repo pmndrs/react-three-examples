@@ -31,7 +31,7 @@
  */
 import { Suspense, useEffect, useMemo, useRef } from 'react';
 import { ACESFilmicToneMapping, PMREMGenerator } from 'three/webgpu';
-import type { Mesh } from 'three/webgpu';
+import type { Mesh, Object3D } from 'three/webgpu';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { useAnimations, useGLTF } from '@react-three/drei/webgpu';
@@ -69,7 +69,7 @@ function RoomEnv() {
 // Finds the one mesh carrying blend shapes (traverse instead of the original's
 // hardcoded `getObjectByName('mesh_2')` — an internal GLTFLoader naming convention
 // for unnamed meshes, not something a reader should have to know).
-function findMorphMesh(root: Mesh): Mesh | undefined {
+function findMorphMesh(root: Object3D): Mesh | undefined {
   let found: Mesh | undefined;
   root.traverse((child) => {
     if (!found && (child as Mesh).morphTargetDictionary) found = child as Mesh;
@@ -81,7 +81,7 @@ function FaceCap() {
   const { scene, animations } = useGLTF(FACECAP_URL, { meshopt: true, ktx2: BASIS_TRANSCODER_PATH });
   const { actions } = useAnimations(animations, scene);
 
-  const headMesh = useMemo(() => findMorphMesh(scene as unknown as Mesh), [scene]);
+  const headMesh = useMemo(() => findMorphMesh(scene), [scene]);
   const dictionary = useMemo(() => headMesh?.morphTargetDictionary ?? {}, [headMesh]);
 
   // One slider per blend shape, generated from the dictionary instead of written by

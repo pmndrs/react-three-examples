@@ -21,7 +21,6 @@
  */
 import { Suspense, useLayoutEffect } from 'react';
 import { SRGBColorSpace } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { equirectUV, texture } from 'three/tsl';
 import { Canvas, useNodes, useThree } from '@react-three/fiber/webgpu';
 import { useTexture } from '@react-three/drei/webgpu';
@@ -47,10 +46,10 @@ function EquirectangularBackground() {
     backgroundNode: texture(equirectTexture, equirectUV(), 0),
   }));
 
-  // Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
-  // WebGPU renderer reads it off the live scene (duck-typed *Node gap, UPSTREAM B11).
+  // `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no
+  // cast is needed here.
   useLayoutEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = backgroundNode;
     return () => {
       withBackgroundNode.backgroundNode = null;

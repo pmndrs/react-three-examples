@@ -27,7 +27,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { color, mix, screenUV, step, texture, vec2 } from 'three/tsl';
 import { Audio, AudioAnalyser, AudioListener, DataTexture, RedFormat } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { Canvas, useFrame, useNodes, useThree } from '@react-three/fiber/webgpu';
 import { DemoHelpers } from '../../utils/DemoHelpers';
 import { resumeAudioContext } from '../../utils/resumeAudioContext';
@@ -67,11 +66,10 @@ function VisualizerBackground({ audioRef }: { audioRef: React.RefObject<HTMLAudi
     return { backgroundNode: mix(color('#202020'), color('#ffff00'), bar) };
   }, 'visualizer');
 
-  // Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
-  // WebGPU renderer reads it off the live scene (duck-typed *Node gap, UPSTREAM B11 —
-  // same cast as `cubemap-mix`/`pmrem-equirectangular`).
+  // `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no
+  // cast is needed.
   useLayoutEffect(() => {
-    const withNode = scene as unknown as { backgroundNode: Node | null };
+    const withNode = scene;
     withNode.backgroundNode = backgroundNode;
     return () => void (withNode.backgroundNode = null);
   }, [scene, backgroundNode]);

@@ -49,7 +49,6 @@
 import { Suspense, useEffect } from 'react';
 import { color, normalWorldGeometry } from 'three/tsl';
 import { ACESFilmicToneMapping } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { DemoHelpers } from '../../../utils/DemoHelpers';
 import { PostFX } from './PostFX';
@@ -57,14 +56,13 @@ import { ReflectiveFloor } from './ReflectiveFloor';
 import { Tree } from './Tree';
 
 // Scene-level TSL background gradient (up-facing world normal → horizon color mix).
-// Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
-// webgpu renderer reads it directly off the live scene instance (same duck-typed gap
-// as `sprites.tsx`'s `fogNode` cast).
+// `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no cast
+// is needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = normalWorldGeometry.y.mix(color('#4195a4'), color('#0066ff'));
     return () => {
       withBackgroundNode.backgroundNode = null;

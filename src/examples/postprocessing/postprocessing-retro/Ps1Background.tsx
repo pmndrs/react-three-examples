@@ -2,7 +2,6 @@
 // procedural stars stamped into a spherical-coordinate grid. No texture, no geometry —
 // it is one node hung off `scene.backgroundNode`.
 import { useLayoutEffect } from 'react';
-import type { Node } from 'three/webgpu';
 import {
   atan,
   color,
@@ -63,10 +62,10 @@ export function Ps1Background() {
   });
 
   // Layout effect: `scene.backgroundNode` is read at shader-graph build time (first RAF
-  // render). The cast is the duck-typed *Node gap — `@types/three`'s Scene doesn't
-  // declare it even though the WebGPU renderer reads it (UPSTREAM B11).
+  // render). `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1),
+  // so no cast is needed.
   useLayoutEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = ps1Background;
     return () => {
       withBackgroundNode.backgroundNode = null;

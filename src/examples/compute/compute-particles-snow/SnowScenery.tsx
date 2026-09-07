@@ -5,7 +5,6 @@
 import { useLayoutEffect, useMemo } from 'react';
 import { color, positionLocal, screenUV } from 'three/tsl';
 import { MeshStandardNodeMaterial } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { useNodes, useThree } from '@react-three/fiber/webgpu';
 
 const TREE_LEVELS = 8;
@@ -13,11 +12,10 @@ const TREE_LEVELS = 8;
 export function SnowScenery() {
   const scene = useThree((state) => state.scene);
 
-  // Radial background gradient (teal core → near-black rim). Cast: @types/three's
-  // Scene doesn't declare `backgroundNode` even though the WebGPU renderer reads it
-  // (UPSTREAM.md B11) — same pattern as backdrop-area/portal.
+  // Radial background gradient (teal core → near-black rim). @types/three declares
+  // `backgroundNode` on `Scene` directly (0.185.1), so no cast is needed.
   useLayoutEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = screenUV.distance(0.5).mul(2).mix(color(0x0f4140), color(0x060a0d));
     return () => {
       withBackgroundNode.backgroundNode = null;

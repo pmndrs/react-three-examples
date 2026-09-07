@@ -23,7 +23,7 @@
  */
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import { DoubleSide, IndirectStorageBufferAttribute, NoToneMapping, Vector4 } from 'three/webgpu';
-import type { InstancedBufferGeometry, Node } from 'three/webgpu';
+import type { InstancedBufferGeometry } from 'three/webgpu';
 import {
   abs,
   atomicStore,
@@ -106,9 +106,10 @@ function IndirectTriangles() {
       drawBuffer.count,
     );
 
-    // Cast: struct member access types as a bare `Node`, which has no `.assign()` —
-    // the typed-TSL struct gap (AGENTS.md B10/B11 cast family), same as compute-water.
-    const member = (name: string) => drawArgs.get(name) as unknown as Node<'uint'>;
+    // Struct member access types as a bare `Node`, but every call below only ever
+    // needs `.assign()` — declared on the untyped base `Node`, not the type-parameterised
+    // fluent extensions (AGENTS.md B10/B11 family) — so no cast is needed here.
+    const member = (name: string) => drawArgs.get(name);
 
     // 0 -> 1 -> 0, quartic so the count spends most of its time low.
     const halfTime = sin(time.mul(0.5));

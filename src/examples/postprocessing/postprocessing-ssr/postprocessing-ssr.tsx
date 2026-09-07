@@ -19,7 +19,6 @@
 import { Suspense, useEffect } from 'react';
 import { color, screenUV } from 'three/tsl';
 import { ACESFilmicToneMapping, PMREMGenerator } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 
@@ -30,8 +29,9 @@ import { SteampunkCamera } from './SteampunkCamera';
 //* Scene =========================================================
 
 // RoomEnvironment → PMREM → scene.environment, plus the screen-space gradient
-// backdrop. Both are node/scene-level writes the JSX tree has no prop for; the
-// `backgroundNode` cast is the documented `@types/three` gap (AGENTS.md B11).
+// backdrop. Both are node/scene-level writes the JSX tree has no prop for;
+// `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no cast
+// is needed.
 function Backdrop() {
   const renderer = useThree((s) => s.renderer);
   const scene = useThree((s) => s.scene);
@@ -45,7 +45,7 @@ function Backdrop() {
     environment.dispose();
     pmremGenerator.dispose();
 
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     // `.mix` is mixElement — the CALLING node is the factor, so the vignette distance
     // drives the blend from the warm center color to the darker rim.
     withBackgroundNode.backgroundNode = screenUV.distance(0.5).remap(0, 0.5).mix(color(0x888877), color(0x776666));

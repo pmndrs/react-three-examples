@@ -14,8 +14,7 @@
  *   tumbling and drifting every blossom from the `time` built-in — zero per-frame
  *   attribute uploads
  * - `scene.backgroundNode` as a screen-space TSL gradient: horizontal `screenUV.x`
- *   pink→cream blend plus a radial glow toward the top edge (documented B11 cast —
- *   @types/three doesn't declare `backgroundNode`)
+ *   pink→cream blend plus a radial glow toward the top edge
  * - One `MeshBasicNodeMaterial` per layer: shared blossom sprite as `map`/`alphaMap`
  *   with `alphaTest`, tinted per layer via the plain `color` JSX prop
  *
@@ -50,7 +49,7 @@ import {
   SRGBColorSpace,
   Vector3,
 } from 'three/webgpu';
-import type { Node, Texture } from 'three/webgpu';
+import type { Texture } from 'three/webgpu';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { PerspectiveCamera, useTexture } from '@react-three/drei/webgpu';
 import { useControls } from 'leva';
@@ -71,9 +70,9 @@ function Background() {
   useLayoutEffect(() => {
     const horizontalEffect = mix(color(0xf996ae), color(0xf6f0a3), screenUV.x);
     const lightEffect = screenUV.distance(vec2(0.5, 1.0)).oneMinus().mul(color(0xd9b6fd));
-    // Cast: @types/three's Scene doesn't declare `backgroundNode` even though the
-    // WebGPU renderer reads it generically (documented duck-typing gap, AGENTS.md B11).
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    // @types/three declares `backgroundNode` on Scene directly (0.185.1), so no cast
+    // is needed.
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = horizontalEffect.add(lightEffect);
     return () => {
       withBackgroundNode.backgroundNode = null;

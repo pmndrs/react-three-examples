@@ -460,10 +460,16 @@ drei — no `import type { OrbitControls as Impl } from 'three/addons/…'` need
 
 - `Fn(([a, b]) => …)` params type as bare `ShaderNodeObject<Node>` — typed math may
   not resolve through them (B10).
-- Duck-typed `*Node` fields: `scene.fogNode`, `scene.backgroundNode`,
-  `light.colorNode` need casts. **Already typed (no cast)**: `backdropNode`,
-  `backdropAlphaNode`, `mrtNode`, `castShadowNode`, `depthNode`, `emissiveNode`,
-  `Texture3DNode.sample()/.normal()`. Check `@types/three` before reaching (B11).
+- Duck-typed `*Node` fields still needing a cast: `light.colorNode`, `emissiveNode` /
+  `clearcoatNode` on a variable typed as the BASE material, a classic-`Material`-typed
+  variable's `colorNode` (GLTF loader results), `PassNode.options`. **Already typed (no
+  cast)**: `scene.backgroundNode` / `fogNode` / `environmentNode` (declared via
+  `declare module` in `renderers/common/Renderer.d.ts` as of `@types/three` 0.185.1 — 34
+  corpus casts were dead weight until the 2026-09-07 sweep), `NodeMaterial.colorNode`,
+  `backdropNode`, `backdropAlphaNode`, `mrtNode`, `castShadowNode`, `depthNode`,
+  `Texture3DNode.sample()/.normal()`. B11's surface MOVES with each `@types/three`
+  release — try without the cast against the installed package before copying one from
+  an older example.
 - Struct storage (`instancedArray(data, Struct)`) has no typed overload; `.get(name)`
   returns bare `Node`.
 - No integer `min`/`max`/`mod` in typed TSL — do it in float (exact below 2^24) and
@@ -483,12 +489,14 @@ drei — no `import type { OrbitControls as Impl } from 'three/addons/…'` need
   `.mul()`/`.mix()`/`Fn()` args works uncast. A comment claiming _"`UniformNode<T>` pins
   its TSL type param to `unknown`"_ propagated this cast to **87 sites**; it was false,
   and 64 of them were swept 2026-09-02. **Try removing the cast first.**
-  After the sweep, the 23 surviving `as unknown as Node<…>` casts are a DIFFERENT family
-  and are correct: struct member access (`duckElement.get('position')` types as bare
-  `Node`), custom node classes (`new InstanceUniformNode()`), `cubeTexture()`, and one
-  `select()` wanting `bool` — i.e. the B10/B11 gaps, not the uniform gap. They live in
-  `compute-water/Water.tsx`, `compute-particles-rain/Rain.tsx`, `skinning-points`,
-  `geometry/instance-uniform.tsx`, `tsl-vfx-tornado/Tornado.tsx`.
+  The surviving `as unknown as` casts are a DIFFERENT family and are correct. Recount after
+  the 2026-09-07 R3 sweep: **97 → 60** (34 were the `scene.*Node` family above, 3 were
+  needlessly narrow targets). The 60: B10 18 (`Fn` destructured params — `Tornado.tsx`
+  alone has 11), B11 7, B19 2, B24 1, B34 1, B53 1, B14-shaped `Loop()` wrappers 4, and 22
+  with no brief of their own — struct member access (`duckElement.get('position')` types as
+  bare `Node`), typed-array creator overloads, `select()` wanting `bool`, integer `dot()`,
+  custom node classes (`new InstanceUniformNode()`), `cubeTexture()`, `wgslFn`'s dual
+  surface. Each was re-tried without the cast and read the resulting `tsc` error.
   Related: a `color`-typed uniform will not unify as a `vec3()` ARGUMENT. Dropping the
   `vec3()` wrapper beats casting — a color node already behaves like a vec3 downstream.
 - `.assign()` is typed `Node | number` — a raw JS boolean fails; use `bool(true)`.
@@ -639,7 +647,11 @@ new ClusteredLighting()` is the worked case — three caches the scene's lights 
   child's `useLayoutEffect` runs BEFORE `onCreated`.** Neither is early enough here.
   Translating a construction-time concern into a React effect is the mistake; when a fix
   keeps failing with the identical error, probe the ordering rather than moving the call
-  again (pattern: `lights-clustered`).
+  again (pattern: `lights-clustered`). **`lights-dynamic` had the identical bug
+  independently**: `renderer.lighting = new DynamicLighting()` in a Canvas child's
+  `useLayoutEffect` never engaged (the WeakMap already held the default manager's node), so
+  the demo's whole claim — adding lights never recompiles — was silently false. Two confirmed
+  cases: treat any `renderer.lighting = …` outside the renderer factory as a bug on sight.
 - **Imperative setup that must precede the first render goes in `useLayoutEffect`.**
   The WebGPU shader-graph build reads mesh state ONCE on the first RAF render and
   caches it (`morphReference()` caches `morphTargetInfluences` — `null` forever if
@@ -941,6 +953,10 @@ new patch, pin, or override lands with an UPSTREAM.md entry in the same commit.*
 
 ## Changelog
 
+- **2026-09-07 — R3 corpus polish.** Cast recount 97 → 60 with the families named (the
+  "23 surviving" claim was two waves stale); `scene.*Node` is typed in `@types/three`
+  0.185.1, so B11 narrowed; second confirmed B41 case (`lights-dynamic`). Credits pass:
+  only 2 of 93 blank entries had an attribution in the original; the rest stay empty.
 - **2026-09-07 — drei alpha.6 → alpha.7; rule 4 slider clause pinned down.** Dennis ruled the
   hidden-constant slider allowed at ONE per example. Review-queue 1c/1d skipped (MediaPipe,
   Needle, 3D Tiles), XR deferred, OffscreenCanvas wanted (fiber ask). Repo pushed and MIT

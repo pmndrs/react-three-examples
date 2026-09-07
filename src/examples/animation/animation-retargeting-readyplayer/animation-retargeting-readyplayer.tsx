@@ -38,7 +38,6 @@
 import { Suspense, useEffect } from 'react';
 import { color, positionWorld, reflector, screenUV, vec2, vec4 } from 'three/tsl';
 import { NeutralToneMapping } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { DemoHelpers } from '../../../utils/DemoHelpers';
 import { RetargetedModels } from './RetargetedModels';
@@ -49,14 +48,13 @@ const horizontalEffect = screenUV.x.mix(color(0x13172b), color(0x311649));
 const lightEffect = screenUV.distance(vec2(0.5, 1.0)).oneMinus().mul(color(0x0c5d68));
 const readyplayerBackground = horizontalEffect.add(lightEffect);
 
-// Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
-// WebGPU renderer reads it directly off the live scene instance (documented duck-typed
-// gap, see animation-retargeting/animation-retargeting.tsx's SceneBackground).
+// `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no cast
+// is needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = readyplayerBackground;
     return () => {
       withBackgroundNode.backgroundNode = null;

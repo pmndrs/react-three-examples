@@ -46,7 +46,6 @@ import {
   viewportSharedTexture,
 } from 'three/tsl';
 import { DoubleSide, MeshBasicNodeMaterial, NeutralToneMapping } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { useAnimations, useGLTF } from '@react-three/drei/webgpu';
@@ -56,14 +55,14 @@ import { DemoHelpers } from '../../utils/DemoHelpers';
 
 const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/models/gltf/Michelle.glb';
 
-// scene.backgroundNode cast — @types/three's Scene doesn't declare it even though the
-// webgpu renderer reads it directly off the live scene instance (same duck-typed gap as
-// backdrop's SceneBackground, with a hue() rotation over time added here).
+// A hue() rotation over time on top of backdrop's SceneBackground gradient.
+// @types/three declares `backgroundNode` on `Scene` directly (0.185.1), so no cast is
+// needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = hue(screenUV.y.mix(color(0x66bbff), color(0x4466ff)), time.mul(0.1));
     return () => {
       withBackgroundNode.backgroundNode = null;

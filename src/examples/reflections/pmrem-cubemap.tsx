@@ -34,7 +34,6 @@
  */
 import { Suspense, useLayoutEffect } from 'react';
 import { ACESFilmicToneMapping, SphereGeometry } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { normalWorldGeometry, pmremTexture } from 'three/tsl';
 import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu';
@@ -76,12 +75,11 @@ function PmremScene() {
   const [map] = useLoader(HDRCubeTextureLoader, [PISA_HDR_FILES]);
 
   // Layout effect: `scene.backgroundNode` is read at shader-graph build time (first
-  // RAF render) — must land before that (AGENTS.md imperative-setup rule). Cast:
-  // `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the WebGPU
-  // renderer reads it off the live scene (duck-typed *Node gap, UPSTREAM B11 — same
-  // cast as `reflection`/`sprites`/`pmrem-equirectangular`).
+  // RAF render) — must land before that (AGENTS.md imperative-setup rule).
+  // `@types/three` now declares `backgroundNode` on `Scene` directly (0.185.1), so no
+  // cast is needed (UPSTREAM B11's Scene half is fixed upstream).
   useLayoutEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = pmremTexture(map, normalWorldGeometry, uBackgroundRoughness);
     return () => {
       withBackgroundNode.backgroundNode = null;

@@ -32,14 +32,14 @@
  *   mixer from fiber's frame loop (`Michelle.tsx`)
  * - `renderer.inspector = new Inspector()` dropped — this repo doesn't wire the
  *   Inspector RootState slot yet (same gap noted in `reflection`)
- * - `scene.backgroundNode` and `floorLight.colorNode` are set through documented casts
- *   (@types/three doesn't declare either duck-typed field; runtime reads verified —
- *   same B11-family gap as the `reflection` cousin)
+ * - `floorLight.colorNode` is set through a documented cast — `@types/three` doesn't
+ *   declare `colorNode` on `Light`, though `AnalyticLightNode`'s constructor reads it
+ *   generically (B11-family gap; `scene.backgroundNode` needs no such cast — 0.185.1
+ *   declares it directly on `Scene`)
  */
 import { Suspense, useEffect, useMemo } from 'react';
 import { color, hue, mix, normalWorld, time, vec3 } from 'three/tsl';
 import { DoubleSide, NeutralToneMapping, SRGBColorSpace } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { useTexture } from '@react-three/drei/webgpu';
 import { DemoHelpers } from '../../../utils/DemoHelpers';
@@ -49,14 +49,13 @@ import { Michelle } from './Michelle';
 const UV_GRID_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/textures/uv_grid_directx.jpg';
 
 // Scene-level TSL background: an up-facing world-normal gradient toward deep blue,
-// continuously hue-cycled with `time`. Cast: `@types/three`'s `Scene` doesn't declare
-// `backgroundNode` even though the WebGPU renderer reads it off the live scene
-// instance (same documented gap as the `reflection` cousin and `sprites.tsx`).
+// continuously hue-cycled with `time`. `@types/three` declares `backgroundNode` on
+// `Scene` directly (0.185.1), so no cast is needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = hue(mix(vec3(0), color(0x0066ff), normalWorld.y).mul(0.1), time);
     return () => {
       withBackgroundNode.backgroundNode = null;

@@ -260,6 +260,23 @@ but is exactly the kind of fragile, non-portable hack AGENTS.md's "no dependency
 rule exists to keep out — I'd rather wait for (a) or skip the example than ship it. **Not
 touched**, no partial file on disk.
 
+### 16. `as unknown as X` vs plain `as X` — should the corpus prefer the minimal cast?
+
+R3 sweep of the 97 `as unknown as` sites found several documented-legitimate casts (real
+`@types/three` gaps: `PassNode.options` — B11, `BloomNode.highPassFn` — B24, `Points.count`
+— B34) that typecheck fine with the `unknown` intermediate hop DROPPED — a plain
+`as { options: … }` / `as ReturnType<typeof …>` compiles clean, because the target type
+still overlaps the source closely enough for TS's single-step assertion rule. The double
+hop isn't WRONG (it's the maximally-permissive form and never fails), but it's stronger
+than the gap requires and reads as "TS is fighting me here" when a lighter cast would do.
+Left as-is everywhere except the sites that turned out to be fully removable (see AGENTS.md
+amendment proposal, backgroundNode/fogNode/environmentNode family) — didn't want to
+speculatively touch ~10 more files under a task whose ask was "remove the unnecessary
+ones," not "minimize the necessary ones." **What I'd do:** if you want the lighter form as
+house style, it's a mechanical follow-up (test each site with `as X`, keep `as unknown as X`
+only where the compiler demands it) — worth doing in the same pass as whatever normalizes
+the B11 comment wording post this sweep, not a new one.
+
 ## ⚪️ FYI — known, tracked, no decision needed
 
 - **Per-object `onPointerMissed` is not "click on nothing".** fiber calls it for every
@@ -309,6 +326,22 @@ delta <= 2`). Cost `geometry-spline-editor` a round of debugging; its selection 
   post-construction `.colorNode =` (the rule-3 pattern fixed in `Terrain.tsx`);
   `volume-caustics` calls `useUniforms` after suspending loaders (reverse of B18-safe
   order — works today, wants a dedicated audit).
+
+- **B11's `Scene` half is fixed in `@types/three` 0.185.1 — the currently installed
+  version, not a future bump.** `declare module "../../scenes/Scene.js" { interface
+Scene { environmentNode?; backgroundNode?; fogNode?; } }` lives in
+  `renderers/common/Renderer.d.ts` right now (verified: a bare `scene.backgroundNode =
+node` with no cast typechecks clean against the installed package). Every
+  `scene as unknown as { backgroundNode: Node | null }` cast in the corpus (34 sites,
+  33 files) was dead weight — removed in the R3 sweep, comments updated to say so instead
+  of "documented cast." `NodeMaterial.colorNode` is ALSO now declared on the base class
+  (not just `MeshStandardNodeMaterial`), so a `material` typed as `NodeMaterial` needs no
+  cast for `.colorNode` either — checked case by case, since a `material` typed as the
+  classic `MeshStandardMaterial`/generic `Material` (the GLTF-loader-return shape) still
+  needs one. `emissiveNode`/`clearcoatNode`/light `.colorNode` remain undeclared — B11
+  is NOT fully closed, only the `Scene` + base-`NodeMaterial.colorNode` slice of it.
+  AGENTS.md's B11 bullet needs a wording pass so the next agent doesn't re-add the cast
+  by copying an older example (proposed wording handed to Dennis with the R3 report).
 
 ---
 

@@ -5,11 +5,13 @@
  * Original: https://threejs.org/examples/#webgpu_lights_dynamic
  *
  * DEMONSTRATES
- * - `renderer.lighting = new DynamicLighting()` (DynamicLights.tsx): an opt-in
- *   lighting backend that batches supported lights into uniform arrays, so adding or
- *   removing a `PointLight` never recompiles the 50 unique `MeshStandardMaterial`s it's
- *   lighting (Shapes.tsx) — set once in a layout effect (AGENTS.md: renderer flags read
- *   at first shader build)
+ * - `renderer.lighting = new DynamicLighting()`: an opt-in lighting backend that
+ *   batches supported lights into uniform arrays, so adding or removing a `PointLight`
+ *   never recompiles the 50 unique `MeshStandardMaterial`s it's lighting (Shapes.tsx).
+ *   Installed from the renderer FACTORY, not a layout effect — three caches the
+ *   scene's lights node in a module-level WeakMap the first time a render list is
+ *   built, and the factory is the only hook that runs early enough (AGENTS.md B41,
+ *   same fix as `lights-clustered`)
  * - A dynamic light COUNT modeled as React state (`useState<LightConfig[]>`) rather
  *   than a fixed prop count — each `<PointLightRig>` still takes its orbit data as
  *   plain props (the `lights-phong` rule), it's the ARRAY LENGTH that's live
@@ -32,7 +34,8 @@
  *   visible directly in the scene
  * - OrbitControls -> this repo's CameraControls (damping on by default)
  */
-import { NoToneMapping } from 'three/webgpu';
+import { NoToneMapping, WebGPURenderer } from 'three/webgpu';
+import { DynamicLighting } from 'three/addons/lighting/DynamicLighting.js';
 
 import { Canvas } from '@react-three/fiber/webgpu';
 
@@ -40,9 +43,19 @@ import { DemoHelpers } from '../../../utils/DemoHelpers';
 import { DynamicLights } from './DynamicLights';
 import { Shapes } from './Shapes';
 
+// The manager goes on at renderer CONSTRUCTION, exactly as `lights-clustered` does —
+// see that example's header for the measured ordering that rules out even a Canvas
+// child's useLayoutEffect (AGENTS.md B41).
+function createRenderer(props: object) {
+  const renderer = new WebGPURenderer(props);
+  renderer.toneMapping = NoToneMapping;
+  renderer.lighting = new DynamicLighting();
+  return renderer;
+}
+
 export default function LightsDynamic() {
   return (
-    <Canvas renderer={{ toneMapping: NoToneMapping }} camera={{ position: [0, 15, 30], fov: 50, near: 0.1, far: 200 }}>
+    <Canvas renderer={createRenderer} camera={{ position: [0, 15, 30], fov: 50, near: 0.1, far: 200 }}>
       <Shapes />
       <DynamicLights />
       <DemoHelpers target={[0, 2, 0]} />

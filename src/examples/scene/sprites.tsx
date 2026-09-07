@@ -34,12 +34,6 @@
  *   original scene is sprites floating in a fogged void with no ground plane, and a
  *   grid would cut across it. The original has zero user interaction (fixed camera);
  *   DemoHelpers' orbit is purely additive
- * - `scene.fogNode` is set through a cast — `@types/three`'s `Scene` interface doesn't
- *   declare `fogNode` even though three's `NodeManager`/`NodeMaterial` read it directly
- *   off the live scene instance (webgpu-only duck-typed property, confirmed against
- *   `three/src/renderers/common/nodes/NodeManager.js`). Not a fiber/drei gap, so not an
- *   UPSTREAM.md entry — flagged here and in the port report as a candidate AGENTS.md
- *   note (same cast-with-comment convention as the documented fiber typing gaps)
  */
 import { Suspense, useMemo, useRef } from 'react';
 import { fog, rangeFogFactor, texture, userData, uv } from 'three/tsl';
@@ -123,8 +117,8 @@ function SpriteField({ amount, radius, spinSpeed }: SpriteFieldProps) {
   );
 }
 
-// Scene-level TSL fog. Cast: `@types/three`'s `Scene` doesn't declare `fogNode` — see
-// header DIVERGENCE.
+// Scene-level TSL fog. `@types/three` declares `fogNode` on `Scene` directly, so no
+// cast is needed.
 function SceneFog() {
   const fogValues = useControls('sprites fog', {
     fogColor: '#0000ff',

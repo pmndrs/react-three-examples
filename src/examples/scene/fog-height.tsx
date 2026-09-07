@@ -18,9 +18,6 @@
  *   pastel pink/peach palette
  *
  * DIVERGENCE from original
- * - `scene.fogNode` is assigned through a documented cast — `@types/three`'s `Scene`
- *   doesn't declare `fogNode` even though the WebGPU renderer's `NodeManager` reads it
- *   off the live scene (AGENTS.md fog rule / UPSTREAM.md B11; pattern: sprites.tsx)
  * - Fog color exposed via leva (original hard-codes 0xffdfc1); the Canvas `background`
  *   prop is tied to the same control so the fog bank always dissolves into the sky.
  *   Background set via the `background` prop (scene.background) rather than the
@@ -33,7 +30,7 @@
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { exponentialHeightFogFactor, fog } from 'three/tsl';
 import { NoToneMapping, Object3D } from 'three/webgpu';
-import type { InstancedMesh, Node } from 'three/webgpu';
+import type { InstancedMesh } from 'three/webgpu';
 
 import { Canvas, useThree, useUniforms } from '@react-three/fiber/webgpu';
 import { useControls } from 'leva';
@@ -41,8 +38,8 @@ import { useControls } from 'leva';
 import { DemoHelpers } from '../../utils/DemoHelpers';
 
 // Custom scene-level TSL fog. The graph is built once from live useUniforms nodes;
-// leva changes only mutate `.value`, no rebuild. Cast: `@types/three`'s `Scene`
-// doesn't declare `fogNode` — see header DIVERGENCE.
+// leva changes only mutate `.value`, no rebuild. `@types/three` declares `fogNode` on
+// `Scene` directly (0.185.1), so no cast is needed.
 function HeightFog({ fogColor }: { fogColor: string }) {
   const scene = useThree((s) => s.scene);
 
@@ -56,7 +53,7 @@ function HeightFog({ fogColor }: { fogColor: string }) {
   const { uDensity, uHeight, uColor } = useUniforms({ uDensity: density, uHeight: height, uColor: fogColor });
 
   useEffect(() => {
-    const fogged = scene as unknown as { fogNode: Node | null };
+    const fogged = scene;
     fogged.fogNode = fog(uColor, exponentialHeightFogFactor(uDensity, uHeight));
     return () => {
       fogged.fogNode = null;

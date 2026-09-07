@@ -4,18 +4,16 @@
 import { useEffect, useMemo } from 'react';
 import { color, screenUV } from 'three/tsl';
 import { SpotLight } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 
 import { useThree } from '@react-three/fiber/webgpu';
 
-// Scene-level TSL sky gradient. Cast: `@types/three`'s `Scene` doesn't declare
-// `backgroundNode` even though the webgpu renderer reads it directly off the live scene
-// instance (same duck-typed gap as `reflection.tsx`'s `SceneBackground`).
+// Scene-level TSL sky gradient. `@types/three` declares `backgroundNode` on `Scene`
+// directly (0.185.1), so no cast is needed.
 export function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = screenUV.y.mix(color(0x66bbff), color(0x4466ff));
     return () => {
       withBackgroundNode.backgroundNode = null;

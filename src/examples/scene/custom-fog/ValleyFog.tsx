@@ -6,7 +6,6 @@
 // through world space, so it reads as slow-moving cloud. (The peaks reach ~130.)
 import { useLayoutEffect } from 'react';
 import { color, densityFogFactor, fog, normalWorld, positionWorld, time, triNoise3D } from 'three/tsl';
-import type { Node } from 'three/webgpu';
 
 import { useThree, useUniforms } from '@react-three/fiber/webgpu';
 import { folder, useControls } from 'leva';
@@ -46,10 +45,9 @@ export function ValleyFog() {
     // The valley band plus a distance haze, so the far peaks dissolve into the grey too.
     const fogArea = groundFogArea.oneMinus().mul(densityFogFactor(fogHaze).oneMinus()).oneMinus();
 
-    // Cast: @types/three's Scene declares neither `fogNode` nor `backgroundNode`, but
-    // the WebGPU renderer reads both off the live instance (NodeManager.updateFog /
-    // updateBackground — AGENTS.md B11; same cast family as sprites.tsx).
-    const fogged = scene as unknown as { fogNode: Node | null; backgroundNode: Node | null };
+    // @types/three declares both `fogNode` and `backgroundNode` on `Scene` directly
+    // (0.185.1), so no cast is needed.
+    const fogged = scene;
     fogged.fogNode = fog(groundColor, fogArea);
     // The visible background IS the fog gradient — a vertical ground→sky mix.
     fogged.backgroundNode = normalWorld.y.max(0).mix(groundColor, skyColor);

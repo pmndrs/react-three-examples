@@ -36,20 +36,18 @@
 import { useEffect, useMemo, Suspense } from 'react';
 import { color, screenUV } from 'three/tsl';
 import { NeutralToneMapping, PMREMGenerator } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { DemoHelpers } from '../../../utils/DemoHelpers';
 import { Herd } from './Herd';
 
-// scene.backgroundNode cast — @types/three doesn't declare it (UPSTREAM.md B11
-// family, same pattern as compute-geometry's SceneBackground). Vertical gradient,
-// ported verbatim from the original's init().
+// Vertical gradient, ported verbatim from the original's init(). @types/three
+// declares `backgroundNode` on `Scene` directly (0.185.1), so no cast is needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useMemo(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = screenUV.y.mix(color(0x8f989c), color(0xe7eaeb));
   }, [scene]);
 

@@ -3,18 +3,16 @@
 // `reflection`'s `SceneBackground`.
 import { useEffect } from 'react';
 import { color, normalWorld } from 'three/tsl';
-import type { Node } from 'three/webgpu';
 
 import { useThree } from '@react-three/fiber/webgpu';
 
-// Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
-// webgpu renderer reads it directly off the live scene instance (duck-typed gap,
-// UPSTREAM.md B11).
+// `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no
+// cast is needed.
 export function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = normalWorld.y.mix(color(0x0487e2), color(0x0066ff));
     return () => {
       withBackgroundNode.backgroundNode = null;

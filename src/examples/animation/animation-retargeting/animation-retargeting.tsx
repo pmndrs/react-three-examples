@@ -40,21 +40,19 @@
  */
 import { Suspense, useEffect } from 'react';
 import { NeutralToneMapping } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { DemoHelpers } from '../../../utils/DemoHelpers';
 import { retargetingBackground } from './background';
 import { Floor } from './Floor';
 import { RetargetedModels } from './RetargetedModels';
 
-// Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
-// webgpu renderer reads it directly off the live scene instance (documented duck-typed
-// gap, see reflection.tsx/portal.tsx/sprites.tsx headers).
+// `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no cast
+// is needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = retargetingBackground;
     return () => {
       withBackgroundNode.backgroundNode = null;

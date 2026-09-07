@@ -8,7 +8,6 @@
 import { useMemo } from 'react';
 import { color } from 'three/tsl';
 import { PerspectiveCamera } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { useFrame, useThree } from '@react-three/fiber/webgpu';
 
 const INSET_MARGIN = 20; // px from the top-left corner, as in the original
@@ -24,9 +23,9 @@ export function InsetView() {
 
   useFrame(
     (state) => {
-      // Cast: duck-typed `backgroundNode` — the runtime reads it generically
-      // (NodeManager) but @types/three doesn't declare it on Scene (UPSTREAM.md B11).
-      const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+      // @types/three declares `backgroundNode` on Scene directly (0.185.1), so no
+      // cast is needed.
+      const withBackgroundNode = scene;
 
       // Main pass: full viewport, black clear, no background node.
       renderer.setClearColor(0x000000);

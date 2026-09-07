@@ -77,7 +77,6 @@ import {
   Vector4,
   type BufferAttribute,
   type Mesh,
-  type Node,
 } from 'three/webgpu';
 import { Canvas, useThree, useUniforms, type ThreeEvent } from '@react-three/fiber/webgpu';
 import { useGLTF } from '@react-three/drei/webgpu';
@@ -87,15 +86,14 @@ import { DemoHelpers } from '../../utils/DemoHelpers';
 const ASSETS = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples';
 const MODEL_URL = `${ASSETS}/models/gltf/LeePerrySmith/LeePerrySmith.glb`;
 
-// scene.backgroundNode cast — @types/three's Scene doesn't declare it even though the
-// webgpu renderer reads it directly off the live scene instance (B11 family, same
-// pattern as backdrop-area's SceneBackground). Purple radial-vignette gradient, ported
-// verbatim from the original's init().
+// Purple radial-vignette gradient, ported verbatim from the original's init().
+// @types/three declares `backgroundNode` on `Scene` directly (0.185.1), so no cast is
+// needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useMemo(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     const bgColor = screenUV.y.mix(color(0x9f87f7), color(0xf2cdcd));
     const bgVignette = screenUV.distance(0.5).remapClamp(0.3, 0.8).oneMinus();
     const bgIntensity = 4;

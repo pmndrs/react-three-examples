@@ -1,13 +1,13 @@
-// The actual point of the demo: `renderer.lighting = new DynamicLighting()` plus a
-// point-light COUNT modeled as React state, so leva buttons can grow or shrink it
-// live without ever recompiling the 50 materials in Shapes.tsx. See the page header
-// for the full DEMONSTRATES/DIVERGENCE notes.
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { DynamicLighting } from 'three/addons/lighting/DynamicLighting.js';
+// A point-light COUNT modeled as React state, so leva buttons can grow or shrink it
+// live without ever recompiling the 50 materials in Shapes.tsx — `renderer.lighting =
+// new DynamicLighting()` (the reason that never recompiles) is installed from the
+// Canvas's renderer factory in lights-dynamic.tsx, not here. See the page header for
+// the full DEMONSTRATES/DIVERGENCE notes.
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Color } from 'three/webgpu';
 import type { PointLight } from 'three/webgpu';
 
-import { useFrame, useThree } from '@react-three/fiber/webgpu';
+import { useFrame } from '@react-three/fiber/webgpu';
 import { button, useControls } from 'leva';
 
 interface LightConfig {
@@ -54,18 +54,10 @@ function PointLightRig({ color, angle, radius, speed, baseY }: Omit<LightConfig,
   );
 }
 
-// Owns the light COUNT as React state, the DynamicLighting backend, and the
-// leva add/remove/auto-add controls — see header DEMONSTRATES.
+// Owns the light COUNT as React state and the leva add/remove/auto-add controls —
+// see header DEMONSTRATES.
 export function DynamicLights() {
-  const renderer = useThree((s) => s.renderer);
-  const [lighting] = useState(() => new DynamicLighting());
   const [lights, setLights] = useState<LightConfig[]>(() => [makeLight(), makeLight()]);
-
-  // Must land before the first shader build reads the renderer's lighting backend —
-  // the whole point is that materials never recompile as lights come and go later.
-  useLayoutEffect(() => {
-    renderer.lighting = lighting;
-  }, [renderer, lighting]);
 
   const addLight = useCallback(() => setLights((prev) => [...prev, makeLight()]), []);
   const removeLight = useCallback(() => setLights((prev) => prev.slice(0, -1)), []);

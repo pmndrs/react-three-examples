@@ -33,7 +33,6 @@
  */
 import { Suspense, useLayoutEffect } from 'react';
 import { ACESFilmicToneMapping, EquirectangularReflectionMapping, SphereGeometry } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { normalWorldGeometry, pmremTexture } from 'three/tsl';
 import { UltraHDRLoader } from 'three/addons/loaders/UltraHDRLoader.js';
 import { Canvas, useLoader, useThree, useUniforms } from '@react-three/fiber/webgpu';
@@ -76,12 +75,11 @@ function PmremScene() {
 
   // Layout effect: `.mapping` is read at shader-graph build time (first RAF render)
   // by both the backgroundNode and every sphere's envMap — it must land before that
-  // (AGENTS.md imperative-setup rule). Cast: `@types/three`'s `Scene` doesn't declare
-  // `backgroundNode` even though the WebGPU renderer reads it off the live scene
-  // (duck-typed *Node gap, UPSTREAM B11 — same cast as `reflection`/`sprites`).
+  // (AGENTS.md imperative-setup rule). `@types/three` now declares `backgroundNode` on
+  // `Scene` directly (0.185.1), so no cast is needed.
   useLayoutEffect(() => {
     map.mapping = EquirectangularReflectionMapping;
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = pmremTexture(map, normalWorldGeometry, uBackgroundRoughness);
     return () => {
       withBackgroundNode.backgroundNode = null;

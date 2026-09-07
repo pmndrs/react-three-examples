@@ -23,7 +23,6 @@
 import { Suspense, useEffect } from 'react';
 import { color, screenUV } from 'three/tsl';
 import { LinearToneMapping } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { Canvas, useThree } from '@react-three/fiber/webgpu';
 import { PerspectiveCamera, useAnimations, useGLTF } from '@react-three/drei/webgpu';
 import { DemoHelpers } from '../../utils/DemoHelpers';
@@ -33,14 +32,13 @@ const MICHELLE_URL = 'https://cdn.jsdelivr.net/gh/mrdoob/three.js@r185/examples/
 // Vertical sky gradient, ported verbatim from the original's init().
 const skyBackground = screenUV.y.mix(color(0x66bbff), color(0x4466ff));
 
-// Cast: `@types/three`'s `Scene` doesn't declare `backgroundNode` even though the
-// WebGPU renderer reads it directly off the live scene instance (documented duck-typed
-// gap, see animation-retargeting/animation-retargeting.tsx's SceneBackground).
+// `@types/three` declares `backgroundNode` on `Scene` directly (0.185.1), so no cast
+// is needed.
 function SceneBackground() {
   const scene = useThree((s) => s.scene);
 
   useEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = skyBackground;
     return () => {
       withBackgroundNode.backgroundNode = null;

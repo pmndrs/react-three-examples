@@ -33,7 +33,7 @@ import { Suspense, useEffect, useLayoutEffect, useRef } from 'react';
 import { color, mrt, output, screenUV, vec4 } from 'three/tsl';
 import { gaussianBlur } from 'three/addons/tsl/display/GaussianBlurNode.js';
 import { NeutralToneMapping, MathUtils } from 'three/webgpu';
-import type { Group, Mesh, MeshStandardNodeMaterial, Node, NodeMaterial } from 'three/webgpu';
+import type { Group, Mesh, MeshStandardNodeMaterial, NodeMaterial } from 'three/webgpu';
 import { Canvas, useFrame, useRenderPipeline, useThree } from '@react-three/fiber/webgpu';
 import { PerspectiveCamera, useAnimations, useGLTF } from '@react-three/drei/webgpu';
 import type CameraControlsImpl from 'camera-controls';
@@ -48,14 +48,13 @@ const SPHERE_COLORS: [color: number, glow: boolean][] = [
   [0x00ffff, false],
 ];
 
-// scene.backgroundNode as a plain gradient — @types/three's Scene doesn't declare
-// this even though the WebGPU renderer reads it off the live scene (duck-typed
-// *Node gap, UPSTREAM B11).
+// scene.backgroundNode as a plain gradient. @types/three declares `backgroundNode`
+// on `Scene` directly (0.185.1), so no cast is needed.
 function GradientBackground() {
   const scene = useThree((s) => s.scene);
 
   useLayoutEffect(() => {
-    const withBackgroundNode = scene as unknown as { backgroundNode: Node | null };
+    const withBackgroundNode = scene;
     withBackgroundNode.backgroundNode = screenUV.y.mix(color(0x66bbff), color(0x4466ff)).mul(0.05);
     return () => {
       withBackgroundNode.backgroundNode = null;

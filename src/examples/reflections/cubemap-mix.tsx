@@ -23,7 +23,6 @@
  */
 import { Suspense, useLayoutEffect } from 'react';
 import { LinearMipmapLinearFilter, LinearToneMapping } from 'three/webgpu';
-import type { Node } from 'three/webgpu';
 import { mix, oscSine, pmremTexture, time } from 'three/tsl';
 import { HDRCubeTextureLoader } from 'three/addons/loaders/HDRCubeTextureLoader.js';
 import { Canvas, useLoader, useNodes, useThree, useUniforms } from '@react-three/fiber/webgpu';
@@ -67,11 +66,10 @@ function CrossfadeEnvironment() {
     };
   });
 
-  // Cast: `@types/three`'s `Scene` doesn't declare `environmentNode`/`backgroundNode`
-  // even though the WebGPU renderer reads both off the live scene (duck-typed *Node
-  // gap, UPSTREAM B11 — same cast as `pmrem-equirectangular`/`cubemap-adjustments`).
+  // `@types/three` now declares both `environmentNode` and `backgroundNode` on
+  // `Scene` directly (0.185.1) — no cast needed (UPSTREAM B11's Scene half is fixed).
   useLayoutEffect(() => {
-    const withNodes = scene as unknown as { environmentNode: Node | null; backgroundNode: Node | null };
+    const withNodes = scene;
     withNodes.environmentNode = environmentNode;
     withNodes.backgroundNode = backgroundNode;
     return () => {
