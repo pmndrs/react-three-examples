@@ -222,8 +222,11 @@ Two layers, because this is a client-rendered SPA with no per-route HTML:
 
 - **`index.html`** carries static `description`/`og:*`/`twitter:*` tags — what a
   crawler that never runs JavaScript sees, for every URL on the site (there's only one
-  real HTML document). `og:image` points at `/og.jpg`, a 1200x630 mosaic of example
-  thumbnails, generated once via a throwaway Playwright script reusing `thumbs.mjs`'s
+  real HTML document). `og:image` points at `%BASE_URL%og.jpg` — Vite's built-in HTML
+  env-replacement syntax, so it resolves to `/og.jpg` locally and under a custom domain,
+  `/react-three-examples/og.jpg` on GitHub Pages (see "Deploy" below) — a 1200x630 mosaic
+  of example thumbnails, generated once via a throwaway Playwright script reusing
+  `thumbs.mjs`'s
   launch recipe against a small HTML mosaic page rather than a single screenshot, since
   no one example represents the whole gallery. Not a committed script — regenerating
   it only matters when the thumbnail set changes substantially, and doing so is a
@@ -250,6 +253,59 @@ generically; given this repo builds its own Playwright-driven tooling already
 (`contact-sheet.mjs`, `thumbs.mjs`), a small custom script following the same recipe is
 more consistent with the rest of the toolchain than adding a prerendering framework
 dependency.
+
+## Deploy
+
+R5 (docs/ROADMAP.md). This is a static Vite SPA — GitHub Pages serves it directly, no
+server. Two things a subpath host needs that a root host doesn't: every asset/route URL
+prefixed with the base path, and a fallback so a deep link 404 still boots the SPA.
+
+- **Base path**: `vite.config.ts` sets `base: process.env.BASE_PATH ?? '/'` — unset (local
+  `pnpm dev`/`pnpm build`) keeps today's root-relative `/assets/...` output. The
+  `deploy.yml` workflow sets `BASE_PATH` to `vars.BASE_PATH` (a repository variable) or,
+  if that's unset, `/<repo-name>/` — which is exactly the URL a GitHub Pages **project**
+  site is served from (`https://pmndrs.github.io/react-three-examples/`).
+  `<BrowserRouter basename={import.meta.env.BASE_URL}>` (`App.tsx`) makes react-router
+  resolve `/examples/<slug>` under that same prefix; `Thumb.tsx`'s thumbnail `<img>` and
+  `index.html`'s `og:image`/`twitter:image` (via `%BASE_URL%og.jpg`, Vite's built-in HTML
+  env-replacement syntax — any `import.meta.env` key substitutes into HTML at build time)
+  are the two other places a root-relative URL would otherwise 404 under a subpath.
+  Nothing else in the shell hardcodes a leading `/` — internal navigation
+  (`<Link to="/examples/...">`) goes through react-router, which prepends the basename
+  itself.
+- **SPA fallback**: Pages has no server-side rewrite, so a direct hit on
+  `/examples/<slug>` 404s unless a `404.html` exists — Pages serves that file (still with
+  a 404 status, but the browser renders its body) for any unknown path, and because
+  `scripts/spa-fallback.mjs` makes it byte-identical to `index.html`, the SPA boots from
+  whatever URL the browser already has and react-router takes it from there. Wired as a
+  `postbuild` script (`package.json`), so every `pnpm build` produces `dist/404.html`,
+  not just the deploy workflow's. `public/.nojekyll` (empty, committed) stops Pages'
+  default Jekyll processing from ignoring the `_`-prefixed paths Vite can emit.
+- **Workflow** (`.github/workflows/deploy.yml`): triggers on push to `main` and
+  `workflow_dispatch`; mirrors `ci.yml`'s checkout/pnpm/node steps so the two don't drift.
+  Build job uploads `dist/` via `actions/upload-pages-artifact`; a separate `deploy` job
+  (environment `github-pages`) publishes it via `actions/deploy-pages`. `concurrency:
+group: pages` means a newer push cancels an in-flight older deploy rather than queuing.
+- **One-time manual step** (Dennis): Settings -> Pages -> Source: "GitHub Actions". The
+  workflow does everything else; nothing before that click actually publishes.
+- **Custom domain later** is a one-variable change, no workflow edit: set the repository
+  variable `BASE_PATH` to `/` (Settings -> Secrets and variables -> Actions -> Variables),
+  add `public/CNAME` containing the domain (e.g. `examples.pmnd.rs`), and point the
+  domain's DNS at GitHub Pages per
+  [GitHub's custom-domain docs](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site).
+  `scripts/spa-fallback.mjs` and the base-path plumbing above need no changes either way
+  — they're already parameterized on `BASE_PATH`.
+- **Verified locally** (not achievable in this environment: the actual Pages
+  environment/DNS/Jekyll behavior itself): `BASE_PATH=/react-three-examples/ pnpm build`
+  produces `dist/404.html` and every asset/OG URL in `dist/index.html` prefixed with
+  `/react-three-examples/`; a plain `pnpm build` (no `BASE_PATH`) is unchanged from
+  before this change (`/assets/...`, root `/og.jpg`). A throwaway static server mapping
+  `/react-three-examples/*` to `dist/*` (404.html fallback for unknown paths), driven with
+  Playwright using `contact-sheet.mjs`'s launch recipe, confirmed: the home gallery
+  renders with a loading thumbnail (`naturalWidth > 0`) under the prefix; a direct deep
+  link to `/react-three-examples/examples/lights-phong` (exercising the 404-fallback +
+  `basename` path together) reaches `window.__exampleReady === true` on a real `webgpu`
+  canvas context; and a sidebar nav click keeps the prefix in the URL.
 
 ## A note on doc drift
 

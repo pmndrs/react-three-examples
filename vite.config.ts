@@ -11,6 +11,11 @@ import tailwindcss from '@tailwindcss/vite';
 const fiberWebgpu = fileURLToPath(new URL('./node_modules/@react-three/fiber/dist/webgpu/index.mjs', import.meta.url));
 
 export default defineConfig({
+  // GitHub Pages serves this app from a repo subpath (`/react-three-examples/`); a
+  // custom domain serves it from `/`. The workflow sets BASE_PATH per-deploy (docs/SITE.md
+  // "Deploy") — unset (local dev, `pnpm build` with no env) keeps today's root-relative
+  // `/assets/...` output.
+  base: process.env.BASE_PATH ?? '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: [{ find: /^@react-three\/fiber(\/webgpu)?$/, replacement: fiberWebgpu }],

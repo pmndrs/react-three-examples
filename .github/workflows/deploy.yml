@@ -1,0 +1,55 @@
+# Publishes the gallery to GitHub Pages. Requires Settings -> Pages -> Source: "GitHub
+# Actions" (one-time, manual — docs/SITE.md "Deploy"). Mirrors ci.yml's checkout/pnpm/
+# node setup so the two workflows don't drift.
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Only one Pages deployment at a time; a newer push cancels an in-flight older one
+# rather than queuing behind it (the official actions/deploy-pages recipe).
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # BASE_PATH is a repo variable (Settings -> Actions -> Variables) so switching to a
+      # custom domain later is a one-variable change with no workflow edit (docs/SITE.md
+      # "Deploy"): unset defaults to "/<repo-name>/", matching project-site Pages URLs
+      # (https://pmndrs.github.io/react-three-examples/); set vars.BASE_PATH=/ for a
+      # custom domain instead.
+      - name: Build
+        run: pnpm build
+        env:
+          BASE_PATH: ${{ vars.BASE_PATH || format('/{0}/', github.event.repository.name) }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

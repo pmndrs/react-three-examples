@@ -21,10 +21,13 @@
     <meta
       property="og:description"
       content="WebGPU-first React Three Fiber v10 ports of the official three.js examples — the same demo, proving it reads clearer in idiomatic React than in vanilla three.js." />
-    <!-- Relative on purpose: R5 (deploy) hasn't picked the GitHub Pages base URL yet, so
-         there's no absolute origin to hardcode. Most unfurlers resolve this against the
-         page URL, but this should become an absolute URL once R5 lands (docs/SITE.md). -->
-    <meta property="og:image" content="/og.jpg" />
+    <!-- %BASE_URL% is Vite's own HTML env-replacement syntax (any import.meta.env key is
+         substituted at build time, htmlEnvHook in vite's source) — "/og.jpg" locally and
+         under a custom domain, "/react-three-examples/og.jpg" on GitHub Pages. Still
+         root-relative rather than a full origin+path (no absolute domain to hardcode), so
+         a crawler that resolves it against the page URL is fine; one that doesn't is a gap
+         noted in docs/SITE.md "OG / meta tags". -->
+    <meta property="og:image" content="%BASE_URL%og.jpg" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -32,7 +35,7 @@
     <meta
       name="twitter:description"
       content="WebGPU-first React Three Fiber v10 ports of the official three.js examples — the same demo, proving it reads clearer in idiomatic React than in vanilla three.js." />
-    <meta name="twitter:image" content="/og.jpg" />
+    <meta name="twitter:image" content="%BASE_URL%og.jpg" />
   </head>
   <body>
     <div id="root"></div>

@@ -49,6 +49,16 @@ Routes are always `/examples/<slug>` — the category never appears in the URL. 
 identifies entry files by matching their **basename** against the manifest, so nesting
 depth can change without touching routing.
 
+## Deploy
+
+Pushing to `main` publishes the gallery to GitHub Pages
+(`.github/workflows/deploy.yml`) — one-time setup: Settings -> Pages -> Source: "GitHub
+Actions". The build is base-path-aware (`BASE_PATH` env var / `vars.BASE_PATH` repo
+variable), so the same build works at a project-site URL
+(`https://pmndrs.github.io/react-three-examples/`, the default) or at a custom domain
+(`vars.BASE_PATH=/` + `public/CNAME`) with no code change. Details: [docs/SITE.md](docs/SITE.md)
+"Deploy".
+
 ## Scope
 
 - **Phase 1 — the `webgpu_*` set: COMPLETE.** 197 of 214 r185 examples ported, 10

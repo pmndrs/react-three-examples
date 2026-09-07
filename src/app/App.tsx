@@ -8,7 +8,11 @@ import { Home } from './Home';
 
 export function App() {
   return (
-    <BrowserRouter>
+    // BASE_URL is Vite's resolved `base` (docs/SITE.md "Deploy") — "/" locally and under a
+    // custom domain, "/react-three-examples/" on GitHub Pages. react-router 7's
+    // `stripBasename` treats a trailing slash and "/" itself as no-ops, so no trimming
+    // needed here (verified against node_modules/react-router/dist/.../chunk-SA4DP3SF.js).
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route element={<Layout />}>
           <Route index element={<Home />} />
