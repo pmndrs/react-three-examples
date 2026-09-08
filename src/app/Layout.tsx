@@ -1,28 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, NavLink, Outlet, useLocation, useSearchParams } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { CATEGORIES, categoryAccent, categoryLabels, exampleMeta, type ExampleMeta } from './manifest';
 import { Thumb } from './Thumb';
-
-// `?tag=` holds a comma-separated, alphabetically-sorted list of selected tags — one
-// param rather than repeated `tag=` keys, so a filtered view is a single copy-pasteable
-// URL (AGENTS.md R4 brief).
-function parseTagParam(searchParams: URLSearchParams): string[] {
-  const raw = searchParams.get('tag');
-  return raw ? raw.split(',').filter(Boolean) : [];
-}
+import { useExampleFilter } from './useExampleFilter';
 
 // Sidebar: grouped-by-category nav + a plain substring search over title/slug/
 // tags/category (now 268 items — no search library needed, see AGENTS.md), composable
 // with a tag multi-select synced to `?tag=`. Groups neither touches collapse out
-// entirely rather than staying open empty.
+// entirely rather than staying open empty. Filter state (search text + tags) lives in
+// `useExampleFilter`, shared with the home gallery so a search or tag pick made here
+// narrows both (REVIEW-QUEUE #12).
 export function Layout() {
-  const [query, setQuery] = useState('');
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { query, setQuery, selectedTags, toggleTag, setTags, filtered, isFiltering } = useExampleFilter();
   const [tagsExpanded, setTagsExpanded] = useState(false);
   const location = useLocation();
   const activeSlug = location.pathname.startsWith('/examples/') ? location.pathname.slice('/examples/'.length) : null;
-
-  const selectedTags = useMemo(() => parseTagParam(searchParams), [searchParams]);
 
   const allTags = useMemo(() => {
     const set = new Set<string>();
@@ -30,34 +22,9 @@ export function Layout() {
     return [...set].sort();
   }, []);
 
-  function setTags(next: string[]) {
-    const params = new URLSearchParams(searchParams);
-    if (next.length > 0) params.set('tag', [...next].sort().join(','));
-    else params.delete('tag');
-    setSearchParams(params, { replace: true });
-  }
-
-  function toggleTag(tag: string) {
-    setTags(selectedTags.includes(tag) ? selectedTags.filter((t) => t !== tag) : [...selectedTags, tag]);
-  }
-
   const groups = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const matches = (example: ExampleMeta) => {
-      const searchOk =
-        q.length === 0 ||
-        example.title.toLowerCase().includes(q) ||
-        example.slug.includes(q) ||
-        example.category.includes(q) ||
-        example.tags.some((tag) => tag.includes(q));
-      // AND semantics: every selected tag must be present — narrows further with each pick.
-      const tagsOk = selectedTags.every((tag) => example.tags.includes(tag));
-      return searchOk && tagsOk;
-    };
-
     const byCategory = new Map<string, ExampleMeta[]>();
-    for (const example of exampleMeta) {
-      if (!matches(example)) continue;
+    for (const example of filtered) {
       const list = byCategory.get(example.category) ?? [];
       list.push(example);
       byCategory.set(example.category, list);
@@ -67,15 +34,14 @@ export function Layout() {
     return CATEGORIES.map((category) => ({ category, examples: byCategory.get(category) ?? [] })).filter(
       (group) => group.examples.length > 0,
     );
-  }, [query, selectedTags]);
+  }, [filtered]);
 
   const activeItemRef = useRef<HTMLAnchorElement>(null);
   useEffect(() => {
     activeItemRef.current?.scrollIntoView({ block: 'nearest' });
   }, [activeSlug]); // only on navigation — a search keystroke shouldn't yank the scroll position
 
-  const resultCount = groups.reduce((sum, g) => sum + g.examples.length, 0);
-  const isFiltering = query.trim().length > 0 || selectedTags.length > 0;
+  const resultCount = filtered.length;
 
   return (
     <div className="flex h-screen bg-neutral-950 text-neutral-100">

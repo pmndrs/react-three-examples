@@ -3,6 +3,7 @@ import { CATEGORIES, categoryAccent, categoryLabels, exampleMeta, type ExampleMe
 import { repoUrl } from './agentLinks';
 import { Thumb } from './Thumb';
 import { useDocumentMeta } from './useDocumentMeta';
+import { useExampleFilter } from './useExampleFilter';
 
 // Landing page at "/" (SPEC §9: "Gallery + sidebar"). Replaces the old redirect-to-
 // first-example — this is a reader's first stop, so it leads with what the repo IS
@@ -10,11 +11,17 @@ import { useDocumentMeta } from './useDocumentMeta';
 // proving the same demo reads clearer in React. Cards show a generated thumbnail (`pnpm
 // thumbs` — docs/SITE.md "Thumbnails") and fall back to a category-accent tile for any
 // example that doesn't have one yet.
+//
+// The gallery reads the SAME search + `?tag=` filter state as the sidebar
+// (`useExampleFilter`) — typing in the sidebar box or picking a tag chip narrows this
+// grid too, rather than only the sidebar list (REVIEW-QUEUE #12).
 export function Home() {
   useDocumentMeta(); // no arg -> site defaults, resets the previous example's <title>/description
 
+  const { query, selectedTags, filtered, isFiltering } = useExampleFilter();
+
   const byCategory = new Map<string, ExampleMeta[]>();
-  for (const example of exampleMeta) {
+  for (const example of filtered) {
     const list = byCategory.get(example.category) ?? [];
     list.push(example);
     byCategory.set(example.category, list);
@@ -45,9 +52,25 @@ export function Home() {
             Each example links back to its three.js original — this is a companion, not a fork.
           </span>
         </div>
+        {isFiltering && (
+          <p className="mt-4 text-xs text-neutral-500">
+            {filtered.length} result{filtered.length === 1 ? '' : 's'}
+            {query.trim().length > 0 ? ` for "${query.trim()}"` : ''}
+            {selectedTags.length > 0 ? ` tagged ${selectedTags.join(', ')}` : ''}
+          </p>
+        )}
       </header>
 
       <main className="space-y-10 px-8 py-10">
+        {filtered.length === 0 && (
+          <p className="text-sm text-neutral-500">
+            No examples match{query.trim().length > 0 ? ` "${query.trim()}"` : ''}
+            {selectedTags.length > 0
+              ? ` with tag${selectedTags.length === 1 ? '' : 's'} ${selectedTags.join(', ')}`
+              : ''}
+            .
+          </p>
+        )}
         {CATEGORIES.map((category) => {
           const examples = byCategory.get(category);
           if (!examples || examples.length === 0) return null;
