@@ -3,7 +3,7 @@
 # SwiftShader Vulkan, BUT headless Chrome never presents the WebGPU canvas on
 # Linux — tests must run HEADED under Xvfb (playwright.config.ts handles the
 # headless:false + SwiftShader flags when platform is linux).
-# Sharding: add a matrix over --shard=N/M when the corpus outgrows one runner.
+# Sharding: the smoke job runs as a 4-way --shard matrix (see the strategy block).
 name: ci
 
 on:
@@ -22,9 +22,9 @@ jobs:
   checks:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -34,6 +34,13 @@ jobs:
 
   smoke:
     runs-on: ubuntu-latest
+    strategy:
+      # Four shards: the unsharded suite took 1.5h and lost the SwiftShader device on
+      # 11 heavy examples as GPU memory accumulated in one long-lived browser process.
+      # Sharding cuts wall clock to ~25min AND gives each quarter a fresh process.
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     # NOT on push (porting-phase policy, 2026-07-28): ~30 min per run at corpus
     # scale is too slow to gate a push-per-pair cadence, and every port is already
     # verified on Metal locally (smoke + animates + contact sheet) before it lands.
@@ -44,9 +51,9 @@ jobs:
     # matrix (run 30261064018). Exceptions: per-example `ciSkip` in examples.json.
     if: github.event_name != 'push'
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
           cache: pnpm
@@ -55,12 +62,12 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y mesa-vulkan-drivers xvfb
       - run: npx playwright install chromium --with-deps
       - name: Smoke suite (headed Chromium under Xvfb)
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" pnpm test:smoke
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" pnpm test:smoke -- --shard=${{ matrix.shard }}/4
         env:
           CI: 'true'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
-          name: playwright-failures
+          name: playwright-failures-shard-${{ matrix.shard }}
           path: test-results/
           retention-days: 7
