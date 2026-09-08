@@ -1,5 +1,9 @@
 # Upstream issue drafts (2026-09-07 audit)
 
+> **Do not file these without asking Dennis.** He handed the findings to the maintainers
+> directly on 2026-09-08. These stay as the written-up evidence behind each brief — repro,
+> root cause, suggested fix, our workaround — not as a filing queue.
+
 Paste-ready GitHub issue text, one file per Part B brief in
 [docs/UPSTREAM.md](../UPSTREAM.md) that came out of the 2026-09-07 full re-verification
 with no matching open upstream issue found. Each draft is self-contained (repro, root

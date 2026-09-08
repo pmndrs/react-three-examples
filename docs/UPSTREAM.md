@@ -69,6 +69,18 @@ commit** (AGENTS.md points agents at this file).
 
 ## Part B — Upstream fix briefs
 
+### Filing plan — SUPERSEDED 2026-09-08: handed off directly
+
+**Dennis took the findings to the maintainers directly on 2026-09-08 rather than filing
+issues from these drafts.** Nobody should now open issues from `docs/upstream-issues/`
+without checking with him first — a second copy of a report he has already delivered in
+person is noise, not signal. The drafts stay in the repo because they are still the best
+written-up evidence for each bug (repro, root-cause line, suggested fix, our workaround),
+and because they are what a maintainer will ask for if they want detail. The per-brief
+`Status 2026-09-07` lines below stay authoritative for what is open, fixed, or stale.
+
+The original filing plan, kept for the counts and the cross-link notes:
+
 ### Filing plan (2026-09-07)
 
 Every brief below was re-verified against the versions listed at the top of this file

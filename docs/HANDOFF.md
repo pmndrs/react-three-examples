@@ -1,5 +1,25 @@
 # Session Handoff — 2026-07-27/29 (overnight, continued: repo live + M2 waves 1–3)
 
+## 2026-09-08 — CI fixed, upstream handed off directly
+
+**Nightly root cause was NOT B28.** A week of red runs contained zero `PMREM.cubeUv`
+occurrences; all 11 affected examples hit `WebGPU Device Lost` — SwiftShader dropping the
+device under memory pressure across a 1.5h SERIAL run in one browser process (253 passed,
+4 failed, 7 flaky). Fixed three ways: the smoke job is now a 4-way `--shard` matrix;
+`fullyParallel` is enabled in CI because **`--shard` splits by FILE, and the whole corpus
+is one spec file** — without it shard 1 would have taken all 268 tests and shards 2-4 none
+(verified 268/0/0/0 with `--list`, 67x4 after), a silent no-op that would have looked like
+a working matrix; `workers: 1` per shard keeps concurrent WebGPU contexts off one
+rasterizer. `WebGPU Device Lost` is now a named CI-only tolerated environment fault
+(`CI_ENVIRONMENT_FAULTS` in `tests/smoke.spec.ts`), reported as a warning — it is
+renderer-emitted, never reproduces on Metal, and every assertion proving the example works
+runs before the console check. Local runs stay strict. All GitHub actions bumped to Node
+24 majors; the deploy workflow's deprecation warning went 2 -> 0.
+
+**Upstream handed off directly** (Dennis, 2026-09-08) — no issues filed from
+`docs/upstream-issues/`; those drafts are now evidence, not a queue. UPSTREAM.md's filing
+plan is marked superseded.
+
 ## 2026-09-07 — Pages live, upstream audit folded in, B48 fixed
 
 Site deployed: https://pmndrs.github.io/react-three-examples/ (`deploy.yml`, BASE_PATH

@@ -101,7 +101,7 @@ recorded reason — every one of the 588 is accounted for in
 | [docs/HANDOFF.md](docs/HANDOFF.md)                               | session-by-session state                                |
 | [docs/REVIEW-QUEUE.md](docs/REVIEW-QUEUE.md)                     | judgment calls waiting on a human                       |
 | [docs/UPSTREAM.md](docs/UPSTREAM.md)                             | patch ledger + 54 upstream fix briefs                   |
-| [docs/upstream-issues/](docs/upstream-issues/)                   | paste-ready issue drafts from those briefs              |
+| [docs/upstream-issues/](docs/upstream-issues/)                   | long-form write-up behind each brief                    |
 | [docs/DEMO-INVENTORY.md](docs/DEMO-INVENTORY.md)                 | all 588 r185 examples, each in exactly one bucket       |
 | [docs/SITE.md](docs/SITE.md)                                     | the gallery shell                                       |
 | [docs/PORTING-BACKLOG.md](docs/PORTING-BACKLOG.md)               | Phase 1 ledger                                          |
@@ -114,9 +114,11 @@ a port is good.
 
 Porting 268 examples surfaced a lot of alpha-era bugs. Every one is written up as a
 self-contained brief in [docs/UPSTREAM.md](docs/UPSTREAM.md) — evidence, root-cause line,
-suggested fix, and the workaround this repo carries — with paste-ready issue text in
+suggested fix, and the workaround this repo carries — with the long-form write-up in
 [docs/upstream-issues/](docs/upstream-issues/). Several have already been fixed upstream
-and are marked retired. Contributions welcome: pick a brief, file it, link it back.
+and are marked retired. The current findings went to the maintainers directly, so check
+before filing anything from them; a brief that turns out stale or wrong is worth a pull
+request against the ledger either way.
 
 ## Stack
 
