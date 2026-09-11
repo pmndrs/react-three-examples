@@ -89,7 +89,7 @@ function CloudVolume() {
     const tex = new Storage3DTexture(GRID_SIZE, GRID_SIZE, GRID_SIZE);
     tex.generateMipmaps = false;
     tex.name = 'cloud';
-    return tex as unknown as StorageTexture;
+    return tex as StorageTexture;
   });
 
   // ROOT-LEVEL useNodes on purpose (UPSTREAM.md B16): a scoped call would name entries

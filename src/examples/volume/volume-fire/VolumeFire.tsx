@@ -66,7 +66,7 @@ function createStorage3D(wrap: Wrapping = ClampToEdgeWrapping): StorageTexture {
   texture.wrapS = wrap;
   texture.wrapT = wrap;
   texture.wrapR = wrap;
-  return texture as unknown as StorageTexture;
+  return texture as StorageTexture;
 }
 
 export function VolumeFire({ cameraControlsRef }: { cameraControlsRef: RefObject<CameraControlsImpl | null> }) {

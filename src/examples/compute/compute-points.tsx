@@ -174,7 +174,7 @@ function PointsField() {
     const points = pointsRef.current;
     if (!points) return;
     points.geometry.drawRange.count = 1;
-    (points as unknown as { count: number }).count = PARTICLE_COUNT;
+    (points as { count: number }).count = PARTICLE_COUNT;
   }, []);
 
   return (

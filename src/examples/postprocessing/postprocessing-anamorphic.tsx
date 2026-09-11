@@ -177,7 +177,7 @@ function PostFX() {
 
     // `highPassFn`'s declared type is `(params) => void`; the runtime (and the
     // addon's own default) returns a Node — documented @types gap, cast once.
-    bloomPass.highPassFn = anamorphicHighPass as unknown as typeof bloomPass.highPassFn;
+    bloomPass.highPassFn = anamorphicHighPass as typeof bloomPass.highPassFn;
 
     renderPipeline.outputNode = scenePassColor.add(bloomPass.mul(uniforms.tintColor));
   });

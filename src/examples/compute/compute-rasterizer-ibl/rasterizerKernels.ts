@@ -55,7 +55,7 @@ function namedLoop<K extends string, T extends 'int' | 'uint'>(
   params: { name: K; type: T; start: Node<T> | number; end: Node<T> | number; condition: string },
   body: (inputs: Record<K, Node<T>>) => void,
 ) {
-  (Loop as unknown as (loopParams: typeof params, loopBody: typeof body) => void)(params, body);
+  (Loop as (loopParams: typeof params, loopBody: typeof body) => void)(params, body);
 }
 
 /** Signed screen-space area of a triangle — also the barycentric weight generator. */

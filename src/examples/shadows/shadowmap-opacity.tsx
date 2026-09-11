@@ -110,7 +110,7 @@ function DragonScene() {
     // Duck-typed cast (AGENTS.md B11 family): GLTFLoader hands back a classic
     // MeshPhysicalMaterial, but attenuationColor/castShadowNode both read fine at
     // runtime regardless of the material's declared TS type.
-    const dragonMaterial = dragon.material as unknown as MeshPhysicalNodeMaterial;
+    const dragonMaterial = dragon.material as MeshPhysicalNodeMaterial;
 
     const dragon2 = dragon.clone();
     dragon2.material = dragonMaterial.clone();

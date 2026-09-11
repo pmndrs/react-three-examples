@@ -82,10 +82,10 @@ export function Tornado() {
     const toRadialUv = Fn(([uvIn, multiplierIn, rotationIn, offsetIn]) => {
       // Fn's destructured params come back as bare `ShaderNodeObject<Node>` — too
       // loose for the swizzles/typed math below (three-side gap, UPSTREAM.md B10).
-      const uvInput = uvIn as unknown as Node<'vec2'>;
-      const multiplier = multiplierIn as unknown as Node<'vec2'>;
-      const rotation = rotationIn as unknown as Node<'float'>;
-      const offset = offsetIn as unknown as Node<'float'>;
+      const uvInput = uvIn as Node<'vec2'>;
+      const multiplier = multiplierIn as Node<'vec2'>;
+      const rotation = rotationIn as Node<'float'>;
+      const offset = offsetIn as Node<'float'>;
 
       const centeredUv = vec2(uvInput).sub(0.5).toVar();
       const distanceToCenter = centeredUv.length();
@@ -101,8 +101,8 @@ export function Tornado() {
     // Shear the UV space — turns straight scrolling noise into diagonal streaks
     // (the "wind-dragged" look on the cylinders).
     const toSkewedUv = Fn(([uvIn, skewIn]) => {
-      const uvInput = uvIn as unknown as Node<'vec2'>; // B10 cast, as above
-      const skew = skewIn as unknown as Node<'vec2'>;
+      const uvInput = uvIn as Node<'vec2'>; // B10 cast, as above
+      const skew = skewIn as Node<'vec2'>;
 
       return vec2(uvInput.x.add(uvInput.y.mul(skew.x)), uvInput.y.add(uvInput.x.mul(skew.y)));
     });
@@ -110,11 +110,11 @@ export function Tornado() {
     // The funnel: re-radius every cylinder vertex along a parabola of its height,
     // plus a sine turbulence wobble that climbs over time.
     const twistedCylinder = Fn(([positionIn, strengthIn, offsetIn, amplitudeIn, timeIn]) => {
-      const position = positionIn as unknown as Node<'vec3'>; // B10 casts, as above
-      const strength = strengthIn as unknown as Node<'float'>;
-      const offset = offsetIn as unknown as Node<'float'>;
-      const amplitude = amplitudeIn as unknown as Node<'float'>;
-      const t = timeIn as unknown as Node<'float'>;
+      const position = positionIn as Node<'vec3'>; // B10 casts, as above
+      const strength = strengthIn as Node<'float'>;
+      const offset = offsetIn as Node<'float'>;
+      const amplitude = amplitudeIn as Node<'float'>;
+      const t = timeIn as Node<'float'>;
 
       const angle = atan(position.z, position.x).toVar();
       const elevation = position.y;
