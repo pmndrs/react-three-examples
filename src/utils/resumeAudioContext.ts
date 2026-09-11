@@ -12,5 +12,5 @@
 import { AudioContext as ThreeAudioContext } from 'three/webgpu';
 
 export function resumeAudioContext() {
-  return (ThreeAudioContext.getContext() as unknown as globalThis.AudioContext).resume();
+  return (ThreeAudioContext.getContext() as globalThis.AudioContext).resume();
 }

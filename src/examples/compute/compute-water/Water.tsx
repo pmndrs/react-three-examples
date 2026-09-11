@@ -272,7 +272,7 @@ export function Water({ controlsRef }: WaterProps) {
       const duckElement = waterDuckData.element(instanceIndex);
       // Casts: struct member access (`.get`) types as bare `Node` — the fluent
       // vec surface doesn't resolve through it (typed-TSL gap, B10 cast family).
-      const instancePosition = (duckElement.get('position') as unknown as Node<'vec3'>).toVar();
+      const instancePosition = (duckElement.get('position') as Node<'vec3'>).toVar();
       const velocity = (duckElement.get('velocity') as unknown as Node<'vec2'>).toVar();
 
       // Simulation-grid texel under the duck.
@@ -316,14 +316,14 @@ export function Water({ controlsRef }: WaterProps) {
         velocity.y.mulAssign(bounceDamping);
       });
 
-      (duckElement.get('position') as unknown as Node<'vec3'>).assign(instancePosition);
+      (duckElement.get('position') as Node<'vec3'>).assign(instancePosition);
       (duckElement.get('velocity') as unknown as Node<'vec2'>).assign(velocity);
     })().compute(NUM_DUCKS);
 
     // Instance placement for the duck mesh — offset the source geometry by the
     // struct buffer's live position (same B10-family cast as above).
     const duckPositionNode = Fn(() => {
-      const instancePosition = waterDuckData.element(instanceIndex).get('position') as unknown as Node<'vec3'>;
+      const instancePosition = waterDuckData.element(instanceIndex).get('position') as Node<'vec3'>;
       return positionLocal.add(instancePosition);
     })();
 

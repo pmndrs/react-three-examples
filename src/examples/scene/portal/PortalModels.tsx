@@ -55,7 +55,7 @@ export function PortalGhost() {
       // the original's plain `material.colorNode = ...` on a classic material works at
       // all. `@types/three` only declares `colorNode` on the Node-suffixed classes
       // (same duck-typed-property pattern as `scene.fogNode`/`backgroundNode`).
-      (material as unknown as { colorNode: Node | null }).colorNode = colorNode;
+      (material as { colorNode: Node | null }).colorNode = colorNode;
       material.wireframe = true;
       mesh.material = material;
     });

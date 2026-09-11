@@ -8,7 +8,7 @@ import type { Node } from 'three/webgpu';
 // default-value typing — AGENTS.md B10. `coord` is always called with a vec2
 // (`positionWorld.xz`); regain that so `.x`/`.y` swizzles typecheck below.
 const grid = Fn(([coordIn, lineWidth = float(0.01), dotSize = float(0.03)]) => {
-  const coord = coordIn as unknown as Node<'vec2'>;
+  const coord = coordIn as Node<'vec2'>;
   const g = fract(coord);
   const fw = fwidth(coord);
   const gx = abs(g.x.sub(0.5));

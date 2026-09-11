@@ -162,7 +162,7 @@ export function FluidParticles() {
     // Fixed-point codec for the atomic grid. Cast: struct member access types as a bare
     // `Node`, which has no fluent surface (typed-TSL gap, AGENTS.md B10/B11 cast family).
     const encodeFixedPoint = (value: Node<'float'>) => int(value.mul(FIXED_POINT_MULTIPLIER));
-    const readCell = (field: Node) => float(atomicLoad(field as unknown as Node<'int'>)).div(FIXED_POINT_MULTIPLIER);
+    const readCell = (field: Node) => float(atomicLoad(field as Node<'int'>)).div(FIXED_POINT_MULTIPLIER);
 
     // Cast: @types/three's Loop overloads stop at two ranges and both are handed to
     // the callback as `{ i, j }`. The runtime takes any number of ranges and names
@@ -222,9 +222,9 @@ export function FluidParticles() {
       const element = particleBuffer.element(instanceIndex);
       // Casts: struct member access types as a bare `Node`, which has no fluent vec
       // surface (typed-TSL gap, AGENTS.md B10/B11 cast family).
-      const particlePosition = (element.get('position') as unknown as Node<'vec3'>).toConst();
+      const particlePosition = (element.get('position') as Node<'vec3'>).toConst();
       const particleVelocity = (element.get('velocity') as unknown as Node<'vec3'>).toConst();
-      const affineMomentum = (element.get('C') as unknown as Node<'mat3'>).toConst();
+      const affineMomentum = (element.get('C') as Node<'mat3'>).toConst();
 
       const gridPosition = particlePosition.mul(GRID_SIZE).toVar();
       const cellIndex = ivec3(gridPosition).sub(1).toConst();
@@ -267,7 +267,7 @@ export function FluidParticles() {
       const volume = float(1).div(density);
       const pressure = max(0, pow(density.div(REST_DENSITY), 5).sub(1).mul(STIFFNESS)).toConst();
       const stress = mat3(pressure.negate(), 0, 0, 0, pressure.negate(), 0, 0, 0, pressure.negate()).toVar();
-      const dudv = (element.get('C') as unknown as Node<'mat3'>).toConst();
+      const dudv = (element.get('C') as Node<'mat3'>).toConst();
       const strain = dudv.add(dudv.transpose());
       stress.addAssign(strain.mul(DYNAMIC_VISCOSITY));
       const eq16Term0 = volume.mul(-4).mul(stress).mul(uDelta);
@@ -355,7 +355,7 @@ export function FluidParticles() {
         particleVelocity.addAssign(weightedVelocity);
       });
 
-      (element.get('C') as unknown as Node<'mat3'>).assign(B.mul(4));
+      (element.get('C') as Node<'mat3'>).assign(B.mul(4));
 
       particleVelocity.addAssign(vec3(0, GRAVITY, 0).mul(uDelta));
       // Grid units -> unit cube, so the rest of this runs in the particle's own space.
@@ -379,7 +379,7 @@ export function FluidParticles() {
       particleVelocity.mulAssign(GRID_SIZE);
 
       (element.get('position') as unknown as Node<'vec3'>).assign(particlePosition);
-      (element.get('velocity') as unknown as Node<'vec3'>).assign(particleVelocity);
+      (element.get('velocity') as Node<'vec3'>).assign(particleVelocity);
     })().compute(DEFAULT_PARTICLE_COUNT, [WORKGROUP_SIZE, 1, 1]);
 
     return {
